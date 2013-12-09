@@ -1,0 +1,17 @@
+PluginDev/Assets/Plugins/Android/google-play-services_lib/
+PluginDev/Library/
+
+GPGSUtils/bin/
+PluginDev/.DS_Store
+PluginDev/Assets/.DS_Store
+PluginDev/Assets/Plugins/.DS_Store
+PluginDev/Assets/Plugins/Android/.DS_Store
+PluginDev/Temp/
+SupportLib/.idea/
+SupportLib/BaseGameUtils/BaseGameUtils.iml
+SupportLib/PlayGamesPluginSupport/PlayGamesPluginSupport.iml
+SupportLib/SupportLib.iml
+
+PluginDev/Assets/Plugins/iOS/GPGSParams.h
+PluginDev/Assets/Plugins/iOS/GPGSParams.h.meta
+
