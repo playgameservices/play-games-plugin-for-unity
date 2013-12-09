@@ -83,7 +83,7 @@ public class GPGSStrings {
 
     public class ExternalLinks {
         public const string GettingStartedGuideURL =
-            "https://github.com/playgameservices/play-games-unity-plugin";
+            "https://github.com/playgameservices/play-games-plugin-for-unity";
         public const string PlayGamesServicesApiURL =
             "https://developers.google.com/games/services";
 
@@ -119,7 +119,7 @@ public class GPGSStrings {
     public const string AboutText = "Copyright (C) 2013 Google Inc.\n\nThis is an open-source " +
             "plugin that allows cross-platform integration with Google Play games services. " + 
             "For more information, visit the official site on Github:\n\n" +
-            "https://github.com/playgameservices/play-games-unity-plugin\n\nPlugin version: ";
+            "https://github.com/playgameservices/play-games-plugin-for-unity\n\nPlugin version: ";
             
     public const string LicenseTitle = "Google Play Games Plugin for Unity";
     public const string LicenseText = "Copyright (C) 2013 Google Inc.\n\n" +
