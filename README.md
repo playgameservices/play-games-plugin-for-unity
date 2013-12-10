@@ -31,6 +31,17 @@ Features:
 * (Android) no need to override/customize AndroidManifest.xml
 * (iOS) integrates into XCode build
 
+System requirements:
+
+* Unity&reg; 4.2 or above
+* To deploy on Android:
+    * Android SDK
+    * Google Play Services library
+* To deploy on iOS:
+    * XCode 4 or above
+    * Google Plus SDK for iOS
+    * Google Play Games SDK for iOS
+
 Note: This first release does not yet include support for multiplayer, listing friends, 
 interactive posts, raw data access, etc.
 
