@@ -174,6 +174,9 @@ your client ID on the Developer Console previously.
 
 When ready, click the **Setup** button to finish the configuration process.
 
+**Important:** If you ever change your bundle ID, you must perform the iOS setup
+again in order to update the necessary files where this information gets replicated.
+
 ## Run the Project
 
 If you are working with the **Minimal** sample, you should be able to build
@@ -494,9 +497,11 @@ configuring your XCode project.
 
 The additional steps are:
 
-1. Add these frameworks to the **Build Phases | Link Binary with Libraries** 
-item (this is found by clicking the top level project, Unity-iPhone, and 
-   then the Unity-iPhone target from the list of targets):<br/><br/>
+1. Add these frameworks. To do this, click the top-level project (the item on the
+list labeled **Unity-iPhone, 1 target, iOS SDK**), then click the **Build Phases**
+tab and expand the **Link Binary with Libraries** item. Then, add the following
+frameworks to that list:
+<br/><br/>
 **AssetsLibrary.framework**<br/>
 **CoreData**<br/>
 **CoreLocation**<br/>
@@ -508,19 +513,21 @@ item (this is found by clicking the top level project, Unity-iPhone, and
 **SystemConfiguration**<br/><br/>
 2. Add the following bundles and frameworks from the Google Plus and Google Play 
    Games SDK that you have previously downloaded. If you have not downloaded 
-   these files yet, they can be found [in the downloads section](https://developers.google.com/games/services/downloads) of the Google Play Games developer site.<br/><br/>
+   these files yet, they can be found [in the downloads section](https://developers.google.com/games/services/downloads) of the Google Play Games developer site. To add these frameworks you can simply drag
+and drop those 5 files on the top-level project item (labeled **Unity-iPhone**).<br/><br/>
    	**GoogleOpenSource.framework**<br/>
    	**GooglePlus.bundle**<br/>
    	**GooglePlus.framework**<br/>
    	**PlayGameServices.bundle**<br/>
    	**PlayGameServices.framework**<br/><br/>
 3. Add the **"-ObjC"** linker flag. To do this, select the top-level project 
-   object, select the **"Unity-iPhone"** target, then go to the **Build Settings**
-   tab. Search for **"Other Linker Flags"** and add **"-ObjC"** to that list.
+   object, then go to the **Build Settings**
+   tab. Search for **"Other Linker Flags"** using the search tool, double click
+   the **Other Linker Flags** item and add **"-ObjC"** to that list (attention to case!).
 
 **Note:** If you export the project a second time to the same XCode project 
 directory, you can use Unity's **Append** option to avoid overwriting these 
-settings.
+settings. If you use **Replace**, however, you might have to reapply some settings.
 
 ## Building for iOS to run on the simulator
 
