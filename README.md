@@ -144,6 +144,22 @@ After filling in the application ID, click the **Setup** button.
 **Important:** The application ID and package name settings must match exactly
 the values you used when setting up your project on the Developer Console.
 
+### Additional instructions on building for Android on Windows
+
+If you are using Windows, you must make sure that your Java SDK installation can be accessed by Unity. To do this:
+
+1. Set the JAVA_HOME environment variable to your Java SDK installation path (for example, `C:\Program Files\Java\jdk1.7.0_45`).
+2. Add the Java SDK's `bin` folder to your `PATH` environment variable (for example, `C:\Program Files\Java\jdk1.7.0_45\bin`)
+3. Reboot.
+
+**How to edit environment variables:** In Windows 2000/XP/Vista/7, 
+right-click **My Computer**, then **Properties**, then go to **Advanced System Properties**
+(or **System Properties** and then click the **Advanced** tab), then
+click **Environment Variables**. On Windows 8, press **Windows Key + W** and
+search for **environment variables**.
+For more information, consult the documentation for your version of Windows. 
+
+
 ## iOS Setup
 
 To configure your Unity game to run with Google Play Games on iOS, download the 
