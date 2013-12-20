@@ -622,3 +622,14 @@ you export the project. To simplify your workflow, consider copying the files to
 a different location before re-exporting, and copy them back after the process 
 is complete.
 
+## Note from Maintainer
+
+The plugin was developed and is currently maintained by [Bruno Oliveira](https://plus.google.com/+BrunoOliveira). Feel free to add me on Google+ and nag me to fix bugs or take a look at your questions on Stack Overflow!
+
+## Special Thanks
+
+This section lists people who have contributed to this project by writing code, improving documentation or fixing bugs.
+
+* [Dgizusse](https://github.com/Dgizusse) for figuring out that setting JAVA_HOME is necessary on Windows.
+
+
