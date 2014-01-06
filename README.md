@@ -225,7 +225,8 @@ available.
 
 ## Initialization
 
-To initialize the plugin, call **PlayGamesPlatform.Activate**:
+To initialize the plugin and make it your default social platform,
+call **PlayGamesPlatform.Activate**:
 
 ```csharp
     using GooglePlayGames;
@@ -236,7 +237,7 @@ To initialize the plugin, call **PlayGamesPlatform.Activate**:
     PlayGamesPlatform.DebugLogEnabled = true;
     
     // Activate the Google Play Games platform
-    PlayGamesPlatform.Activate();</td>
+    PlayGamesPlatform.Activate();
 ```
 
 After activated, you can access the Play Games platform through 
@@ -621,6 +622,24 @@ you use the **Append** option. Therefore, you must perform these changes every t
 you export the project. To simplify your workflow, consider copying the files to 
 a different location before re-exporting, and copy them back after the process 
 is complete.
+
+## (Advanced) Using the Plugin Without Overriding the Default Social Platform
+
+When you call `PlayGamesPlatform.Activate`, Google Play Games becomes your default social platform implementation, which means that static calls to methods in `Social` and `Social.Active` will be carried out by the Google Play Games plugin. This is the desired behavior for most games using the plugin.
+
+However, if for some reason you wish to keep the default implementation accessible (for example, to use it to submit achievements and leaderboards to a different social platform), you can use the Google Play Games plugin without overriding the default one. To do this:
+
+1. Do not call `PlayGamesPlatform.Activate`
+2. If `Xyz` is the name of a method you wish to call on the `Social` class, do not call `Social.Xyz`. Instead, call `PlayGamesPlatform.Instance.Xyz`
+3. Do not use `Social.Active` when interacting with Google Play Games. Instead, use `PlayGamesPlatform.Instance`.
+
+That way, you can even submit scores and achievements simultaneously to two or more social platforms:
+
+    // Submit achievement to original default social platform
+    Social.ReportProgress("MyAchievementIdHere", 100.0f, callback);
+    
+    // Submit achievement to Google Play
+    PlayGamesPlatform.Instance.ReportProgress("MyGooglePlayAchievementIdHere", 100.0f, callback);
 
 ## Note from Maintainer
 
