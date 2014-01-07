@@ -519,6 +519,7 @@ list labeled **Unity-iPhone, 1 target, iOS SDK**), then click the **Build Phases
 tab and expand the **Link Binary with Libraries** item. Then, add the following
 frameworks to that list:
 <br/><br/>
+**AddressBook.framework**<br/>
 **AssetsLibrary.framework**<br/>
 **CoreData**<br/>
 **CoreLocation**<br/>

@@ -137,6 +137,7 @@ TO FINISH CONFIGURING THE EXPORTED XCODE PROJECT
 
 1. Add these frameworks:
 
+      AddressBook
       AssetsLibrary
       CoreData
       CoreLocation
