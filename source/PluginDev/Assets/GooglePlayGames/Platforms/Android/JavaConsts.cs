@@ -32,6 +32,7 @@ namespace GooglePlayGames.Android {
         public const int STATUS_OK = 0;
         public const int STATUS_STALE_DATA = 3;
         public const int STATUS_NO_DATA = 4;
+        public const int STATUS_OPERATION_DEFERRED = 5;
         public const int STATUS_KEY_NOT_FOUND = 2002;
     }
 }
