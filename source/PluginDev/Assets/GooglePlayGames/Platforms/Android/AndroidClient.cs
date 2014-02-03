@@ -128,7 +128,9 @@ namespace GooglePlayGames.Android {
             if (mAuthState == AuthState.LoadingAchs) {
                 Logger.d("AUTH: Initial achievement load finished.");
 
-                if (statusCode == JavaConsts.STATUS_OK || statusCode == JavaConsts.STATUS_STALE_DATA) {
+                if (statusCode == JavaConsts.STATUS_OK ||
+                    statusCode == JavaConsts.STATUS_STALE_DATA ||
+                    statusCode == JavaConsts.STATUS_OPERATION_DEFERRED) {
                     // successful load (either from network or local cache)
                     Logger.d("Processing buffer.");
                     mAchievementBank.ProcessBuffer(buffer);
