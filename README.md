@@ -45,6 +45,10 @@ System requirements:
 Note: This first release does not yet include support for multiplayer, listing friends, 
 interactive posts, raw data access, etc.
 
+## Upgrading
+
+If you have already integrated your project with a previous version of the plugin and wish to upgrade to a new version, please refer to the [upgrade instructions](https://github.com/playgameservices/play-games-plugin-for-unity/blob/master/UPGRADING.txt).
+
 ## Configure Your Game
 
 To use the plugin, you must first [configure your 
