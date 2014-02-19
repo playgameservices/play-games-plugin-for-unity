@@ -1,0 +1,11 @@
+NOTES ON UPGRADING
+
+If you have already integrated the plugin and want to upgrade it to a newer version,
+perform these steps:
+
+FROM 0.8.00 to 0.8.01
+
+* Delete the folder: Assets/GooglePlayGames
+* Import the new plugin
+* Redo setup (Google Play Games | Android Setup and Google Play Games | iOS Setup)
+
