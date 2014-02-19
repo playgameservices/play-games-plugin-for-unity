@@ -1,4 +1,5 @@
 PluginDev/Assets/Plugins/Android/google-play-services_lib/
+PluginDev/Assets/Plugins/Android/google-play-services_lib.meta
 PluginDev/Library/
 
 GPGSUtils/bin/
@@ -15,3 +16,7 @@ SupportLib/SupportLib.iml
 PluginDev/Assets/Plugins/iOS/GPGSParams.h
 PluginDev/Assets/Plugins/iOS/GPGSParams.h.meta
 
+PluginDev/Assets/Editor/projsettings.txt
+PluginDev/Assets/Editor/projsettings.txt.meta
+PluginDev/Assets/Plugins/Android/MainLibProj/AndroidManifest.xml
+PluginDev/Assets/Plugins/Android/MainLibProj/AndroidManifest.xml.meta

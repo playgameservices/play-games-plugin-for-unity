@@ -25,16 +25,20 @@ public class GPGSUtil {
         return path.Replace("/", System.IO.Path.DirectorySeparatorChar.ToString());
     }
 
-    public static string ReadTextFile(string name) {
-        string file = FixSlashes("Assets/Editor/" + name + ".txt");
-        if (!File.Exists(file)) {
-            Alert("Plugin error: text file not found: " + file);
+    public static string ReadFile(string filePath) {
+        filePath = FixSlashes(filePath);
+        if (!File.Exists(filePath)) {
+            Alert("Plugin error: file not found: " + filePath);
             return null;
         }
-        StreamReader sr = new StreamReader(file);
+        StreamReader sr = new StreamReader(filePath);
         string body = sr.ReadToEnd();
         sr.Close();
         return body;
+    }
+    
+    public static string ReadTextFile(string name) {
+        return ReadFile(FixSlashes("Assets/Editor/" + name + ".txt"));
     }
 
     public static void WriteFile(string file, string body) {

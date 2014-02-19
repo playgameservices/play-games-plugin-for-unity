@@ -1,0 +1,18 @@
+2014-02-04 Version 0.8.01 (codename: brasilia)
+
+    Updates all plug in code to use new Google Play Services 
+    programming pattern (GoogleApiClient) and provides a few
+    bug fixes.
+    
+    * References to GamesClient and AppStateClient updated to use GoogleApiClient
+    * Bug fix: GetUserId() occasionally causing crashes on IOS
+    * Bug fix: IsAuthenticated() returning true immediatly after SignOut()
+    * Bug fix: GPGSAppController.m missing call to super
+    * Bug fix: Error dialogs pop up briefly when no network available
+    * Bug fix: PostProcessBuildPlayer not friendly with other plugins
+    * Bug fix: Missing AddressBook.framework in iOS build instructions
+
+2013-12-10 Version 0.8.00 (codename: altamira)
+
+    Initial launch.
+

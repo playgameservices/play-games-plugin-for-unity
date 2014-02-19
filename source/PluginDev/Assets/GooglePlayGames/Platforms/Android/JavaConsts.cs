@@ -19,6 +19,9 @@ using System;
 
 namespace GooglePlayGames.Android {
     internal class JavaConsts {
+        // GameHelper client request flags
+        public const int GAMEHELPER_CLIENT_ALL = 7;    
+    
         // achievement states
         public const int STATE_HIDDEN = 2;
         public const int STATE_REVEALED = 1;
@@ -33,6 +36,9 @@ namespace GooglePlayGames.Android {
         public const int STATUS_STALE_DATA = 3;
         public const int STATUS_NO_DATA = 4;
         public const int STATUS_KEY_NOT_FOUND = 2002;
+        public const int STATUS_CONFLICT = 2000;
+        
+        public const int SDK_VARIANT = 37143;
     }
 }
 #endif

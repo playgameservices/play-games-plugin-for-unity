@@ -23,26 +23,26 @@ using GooglePlayGames.BasicApi;
 using GooglePlayGames.OurUtils;
 
 namespace GooglePlayGames.Android {
-    internal class OnStateLoadedProxy : AndroidJavaProxy {
+    internal class OnStateResultProxy : AndroidJavaProxy {
         private OnStateLoadedListener mListener;
         private AndroidClient mAndroidClient;
 
-        internal OnStateLoadedProxy(AndroidClient androidClient, OnStateLoadedListener listener) :
-                base("com.google.android.gms.appstate.OnStateLoadedListener") {
+        internal OnStateResultProxy(AndroidClient androidClient, OnStateLoadedListener listener) :
+                base(JavaUtil.ResultCallbackClass) {
             mListener = listener;
             mAndroidClient = androidClient;
         }
 
         private void OnStateConflict(int stateKey, string resolvedVersion,
                     byte[] localData, byte[] serverData) {
-            Logger.d("OnStateLoadedProxy.onStateConflict called, stateKey=" + stateKey +
+            Logger.d("OnStateResultProxy.onStateConflict called, stateKey=" + stateKey +
                 ", resolvedVersion=" + resolvedVersion);
 
             debugLogData("localData", localData);
             debugLogData("serverData", serverData);
 
             if (mListener != null) {
-                Logger.d("OnStateLoadedProxy.onStateConflict invoking conflict callback.");
+                Logger.d("OnStateResultProxy.onStateConflict invoking conflict callback.");
                 PlayGamesHelperObject.RunOnGameThread(() => {
                     byte[] resolvedData = mListener.OnStateConflict(stateKey,
                         localData, serverData);
@@ -54,7 +54,7 @@ namespace GooglePlayGames.Android {
         }
 
         private void OnStateLoaded(int statusCode, int stateKey, byte[] localData) {
-            Logger.d("OnStateLoadedProxy.onStateLoaded called, status " + statusCode +
+            Logger.d("OnStateResultProxy.onStateLoaded called, status " + statusCode +
                 ", stateKey=" + stateKey);
             debugLogData("localData", localData);
 
@@ -80,14 +80,14 @@ namespace GooglePlayGames.Android {
                 localData = null;
                 break;
             default:
-                Logger.d("Status interpreted as failure.");
+                Logger.e("Cloud load failed with status code " + statusCode);
                 success = false;
                 localData = null;
                 break;
             }
 
             if (mListener != null) {
-                Logger.d("OnStateLoadedProxy.onStateLoaded invoking load callback.");
+                Logger.d("OnStateResultProxy.onStateLoaded invoking load callback.");
                 PlayGamesHelperObject.RunOnGameThread(() => {
                     mListener.OnStateLoaded(success, stateKey, localData);
                 });
@@ -100,33 +100,47 @@ namespace GooglePlayGames.Android {
             Logger.d("   " + tag + ": " + Logger.describe(data));
         }
 
-        // We have to override Invoke because apparently the default implementation tries
-        // to call getLength with the wrong signature on java.lang.reflect.Array and
-        // crashes.
-        public override AndroidJavaObject Invoke (string methodName, AndroidJavaObject[] javaArgs) {
-            Logger.d("OnStateLoadedProxy.Invoke, method=" + methodName);
-            Logger.d("    args=" + (javaArgs == null ? "(null)" :
-                    "AndroidJavaObject[" + javaArgs.Length + "]"));
-
-            if (methodName.Equals("onStateLoaded")) {
-                Logger.d("Parsing onStateLoaded args.");
-                int statusCode = javaArgs[0].Call<int>("intValue");
-                int stateKey = javaArgs[1].Call<int>("intValue");
-                byte[] localData = ConvertByteArray(javaArgs[2]);
-                Logger.d("onStateLoaded args parsed, calling.");
-                OnStateLoaded(statusCode, stateKey, localData);
-            } else if (methodName.Equals("onStateConflict")) {
-                Logger.d("Parsing onStateConflict args.");
-                int stateKey = javaArgs[0].Call<int>("intValue");
-                string ver = javaArgs[1].Call<string>("toString");
-                byte[] localData = ConvertByteArray(javaArgs[2]);
-                byte[] serverData = ConvertByteArray(javaArgs[3]);
-                Logger.d("onStateConflict args parsed, calling.");
-                OnStateConflict(stateKey, ver, localData, serverData);
-            } else {
-                Logger.e("Unexpected method invoked on OnStateLoadedProxy: " + methodName);
+        public void onResult(AndroidJavaObject result) {
+            Logger.d("OnStateResultProxy.onResult, result=" + result);
+            
+            int statusCode = JavaUtil.GetStatusCode(result);
+            Logger.d("OnStateResultProxy: status code is " + statusCode);
+            
+            if (result == null) {
+                Logger.e("OnStateResultProxy: result is null.");
+                return;
             }
-            return null;
+            
+            Logger.d("OnstateResultProxy: retrieving result objects...");
+            AndroidJavaObject loadedResult = JavaUtil.CallNullSafeObjectMethod(result, 
+                    "getLoadedResult");
+            AndroidJavaObject conflictResult = JavaUtil.CallNullSafeObjectMethod(result,
+                    "getConflictResult");
+            
+            Logger.d("Got result objects.");
+            Logger.d("loadedResult = " + loadedResult);
+            Logger.d("conflictResult = " + conflictResult);
+
+            if (conflictResult != null) {
+                Logger.d("OnStateResultProxy: processing conflict.");
+                int stateKey = conflictResult.Call<int>("getStateKey");
+                string ver = conflictResult.Call<string>("getResolvedVersion");
+                byte[] localData = ConvertByteArray(JavaUtil.CallNullSafeObjectMethod(
+                        conflictResult, "getLocalData"));
+                byte[] serverData = ConvertByteArray(JavaUtil.CallNullSafeObjectMethod(
+                        conflictResult, "getServerData"));
+                Logger.d("OnStateResultProxy: conflict args parsed, calling.");
+                OnStateConflict(stateKey, ver, localData, serverData);
+            } else if (loadedResult != null) {
+                Logger.d("OnStateResultProxy: processing normal load.");
+                int stateKey = loadedResult.Call<int>("getStateKey");
+                byte[] localData = ConvertByteArray(JavaUtil.CallNullSafeObjectMethod(
+                        loadedResult, "getLocalData"));
+                Logger.d("OnStateResultProxy: loaded args parsed, calling.");
+                OnStateLoaded(statusCode, stateKey, localData);
+            } else {
+                Logger.e("OnStateResultProxy: both loadedResult and conflictResult are null!");
+            }
         }
 
         private static byte[] ConvertByteArray(AndroidJavaObject byteArrayObj) {

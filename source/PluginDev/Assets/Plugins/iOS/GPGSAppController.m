@@ -23,6 +23,9 @@
             openURL:(NSURL *)url
   sourceApplication:(NSString *)sourceApplication
          annotation:(id)annotation {
+    
+    [super application:application openURL:url sourceApplication:sourceApplication annotation:annotation];
+    
     return [GPPURLHandler handleURL:url
                   sourceApplication:sourceApplication
                          annotation:annotation];

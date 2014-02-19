@@ -82,8 +82,8 @@ static GPGSManager *sInstance = NULL;
             // Retrieve that information from the GPGApplicationModel
             GPGPlayerModel *playerModel = [[[GPGManager sharedInstance] applicationModel] player];
             GPGPlayer *localPlayer = playerModel.localPlayer;
-            mPlayerName = localPlayer.name;
-            mPlayerId = localPlayer.playerId;
+            mPlayerName = [localPlayer.name copy];
+            mPlayerId = [localPlayer.playerId copy];
             LOGD((@"Player name %@, player id %@", localPlayer.name, localPlayer.playerId));
         }
 

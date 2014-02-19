@@ -26,6 +26,7 @@ public class GPGSStrings {
     public const string Yes = "Yes";
     public const string No = "No";
     public const string Success = "Success";
+    public const string Warning = "Warning";
 
     public class Setup {
         public const string AppIdTitle = "Google Play Games Application ID";
@@ -75,10 +76,17 @@ public class GPGSStrings {
         public const string LibProjNotFoundBlurb = "Google Play Services library project " +
                 "could not be found your SDK installation. Make sure it is installed (open " +
                 "the SDK manager and go to Extras, and select Google Play Services).";
-
-        public const string SetupComplete = "Google Play Games configured successfully. " +
-            "\n\nNote: remember to set the minimum Android version to Froyo (2.2) or above on the " +
-            "Build Settings window before building.";
+                
+        public const string LibProjVerNotFound = "The version of your copy of the Google Play " + 
+                "Services Library Project could not be determined. Please make sure it is " +
+                "at least version {0}. Continue?";
+                
+        public const string LibProjVerTooOld = "Your copy of the Google Play " + 
+            "Services Library Project is out of date. Please launch the Android SDK manager " + 
+            "and upgrade your Google Play Services bundle to the latest version (your version: " +
+            "{0}; required version: {1}). Proceeding may cause problems. Proceed anyway?";
+        
+        public const string SetupComplete = "Google Play Games configured successfully.";
     }
 
     public class ExternalLinks {
