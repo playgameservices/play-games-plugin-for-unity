@@ -655,5 +655,5 @@ The plugin was developed and is currently maintained by [Bruno Oliveira](https:/
 This section lists people who have contributed to this project by writing code, improving documentation or fixing bugs.
 
 * [Dgizusse](https://github.com/Dgizusse) for figuring out that setting JAVA_HOME is necessary on Windows.
-
+* [antonlicht](https://github.com/antonlicht) for fixing a bug with the parameter type of showErrorDialog on the support library.
 
