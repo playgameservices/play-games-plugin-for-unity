@@ -127,7 +127,7 @@ namespace GooglePlayGames.Android {
             if (origin == ORIGIN_SIGN_IN_HELPER_ACTIVITY) {
                 Logger.d("GHM got onSignInFailed from Sign In Helper. Showing error message.");
                 using (AndroidJavaClass klass = new AndroidJavaClass(SignInHelperManagerClass)) {
-                    klass.CallStatic("showErrorDialog", mGameHelper);
+                    klass.CallStatic("showErrorDialog", mAndroidClient.GetActivity());
                 }
                 Logger.d("Error message shown.");
             }
