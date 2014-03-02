@@ -374,7 +374,7 @@ object first:
     using UnityEngine.SocialPlatforms;
     ...
     // show leaderboard UI
-    (PlayGamesPlatform) Social.Active).ShowLeaderboardUI("Cfji293fjsie_QA");
+    ((PlayGamesPlatform) Social.Active).ShowLeaderboardUI("Cfji293fjsie_QA");
 ```
 
 ## Saving Game State to the Cloud
