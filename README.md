@@ -1,5 +1,5 @@
 # Google Play Games plugin for Unity
-_Copyright (c) 2013 Google Inc. All rights reserved._
+_Copyright (c) 2014 Google Inc. All rights reserved._
 
 The Google Play Games plugin for Unity&reg; is an open-source project whose goal
 is to provide a plugin that allows game developers to integrate with
@@ -22,8 +22,8 @@ following features of the Google Play Games API:<br/>
 * post score to leaderboard
 * cloud save read/write
 * show built-in achievement/leaderboards UI
-* [turn-based multiplayer](TBMP.md).
-* [real-time multiplayer](RTMP.md).
+* [turn-based multiplayer](TBMP.md) <b>(new)</b>
+* [real-time multiplayer](RTMP.md) <b>(new)</b>
 
 All features are available on Android and iOS.
 
