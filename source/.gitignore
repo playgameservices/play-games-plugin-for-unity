@@ -20,3 +20,5 @@ PluginDev/Assets/Editor/projsettings.txt
 PluginDev/Assets/Editor/projsettings.txt.meta
 PluginDev/Assets/Plugins/Android/MainLibProj/AndroidManifest.xml
 PluginDev/Assets/Plugins/Android/MainLibProj/AndroidManifest.xml.meta
+PluginDev/*.apk
+

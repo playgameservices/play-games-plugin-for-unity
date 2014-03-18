@@ -129,6 +129,22 @@ sub main {
     close PLIST;
     print "Info.plist edited successfully and written.\n";
 
+		# TODO: This is fragile. We should search for projects instead of assuming the name is Unity-iPhone
+    print "Reading in Xcode project.\n";
+    $xproj = `cat "$xcodedir/Unity-iPhone.xcodeproj/project.pbxproj"`;
+    if ($? != 0) {
+        return "Failed to read in pbxproj.";
+    }
+    print "Add our -fobjc-arc flags.\n";
+
+    $xproj =~ s/(.*\{isa\s*=\s*PBXBuildFile.*GPGS\w*\.m.*)\}\;/\1settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };/g;
+
+    print "Writing out Xcode project.\n";
+    open XPROJ, ">$xcodedir/Unity-iPhone.xcodeproj/project.pbxproj";
+    print XPROJ $xproj;
+    close XPROJ;
+    print "Xcode project edited successfully and written.\n";
+
     print "Setup successful. Output project is $xcodedir.\n\n";
     print <<END
 
@@ -147,6 +163,7 @@ TO FINISH CONFIGURING THE EXPORTED XCODE PROJECT
       QuartzCore
       Security
       SystemConfiguration
+      libc++.dylib
 
 2. Add the following bundles and frameworks from the Google Plus
    and the Google Play Games SDKs. These can be downloaded from
@@ -155,15 +172,19 @@ TO FINISH CONFIGURING THE EXPORTED XCODE PROJECT
       GoogleOpenSource.framework
       GooglePlus.bundle
       GooglePlus.framework
-      PlayGameServices.bundle
-      PlayGameServices.framework
+      GooglePlayGames.bundle
+      GooglePlayGames.framework
 
 3. Add the '-ObjC' linker flag. To do this, select the top-level project
    object, select the 'Unity-iPhone' build target, then go to the
    Build Settings tab. Search for Other Linker Flags and add
    the '-ObjC' flag to that list.
 
-4. If you want to run the project in the simulator (as opposed to an
+4. Go to your Target -> Build Phases -> Compile Sources, select all GPGS*.m
+   files, and double-click them to add the "-fobjc-arc" flag. This will enable
+   ARC for these specific files.
+
+5. If you want to run the project in the simulator (as opposed to an
    actual device, read the notes in the APPENDIX below.
 
 

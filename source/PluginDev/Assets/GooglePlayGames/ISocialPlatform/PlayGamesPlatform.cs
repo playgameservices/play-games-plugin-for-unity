@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using GooglePlayGames.BasicApi;
 using GooglePlayGames.OurUtils;
+using GooglePlayGames.BasicApi.Multiplayer;
 
 namespace GooglePlayGames {
     /// <summary>
@@ -78,6 +79,20 @@ namespace GooglePlayGames {
             }
         }
 
+        /// Gets the real time multiplayer API object
+        public IRealTimeMultiplayerClient RealTime {
+            get {
+                return mClient.GetRtmpClient();
+            }
+        }
+
+        /// Gets the turn based multiplayer API object
+        public ITurnBasedMultiplayerClient TurnBased {
+            get {
+                return mClient.GetTbmpClient();
+            }
+        }
+
         /// <summary>
         /// Activates the Play Games platform as the implementation of Social.Active.
         /// After calling this method, you can call methods on Social.Active. For
@@ -128,16 +143,13 @@ namespace GooglePlayGames {
         /// with <c>true</c> if authentication was successful, <c>false</c>
         /// otherwise.
         /// </param>
-        public void Authenticate(ILocalUser localUser, Action<bool> callback) {
-            Authenticate(localUser, callback, false);
+        public void Authenticate(Action<bool> callback) {
+            Authenticate(callback, false);
         }
 
         /// <summary>
         /// Authenticate the local user with the Google Play Games service.
         /// </summary>
-        /// <param name='unused'>
-        /// Unused. For future compatibility, always pass <c>Social.localUser</c>.
-        /// </param>
         /// <param name='callback'>
         /// The callback to call when authentication finishes. It will be called
         /// with <c>true</c> if authentication was successful, <c>false</c>
@@ -152,12 +164,25 @@ namespace GooglePlayGames {
         /// and, if that fails, present the user with a "Sign in" button that then
         /// triggers normal (not silent) authentication.
         /// </param>
-        public void Authenticate(ILocalUser unused, Action<bool> callback, bool silent) {
+        public void Authenticate(Action<bool> callback, bool silent) {
             // make a platform-specific Play Games client
-            mClient = PlayGamesClientFactory.GetPlatformPlayGamesClient();
+            if (mClient == null) {
+                Logger.d("Creating platform-specific Play Games client.");
+                mClient = PlayGamesClientFactory.GetPlatformPlayGamesClient();
+            }
 
             // authenticate!
             mClient.Authenticate(callback, silent);
+        }
+        
+        /// <summary>
+        /// Same as <see cref="Authenticate(Action<bool>,bool)"/>. Provided for compatibility
+        /// with ISocialPlatform.
+        /// </summary>
+        /// <param name="unused">Unused.</param>
+        /// <param name="callback">Callback.</param>
+        public void Authenticate(ILocalUser unused, Action<bool> callback) {
+            Authenticate(callback, false);
         }
 
         /// <summary>
@@ -169,7 +194,7 @@ namespace GooglePlayGames {
         public bool IsAuthenticated() {
             return mClient != null && mClient.IsAuthenticated();
         }
-        
+
         /// Sign out. After signing out, Authenticate must be called again to sign back in.
         public void SignOut() {
             if (mClient != null) {
@@ -198,7 +223,7 @@ namespace GooglePlayGames {
             if (!IsAuthenticated()) {
                 Logger.e("GetUserId() can only be called after authentication.");
                 return "0";
-            }            
+            }
             return mClient.GetUserId();
         }
 
@@ -252,8 +277,8 @@ namespace GooglePlayGames {
                 }
                 return;
             }
-            
-            
+
+
             // map ID, if it's in the dictionary
             Logger.d("ReportProgress, " + achievementID + ", " + progress);
             achievementID = MapId(achievementID);
@@ -325,8 +350,8 @@ namespace GooglePlayGames {
                 }
                 return;
             }
-            
-            
+
+
             // map ID, if it's in the dictionary
             Logger.d("IncrementAchievement: " + achievementID + ", steps " + steps);
             achievementID = MapId(achievementID);
@@ -387,7 +412,7 @@ namespace GooglePlayGames {
                 }
                 return;
             }
-            
+
             Logger.d("ReportScore: score=" + score + ", board=" + board);
             string lbId = MapId(board);
             mClient.SubmitScore(lbId, score, callback);
@@ -420,7 +445,7 @@ namespace GooglePlayGames {
                 Logger.e("ShowAchievementsUI can only be called after authentication.");
                 return;
             }
-            
+
             Logger.d("ShowAchievementsUI");
             mClient.ShowAchievementsUI();
         }
@@ -575,6 +600,11 @@ namespace GooglePlayGames {
             get {
                 return mLocalUser;
             }
+        }
+
+        /// Register an invitation delegate to be notified when a multiplayer invitation arrives
+        public void RegisterInvitationDelegate(BasicApi.InvitationReceivedDelegate deleg) {
+            mClient.RegisterInvitationDelegate(deleg);
         }
 
         private string MapId(string id) {

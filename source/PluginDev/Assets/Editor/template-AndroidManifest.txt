@@ -17,6 +17,10 @@
         		android:value="@integer/google_play_services_version" /> 
         <activity android:name="com.google.example.games.pluginsupport.SignInHelperActivity"
             	android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+        <activity android:name="com.google.example.games.pluginsupport.SelectOpponentsHelperActivity"
+            	android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+        <activity android:name="com.google.example.games.pluginsupport.InvitationInboxHelperActivity"
+                android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
     </application> 
 </manifest>
 

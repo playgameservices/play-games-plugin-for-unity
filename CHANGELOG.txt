@@ -1,3 +1,16 @@
+2014-03-17 Version 0.9.00 (codename: cuiaba)
+
+    New features:
+        * Turn-based multiplayer (iOS, Android)
+        * Real-time multiplayer (iOS, Android)
+    Bug fixes:
+        * #49 - double cancellation necessary
+        * #40 - add account crashes app
+        * #25 - Action Scheduled for Later
+        * properly close Achievement buffer
+        * fix memory management on iOS
+        * minor fixes
+
 2014-02-04 Version 0.8.01 (codename: brasilia)
 
     Updates all plug in code to use new Google Play Services 

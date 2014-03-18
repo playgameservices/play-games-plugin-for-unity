@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections;
+using GooglePlayGames.BasicApi.Multiplayer;
 
 namespace GooglePlayGames.BasicApi {
     /**
@@ -94,9 +95,33 @@ namespace GooglePlayGames.BasicApi {
 
         // Save state to cloud
         void UpdateState(int slot, byte[] data, OnStateLoadedListener listener);
+        
+        // Return a real-time multiplayer client
+        Multiplayer.IRealTimeMultiplayerClient GetRtmpClient();
+        
+        // Return a turn-based multiplayer client
+        Multiplayer.ITurnBasedMultiplayerClient GetTbmpClient();
+        
+        // Register an invitation delegate for RTMP/TBMP invitations
+        void RegisterInvitationDelegate(InvitationReceivedDelegate deleg);
     }
 
     // Delegate that encrypts or decrypts a buffer for local storage.
     public delegate byte[] BufferEncrypter(bool encrypt, byte[] data);
+    
+    /// <summary>
+    /// Delegate that handles an incoming invitation (for both RTMP and TBMP).
+    /// </summary>
+    /// <param name="shouldAutoAccept">If this is true, then the game should immediately
+    /// accept the invitation and go to the game screen without prompting the user. If
+    /// false, you should prompt the user before accepting the invitation. As an example,
+    /// when a user taps on the "Accept" button on a notification in Android, it is
+    /// clear that they want to accept that invitation right away, so the plugin calls this
+    /// delegate with shouldAutoAccept = true. However, if we receive an incoming invitation
+    /// that the player hasn't specifically indicated they wish to accept (for example,
+    /// we received one in the background from the server), this delegate will be called
+    /// with shouldAutoAccept=false to indicate that you should confirm with the user
+    /// to see if they wish to accept or decline the invitation.</param>
+    public delegate void InvitationReceivedDelegate(Invitation invitation, bool shouldAutoAccept);
 }
 

@@ -28,7 +28,7 @@ namespace GooglePlayGames.Android {
         private AndroidClient mAndroidClient;
 
         internal OnStateResultProxy(AndroidClient androidClient, OnStateLoadedListener listener) :
-                base(JavaUtil.ResultCallbackClass) {
+                base(JavaConsts.ResultCallbackClass) {
             mListener = listener;
             mAndroidClient = androidClient;
         }
@@ -125,16 +125,16 @@ namespace GooglePlayGames.Android {
                 Logger.d("OnStateResultProxy: processing conflict.");
                 int stateKey = conflictResult.Call<int>("getStateKey");
                 string ver = conflictResult.Call<string>("getResolvedVersion");
-                byte[] localData = ConvertByteArray(JavaUtil.CallNullSafeObjectMethod(
+                byte[] localData = JavaUtil.ConvertByteArray(JavaUtil.CallNullSafeObjectMethod(
                         conflictResult, "getLocalData"));
-                byte[] serverData = ConvertByteArray(JavaUtil.CallNullSafeObjectMethod(
+                byte[] serverData = JavaUtil.ConvertByteArray(JavaUtil.CallNullSafeObjectMethod(
                         conflictResult, "getServerData"));
                 Logger.d("OnStateResultProxy: conflict args parsed, calling.");
                 OnStateConflict(stateKey, ver, localData, serverData);
             } else if (loadedResult != null) {
                 Logger.d("OnStateResultProxy: processing normal load.");
                 int stateKey = loadedResult.Call<int>("getStateKey");
-                byte[] localData = ConvertByteArray(JavaUtil.CallNullSafeObjectMethod(
+                byte[] localData = JavaUtil.ConvertByteArray(JavaUtil.CallNullSafeObjectMethod(
                         loadedResult, "getLocalData"));
                 Logger.d("OnStateResultProxy: loaded args parsed, calling.");
                 OnStateLoaded(statusCode, stateKey, localData);
@@ -143,25 +143,7 @@ namespace GooglePlayGames.Android {
             }
         }
 
-        private static byte[] ConvertByteArray(AndroidJavaObject byteArrayObj) {
-            Debug.Log("ConvertByteArray.");
-
-            if (byteArrayObj == null) {
-                return null;
-            }
-
-            AndroidJavaClass jc = new AndroidJavaClass("java.lang.reflect.Array");
-            Debug.Log("Calling java.lang.reflect.Array.getLength.");
-            int len = jc.CallStatic<int>("getLength", byteArrayObj);
-
-            byte[] b = new byte[len];
-            int i;
-            for (i = 0; i < len; i++) {
-                b[i] = jc.CallStatic<byte>("getByte", byteArrayObj, i);
-            }
-
-            return b;
-        }
+        
     }
 }
 

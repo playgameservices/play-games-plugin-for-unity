@@ -1,10 +1,8 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/GooglePlayGames/Platforms/Android/GameHelperManager.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Settings.cs">
     <Files>
-      <File FileName="Assets/GooglePlayGames/ISocialPlatform/PlayGamesPlatform.cs" Line="156" Column="56" />
-      <File FileName="Assets/GooglePlayGames/Platforms/Android/AndroidClient.cs" Line="15" Column="4" />
-      <File FileName="Assets/GooglePlayGames/Platforms/Android/GameHelperManager.cs" Line="97" Column="24" />
+      <File FileName="Assets/Settings.cs" Line="37" Column="4" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">

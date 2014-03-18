@@ -8,6 +8,8 @@ import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.games.multiplayer.Invitation;
+import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch;
 import com.google.example.games.basegameutils.GameHelper;
 
 public class SignInHelperManager {
@@ -19,6 +21,8 @@ public class SignInHelperManager {
     GameHelper.GameHelperListener mListener = null;
     int mSignInErrorActivityResponse = 0;
     int mSignInErrorCode = 0;
+    Invitation mInvitation = null;
+    TurnBasedMatch mMatch = null;
 
     private SignInHelperManager() {}
 
@@ -32,6 +36,36 @@ public class SignInHelperManager {
 
     public static SignInHelperManager getInstance() {
         return sInstance;
+    }
+
+    public void setInvitation(Invitation inv) {
+        mInvitation = inv;
+    }
+    public void setTurnBasedMatch(TurnBasedMatch m) {
+        mMatch = m;
+    }
+
+    public Invitation getInvitation() {
+        return mInvitation;
+    }
+    public TurnBasedMatch getTurnBasedMatch() {
+        return mMatch;
+    }
+
+    public boolean hasInvitation() {
+        return mInvitation != null;
+    }
+
+    public boolean hasTurnBasedMatch() {
+        return mMatch != null;
+    }
+
+    public void forgetInvitation() {
+        mInvitation = null;
+    }
+
+    public void forgetTurnBasedMatch() {
+        mMatch = null;
     }
 
     void setSignInErrorReason(GameHelper.SignInFailureReason reason) {

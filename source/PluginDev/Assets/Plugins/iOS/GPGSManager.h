@@ -17,7 +17,7 @@
 
 #import <Foundation/Foundation.h>
 #import <GooglePlus/GooglePlus.h>
-#import "GPGSInterface.h"
+#import "GPGSTypedefs.h"
 
 @interface GPGSManager : NSObject <GPPSignInDelegate> {
     GPGSSuccessCallback mAuthCallback;

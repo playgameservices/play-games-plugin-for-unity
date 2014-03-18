@@ -33,13 +33,35 @@ namespace GooglePlayGames.Android {
         // Codes that indicate the origin of an OnSignInSucceeded/OnSignInFailed callback
         const int ORIGIN_MAIN_ACTIVITY = 1000;
         const int ORIGIN_SIGN_IN_HELPER_ACTIVITY = 1001;
+        
+        // whether we are in between OnPause() and OnResume()
+        bool mPaused = false;
 
         internal enum ConnectionState {
             Disconnected, Connecting, Connected
         }
-        ConnectionState mConnectionState = ConnectionState.Disconnected;
-
-        internal ConnectionState State { get { return mConnectionState; } }
+        
+        internal ConnectionState State {
+        	get {
+        		if (mGameHelper.Call<bool>("isSignedIn")) {
+        			return ConnectionState.Connected;
+        		} else if (mGameHelper.Call<bool>("isConnecting")) {
+        			return ConnectionState.Connecting;
+        		} else {
+        			return ConnectionState.Disconnected;
+        		}
+        	}
+        }
+        
+        internal bool Connecting {
+        	get {
+        		return mGameHelper.Call<bool>("isConnecting");
+        	}
+        }
+        
+        public delegate void OnStopDelegate();
+        
+        List<OnStopDelegate> mOnStopDelegates = new List<OnStopDelegate>();
 
         internal GameHelperManager(AndroidClient client) {
             mAndroidClient = client;
@@ -57,11 +79,9 @@ namespace GooglePlayGames.Android {
 
             // set up the GameHelper
             Logger.d("GHM setting up GameHelper.");
-            mGameHelper.Call("enableDebugLog", Logger.DebugLogEnabled, "GameHelper");
-            
+            mGameHelper.Call("enableDebugLog", Logger.DebugLogEnabled);
             
             GameHelperListener listenerProxy = new GameHelperListener(this, ORIGIN_MAIN_ACTIVITY);
-            
             
             // IMPORTANT: we need to tweak the default behavior of GameHelper because 
             // it should never attempt to automatically start the 
@@ -103,25 +123,28 @@ namespace GooglePlayGames.Android {
 
             // start initial auth
             Logger.d("GHM calling GameHelper.onStart to try initial auth.");
-            mConnectionState = ConnectionState.Connecting;
             mGameHelper.Call("onStart", mAndroidClient.GetActivity());
         }
 
         void OnResume() {
+        	mPaused = false;
             Logger.d("GHM got OnResume, relaying to GameHelper");
-            mConnectionState = ConnectionState.Connecting;
             mGameHelper.Call("onStart", mAndroidClient.GetActivity());
         }
 
         void OnPause() {
             Logger.d("GHM got OnPause, relaying to GameHelper");
-            mConnectionState = ConnectionState.Connecting;
+            mPaused = true;
+            
+            foreach (OnStopDelegate del in mOnStopDelegates) {
+                del.Invoke();
+            }
+            
             mGameHelper.Call("onStop");
         }
 
         void OnSignInFailed(int origin) {
             Logger.d("GHM got onSignInFailed, origin " + origin + ", notifying AndroidClient.");
-            mConnectionState = ConnectionState.Disconnected;
             
             // if the origin is the Sign In Helper activity, check if there's an error to show
             if (origin == ORIGIN_SIGN_IN_HELPER_ACTIVITY) {
@@ -138,22 +161,31 @@ namespace GooglePlayGames.Android {
         void OnSignInSucceeded(int origin) {
             Logger.d("GHM got onSignInSucceeded, origin " + origin + ", notifying AndroidClient.");
             if (origin == ORIGIN_MAIN_ACTIVITY) {
-                mConnectionState = ConnectionState.Connected;
                 mAndroidClient.OnSignInSucceeded();
             } else if (origin == ORIGIN_SIGN_IN_HELPER_ACTIVITY) {
-                // the sign in helper Activity succeeded sign in, so we are ready to
-                // start setting up our GameHelper.
-                Logger.d("GHM got helper's OnSignInSucceeded, so calling GameHelper.onStart");
-                mConnectionState = ConnectionState.Connecting;
-                mGameHelper.Call("onStart", mAndroidClient.GetActivity());
+                // the sign in helper Activity succeeded sign in
+                Logger.d("GHM got helper's OnSignInSucceeded.");
+                // we don't need to do anything here because as soon as the sign in helper
+                // activity is finished, we will get OnResume() and then we'll try to
+                // reconnect our GameHelper, which will result in a success.
+                // DO NOT CALL mGameHelper.Call("onStart", mAndroidClient.GetActivity()) HERE.
             }
         }
 
         internal void BeginUserInitiatedSignIn() {
             Logger.d("GHM Starting user-initiated sign in.");
-            mConnectionState = ConnectionState.Connecting;
-            AndroidJavaClass c = new AndroidJavaClass(SignInHelperManagerClass);
+            
+            // set the "connect on start" flag to true, because a previous sign-out
+            // might have set it to false; if we left it as false, the sign-in would
+            // succeed in the helper (external) Activity but would *fail* in our
+            // Activity because GameHelper would not try to reconnect on onStart()
+            Logger.d("Forcing GameHelper's connect-on-start flag to true.");
+            mGameHelper.Call("setConnectOnStart", true);
+            
+            // launch the external activity (from our plugin support library)
+            // that will handle sign-in for us
             Logger.d("GHM launching sign-in Activity via SignInHelperManager.launchSignIn");
+            AndroidJavaClass c = new AndroidJavaClass(SignInHelperManagerClass);
             c.CallStatic("launchSignIn", mAndroidClient.GetActivity(),
                     new GameHelperListener(this, ORIGIN_SIGN_IN_HELPER_ACTIVITY),
                     Logger.DebugLogEnabled);
@@ -162,18 +194,52 @@ namespace GooglePlayGames.Android {
         public AndroidJavaObject GetApiClient() {
             return mGameHelper.Call<AndroidJavaObject>("getApiClient");
         }
+        
+        public AndroidJavaObject GetInvitation() {
+            bool has = mGameHelper.Call<bool>("hasInvitation");
+            
+            // we have to have this "if" because AndroidJavaObject crashes when it returns null
+            if (has) {
+                return mGameHelper.Call<AndroidJavaObject>("getInvitation");
+            } else {
+                return null;
+            }
+        }
+        
+        public AndroidJavaObject GetTurnBasedMatch() {
+            bool has = mGameHelper.Call<bool>("hasTurnBasedMatch");
+            
+            // we have to have this "if" because AndroidJavaObject crashes when it returns null
+            if (has) {
+                return mGameHelper.Call<AndroidJavaObject>("getTurnBasedMatch");
+            } else {
+                return null;
+            }
+        }
+        
+        public void ClearInvitationAndTurnBasedMatch() {
+            Logger.d("GHM clearing invitation and turn-based match on GameHelper.");
+            mGameHelper.Call("clearInvitation");
+            mGameHelper.Call("clearTurnBasedMatch");
+        }
 
         public bool IsConnected() {
             return mGameHelper.Call<bool>("isSignedIn");
         }
         
+        public bool Paused {
+        	get {
+        		return mPaused;
+        	}
+        }
+        
         public void SignOut() {
             Logger.d("GHM SignOut");
-            if (mConnectionState != ConnectionState.Connected) {
-                Logger.w("GameHelperManager.SignOut should only be called when Connected.");
-            }
             mGameHelper.Call("signOut");
-            mConnectionState = ConnectionState.Disconnected;
+        }
+        
+        public void AddOnStopDelegate(OnStopDelegate del) {
+            mOnStopDelegates.Add(del);
         }
 
         // Proxy for GameHelperListener

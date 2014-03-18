@@ -27,6 +27,15 @@ public class GPGSStrings {
     public const string No = "No";
     public const string Success = "Success";
     public const string Warning = "Warning";
+    
+    public class PostInstall {
+        public const string Title = "Google Play Games Plugin for Unity";
+        public const string Text = "The Google Play Games Plugin for Unity version $VERSION " + 
+                "is now ready to use. If this is a new installation or of you have " +
+                "just upgraded from a previous version, please click the 'Google Play Games' " + 
+                "menu and select 'Android Setup' and/or 'iOS Setup' to set up your " + 
+                "project to build for the corresponding platforms.";
+    }
 
     public class Setup {
         public const string AppIdTitle = "Google Play Games Application ID";

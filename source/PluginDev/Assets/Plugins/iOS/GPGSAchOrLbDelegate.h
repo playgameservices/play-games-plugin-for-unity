@@ -16,7 +16,7 @@
 // Author: Bruno Oliveira
 
 #import <Foundation/Foundation.h>
-#import <PlayGameServices/PlayGameServices.h>
+#import <GooglePlayGames/GooglePlayGames.h>
 
 @interface GPGSAchOrLbDelegate : NSObject <GPGAchievementControllerDelegate,
     GPGLeaderboardControllerDelegate, GPGLeaderboardsControllerDelegate>

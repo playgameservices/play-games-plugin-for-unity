@@ -1,0 +1,10 @@
+Assets/GooglePlayGames
+Assets/Editor
+Assets/Plugins
+Library
+Temp
+Assets/Editor.meta
+Assets/GooglePlayGames.meta
+Assets/Plugins.meta
+*.apk
+

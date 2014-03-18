@@ -13,15 +13,19 @@ _iOS is a trademark of Apple, Inc._
 ## Overview
 
 The Google Play Games plugin for Unity allows you to access the Google Play Games 
-API through Unity's [social interface](http://docs.unity3d.com/Documentation/ScriptReference/Social.html). The initial release of the plugin provides support for the 
+API through Unity's [social interface](http://docs.unity3d.com/Documentation/ScriptReference/Social.html). 
+The plugin provides support for the 
 following features of the Google Play Games API:<br/>
 
 * sign in
 * unlock/reveal/increment achievement
 * post score to leaderboard
 * cloud save read/write
-* show built-in achievement UI
-* show built-in leaderboards UI
+* show built-in achievement/leaderboards UI
+* [turn-based multiplayer](TBMP.md).
+* [real-time multiplayer](RTMP.md).
+
+All features are available on Android and iOS.
 
 Features:
 
@@ -33,21 +37,19 @@ Features:
 
 System requirements:
 
-* Unity&reg; 4.2 or above
+* Unity&reg; 4.3 or above
 * To deploy on Android:
     * Android SDK
-    * Google Play Services library
+    * Google Play Services library, version 4.2.42 or above
 * To deploy on iOS:
     * XCode 4 or above
     * Google Plus SDK for iOS
     * Google Play Games SDK for iOS
 
-Note: This first release does not yet include support for multiplayer, listing friends, 
-interactive posts, raw data access, etc.
 
 ## Upgrading
 
-If you have already integrated your project with a previous version of the plugin and wish to upgrade to a new version, please refer to the [upgrade instructions](https://github.com/playgameservices/play-games-plugin-for-unity/blob/master/UPGRADING.txt).
+If you have already integrated your project with a previous version of the plugin and wish to upgrade to a new version, please refer to the [upgrade instructions](UPGRADING.txt).
 
 ## Configure Your Game
 
@@ -58,6 +60,10 @@ for Android and/or iOS (depending on what platforms you intend to deploy or game
 on). Be particularly careful when entering your package name and your 
 certificate fingerprints, since mistakes on those screens can be difficult to 
 recover from.
+
+If you intend to use real-time or turn-based multiplayer in your game, remember
+to activate those features in the Google Play Developer Console when creating
+your application instances.
 
 Please note the following pieces of information when creating your client IDs, 
 as they will be necessary later:
@@ -103,7 +109,7 @@ quickly test your setup and make sure you can access the API.
 If you want to test a larger sample after you are familiar with the plugin, 
 try the **CubicPilot** game.
 More information about building the samples can be found in the
-[samples README](https://github.com/playgameservices/play-games-plugin-for-unity/blob/master/samples/README.md) file.
+[samples README](samples/README.md) file.
 
 ## Plugin Installation
 
@@ -482,6 +488,14 @@ will **not** be encrypted using this method when saved to the server.
     ((PlayGamesPlatform) Social.Active).SetCloudCacheEncrypter(MyEncrypter);
 ````
 
+## Multiplayer
+
+If you wish to integrate **turn-based multiplayer** in your game, refer to the 
+[Getting Started with Turn-Based Multiplayer](TBMP.md).
+
+If you wish to integrate **real-time multiplayer** in your game, refer to the 
+[Getting Started with Real-Time Multiplayer](RTMP.md).
+
 ## Sign out
 
 To sign the user out, use the **PlayGamesPlatform.SignOut** method.
@@ -507,9 +521,12 @@ fingerprint you entered in the Developer Console during the setup.
 
 ## Building for iOS
 
-To build your game for iOS, do as you would normally do in Unity. Select **File | Build Settings**, then select the **iOS** platform. However, do not choose 
-**Build & Run**. Instead, choose only **Build**, and select an output directory 
-to save the XCode project.
+To build your game for iOS, do as you would normally do in Unity. Select **File | Build Settings**, then select the **iOS** platform.
+Click **Player Settings** and make sure that the target iOS platform is 6.0 or above.
+
+Then, click **Build** and select an output directory to save the XCode project. Do not use
+the **Build and Run** option, since there are some manual steps you must take in
+the XCode project before your project can run.
 
 After building the XCode project, the Play Games postprocessor will run to 
 configure the Info.plist settings on your project. You will see a log of the 
@@ -533,6 +550,7 @@ frameworks to that list:
 **QuartzCore**<br/>
 **Security**<br/>
 **SystemConfiguration**<br/><br/>
+**libc++.dylib**<br/><br/>
 2. Add the following bundles and frameworks from the Google Plus and Google Play 
    Games SDK that you have previously downloaded. If you have not downloaded 
    these files yet, they can be found [in the downloads section](https://developers.google.com/games/services/downloads) of the Google Play Games developer site. To add these frameworks you can simply drag
@@ -550,6 +568,15 @@ and drop those 5 files on the top-level project item (labeled **Unity-iPhone**).
 **Note:** If you export the project a second time to the same XCode project 
 directory, you can use Unity's **Append** option to avoid overwriting these 
 settings. If you use **Replace**, however, you might have to reapply some settings.
+
+## Common Build Errors on iOS
+
+**"The current deployment target does not support automated _weak references"**. Make sure your target iOS platform is 6.0 or above. If the target platform is below 6.0, this error will occur during build.
+
+**"Dsymutil error"**. Depending on your version of XCode, you may need to disable dSYM file generation. To do this, go to Build Settings |
+Build Options | Debug Information Format | Debug. Select **DWARF** instead of **DWARF with dSYM**.
+
+**URL errors while signing in.** This is often a sign that either the client ID or the Bundle Identifier is not correctly set up, or that your **Info.plist** file got corrupted. Check that your client ID and Bundle ID are correctly configured in the project and that they correspond to the data in the Developer Console.
 
 ## Building for iOS to run on the simulator
 
@@ -646,9 +673,21 @@ That way, you can even submit scores and achievements simultaneously to two or m
     // Submit achievement to Google Play
     PlayGamesPlatform.Instance.ReportProgress("MyGooglePlayAchievementIdHere", 100.0f, callback);
 
+## Using Production APNS Certificate (iOS)
+
+In the `GPGSAppController.m` file, you will notice within the `application:didRegisterForRemoteNotificationsWithDeviceToken` method that there are two calls;
+one for using a push notification in the sandbox environment, and one for using a push notification in the production environment. You should make sure to 
+comment the first call (and uncomment the second) when you're ready to switch to a production environment and push notification.
+
+
 ## Note from Maintainer
 
 The plugin was developed and is currently maintained by [Bruno Oliveira](https://plus.google.com/+BrunoOliveira). Feel free to add me on Google+ and nag me to fix bugs or take a look at your questions on Stack Overflow!
+
+## Acknowledgements
+
+The iOS library makes use of the [MiniJSON.cs](https://gist.github.com/darktable/1411710) class developed by Calvin Rien (originally based on a parser by Patrick van Bergen), 
+available under the MIT License.
 
 ## Special Thanks
 
@@ -657,4 +696,5 @@ This section lists people who have contributed to this project by writing code, 
 * [Dgizusse](https://github.com/Dgizusse) for figuring out that setting JAVA_HOME is necessary on Windows.
 * [antonlicht](https://github.com/antonlicht) for fixing a bug with the parameter type of showErrorDialog on the support library.
 * [pR0Ps](https://github.com/pR0Ps) for fixing an issue where OnAchievementsLoaded was not accepting an OPERATION_DEFERRED result code as a success.
+* [friikyeu](https://github.com/friikyeu) for helping debug [an issue](https://github.com/playgameservices/play-games-plugin-for-unity/issues/25) that caused API calls to be queued up rather than executed even when connected.
 

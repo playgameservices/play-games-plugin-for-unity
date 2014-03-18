@@ -19,6 +19,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using GooglePlayGames.BasicApi;
+using GooglePlayGames.BasicApi.Multiplayer;
 using GooglePlayGames.OurUtils;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -36,6 +37,13 @@ namespace GooglePlayGames.IOS {
             IntPtr resolvBufPtr, int resolvBufCap);
         private delegate void GPGSLoadStateCallback(bool success, int slot,
             IntPtr dataBuf, int dataSize);
+		private delegate void GPGSPushNotificationCallback(bool isRealTime,
+		                                                   string invitationId,
+		                                                   string inviterId, 
+		                                                   string inviterName, 
+		                                                   int variant);
+
+
 
         // Entry points exposed by the iOS native code (.m files in Assets/Plugins/iOS):
         [DllImport("__Internal")]
@@ -86,8 +94,18 @@ namespace GooglePlayGames.IOS {
         private static extern void GPGSLoadState(int slot, GPGSLoadStateCallback loadCb,
             GPGSStateConflictCallback conflictCb);
             
+		[DllImport("__Internal")]
+		private static extern void GPGSRegisterInviteDelegate(GPGSPushNotificationCallback notificationCb);
+
         // Default capacity for stringbuilder buffers
         private const int DefaultStringBufferCapacity = 256;
+
+        private IRealTimeMultiplayerClient mRtmpClient;
+
+        private ITurnBasedMultiplayerClient mTbmpClient;
+
+
+		private static InvitationReceivedDelegate sInvitationDelegate;
 
         // Pending callbacks from such calls as UnlockAchievement, etc. These are keyed
         // by an identifier that we send to the low-level C API, which is then reported
@@ -96,6 +114,8 @@ namespace GooglePlayGames.IOS {
         static int mNextCallbackId = 0;
 
         bool mAuthenticated = false;
+		bool mRegisteredInvitationListener = false;
+
         System.Action<bool> mAuthCallback = null;
         static IOSClient sInstance = null;
 
@@ -124,6 +144,9 @@ namespace GooglePlayGames.IOS {
                     "and will likely break things.");
             }
             sInstance = this;
+
+            mRtmpClient = new IOSRtmpClient();
+            mTbmpClient = new IOSTbmpClient();
         }
 
         public void Authenticate(System.Action<bool> callback, bool silent) {
@@ -306,7 +329,7 @@ namespace GooglePlayGames.IOS {
 
             byte[] resolvData = null;
 
-            if (OurUtils.Utils.BuffersAreIdentical(localData, serverData)) {
+            if (OurUtils.Misc.BuffersAreIdentical(localData, serverData)) {
                 Logger.d(prefix + "Bypassing fake conflict " +
                     "(local data is IDENTICAL to server data).");
                 resolvData = localData != null ? localData : serverData;
@@ -442,6 +465,69 @@ namespace GooglePlayGames.IOS {
         private byte[] DummyEncrypter(bool encrypt, byte[] data) {
             return data;
         }
+
+        /**
+         * 
+         * Multiplayer Methods
+         * 
+         */
+
+        public IRealTimeMultiplayerClient GetRtmpClient() {
+            return mRtmpClient;
+        }
+
+        public ITurnBasedMultiplayerClient GetTbmpClient() {
+            return mTbmpClient;
+        }
+
+		// Due to limitations of Mono on iOS, callbacks invoked from C have to be static,
+		// and have to have this MonoPInvokeCallback annotation.
+		[MonoPInvokeCallback(typeof(GPGSPushNotificationCallback))]
+		private static void PushNotificationCallback(bool isRealTime,
+		                                             string invitationId,
+		                                             string inviterId, 
+		                                             string inviterName, 
+		                                             int variant)
+		{
+			Logger.d("IOSClient.PushotificationCallback isRealTime=" + isRealTime + ", invitationId=" + invitationId 
+			         + " inviterId=" + inviterId + " inviterName= " + inviterName + " variant=" + variant);
+
+			Invitation.InvType invitationType = (isRealTime) ? Invitation.InvType.RealTime : Invitation.InvType.TurnBased;
+			Participant inviter = new Participant (inviterName, inviterId, Participant.ParticipantStatus.Unknown, null, false);
+			Invitation incomingInvite = new Invitation (invitationType, invitationId, inviter, variant);
+			// For now, we're going to always going to make this false.
+			sInvitationDelegate.Invoke (incomingInvite, false);
+		}
+
+		private void RegisterInvitationListener() {
+			// Tell my iOS application to reuqest push notifications
+			GPGSRegisterInviteDelegate(PushNotificationCallback);
+			mRegisteredInvitationListener = true;
+
+		}
+
+
+        // Register an invitation delegate for RTMP/TBMP invitations
+        public void RegisterInvitationDelegate(InvitationReceivedDelegate deleg) {
+			Logger.d("iOSClient.RegisterInvitationDelegate");
+			if (deleg == null) {
+				Logger.w("iOSClient.RegisterInvitationDelegate called w/ null argument.");
+				return;
+			}
+			sInvitationDelegate = deleg;
+			
+			// install invitation listener, if we don't have one yet
+			if (!mRegisteredInvitationListener) {
+				Logger.d("Registering an invitation listener.");
+				RegisterInvitationListener();
+			}
+
+			// I don't think I need to deal with pending notifications, as the iOS library
+            // caches them until the user has signed in
+        }
+
+
+
 
         private static int RegisterSuccessCallback(string methodName, System.Action<bool> callback) {
             int key = mNextCallbackId++;

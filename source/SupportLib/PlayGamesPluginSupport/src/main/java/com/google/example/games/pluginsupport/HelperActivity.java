@@ -50,6 +50,7 @@ public class HelperActivity extends Activity implements GameHelper.GameHelperLis
         mHelper = new GameHelper(this, GameHelper.CLIENT_ALL);
         mHelper.enableDebugLog(mDebugEnabled, TAG + "/GameHelper");
         mHelper.setShowErrorDialogs(false);
+        mHelper.setMaxAutoSignInAttempts(0);
         mHelper.setup(this);
         View v = new View(this);
         v.setBackgroundColor(BG_COLOR);

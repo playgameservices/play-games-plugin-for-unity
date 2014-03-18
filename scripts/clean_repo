@@ -1,0 +1,15 @@
+#!/bin/sh
+
+if ! [ -f README.md ]; then
+    echo "Run this script from the base of the repo."
+    exit 2
+fi
+
+for d in samples/CubicPilot samples/Minimal samples/QuizRacer samples/TicTacToe; do
+    rm -rvf $d/Assets/Editor $d/Assets/Editor.meta
+    rm -rvf $d/Assets/GooglePlayGames $d/Assets/GooglePlayGames.meta
+    rm -rvf $d/Assets/Plugins $d/Assets/Plugins.meta
+    rm -rvf $d/Library
+    find $d -name '*.apk' -exec rm -v {} \;
+done
+

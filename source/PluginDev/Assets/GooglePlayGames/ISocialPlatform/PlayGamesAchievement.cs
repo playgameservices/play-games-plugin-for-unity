@@ -33,7 +33,7 @@ namespace GooglePlayGames {
 
         /// <summary>
         /// Reveals, unlocks or increment achievement. Call after setting
-        /// <see cref="id" /> and <see cref="percentCompleted">. Equivalent to calling
+        /// <see cref="id" /> and <see cref="percentCompleted" />. Equivalent to calling
         /// <see cref="PlayGamesPlatform.ReportProgress" />.
         /// </summary>
         public void ReportProgress (Action<bool> callback) {

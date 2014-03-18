@@ -35,11 +35,82 @@ namespace GooglePlayGames.Android {
         public const int STATUS_OK = 0;
         public const int STATUS_STALE_DATA = 3;
         public const int STATUS_NO_DATA = 4;
-        public const int STATUS_OPERATION_DEFERRED = 5;
+        public const int STATUS_DEFERRED = 5;
         public const int STATUS_KEY_NOT_FOUND = 2002;
         public const int STATUS_CONFLICT = 2000;
         
         public const int SDK_VARIANT = 37143;
+        
+        // GmsCore base package name
+        public const string GmsPkg = "com.google.android.gms";
+        
+        // Useful classes in GmsCore:
+        public const string ResultCallbackClass = GmsPkg + ".common.api.ResultCallback";
+        public const string RoomStatusUpdateListenerClass = 
+                GmsPkg + ".games.multiplayer.realtime.RoomStatusUpdateListener";
+        public const string RoomUpdateListenerClass = 
+                GmsPkg + ".games.multiplayer.realtime.RoomUpdateListener";
+        public const string RealTimeMessageReceivedListenerClass =
+                GmsPkg + ".games.multiplayer.realtime.RealTimeMessageReceivedListener";
+        public const string OnInvitationReceivedListenerClass =
+                GmsPkg + ".games.multiplayer.OnInvitationReceivedListener";
+        public const string ParticipantResultClass = 
+                GmsPkg + ".games.multiplayer.ParticipantResult";
+        
+        // Plugin support package name
+        public const string PluginSupportPkg = "com.google.example.games.pluginsupport";
+        
+        // Useful classes in plugin support library
+        public const string SupportRtmpUtilsClass = PluginSupportPkg + ".RtmpUtils";
+        public const string SupportTbmpUtilsClass = PluginSupportPkg + ".TbmpUtils";
+        public const string SupportSelectOpponentsHelperActivity = PluginSupportPkg + 
+                ".SelectOpponentsHelperActivity";
+        public const string SupportSelectOpponentsHelperActivityListener =
+                SupportSelectOpponentsHelperActivity + "$Listener";
+        public const string SupportInvitationInboxHelperActivity = PluginSupportPkg + 
+            ".InvitationInboxHelperActivity";
+        public const string SupportInvitationInboxHelperActivityListener =
+            SupportInvitationInboxHelperActivity + "$Listener";
+        public const string SignInHelperManagerClass = PluginSupportPkg + ".SignInHelperManager";
+        
+        // participant status
+        public const int STATUS_NOT_INVITED_YET = 0;
+        public const int STATUS_INVITED = 1;
+        public const int STATUS_JOINED = 2;
+        public const int STATUS_DECLINED = 3;
+        public const int STATUS_LEFT = 4;
+        public const int STATUS_FINISHED = 5;
+        public const int STATUS_UNRESPONSIVE = 6;
+        
+        // invitation types
+        public const int INVITATION_TYPE_REAL_TIME = 0;
+        public const int INVITATION_TYPE_TURN_BASED = 1;
+
+        // match status
+        public const int MATCH_STATUS_AUTO_MATCHING = 0;
+        public const int MATCH_STATUS_ACTIVE = 1;
+        public const int MATCH_STATUS_COMPLETE = 2;
+        public const int MATCH_STATUS_EXPIRED = 3;
+        public const int MATCH_STATUS_CANCELED = 4;
+
+        // match turn status
+        public const int MATCH_TURN_STATUS_INVITED = 0;
+        public const int MATCH_TURN_STATUS_MY_TURN = 1;
+        public const int MATCH_TURN_STATUS_THEIR_TURN = 2;
+        public const int MATCH_TURN_STATUS_COMPLETE = 3;
+
+        // match variant
+        public const int MATCH_VARIANT_ANY = -1;
+
+        // match participant result codes
+        public const int MATCH_RESULT_UNINITIALIZED = -1;
+        public const int PLACING_UNINITIALIZED = -1;
+        public const int MATCH_RESULT_WIN = 0;
+        public const int MATCH_RESULT_LOSS = 1;
+        public const int MATCH_RESULT_TIE = 2;
+        public const int MATCH_RESULT_NONE = 3;
+        public const int MATCH_RESULT_DISCONNECT = 4;
+        public const int MATCH_RESULT_DISAGREED = 5;
     }
 }
 #endif

@@ -18,9 +18,13 @@
 #import "GPGSAchOrLbDelegate.h"
 
 @implementation GPGSAchOrLbDelegate
-- (GPGSAchOrLbDelegate*)initWithViewController:(UIViewController*)vc
+
+- (id)initWithViewController:(UIViewController*)vc
 {
-    mViewController = vc;
+    self = [super init];
+    if (self) {
+      mViewController = vc;
+    }
     return self;
 }
 

@@ -9,6 +9,8 @@ import android.os.Handler;
 import android.view.View;
 import android.view.Window;
 
+import com.google.android.gms.games.multiplayer.Invitation;
+import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch;
 import com.google.example.games.basegameutils.BaseGameActivity;
 import com.google.example.games.basegameutils.GameHelper;
 
@@ -49,6 +51,16 @@ public class SignInHelperActivity extends HelperActivity {
 
     @Override
     public void onSignInSucceeded() {
+        Invitation inv = mHelper.getInvitation();
+        if (inv != null) {
+            SignInHelperManager.getInstance().setInvitation(inv);
+        }
+
+        TurnBasedMatch match = mHelper.getTurnBasedMatch();
+        if (match != null) {
+            SignInHelperManager.getInstance().setTurnBasedMatch(match);
+        }
+
         final int DELAY = 1000;
         mHandler.postDelayed(new Runnable() {
             @Override

@@ -589,7 +589,6 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
         } else {
             // We don't have a pending connection result, so start anew.
             debugLog("beginUserInitiatedSignIn: starting new sign-in flow.");
-            mConnecting = true;
             connect();
         }
     }
@@ -738,6 +737,10 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
         // Try to resolve the problem
         if (mExpectingResolution) {
             debugLog("We're already expecting the result of a previous resolution.");
+            return;
+        }
+        if (mActivity == null) {
+            Log.e(TAG, "Ignoring attempt to resolve connection result without an active Activity.");
             return;
         }
 

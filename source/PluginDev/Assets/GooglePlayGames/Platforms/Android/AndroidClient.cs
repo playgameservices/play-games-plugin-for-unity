@@ -21,6 +21,7 @@ using System.Collections;
 using System.Collections.Generic;
 using GooglePlayGames.BasicApi;
 using GooglePlayGames.OurUtils;
+using GooglePlayGames.BasicApi.Multiplayer;
 
 namespace GooglePlayGames.Android {
     public class AndroidClient : IPlayGamesClient {
@@ -52,7 +53,7 @@ namespace GooglePlayGames.Android {
         // Sometimes we have to execute an action on the UI thread involving GamesClient,
         // but we might hit that unlucky moment when GamesClient is still in the process
         // of connecting and can't take API calls. So, if that happens, we queue the
-        // actions here and execute when we get onSignInSucceeded or onSignInFailed,.
+        // actions here and execute when we get onSignInSucceeded or onSignInFailed
         List<Action> mActionsPendingSignIn = new List<Action>();
         
         // Are we currently in the process of signing out?
@@ -60,13 +61,31 @@ namespace GooglePlayGames.Android {
 
         // Result code for child activities whose result we don't care about
         const int RC_UNUSED = 9999;
-
+        
+        // RTMP client and TBMP clients
+        AndroidRtmpClient mRtmpClient;
+        AndroidTbmpClient mTbmpClient;
+        
+        // invitation delegate
+        InvitationReceivedDelegate mInvitationDelegate = null;
+        
+        // have we installed an invitation listener?
+        bool mRegisteredInvitationListener = false;
+        
+        // the invitation we received via notification. We store it here while we don't have
+        // an invitation delegate to deliver it to; when we get one, we deliver it and forget it.
+        Invitation mInvitationFromNotification = null;
+        
         public AndroidClient() {
+            mRtmpClient = new AndroidRtmpClient(this);
+            mTbmpClient = new AndroidTbmpClient(this);
             RunOnUiThread(() => {
                 Logger.d("Initializing Android Client.");
                 Logger.d("Creating GameHelperManager to manage GameHelper.");
                 mGHManager = new GameHelperManager(this);
-                Logger.d("GameHelper manager is set up.");
+                
+                // make sure that when game stops, we clean up the real time multiplayer room
+                mGHManager.AddOnStopDelegate(mRtmpClient.OnStop);
             });
             // now we wait for the result of the initial auth, which will trigger
             // a call to either OnSignInSucceeded or OnSignInFailed
@@ -132,15 +151,24 @@ namespace GooglePlayGames.Android {
             if (mAuthState == AuthState.LoadingAchs) {
                 Logger.d("AUTH: Initial achievement load finished.");
 
-                if (statusCode == JavaConsts.STATUS_OK ||
-                    statusCode == JavaConsts.STATUS_STALE_DATA ||
-                    statusCode == JavaConsts.STATUS_OPERATION_DEFERRED) {
+                if (statusCode == JavaConsts.STATUS_OK || 
+                        statusCode == JavaConsts.STATUS_STALE_DATA ||
+                        statusCode == JavaConsts.STATUS_DEFERRED) {
                     // successful load (either from network or local cache)
-                    Logger.d("Processing buffer.");
+                    Logger.d("Processing achievement buffer.");
                     mAchievementBank.ProcessBuffer(buffer);
+                    
+                    Logger.d("Closing achievement buffer.");
+                    buffer.Call("close");
+                    
                     Logger.d("AUTH: Auth process complete!");
                     mAuthState = AuthState.Done;
                     InvokeAuthCallback(true);
+                    
+                    // inform the RTMP client and TBMP clients that sign in suceeded
+                    CheckForConnectionExtras();
+                    mRtmpClient.OnSignInSucceeded();
+                    mTbmpClient.OnSignInSucceeded();
                 } else {
                     Logger.w("AUTH: Failed to load achievements, status code " + statusCode);
                     mAuthState = AuthState.NoAuth;
@@ -198,6 +226,13 @@ namespace GooglePlayGames.Android {
                 // we were not in an auth flow).
                 Logger.d("Normal lifecycle OnSignInSucceeded received.");
                 RunPendingActions();
+                
+                // check for invitations that may have arrived via notification
+                CheckForConnectionExtras();
+                
+                // inform the RTMP client that sign-in has suceeded
+                mRtmpClient.OnSignInSucceeded();
+                mTbmpClient.OnSignInSucceeded();
             }
         }
 
@@ -286,7 +321,7 @@ namespace GooglePlayGames.Android {
             AndroidClient mOwner;
 
             internal OnAchievementsLoadedResultProxy(AndroidClient c) :
-                    base(JavaUtil.ResultCallbackClass) {
+                    base(JavaConsts.ResultCallbackClass) {
                 mOwner = c;
             }
 
@@ -310,7 +345,7 @@ namespace GooglePlayGames.Android {
         // or have definitely failed to sign in.
         private void RunWhenConnectionStable(Action a) {
             RunOnUiThread(() => {
-                if (mGHManager.State == GameHelperManager.ConnectionState.Connecting) {
+                if (mGHManager.Paused || mGHManager.Connecting) {
                     // we're in the middle of establishing a connection, so we'll
                     // have to queue this action to execute once the connection is
                     // established (or fails)
@@ -323,7 +358,7 @@ namespace GooglePlayGames.Android {
             });
         }
 
-        private void CallClientApi(string desc, Action call, Action<bool> callback) {
+        internal void CallClientApi(string desc, Action call, Action<bool> callback) {
             Logger.d("Requesting API call: " + desc);
             RunWhenConnectionStable(() => {
                 // we got a stable connection state to the games service
@@ -521,12 +556,235 @@ namespace GooglePlayGames.Android {
             listener.OnStateSaved(true, slot);
         }
 
+        // called from game thread
         public void SetCloudCacheEncrypter(BufferEncrypter encrypter) {
             Logger.d("Ignoring cloud cache encrypter (not used in Android)");
             // Not necessary in Android (since the library takes care of storing
             // data locally)
         }
+        
+        // called from game thread
+        public void RegisterInvitationDelegate(InvitationReceivedDelegate deleg) {
+            Logger.d("AndroidClient.RegisterInvitationDelegate");
+            if (deleg == null) {
+                Logger.w("AndroidClient.RegisterInvitationDelegate called w/ null argument.");
+                return;
+            }
+            mInvitationDelegate = deleg;
+            
+            // install invitation listener, if we don't have one yet
+            if (!mRegisteredInvitationListener) {
+                Logger.d("Registering an invitation listener.");
+                RegisterInvitationListener();
+            }
+            
+            if (mInvitationFromNotification != null) {
+                Logger.d("Delivering pending invitation from notification now.");
+                Invitation inv = mInvitationFromNotification;
+                mInvitationFromNotification = null;
+                PlayGamesHelperObject.RunOnGameThread(() => {
+                    if (mInvitationDelegate != null) {
+                        mInvitationDelegate.Invoke(inv, true);
+                    }
+                });
+            }
+        }
+        
+        // called from game thread
+        public Invitation GetInvitationFromNotification() {
+            Logger.d("AndroidClient.GetInvitationFromNotification");
+            Logger.d("Returning invitation: " + ((mInvitationFromNotification == null) ?
+                     "(null)" : mInvitationFromNotification.ToString()));
+            return mInvitationFromNotification;
+        }
+        
+        // called from game thread
+        public bool HasInvitationFromNotification() {
+            bool has = mInvitationFromNotification != null;
+            Logger.d("AndroidClient.HasInvitationFromNotification, returning " + has);
+            return has;
+        }
+        
+        
+        private void RegisterInvitationListener() {
+            Logger.d("AndroidClient.RegisterInvitationListener");
+            CallClientApi("register invitation listener", () => {
+                mGHManager.CallGmsApi("games.Games", "Invitations",
+                        "registerInvitationListener", new OnInvitationReceivedProxy(this));
+            }, null);
+            mRegisteredInvitationListener = true;
+        }
+        
+        public IRealTimeMultiplayerClient GetRtmpClient() {
+            return mRtmpClient;
+        }
+        
+        public ITurnBasedMultiplayerClient GetTbmpClient() {
+            return mTbmpClient;
+        }
+
+        internal GameHelperManager GHManager {
+            get {
+                return mGHManager;
+            }
+        }
+        
+        internal void ClearInvitationIfFromNotification(string invitationId) {
+            Logger.d("AndroidClient.ClearInvitationIfFromNotification: " + invitationId);
+            if (mInvitationFromNotification != null && 
+                mInvitationFromNotification.InvitationId.Equals(invitationId)) {
+                Logger.d("Clearing invitation from notification: " + invitationId);
+                mInvitationFromNotification = null;
+            }
+        }
+        
+        private void CheckForConnectionExtras() {
+            // check to see if we have a pending invitation in our gamehelper
+            Logger.d("AndroidClient: CheckInvitationFromNotification.");
+            Logger.d("AndroidClient: looking for invitation in our GameHelper.");
+            Invitation invFromNotif = null;
+            AndroidJavaObject invObj = mGHManager.GetInvitation();
+            AndroidJavaObject matchObj = mGHManager.GetTurnBasedMatch();
+            
+            mGHManager.ClearInvitationAndTurnBasedMatch();
+            
+            if (invObj != null) {
+                Logger.d("Found invitation in GameHelper. Converting.");
+                invFromNotif = ConvertInvitation(invObj);
+                Logger.d("Found invitation in our GameHelper: " + invFromNotif);
+            } else {
+                Logger.d("No invitation in our GameHelper. Trying SignInHelperManager.");
+                AndroidJavaClass cls = JavaUtil.GetClass(JavaConsts.SignInHelperManagerClass);
+                using (AndroidJavaObject inst = cls.CallStatic<AndroidJavaObject>("getInstance")) {
+                    if (inst.Call<bool>("hasInvitation")) {
+                        invFromNotif = ConvertInvitation(inst.Call<AndroidJavaObject>("getInvitation"));
+                        Logger.d("Found invitation in SignInHelperManager: " + invFromNotif);
+                        inst.Call("forgetInvitation");
+                    } else {
+                        Logger.d("No invitation in SignInHelperManager either.");
+                    }
+                }
+            }
+            
+            TurnBasedMatch match = null;
+            if (matchObj != null) {
+                Logger.d("Found match in GameHelper. Converting.");
+                match = JavaUtil.ConvertMatch(mUserId, matchObj);
+                Logger.d("Match from GameHelper: " + match);
+            } else {
+                Logger.d("No match in our GameHelper. Trying SignInHelperManager.");
+                AndroidJavaClass cls = JavaUtil.GetClass(JavaConsts.SignInHelperManagerClass);
+                using (AndroidJavaObject inst = cls.CallStatic<AndroidJavaObject>("getInstance")) {
+                    if (inst.Call<bool>("hasTurnBasedMatch")) {
+                        match = JavaUtil.ConvertMatch(mUserId, 
+                                inst.Call<AndroidJavaObject>("getTurnBasedMatch"));
+                        Logger.d("Found match in SignInHelperManager: " + match);
+                        inst.Call("forgetTurnBasedMatch");
+                    } else {
+                        Logger.d("No match in SignInHelperManager either.");
+                    }
+                }
+            }
+            
+            // if we got an invitation from the notification, invoke the delegate
+            if (invFromNotif != null) {
+                if (mInvitationDelegate != null) {
+                    Logger.d("Invoking invitation received delegate to deal with invitation " + 
+                             " from notification.");
+                    PlayGamesHelperObject.RunOnGameThread(() => {
+                        if (mInvitationDelegate != null) {
+                            mInvitationDelegate.Invoke(invFromNotif, true);
+                        }
+                    });
+                } else {
+                    Logger.d("No delegate to handle invitation from notification; queueing.");
+                    mInvitationFromNotification = invFromNotif;
+                }
+            }
+            
+            // if we got a turn-based match, hand it over to the TBMP client who will know
+            // better what to do with it
+            if (match != null) {
+                mTbmpClient.HandleMatchFromNotification(match);
+            }
+        }
+        
+        private Invitation ConvertInvitation(AndroidJavaObject invObj) {
+            Logger.d("Converting Android invitation to our Invitation object.");
+            string invitationId = invObj.Call<string>("getInvitationId");
+            int invType = invObj.Call<int>("getInvitationType");
+            Participant inviter;
+            using (AndroidJavaObject inviterObj = invObj.Call<AndroidJavaObject>("getInviter")) {
+                inviter = JavaUtil.ConvertParticipant(inviterObj);
+            }
+            int variant = invObj.Call<int>("getVariant");
+            Invitation.InvType type;
+            
+            switch (invType) {
+            case JavaConsts.INVITATION_TYPE_REAL_TIME:
+                type = Invitation.InvType.RealTime;
+                break;
+            case JavaConsts.INVITATION_TYPE_TURN_BASED:
+                type = Invitation.InvType.TurnBased;
+                break;
+            default:
+                Logger.e("Unknown invitation type " + invType);
+                type = Invitation.InvType.Unknown;
+                break;
+            }
+            
+            Invitation result = new Invitation(type, invitationId, inviter, variant);
+            Logger.d("Converted invitation: " + result.ToString());
+            return result;
+        }
+        
+        private void OnInvitationReceived(AndroidJavaObject invitationObj) {
+            Logger.d("AndroidClient.OnInvitationReceived. Converting invitation...");
+            Invitation inv = ConvertInvitation(invitationObj);
+            Logger.d("Invitation: " + inv.ToString());
+            
+            if (mInvitationDelegate != null) {
+                Logger.d("Delivering invitation to invitation received delegate.");
+                PlayGamesHelperObject.RunOnGameThread(() => {
+                    if (mInvitationDelegate != null) {
+                        mInvitationDelegate.Invoke(inv, false);
+                    }
+                });
+            } else {
+                Logger.w("AndroidClient.OnInvitationReceived discarding invitation because " + 
+                        " delegate is null.");
+            }
+        }
+        
+        private void OnInvitationRemoved(string invitationId) {
+            Logger.d("AndroidClient.OnInvitationRemoved: " + invitationId);
+            ClearInvitationIfFromNotification(invitationId);
+        }
+        
+        private class OnInvitationReceivedProxy : AndroidJavaProxy {
+            AndroidClient mOwner;
+            
+            internal OnInvitationReceivedProxy(AndroidClient owner)
+                    : base(JavaConsts.OnInvitationReceivedListenerClass) {
+                mOwner = owner;
+            }
+            
+            public void onInvitationReceived(AndroidJavaObject invitationObj) {
+                Logger.d("OnInvitationReceivedProxy.onInvitationReceived");
+                mOwner.OnInvitationReceived(invitationObj);
+            }
+            
+            public void onInvitationRemoved(string invitationId) {
+                Logger.d("OnInvitationReceivedProxy.onInvitationRemoved");
+                mOwner.OnInvitationRemoved(invitationId);
+            }
+        }
+        
+        public string PlayerId {
+            get {
+                return mUserId;
+            }
+        }
     }
 }
-
 #endif

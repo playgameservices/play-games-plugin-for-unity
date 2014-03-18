@@ -22,6 +22,9 @@ using GooglePlayGames.BasicApi;
 namespace GooglePlayGames {
     internal class PlayGamesClientFactory {
         internal static IPlayGamesClient GetPlatformPlayGamesClient() {
+            if (Application.isEditor) {
+                return new GooglePlayGames.BasicApi.DummyClient();
+            }
 #if UNITY_ANDROID
             return new GooglePlayGames.Android.AndroidClient();
 #elif UNITY_IPHONE

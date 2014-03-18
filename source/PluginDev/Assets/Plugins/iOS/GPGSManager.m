@@ -19,7 +19,7 @@
 #import "GPGSLogging.h"
 #import "GPGSParams.h"
 #import <GooglePlus/GooglePlus.h>
-#import <PlayGameServices/PlayGameServices.h>
+#import <GooglePlayGames/GooglePlayGames.h>
 
 static GPGSManager *sInstance = NULL;
 
@@ -60,7 +60,7 @@ static GPGSManager *sInstance = NULL;
     // NOTE: if you get compile errors in this function, it may be because your Google
     // Play Games SDK for iOS is not recent enough. If so, update it and try again.
     // Check https://developers.google.com/games/services/downloads
-    [GPGManager sharedInstance].sdkTag = 0xa227;
+    //[GPGManager sharedInstance].sdkTag = 0xa227;
     [[GPGManager sharedInstance] signIn:[GPPSignIn sharedInstance]
                      reauthorizeHandler:^(BOOL requiresKeychainWipe, NSError *error) {
         // If you hit this, auth has failed and you need to authenticate.
@@ -131,7 +131,7 @@ static GPGSManager *sInstance = NULL;
 - (void)signOut
 {
     LOGD((@"GPGSManager Signing out."));
-    [[GPGManager sharedInstance] signout];
+    [[GPGManager sharedInstance] signOut];
 }
 
 

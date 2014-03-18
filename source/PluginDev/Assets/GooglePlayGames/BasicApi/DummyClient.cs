@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections;
+using GooglePlayGames.BasicApi.Multiplayer;
 
 namespace GooglePlayGames.BasicApi {
     public class DummyClient : IPlayGamesClient {
@@ -84,6 +85,16 @@ namespace GooglePlayGames.BasicApi {
         public void UpdateState(int slot, byte[] data, OnStateLoadedListener listener) {}
 
         public void SetCloudCacheEncrypter(BufferEncrypter encrypter) {}
+        
+        public Multiplayer.IRealTimeMultiplayerClient GetRtmpClient() { return null; }
+        
+        public Multiplayer.ITurnBasedMultiplayerClient GetTbmpClient() { return null; }
+        
+        public void RegisterInvitationDelegate(InvitationReceivedDelegate deleg) {}
+        
+        public Invitation GetInvitationFromNotification() { return null; }
+        
+        public bool HasInvitationFromNotification() { return false; }
     }
 }
 

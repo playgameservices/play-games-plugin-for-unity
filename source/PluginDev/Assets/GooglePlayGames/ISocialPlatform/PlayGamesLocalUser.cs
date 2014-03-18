@@ -33,7 +33,7 @@ namespace GooglePlayGames {
         /// <see cref="PlayGamesPlatform.Authenticate" />.
         /// </summary>
         public void Authenticate(Action<bool> callback) {
-            mPlatform.Authenticate(this, callback);
+            mPlatform.Authenticate(callback);
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace GooglePlayGames {
         /// <see cref="PlayGamesPlatform.Authenticate" />.
         /// </summary>
         public void Authenticate(Action<bool> callback, bool silent) {
-            mPlatform.Authenticate(this, callback, silent);
+            mPlatform.Authenticate(callback, silent);
         }
 
         /// <summary>
