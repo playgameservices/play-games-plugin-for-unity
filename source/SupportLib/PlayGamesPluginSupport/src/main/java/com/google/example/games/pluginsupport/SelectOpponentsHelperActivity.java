@@ -43,7 +43,7 @@ public class SelectOpponentsHelperActivity extends UiHelperActivity {
     @Override
     protected void deliverSuccess(Intent data) {
         // get the invitee list
-        final ArrayList<String> invitees = data.getStringArrayListExtra(Multiplayer.EXTRA_PLAYERS);
+        final ArrayList<String> invitees = data.getStringArrayListExtra(Games.EXTRA_PLAYER_IDS);
         debugLog("Invitee count: " + invitees.size());
 
         // get the automatch criteria
