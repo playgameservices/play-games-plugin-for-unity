@@ -2,7 +2,7 @@
 
 for i in PluginDev ../samples/QuizRacer ../samples/TicTacToe; do
     if [ -d $i/Assets/Plugins/Android ]; then
-        cp -vf SupportLib/BaseGameUtils/build/bundles/debug/classes.jar $i/Assets/Plugins/Android/BaseGameUtils/libs/base-game-utils.jar
+        cp -vf SupportLib/BaseGameUtils/build/bundles/release/classes.jar $i/Assets/Plugins/Android/BaseGameUtils/libs/base-game-utils.jar
 
         cp -vf SupportLib/PlayGamesPluginSupport/build/bundles/debug/classes.jar $i/Assets/Plugins/Android/MainLibProj/libs/play-games-plugin-support.jar
     else
