@@ -6,17 +6,17 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.7+'
+        classpath 'com.android.tools.build:gradle:0.9.+'
     }
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:+'
-    compile 'com.google.android.gms:play-services:4.2.42+'
+    compile 'com.android.support:support-v4:19.1.0'
+    compile 'com.google.android.gms:play-services:4.3.23'
 }
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "19.0.0"
+    buildToolsVersion "19.0.3"
 }
 
