@@ -12,7 +12,7 @@ buildscript {
 
 dependencies {
     compile 'com.android.support:support-v4:+'
-    compile 'com.google.android.gms:play-services:4.3.23+'
+    compile 'com.google.android.gms:play-services:4.4.52+'
 }
 
 android {

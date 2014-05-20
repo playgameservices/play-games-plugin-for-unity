@@ -30,6 +30,7 @@ import android.util.Log;
 import com.google.android.gms.appstate.AppStateManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.Api;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesActivityResultCodes;
@@ -95,9 +96,8 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
     GoogleApiClient.Builder mGoogleApiClientBuilder = null;
 
     // Api options to use when adding each API, null for none
-    GoogleApiClient.ApiOptions mGamesApiOptions = null;
-    GoogleApiClient.ApiOptions mPlusApiOptions = null;
-    GoogleApiClient.ApiOptions mAppStateApiOptions = null;
+    Api.ApiOptions mGamesApiOptions = null;
+    Api.ApiOptions mPlusApiOptions = null;
 
     // Google API client object we manage.
     GoogleApiClient mGoogleApiClient = null;
@@ -207,19 +207,13 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
     }
 
     /** Sets the options to pass when setting up the Games API. Call before setup(). */
-    public void setGamesApiOptions(GoogleApiClient.ApiOptions options) {
+    public void setGamesApiOptions(Api.ApiOptions options) {
         doApiOptionsPreCheck();
         mGamesApiOptions = options;
     }
 
-    /** Sets the options to pass when setting up the AppState API. Call before setup(). */
-    public void setAppStateApiOptions(GoogleApiClient.ApiOptions options) {
-        doApiOptionsPreCheck();
-        mAppStateApiOptions = options;
-    }
-
     /** Sets the options to pass when setting up the Plus API. Call before setup(). */
-    public void setPlusApiOptions(GoogleApiClient.ApiOptions options) {
+    public void setPlusApiOptions(Api.ApiOptions options) {
         doApiOptionsPreCheck();
         mPlusApiOptions = options;
     }
@@ -240,17 +234,29 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.Builder builder = new GoogleApiClient.Builder(mActivity, this, this);
 
         if (0 != (mRequestedClients & CLIENT_GAMES)) {
-            builder.addApi(Games.API, mGamesApiOptions);
+            // Null options are not permitted. Make sure we generate placeholder
+            // options if necessary.
+            Games.GamesOptions options = (Games.GamesOptions)mGamesApiOptions;
+            if (options == null) {
+                options = Games.GamesOptions.builder().build();
+            }
+            builder.addApi(Games.API, options);
             builder.addScope(Games.SCOPE_GAMES);
         }
 
         if (0 != (mRequestedClients & CLIENT_PLUS)) {
-            builder.addApi(Plus.API, mPlusApiOptions);
+            // Null options are not permitted. Make sure we generate placeholder
+            // options if necessary.
+            Plus.PlusOptions options = (Plus.PlusOptions)mPlusApiOptions;
+            if (options == null) {
+                options = new Plus.PlusOptions.Builder().build();
+            }
+            builder.addApi(Plus.API, options);
             builder.addScope(Plus.SCOPE_PLUS_LOGIN);
         }
 
         if (0 != (mRequestedClients & CLIENT_APPSTATE)) {
-            builder.addApi(AppStateManager.API, mAppStateApiOptions);
+            builder.addApi(AppStateManager.API);
             builder.addScope(AppStateManager.SCOPE_APP_STATE);
         }
 
