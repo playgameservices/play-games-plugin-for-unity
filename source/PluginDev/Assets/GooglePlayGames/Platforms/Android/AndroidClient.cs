@@ -158,7 +158,7 @@ namespace GooglePlayGames.Android {
                     Logger.d("Processing achievement buffer.");
                     mAchievementBank.ProcessBuffer(buffer);
                     
-                    Logger.d("Closing achievement buffsier.");
+                    Logger.d("Closing achievement buffers.");
                     buffer.Call("close");
                     
                     Logger.d("AUTH: Auth process complete!");
