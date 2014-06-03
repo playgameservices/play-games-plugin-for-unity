@@ -301,7 +301,7 @@ namespace GooglePlayGames.Android {
                 mAuthState = AuthState.NoAuth;
                 mSignOutInProgress = false;
                 mUserId = null;
-				mUserDisplayName = null;
+		mUserDisplayName = null;
                 Logger.d("Now signed out.");
             });
         }
