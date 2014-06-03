@@ -158,7 +158,7 @@ namespace GooglePlayGames.Android {
                     Logger.d("Processing achievement buffer.");
                     mAchievementBank.ProcessBuffer(buffer);
                     
-                    Logger.d("Closing achievement buffer.");
+                    Logger.d("Closing achievement buffsier.");
                     buffer.Call("close");
                     
                     Logger.d("AUTH: Auth process complete!");
@@ -300,6 +300,8 @@ namespace GooglePlayGames.Android {
                 mGHManager.SignOut();
                 mAuthState = AuthState.NoAuth;
                 mSignOutInProgress = false;
+                mUserId = null;
+				mUserDisplayName = null;
                 Logger.d("Now signed out.");
             });
         }
