@@ -90,7 +90,7 @@ namespace GooglePlayGames.Android {
         public static byte[] ConvertByteArray(AndroidJavaObject byteArrayObj) {
             Debug.Log("ConvertByteArray.");
             
-            if (byteArrayObj == null) {
+            if (byteArrayObj == null || byteArrayObj.GetRawObject().ToInt32() == 0) {
                 return null;
             }
             
