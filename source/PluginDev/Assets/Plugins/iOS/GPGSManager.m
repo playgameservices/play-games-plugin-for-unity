@@ -82,9 +82,9 @@ static GPGSManager *sInstance = NULL;
             // Retrieve that information from the GPGApplicationModel
             GPGPlayerModel *playerModel = [[[GPGManager sharedInstance] applicationModel] player];
             GPGPlayer *localPlayer = playerModel.localPlayer;
-            mPlayerName = [localPlayer.name copy];
+            mPlayerName = [localPlayer.displayName copy];
             mPlayerId = [localPlayer.playerId copy];
-            LOGD((@"Player name %@, player id %@", localPlayer.name, localPlayer.playerId));
+            LOGD((@"Player name %@, player id %@", localPlayer.displayName, localPlayer.playerId));
         }
 
         // Notify auth callback

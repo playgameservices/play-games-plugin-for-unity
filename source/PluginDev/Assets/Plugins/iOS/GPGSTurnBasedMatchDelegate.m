@@ -55,11 +55,11 @@ static GPGSTurnBasedMatchDelegate *_sInstance = nil;
   for (GPGTurnBasedParticipant *participant in match.participants) {
     NSDictionary *participantAsDictionary =
     @{
-      @"displayName": participant.player.name,
+      @"displayName": participant.player.displayName,
       @"participantId": participant.participantId,
       @"status": @(participant.status),
       @"player": @{
-          @"playerDisplayName": participant.player.name,
+          @"playerDisplayName": participant.player.displayName,
           @"playerId": ((participant.player.playerId) ? participant.player.playerId : @""),
           },
       @"isConnectedToRoom": @(YES) // TODO: Fix this
@@ -199,7 +199,7 @@ static GPGSTurnBasedMatchDelegate *_sInstance = nil;
     self.invitationReceivedCallback(GPGSFALSE,
                                     [match.matchId UTF8String],
                                     [invitingParticipant.participantId UTF8String],
-                                    [invitingParticipant.player.name UTF8String],
+                                    [invitingParticipant.player.displayName UTF8String],
                                     match.matchConfig.variant
                                     );
   }
