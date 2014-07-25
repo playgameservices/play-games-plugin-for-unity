@@ -158,12 +158,14 @@ TO FINISH CONFIGURING THE EXPORTED XCODE PROJECT
       CoreData
       CoreLocation
       CoreMotion
+      CoreTelephony
       CoreText
       MediaPlayer
       QuartzCore
       Security
       SystemConfiguration
       libc++.dylib
+      libz.dylib
 
 2. Add the following bundles and frameworks from the Google Plus
    and the Google Play Games SDKs. These can be downloaded from
