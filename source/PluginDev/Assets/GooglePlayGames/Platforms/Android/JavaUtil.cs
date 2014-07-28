@@ -90,19 +90,11 @@ namespace GooglePlayGames.Android {
         public static byte[] ConvertByteArray(AndroidJavaObject byteArrayObj) {
             Debug.Log("ConvertByteArray.");
             
-            if (byteArrayObj == null) {
+            if (byteArrayObj == null || byteArrayObj.GetRawObject().ToInt32() == 0) {
                 return null;
             }
             
-            AndroidJavaClass jc = new AndroidJavaClass("java.lang.reflect.Array");
-            Debug.Log("Calling java.lang.reflect.Array.getLength.");
-            int len = jc.CallStatic<int>("getLength", byteArrayObj);
-            
-            byte[] b = new byte[len];
-            int i;
-            for (i = 0; i < len; i++) {
-                b[i] = jc.CallStatic<byte>("getByte", byteArrayObj, i);
-            }
+            byte[] b = AndroidJNIHelper.ConvertFromJNIArray<byte[]>(byteArrayObj.GetRawObject());
             
             return b;
         }
