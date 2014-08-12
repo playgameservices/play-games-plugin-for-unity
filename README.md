@@ -407,7 +407,7 @@ method.
 ```
 
 The **OnStateSaved** method of the **OnStateLoadedListener** will be called to 
-indicate the success or failure of the cloud save operation.
+indicate the success or failure of the cloud save operation.<br/>
 Please note that the [Slot number](https://developers.google.com/games/services/common/concepts/cloudsave#data_slots) is from 0 to 3 and can hold up to 256 kilobytes of data, for a total storage size of 1024 kilobytes.
 
 ## Loading Game State from the Cloud
