@@ -26,7 +26,7 @@ namespace GooglePlayGames.BasicApi.Multiplayer {
     /// </summary>
     public class Participant : IComparable<Participant> {
         public enum ParticipantStatus {
-            NotInvitedYet, Invited, Joined, Declined, Left, Finished, Unresponsive, Unknown
+            NotInvitedYet, Invited, Joined, Declined, Left, Finished, Unresponsive, Unknown, ConnectionEstablished
         };
 
         private string mDisplayName = "";
