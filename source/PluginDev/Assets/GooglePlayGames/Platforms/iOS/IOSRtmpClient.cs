@@ -158,7 +158,7 @@ namespace GooglePlayGames.IOS {
             return result.ToArray();
         }
 
-        private static Participant.ParticipantStatus convertIntFromiOSToParticipantStatus(int iOSStatus) {
+        private static Participant.ParticipantStatus convertIntFromiOSToParticipantStatus(System.Int64 iOSStatus) {
             switch (iOSStatus) {
             case 0:
                 return Participant.ParticipantStatus.Invited;
@@ -169,8 +169,7 @@ namespace GooglePlayGames.IOS {
             case 3:
                 return Participant.ParticipantStatus.Left;
             case 4:
-                // "Connection established"
-                return Participant.ParticipantStatus.Unknown;
+				return Participant.ParticipantStatus.ConnectionEstablished;
             }
             return Participant.ParticipantStatus.Unknown;
         }
@@ -188,7 +187,7 @@ namespace GooglePlayGames.IOS {
                 Player dummyPlayer = new Player((string)nextData["playerName"], (string)nextData["playerId"]);
                 Participant nextParticipant = new Participant((string)nextData["displayName"],
                                                               (string)nextData["participantId"],
-                                                              (Participant.ParticipantStatus)((System.Int64)nextData["status"]),
+                                                              convertIntFromiOSToParticipantStatus((System.Int64)nextData["status"]),
                                                               dummyPlayer,
                                                               (System.Int64)nextData["connectedToRoom"] == 1);
                 Debug.Log("Participant " + nextParticipant.DisplayName + " id " + 
