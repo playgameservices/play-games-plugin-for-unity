@@ -109,29 +109,44 @@ namespace GooglePlayGames.IOS {
             case 0:
                 Logger.d("Room is inviting");
                 mAccumulatedProgress = Math.Min(mAccumulatedProgress, 20.0f);
-                sRtmpListener.OnRoomSetupProgress(mAccumulatedProgress);
+				if (sRtmpListener != null) {
+					sRtmpListener.OnRoomSetupProgress(mAccumulatedProgress);
+				}
+
                 break;
             case 1:
                 Logger.d("Room is connnecting");
                 mAccumulatedProgress = Math.Min(mAccumulatedProgress, 40.0f);
-                sRtmpListener.OnRoomSetupProgress(mAccumulatedProgress);
+				if (sRtmpListener != null) {
+					sRtmpListener.OnRoomSetupProgress(mAccumulatedProgress);
+				}
+                
                 break;
             case 2:
                 Logger.d("Room is automatching");
                 mAccumulatedProgress = Math.Min(mAccumulatedProgress, 20.0f);
-                sRtmpListener.OnRoomSetupProgress(mAccumulatedProgress);
+				if (sRtmpListener != null) {
+					sRtmpListener.OnRoomSetupProgress(mAccumulatedProgress);
+				}
+               
                 break;
             case 3:
                 Logger.d("Room is active");
                 mAccumulatedProgress = Math.Min(mAccumulatedProgress, 100.0f);
-                sRtmpListener.OnRoomSetupProgress(mAccumulatedProgress);
-                sRtmpListener.OnRoomConnected(true);
+				if (sRtmpListener != null) {
+					sRtmpListener.OnRoomSetupProgress(mAccumulatedProgress);
+					sRtmpListener.OnRoomConnected(true);
+				}
+               
                 sDeliveredRoomConnected = true;
 
                 break;
             case 4: // Room was deleted
                 Logger.d("Room was deleted. Calling left room");
-                sRtmpListener.OnLeftRoom();
+				if (sRtmpListener != null) {
+					sRtmpListener.OnLeftRoom();
+				}
+                
                 Clear();
                 break;
             default:
@@ -240,7 +255,10 @@ namespace GooglePlayGames.IOS {
             if (dataBuf.ToInt32() != 0) {
                 data = new byte[dataSize];
                 Marshal.Copy(dataBuf, data, 0, dataSize);
-                sRtmpListener.OnRealTimeMessageReceived(isReliable, participantId, data);
+				if (sRtmpListener != null) {
+					sRtmpListener.OnRealTimeMessageReceived(isReliable, participantId, data);
+				}
+               
             }
         }
 
