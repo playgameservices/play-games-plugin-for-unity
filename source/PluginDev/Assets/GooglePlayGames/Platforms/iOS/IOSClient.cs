@@ -47,7 +47,7 @@ namespace GooglePlayGames.IOS {
 
         // Entry points exposed by the iOS native code (.m files in Assets/Plugins/iOS):
         [DllImport("__Internal")]
-        private static extern void GPGSAuthenticateWithCallback(GPGSSuccessCallback cb);
+        private static extern bool GPGSAuthenticateWithCallback(GPGSSuccessCallback cb, bool silent);
 
         [DllImport("__Internal")]
         private static extern void GPGSEnableDebugLog(bool enable);
@@ -152,7 +152,10 @@ namespace GooglePlayGames.IOS {
         public void Authenticate(System.Action<bool> callback, bool silent) {
             Logger.d("IOSClient.Authenticate");
             mAuthCallback = callback;
-            GPGSAuthenticateWithCallback(AuthCallback);
+            // Authenticate currently returns void, so there's nothing
+            // we can do with this value right now beyond log it
+            bool tryingSilentSignIn = GPGSAuthenticateWithCallback(AuthCallback, silent);
+            Logger.d("Trying silent signin = " + tryingSilentSignIn);
         }
         
         public void SignOut() {

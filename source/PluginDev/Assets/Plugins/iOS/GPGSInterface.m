@@ -27,9 +27,10 @@
 
 // This file defines entry points to be called from C#.
 
-void GPGSAuthenticateWithCallback(GPGSSuccessCallback cb) {
+GPGSBOOL GPGSAuthenticateWithCallback(GPGSSuccessCallback cb, BOOL silently) {
   LOGD((@"GPGSAuthenticateWithCallback."));
-  [[GPGSManager instance] authenticateWithCallback: cb];
+  BOOL tryingSilentSignIn = [[GPGSManager instance] authenticateWithCallback:cb silently:silently];
+  return (tryingSilentSignIn) ? GPGSTRUE : GPGSFALSE;
 }
 
 void GPGSEnableDebugLog(GPGSBOOL enable) {

@@ -73,8 +73,10 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
     void ShowNotAuthUi() {
         DrawTitle(null);
         DrawStatus();
-        if (GUI.Button(CalcGrid(1,1), "Authenticate")) {
-            DoAuthenticate();
+        if (GUI.Button(CalcGrid(1, 1), "Authenticate")) {
+            DoAuthenticate(false);
+        } else if (GUI.Button(CalcGrid(1, 2), "Silent Auth")) {
+            DoAuthenticate(true);
         }
     }
 
@@ -253,12 +255,14 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
         mStandby = false;
     }
 
-    void DoAuthenticate() {
-        SetStandBy("Authenticating...");
+    void DoAuthenticate(bool silent) {
+        if (!silent) {
+            SetStandBy("Authenticating...");
+        }
 
         PlayGamesPlatform.DebugLogEnabled = true;
         PlayGamesPlatform.Activate();
-        Social.localUser.Authenticate((bool success) => {
+        PlayGamesPlatform.Instance.Authenticate((bool success) => {
             EndStandBy();
             if (success) {
                 mStatus = "Authenticated. Hello, " + Social.localUser.userName + " (" +
@@ -271,7 +275,7 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
                 mStatus = "*** Failed to authenticate.";
             }
             ShowEffect(success);
-        });
+        }, silent);
     }
 
     void DoSignOut() {

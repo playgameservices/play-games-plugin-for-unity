@@ -26,7 +26,7 @@
 }
 - (GPGSManager*)init;
 + (GPGSManager*)instance;
-- (void) authenticateWithCallback:(GPGSSuccessCallback)callback;
+- (BOOL) authenticateWithCallback:(GPGSSuccessCallback)callback silently:(BOOL)trySilent;
 - (void) signOut;
 - (NSString*) playerId;
 - (NSString*) playerName;
