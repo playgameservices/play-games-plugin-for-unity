@@ -184,7 +184,7 @@ void GPGSShowLeaderboardsUI(const char *lbId_s) {
 }
 
 void GPGSSubmitScore(const char *lbId_s, int64_t score64, GPGSSuccessCallback callback, int32_t userdata) {
-  long score = (long) score64;
+  long long score = (long long) score64;
   LOGD((@"GPGSSubmitScore %s, score %ld", lbId_s, score));
   NSString *lbId = [[NSString alloc] initWithUTF8String:lbId_s];
   GPGScore *myScore = [[GPGScore alloc] initWithLeaderboardId:lbId];
