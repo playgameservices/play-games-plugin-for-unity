@@ -33,15 +33,16 @@ static GPGSManager *sInstance = NULL;
     return self;
 }
 
-- (void) authenticateWithCallback:(GPGSSuccessCallback)callback
+- (BOOL)authenticateWithCallback:(GPGSSuccessCallback)callback silently:(BOOL)trySilent
 {
     LOGD((@"GPGSManager initializing and authenticating."));
     mAuthCallback = callback;
     [GPGManager sharedInstance].statusDelegate = self;
 
+    [GPGManager sharedInstance].sdkTag = 0xa227;
     // Let's not break anybody currently using app state
     [GPGManager sharedInstance].appStateEnabled = YES;
-    [[GPGManager sharedInstance] signInWithClientID:@kClientID silently:NO];
+    return [[GPGManager sharedInstance] signInWithClientID:@kClientID silently:trySilent];
 }
 
 - (void)didFinishGamesSignInWithError:(NSError *)error {
