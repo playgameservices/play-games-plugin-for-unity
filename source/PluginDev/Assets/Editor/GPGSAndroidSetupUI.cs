@@ -27,11 +27,6 @@ public class GPGSAndroidSetupUI : EditorWindow {
         EditorWindow.GetWindow(typeof(GPGSAndroidSetupUI));
     }
 
-    [MenuItem("File/Play Games - Android setup...")]
-    public static void MenuItemFileGPGSAndroidSetup() {
-        EditorWindow.GetWindow(typeof(GPGSAndroidSetupUI));
-    }
-
     void OnEnable() {
         mAppId = GPGSProjectSettings.Instance.Get("proj.AppId");
     }
