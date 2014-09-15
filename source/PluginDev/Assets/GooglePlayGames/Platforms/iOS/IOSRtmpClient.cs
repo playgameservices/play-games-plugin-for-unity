@@ -131,9 +131,9 @@ namespace GooglePlayGames.IOS {
                 break;
             case 4: // Room was deleted
                 Logger.d("Room was deleted. Calling onLeftRoom");
-				if (sRtmpListener != null) {
-	                sRtmpListener.OnLeftRoom();
-				}
+                if (sRtmpListener != null) {
+                    sRtmpListener.OnLeftRoom();
+                }
                 Clear();
                 break;
             default:
@@ -241,9 +241,9 @@ namespace GooglePlayGames.IOS {
             if (dataBuf.ToInt32() != 0) {
                 data = new byte[dataSize];
                 Marshal.Copy(dataBuf, data, 0, dataSize);
-				if (sRtmpListener != null) {
-	                sRtmpListener.OnRealTimeMessageReceived(isReliable, participantId, data);
-				}
+                if (sRtmpListener != null) {
+                    sRtmpListener.OnRealTimeMessageReceived(isReliable, participantId, data);
+                }
             }
         }
 
