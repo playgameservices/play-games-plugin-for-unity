@@ -497,6 +497,8 @@ void GPGSTBMPTakeTurnInMatch(const char *matchId_s, GPGSCBUF buf, int32_t dataSi
 
 void GPGSTBMPShowInvitesAndFindMatch(int32_t callbackId, GPGTurnBasedMatchCreateCallback callback) {
   LOGD((@"GPGSTBMPShowInvitesAndFindMatch"));
+  UIViewController *vc = GetUnityViewController();
+  [[GPGSTurnBasedMatchDelegate sharedInstance] setupWithParent:vc callbackId:callbackId unityCallback:callback];
   [GPGLauncherController sharedInstance].turnBasedMatchListLauncherDelegate = [GPGSTurnBasedMatchDelegate sharedInstance];
   [[GPGLauncherController sharedInstance] presentTurnBasedMatchList];
 }
