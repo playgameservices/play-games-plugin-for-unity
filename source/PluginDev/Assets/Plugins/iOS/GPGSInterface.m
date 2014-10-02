@@ -20,7 +20,6 @@
 #import "GPGSRealTimeRoomDelegate.h"
 #import "GPGSTurnBasedMatchDelegate.h"
 #import "UnityAppController.h"
-#import "GPGSAchOrLbDelegate.h"
 #import "GPGSTypedefs.h"
 
 #import <GooglePlayGames/GooglePlayGames.h>
@@ -70,31 +69,32 @@ GPGSBOOL GPGSQueryAchievement(const char *achId_s, GPGSBOOL *outIsIncremental,
                               int32_t *outCurSteps, int32_t *outTotalSteps) {
   LOGD((@"GPGSQueryAchievement %s", achId_s));
   NSString *achId = [[NSString alloc] initWithUTF8String:achId_s];
-  GPGAchievementMetadata *metaData = [[GPGManager sharedInstance].applicationModel.achievement        metadataForAchievementId:achId];
-
-  if (!metaData) {
-    return GPGSFALSE;
-  }
+  __block GPGAchievementMetadata *aMetadata;
+  dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    [GPGAchievementMetadata metadataForAchievementId:achId completionHandler:^(GPGAchievementMetadata *metadata, NSError *error) {
+      aMetadata = metadata;
+    }];
+  });
 
   if (NULL != outIsIncremental) {
-    *outIsIncremental = ([metaData type] == GPGAchievementTypeIncremental);
+    *outIsIncremental = ([aMetadata type] == GPGAchievementTypeIncremental);
   }
 
   if (NULL != outIsRevealed) {
-    *outIsRevealed = ([metaData state] == GPGAchievementStateRevealed ||
-                      [metaData state] == GPGAchievementStateUnlocked);
+    *outIsRevealed = ([aMetadata state] == GPGAchievementStateRevealed ||
+                      [aMetadata state] == GPGAchievementStateUnlocked);
   }
 
   if (NULL != outIsUnlocked) {
-    *outIsUnlocked = ([metaData state] == GPGAchievementStateUnlocked);
+    *outIsUnlocked = ([aMetadata state] == GPGAchievementStateUnlocked);
   }
 
   if (NULL != outCurSteps) {
-    *outCurSteps = [metaData completedSteps];
+    *outCurSteps = [aMetadata completedSteps];
   }
 
   if (NULL != outTotalSteps) {
-    *outTotalSteps = [metaData numberOfSteps];
+    *outTotalSteps = [aMetadata numberOfSteps];
   }
 
   return GPGSTRUE;
@@ -144,22 +144,9 @@ static UIViewController* GetUnityViewController() {
   return ((UnityAppController*)[UIApplication sharedApplication].delegate).rootViewController;
 }
 
-GPGSAchOrLbDelegate* _achOrLbDelegate = NULL;
-
-GPGSAchOrLbDelegate* MakeAchOrLbDelegate() {
-    UIViewController *vc = GetUnityViewController();
-    GPGSAchOrLbDelegate *delegate = [[GPGSAchOrLbDelegate alloc] initWithViewController: vc];
-    _achOrLbDelegate = delegate;
-    return _achOrLbDelegate;
-}
-
 void GPGSShowAchievementsUI() {
   LOGD((@"GPGSShowAchievementsUI"));
-  UIViewController *vc = GetUnityViewController();
-  GPGAchievementController *achController = [[GPGAchievementController alloc] init];
-  GPGSAchOrLbDelegate *delegate = MakeAchOrLbDelegate();
-  achController.achievementDelegate = delegate;
-  [vc presentViewController:achController animated:YES completion:nil];
+  [[GPGLauncherController sharedInstance] presentAchievementList];
 }
 
 void GPGSShowLeaderboardsUI(const char *lbId_s) {
@@ -170,17 +157,10 @@ void GPGSShowLeaderboardsUI(const char *lbId_s) {
     lbId = [[NSString alloc] initWithUTF8String:lbId_s];
   }
 
-  UIViewController *vc = GetUnityViewController();
-  GPGSAchOrLbDelegate *delegate = MakeAchOrLbDelegate();
-
   if (lbId) {
-    GPGLeaderboardController *lbController = [[GPGLeaderboardController alloc] initWithLeaderboardId:lbId];
-    lbController.leaderboardDelegate = delegate;
-    [vc presentViewController:lbController animated:YES completion:nil];
+    [[GPGLauncherController sharedInstance] presentLeaderboardWithLeaderboardId:lbId];
   } else {
-    GPGLeaderboardsController *lbsController = [[GPGLeaderboardsController alloc] init];
-    lbsController.leaderboardsDelegate = delegate;
-    [vc presentViewController:lbsController animated:YES completion:nil];
+    [[GPGLauncherController sharedInstance] presentLeaderboardList];
   }
 }
 
@@ -296,6 +276,7 @@ void GPGSRegisterInviteDelegate(GPGSPushNotificationCallback pushNotificationCal
 
   [GPGManager sharedInstance].realTimeRoomDelegate = [GPGSRealTimeRoomDelegate sharedInstance];
   [GPGSRealTimeRoomDelegate sharedInstance].pushNotificationCallback = pushNotificationCallback;
+  [GPGLauncherController sharedInstance].turnBasedMatchListLauncherDelegate = [GPGSTurnBasedMatchDelegate sharedInstance];
   [GPGManager sharedInstance].turnBasedMatchDelegate = [GPGSTurnBasedMatchDelegate sharedInstance];
   [GPGSTurnBasedMatchDelegate sharedInstance].invitationReceivedCallback = pushNotificationCallback;
 
@@ -311,14 +292,7 @@ void GPGSRtmpCreateWithInviteScreen(
   LOGD((@"GPGSRtmpCreateWithInviteScreen"));
   // Fun fact: The unity plugin interprets the DEFAULT variant as 0, not -1;
   if (variant == 0) { variant = -1; }
-  GPGRealTimeRoomViewController *roomViewController =
-  [[GPGRealTimeRoomViewController alloc] initWithMinPlayers:minOpponents
-                                                 maxPlayers:maxOpponents
-                                           exclusiveBitMask:0
-                                                    variant:variant];
-
   [GPGManager sharedInstance].realTimeRoomDelegate = [GPGSRealTimeRoomDelegate sharedInstance];
-
   [GPGSRealTimeRoomDelegate sharedInstance].statusChangedCallback = statusChangedCallback;
   [GPGSRealTimeRoomDelegate sharedInstance].participantsChangedCallback =
       participantsChangedCallback;
@@ -327,8 +301,11 @@ void GPGSRtmpCreateWithInviteScreen(
 
   UIViewController *vc = GetUnityViewController();
   [GPGSRealTimeRoomDelegate sharedInstance].parentOfRealTimeVC = vc;
-  [vc presentViewController:roomViewController animated:YES completion:nil];
-
+  [[GPGLauncherController sharedInstance]
+      presentRealTimeInviteWithMinPlayers:minOpponents
+                               maxPlayers:maxOpponents
+                         exclusiveBitMask:0
+                                  variant:variant];
 }
 
 void GPGSRtmpDeclineRoomWithId(const char *roomId_s) {
@@ -375,11 +352,7 @@ void GPGSRtmpCreateQuickGame(int32_t minOpponents, int32_t maxOpponents, int32_t
   config.variant = variant;
 
   [GPGManager sharedInstance].realTimeRoomDelegate = [GPGSRealTimeRoomDelegate sharedInstance];
-  GPGRealTimeRoomViewController *roomViewController =
-      [[GPGRealTimeRoomViewController alloc] initAndCreateRoomWithConfig:config];
-  UIViewController *vc = GetUnityViewController();
-  [GPGSRealTimeRoomDelegate sharedInstance].parentOfRealTimeVC = vc;
-  [vc presentViewController:roomViewController animated:YES completion:nil];
+  [[GPGLauncherController sharedInstance] presentRealTimeWaitingRoomWithConfig:config];
 }
 
 void GPGSRtmpShowAllInvitations(
@@ -403,11 +376,7 @@ void GPGSRtmpShowAllInvitations(
        }
      }
 
-     GPGRealTimeRoomViewController *invitesRoom =
-         [[GPGRealTimeRoomViewController alloc] initWithRoomDataList:roomsWithInvites];
-     UIViewController *vc = GetUnityViewController();
-     [GPGSRealTimeRoomDelegate sharedInstance].parentOfRealTimeVC = vc;
-     [vc presentViewController:invitesRoom animated:YES completion:nil];
+     [[GPGLauncherController sharedInstance] presentRealTimeInvitesWithRoomDataList:roomsWithInvites];
    }];
 }
 
@@ -456,15 +425,14 @@ void GPGSTBMPCreateQuickMatch(int32_t minOpponents, int32_t maxOpponents, int32_
 void GPGSTBMPCreateWithInviteScreen(int32_t minOpponents, int32_t maxOpponents, int32_t variant,
                               int32_t callbackId, GPGTurnBasedMatchCreateCallback callback) {
   // This can be a 2-4 player game
-  GPGPeoplePickerViewController *findFriendsVC = [[GPGPeoplePickerViewController alloc] init];
-  findFriendsVC.minPlayersToPick = minOpponents;
-  findFriendsVC.maxPlayersToPick = maxOpponents;
-
+  GPGSTurnBasedMatchDelegate *tbmpDelegate = [GPGSTurnBasedMatchDelegate sharedInstance];
+  tbmpDelegate.minPlayers = minOpponents;
+  tbmpDelegate.maxPlayers = maxOpponents;
+  [GPGLauncherController sharedInstance].playerPickerLauncherDelegate = tbmpDelegate;
+  [GPGLauncherController sharedInstance].launcherDelegate = tbmpDelegate;
   UIViewController *vc = GetUnityViewController();
-  [[GPGSTurnBasedMatchDelegate sharedInstance] setupWithParent:vc callbackId:callbackId unityCallback:callback];
-  findFriendsVC.peoplePickerDelegate = [GPGSTurnBasedMatchDelegate sharedInstance];
-  [vc presentViewController:findFriendsVC animated:YES completion:nil];
-  
+  [tbmpDelegate setupWithParent:vc callbackId:callbackId unityCallback:callback];
+  [[GPGLauncherController sharedInstance] presentPlayerPicker];
 }
 
 void GPGSTBMPAcceptMatchWithId(const char *invitationId_s, int32_t callbackId, GPGTurnBasedMatchCreateCallback callback) {
@@ -512,30 +480,27 @@ void GPGSTBMPTakeTurnInMatch(const char *matchId_s, GPGSCBUF buf, int32_t dataSi
       (nextPlayerId_s == NULL) ? nil : [[NSString alloc] initWithUTF8String:nextPlayerId_s];
   NSData *matchData = [NSData dataWithBytes:buf length:dataSize];
   NSLog(@"I am attempting to take a turn with matchID %@ and player %@", matchId, nextPlayerId);
-  GPGTurnBasedMatch *match =
-      [[GPGManager sharedInstance].applicationModel.turnBased matchForId:matchId];
-  NSLog(@"I have found the match! Here it is: %@", match);
-  NSLog(@"Tetting ready to take my turn in match %@", match.matchId);
-  [match takeTurnWithNextParticipantId:nextPlayerId data:matchData results:nil completionHandler:^(NSError *error) {
-    NSLog(@"Taking my turn. Got back error? %@", [error localizedDescription]);
-    if (error) {
-      callback(GPGSTRUE, [error code], callbackId);
-    } else {
-      callback(GPGSFALSE, 0, callbackId);
-    }
-  }];
+  [GPGTurnBasedMatch fetchMatchWithId:matchId includeMatchData:YES completionHandler:^(GPGTurnBasedMatch *match, NSError *error) {
+    NSLog(@"I have found the match! Here it is: %@", match);
+    NSLog(@"Tetting ready to take my turn in match %@", match.matchId);
 
+    [match takeTurnWithNextParticipantId:nextPlayerId data:matchData results:nil completionHandler:^(NSError *error) {
+      NSLog(@"Taking my turn. Got back error? %@", [error localizedDescription]);
+      if (error) {
+        callback(GPGSTRUE, [error code], callbackId);
+      } else {
+        callback(GPGSFALSE, 0, callbackId);
+      }
+    }];
+  }];
 }
 
 void GPGSTBMPShowInvitesAndFindMatch(int32_t callbackId, GPGTurnBasedMatchCreateCallback callback) {
-
   LOGD((@"GPGSTBMPShowInvitesAndFindMatch"));
-  UIViewController *unityVC = GetUnityViewController();
-  GPGTurnBasedMatchViewController *tbmvc = [[GPGTurnBasedMatchViewController alloc] init];
-  tbmvc.matchDelegate = [GPGSTurnBasedMatchDelegate sharedInstance];
-  [[GPGSTurnBasedMatchDelegate sharedInstance] setupWithParent:unityVC callbackId:callbackId unityCallback:callback];
-  [unityVC presentViewController:tbmvc animated:YES completion:nil];
-
+  UIViewController *vc = GetUnityViewController();
+  [[GPGSTurnBasedMatchDelegate sharedInstance] setupWithParent:vc callbackId:callbackId unityCallback:callback];
+  [GPGLauncherController sharedInstance].turnBasedMatchListLauncherDelegate = [GPGSTurnBasedMatchDelegate sharedInstance];
+  [[GPGLauncherController sharedInstance] presentTurnBasedMatchList];
 }
 
 void GPGSTBMPLeaveDuringTurn(const char *matchId_s, const char *nextParticipantId_s, int32_t callbackId, GPGTurnBasedSuccessCallback callback) {
@@ -543,14 +508,15 @@ void GPGSTBMPLeaveDuringTurn(const char *matchId_s, const char *nextParticipantI
   NSString *matchId =  [[NSString alloc] initWithUTF8String:matchId_s];
   NSString *nextPlayerId = (nextParticipantId_s == NULL) ? nil : [[NSString alloc] initWithUTF8String:nextParticipantId_s];
   NSLog(@"I am attempting to leave a turn with matchID %@ and player %@", matchId, nextPlayerId);
-  GPGTurnBasedMatch *match = [[GPGManager sharedInstance].applicationModel.turnBased matchForId:matchId];
-  [match leaveDuringTurnWithNextParticipantId:nextPlayerId completionHandler:^(NSError *error) {
-    NSLog(@"Leaving during turn. Got back error? %@", [error localizedDescription]);
-    if (error) {
-      callback(GPGSTRUE, [error code], callbackId);
-    } else {
-      callback(GPGSFALSE, 0, callbackId);
-    }
+  [GPGTurnBasedMatch fetchMatchWithId:matchId includeMatchData:YES completionHandler:^(GPGTurnBasedMatch *match, NSError *error) {
+    [match leaveDuringTurnWithNextParticipantId:nextPlayerId completionHandler:^(NSError *error) {
+      NSLog(@"Leaving during turn. Got back error? %@", [error localizedDescription]);
+      if (error) {
+        callback(GPGSTRUE, [error code], callbackId);
+      } else {
+        callback(GPGSFALSE, 0, callbackId);
+      }
+    }];
   }];
 }
 
@@ -558,14 +524,15 @@ void GPGSTBMPLeaveOutofTurn(const char *matchId_s, int32_t callbackId, GPGTurnBa
   LOGD((@"GPGSTBMPLeaveDuringTurn"));
   NSString *matchId =  [[NSString alloc] initWithUTF8String:matchId_s];
   NSLog(@"I am attempting to leave OUT OF turn with matchID %@ ", matchId);
-  GPGTurnBasedMatch *match = [[GPGManager sharedInstance].applicationModel.turnBased matchForId:matchId];
-  [match leaveOutOfTurnWithCompletionHandler:^(NSError *error) {
-    NSLog(@"Leave out of turn. Got back error? %@", [error localizedDescription]);
-    if (error) {
-      callback(GPGSTRUE, [error code], callbackId);
-    } else {
-      callback(GPGSFALSE, 0, callbackId);
-    }
+  [GPGTurnBasedMatch fetchMatchWithId:matchId includeMatchData:YES completionHandler:^(GPGTurnBasedMatch *match, NSError *error) {
+    [match leaveOutOfTurnWithCompletionHandler:^(NSError *error) {
+      NSLog(@"Leave out of turn. Got back error? %@", [error localizedDescription]);
+      if (error) {
+        callback(GPGSTRUE, [error code], callbackId);
+      } else {
+        callback(GPGSFALSE, 0, callbackId);
+      }
+    }];
   }];
 }
 
@@ -573,14 +540,15 @@ void GPGSTBMPCancelMatch(const char *matchId_s, int32_t callbackId, GPGTurnBased
   LOGD((@"GPGSTBMPCancelMatch"));
   NSString *matchId =  [[NSString alloc] initWithUTF8String:matchId_s];
   NSLog(@"I am attempting to cancel with matchID %@ ", matchId);
-  GPGTurnBasedMatch *match = [[GPGManager sharedInstance].applicationModel.turnBased matchForId:matchId];
-  [match dismissWithCompletionHandler:^(NSError *error) {
-    NSLog(@"Dismiss. Got back error? %@", [error localizedDescription]);
-    if (error) {
-      callback(GPGSTRUE, [error code], callbackId);
-    } else {
-      callback(GPGSFALSE, 0, callbackId);
-    }
+  [GPGTurnBasedMatch fetchMatchWithId:matchId includeMatchData:YES completionHandler:^(GPGTurnBasedMatch *match, NSError *error) {
+    [match dismissWithCompletionHandler:^(NSError *error) {
+      NSLog(@"Dismiss. Got back error? %@", [error localizedDescription]);
+      if (error) {
+        callback(GPGSTRUE, [error code], callbackId);
+      } else {
+        callback(GPGSFALSE, 0, callbackId);
+      }
+    }];
   }];
 }
 
@@ -608,16 +576,16 @@ void GPGSTBMPFinishMatch(const char *matchId_s, GPGSCBUF buf, int32_t dataSize, 
     [finalResults addObject:playerResult];
   }
 
-  GPGTurnBasedMatch *match = [[GPGManager sharedInstance].applicationModel.turnBased matchForId:matchId];
-  [match finishWithData:matchData results:finalResults completionHandler:^(NSError *error) {
-    NSLog(@"Finishing match. Got back error %@", [error localizedDescription]);
-    if (error) {
-      callback(GPGSTRUE, [error code], callbackId);
-    } else {
-      callback(GPGSFALSE, 0, callbackId);
-    }
+  [GPGTurnBasedMatch fetchMatchWithId:matchId includeMatchData:YES completionHandler:^(GPGTurnBasedMatch *match, NSError *error) {
+    [match finishWithData:matchData results:finalResults completionHandler:^(NSError *error) {
+      NSLog(@"Finishing match. Got back error %@", [error localizedDescription]);
+      if (error) {
+        callback(GPGSTRUE, [error code], callbackId);
+      } else {
+        callback(GPGSFALSE, 0, callbackId);
+      }
+    }];
   }];
-
 }
 
 void GPGSTBMPAcknowledgeFinish(const char *matchId_s, int32_t callbackId, GPGTurnBasedSuccessCallback callback) {
@@ -625,29 +593,30 @@ void GPGSTBMPAcknowledgeFinish(const char *matchId_s, int32_t callbackId, GPGTur
   LOGD((@"Acknowledging finish for match %@", matchId));
   // For now, we are just acknowledging the results
 
-  GPGTurnBasedMatch *match = [[GPGManager sharedInstance].applicationModel.turnBased matchForId:matchId];
-  [match finishWithData:nil results:nil completionHandler:^(NSError *error) {
-    if (error) {
-      callback(GPGSTRUE, [error code], callbackId);
-    } else {
-      callback(GPGSFALSE, 0, callbackId);
-    }
+  [GPGTurnBasedMatch fetchMatchWithId:matchId includeMatchData:YES completionHandler:^(GPGTurnBasedMatch *match, NSError *error) {
+    [match finishWithData:nil results:nil completionHandler:^(NSError *error) {
+      if (error) {
+        callback(GPGSTRUE, [error code], callbackId);
+      } else {
+        callback(GPGSFALSE, 0, callbackId);
+      }
+    }];
   }];
-
 }
 
 void GPGSTBMPRemach(const char *matchId_s, int32_t callbackId, GPGTurnBasedMatchCreateCallback callback) {
   NSString *matchId =  [[NSString alloc] initWithUTF8String:matchId_s];
   LOGD((@"Requesting rematch for match %@", matchId));
-  GPGTurnBasedMatch *match = [[GPGManager sharedInstance].applicationModel.turnBased matchForId:matchId];
-  [match rematchWithCompletionHandler:^(GPGTurnBasedMatch *rematch, NSError *error) {
-    if (error) {
-      NSLog(@"Received an error trying to rematch %@", [error localizedDescription]);
-      callback([@"" UTF8String], GPGSTRUE, callbackId);
-    } else {
-      callback([[GPGSTurnBasedMatchDelegate getJsonStringFromMatch:rematch] UTF8String], GPGSFALSE,
-               callbackId);
-    }
+  [GPGTurnBasedMatch fetchMatchWithId:matchId includeMatchData:YES completionHandler:^(GPGTurnBasedMatch *match, NSError *error) {
+    [match rematchWithCompletionHandler:^(GPGTurnBasedMatch *rematch, NSError *error) {
+      if (error) {
+        NSLog(@"Received an error trying to rematch %@", [error localizedDescription]);
+        callback([@"" UTF8String], GPGSTRUE, callbackId);
+      } else {
+        callback([[GPGSTurnBasedMatchDelegate getJsonStringFromMatch:rematch] UTF8String], GPGSFALSE,
+                 callbackId);
+      }
+    }];
   }];
 }
 

@@ -55,19 +55,16 @@ static GPGSManager *sInstance = NULL;
   } else {
     LOGD((@"Games sign in successful"));
     // request information about the player
-    [[[GPGManager sharedInstance] applicationModel] loadDataForKey:GPGModelLocalPlayerKey
-                                                 completionHandler:^(NSError *error) {
+    [GPGPlayer localPlayerWithCompletionHandler:^(GPGPlayer *player, NSError *error) {
       LOGD((@"GPGSManager got player data callback"));
       if (error) {
         // Error
         LOGE((@"Failed to retrieve player name/id: %@", error));
       } else {
         // Retrieve that information from the GPGApplicationModel
-        GPGPlayerModel *playerModel = [[[GPGManager sharedInstance] applicationModel] player];
-        GPGPlayer *localPlayer = playerModel.localPlayer;
-        mPlayerName = [localPlayer.displayName copy];
-        mPlayerId = [localPlayer.playerId copy];
-        LOGD((@"Player name %@, player id %@", localPlayer.displayName, localPlayer.playerId));
+        mPlayerName = [player.displayName copy];
+        mPlayerId = [player.playerId copy];
+        LOGD((@"Player name %@, player id %@", player.displayName, player.playerId));
       }
 
       // Notify auth callback
