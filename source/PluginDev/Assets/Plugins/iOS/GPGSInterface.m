@@ -292,7 +292,7 @@ void GPGSRtmpCreateWithInviteScreen(
   LOGD((@"GPGSRtmpCreateWithInviteScreen"));
   // Fun fact: The unity plugin interprets the DEFAULT variant as 0, not -1;
   if (variant == 0) { variant = -1; }
-
+  [GPGManager sharedInstance].realTimeRoomDelegate = [GPGSRealTimeRoomDelegate sharedInstance];
   [GPGSRealTimeRoomDelegate sharedInstance].statusChangedCallback = statusChangedCallback;
   [GPGSRealTimeRoomDelegate sharedInstance].participantsChangedCallback =
       participantsChangedCallback;
