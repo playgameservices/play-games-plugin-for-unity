@@ -29,11 +29,6 @@ public class GPGSIOSSetupUI : EditorWindow {
         EditorWindow.GetWindow(typeof(GPGSIOSSetupUI));
     }
 
-    [MenuItem("File/Play Games - iOS setup...")]
-    public static void MenuItemFileGPGSIOSSetup() {
-        EditorWindow.GetWindow(typeof(GPGSIOSSetupUI));
-    }
-
     void OnEnable() {
         mAppId = GPGSProjectSettings.Instance.Get("proj.AppId");
         mClientId = GPGSProjectSettings.Instance.Get("ios.ClientId");

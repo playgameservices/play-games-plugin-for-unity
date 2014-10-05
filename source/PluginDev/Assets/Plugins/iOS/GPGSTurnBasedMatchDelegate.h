@@ -19,14 +19,15 @@
 #import "GPGSTypedefs.h"
 
 
-@interface GPGSTurnBasedMatchDelegate : NSObject  <GPGTurnBasedMatchViewControllerDelegate,
-GPGPeoplePickerViewControllerDelegate, GPGTurnBasedMatchDelegate>
+@interface GPGSTurnBasedMatchDelegate : NSObject<GPGTurnBasedMatchDelegate, GPGPlayerPickerLauncherDelegate, GPGTurnBasedMatchListLauncherDelegate, GPGLauncherDelegate>
 
 @property (nonatomic) int32_t callbackId;
 @property (nonatomic, weak) UIViewController *parentVc;
 @property (nonatomic) GPGTurnBasedMatchCreateCallback getMatchCallback;
 @property (nonatomic) GPGSPushNotificationCallback invitationReceivedCallback;
 @property (nonatomic) GPGSTurnBasedMatchYourTurnCallback yourTurnCallback;
+@property (nonatomic) int32_t minPlayers;
+@property (nonatomic) int32_t maxPlayers;
 
 + (GPGSTurnBasedMatchDelegate *)sharedInstance;
 + (NSString *)getJsonStringFromMatch:(GPGTurnBasedMatch *)match;

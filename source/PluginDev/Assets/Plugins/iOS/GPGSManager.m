@@ -33,82 +33,55 @@ static GPGSManager *sInstance = NULL;
     return self;
 }
 
-- (void) authenticateWithCallback:(GPGSSuccessCallback)callback
+- (BOOL)authenticateWithCallback:(GPGSSuccessCallback)callback silently:(BOOL)trySilent
 {
     LOGD((@"GPGSManager initializing and authenticating."));
     mAuthCallback = callback;
-    GPPSignIn *signIn = [GPPSignIn sharedInstance];
-    // You set kClientID in a previous step
-    signIn.clientID = @kClientID;
-    signIn.scopes = [NSArray arrayWithObjects:
-                     @"https://www.googleapis.com/auth/games",
-                     @"https://www.googleapis.com/auth/appstate",
-                     nil];
-    signIn.language = [[NSLocale preferredLanguages] objectAtIndex:0];
-    signIn.delegate = self;
-    signIn.shouldFetchGoogleUserID =YES;
-    LOGD((@"GPPSignIn initialized."));
-    LOGD((@"GPPSignIn attempting sign in now."));
-    [[GPPSignIn sharedInstance] authenticate];
+    [GPGManager sharedInstance].statusDelegate = self;
+
+    [GPGManager sharedInstance].sdkTag = 0xa227;
+    // Let's not break anybody currently using app state
+    [GPGManager sharedInstance].appStateEnabled = YES;
+    return [[GPGManager sharedInstance] signInWithClientID:@kClientID silently:trySilent];
 }
 
--(void)startGoogleGamesSignIn
-{
-    LOGD((@"GPGSManager Starting Google Games sign in."));
-
-    // The GPPSignIn object has an auth token now. Pass it to the GPGManager.
-    // NOTE: if you get compile errors in this function, it may be because your Google
-    // Play Games SDK for iOS is not recent enough. If so, update it and try again.
-    // Check https://developers.google.com/games/services/downloads
-    //[GPGManager sharedInstance].sdkTag = 0xa227;
-    [[GPGManager sharedInstance] signIn:[GPPSignIn sharedInstance]
-                     reauthorizeHandler:^(BOOL requiresKeychainWipe, NSError *error) {
-        // If you hit this, auth has failed and you need to authenticate.
-        // Most likely you can refresh behind the scenes
-        if (requiresKeychainWipe) {
-            [[GPPSignIn sharedInstance] signOut];
-        }
-        [[GPPSignIn sharedInstance] authenticate];
-    }];
-
-    // request information about the player
-    [[[GPGManager sharedInstance] applicationModel] loadDataForKey:GPGModelLocalPlayerKey
-                                                   completionHandler:^(NSError *error) {
-        LOGD((@"GPGSManager got player data callback"));
-        if (error) {
-            // Error
-            LOGE((@"Failed to retrieve player name/id: %@", error));
-        } else {
-            // Retrieve that information from the GPGApplicationModel
-            GPGPlayerModel *playerModel = [[[GPGManager sharedInstance] applicationModel] player];
-            GPGPlayer *localPlayer = playerModel.localPlayer;
-            mPlayerName = [localPlayer.displayName copy];
-            mPlayerId = [localPlayer.playerId copy];
-            LOGD((@"Player name %@, player id %@", localPlayer.displayName, localPlayer.playerId));
-        }
-
-        // Notify auth callback
-        if (mAuthCallback) {
-            LOGD((@"GPGSManager Calling auth callback with GPGSTRUE."));
-            (*mAuthCallback)(GPGSTRUE, 0);
-        }
-    }];
-}
-
-- (void)finishedWithAuth:(GTMOAuth2Authentication *)auth error:(NSError *)error
-{
-    LOGD((@"GPGSManager Finished with auth."));
-    if (error == nil && auth) {
-        LOGD((@"Success signing in to Google! Auth object is %@", auth));
-        [self startGoogleGamesSignIn];
-    } else {
-        LOGD((@"Failed to log into Google\n\tError=%@\n\tAuthObj=%@",error,auth));
-        if (mAuthCallback) {
-            LOGD((@"Calling auth callback with GPGSFALSE."));
-            (*mAuthCallback)(GPGSFALSE, 0);
-        }
+- (void)didFinishGamesSignInWithError:(NSError *)error {
+  if (error) {
+    LOGE((@"Error signing in: %@", [error localizedDescription]));
+    if (mAuthCallback) {
+      LOGD((@"Calling auth callback with GPGSFALSE."));
+      (*mAuthCallback)(GPGSFALSE, 0);
     }
+  } else {
+    LOGD((@"Games sign in successful"));
+    // request information about the player
+    [GPGPlayer localPlayerWithCompletionHandler:^(GPGPlayer *player, NSError *error) {
+      LOGD((@"GPGSManager got player data callback"));
+      if (error) {
+        // Error
+        LOGE((@"Failed to retrieve player name/id: %@", error));
+      } else {
+        // Retrieve that information from the GPGApplicationModel
+        mPlayerName = [player.displayName copy];
+        mPlayerId = [player.playerId copy];
+        LOGD((@"Player name %@, player id %@", player.displayName, player.playerId));
+      }
+
+      // Notify auth callback
+      if (mAuthCallback) {
+        LOGD((@"GPGSManager Calling auth callback with GPGSTRUE."));
+        (*mAuthCallback)(GPGSTRUE, 0);
+      }
+    }];
+  }
+
 }
+
+- (void)didFinishGamesSignOutWithError:(NSError *)error {
+  LOGD((@"GPGSManager Player successfully signed out"));
+
+}
+
 
 + (GPGSManager*)instance
 {

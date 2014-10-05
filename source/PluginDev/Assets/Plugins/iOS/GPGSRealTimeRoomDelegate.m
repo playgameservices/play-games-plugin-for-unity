@@ -62,23 +62,16 @@ static GPGSRealTimeRoomDelegate *_sInstance = nil;
   }
 }
 
-- (void)dismissRoomController {
-  if (self.parentOfRealTimeVC &&
-      [self.parentOfRealTimeVC.presentedViewController class] == [GPGRealTimeRoomViewController class]) {
-    [self.parentOfRealTimeVC dismissViewControllerAnimated:YES completion:nil];
-  }
-}
-
 - (void)room:(GPGRealTimeRoom *)room didChangeStatus:(GPGRealTimeRoomStatus)status {
   LOGD((@"Room changed status"));
   [self logRoomStatus:status];
   self.roomToTrack = room;
   if (status == GPGRealTimeRoomStatusDeleted) {
     // This very likely happened because the user hit cancel in the RealTimeVC
-    [self dismissRoomController];
+    [[GPGLauncherController sharedInstance] dismissAnimated:YES completionHandler:nil];
   }
   if (status == GPGRealTimeRoomStatusActive) {
-    [self dismissRoomController];
+    [[GPGLauncherController sharedInstance] dismissAnimated:YES completionHandler:nil];
   }
   if (self.statusChangedCallback) {
     self.statusChangedCallback(status);
@@ -156,12 +149,6 @@ toParticipant:(GPGRealTimeParticipant *)participant
   if (self.roomErrorCallback) {
     self.roomErrorCallback([error.localizedDescription UTF8String], error.code);
   }
-}
-
-
-- (void)roomViewControllerDidClose:(GPGRealTimeRoomViewController *)roomViewController {
-  LOGD((@"Room view controller closed"));
-  [self dismissRoomController];
 }
 
 - (void)sendMessageReliable:(BOOL)isRealible

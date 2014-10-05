@@ -299,6 +299,8 @@ namespace GooglePlayGames.Android {
                 Logger.d("Calling GHM.SignOut");
                 mGHManager.SignOut();
                 mAuthState = AuthState.NoAuth;
+                mUserId = null;
+                mUserDisplayName = null;
                 mSignOutInProgress = false;
                 Logger.d("Now signed out.");
             });

@@ -16,17 +16,17 @@
 // Author: Bruno Oliveira
 
 #import <Foundation/Foundation.h>
-#import <GooglePlus/GooglePlus.h>
+#import <GooglePlayGames/GooglePlayGames.h>
 #import "GPGSTypedefs.h"
 
-@interface GPGSManager : NSObject <GPPSignInDelegate> {
+@interface GPGSManager : NSObject <GPGStatusDelegate> {
     GPGSSuccessCallback mAuthCallback;
     NSString* mPlayerName;
     NSString* mPlayerId;
 }
 - (GPGSManager*)init;
 + (GPGSManager*)instance;
-- (void) authenticateWithCallback:(GPGSSuccessCallback)callback;
+- (BOOL) authenticateWithCallback:(GPGSSuccessCallback)callback silently:(BOOL)trySilent;
 - (void) signOut;
 - (NSString*) playerId;
 - (NSString*) playerName;

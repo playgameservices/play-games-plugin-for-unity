@@ -91,77 +91,50 @@ static GPGSTurnBasedMatchDelegate *_sInstance = nil;
   self.getMatchCallback = callback;
 }
 
-#pragma mark - GPGTurnBasedMatchViewControllerDelegate methods
+#pragma mark - GPGTurnBasedMatchListLauncherDelegate
 
-- (void)turnBasedMatchViewController:(GPGTurnBasedMatchViewController *)controller
-                didTakeTurnWithMatch:(GPGTurnBasedMatch *)match {
-  NSLog(@"Did take turn was picked");
-  [self.parentVc dismissViewControllerAnimated:YES completion:nil];
+- (void)turnBasedMatchListLauncherDidJoinMatch:(GPGTurnBasedMatch *)match {
   self.getMatchCallback([[GPGSTurnBasedMatchDelegate getJsonStringFromMatch:match] UTF8String], GPGSFALSE, self.callbackId);
 }
 
-- (void)turnBasedMatchViewController:(GPGTurnBasedMatchViewController *)controller
-                didTapMyTurnMatch:(GPGTurnBasedMatch *)match {
-  NSLog(@"I decided to view my turn");
-  // TODO: Decide what to do here. Call did take turn? Show a dialog? Up to the develoepr?
-}
-
-
-- (void)turnBasedMatchViewController:(GPGTurnBasedMatchViewController *)controller
-                        didJoinMatch:(GPGTurnBasedMatch *)match {
-  NSLog(@"Did join match was picked");
-  [self.parentVc dismissViewControllerAnimated:YES completion:nil];
+- (void)turnBasedMatchListLauncherDidSelectMatch:(GPGTurnBasedMatch *)match {
+  NSLog(@"Match selected.");
   self.getMatchCallback([[GPGSTurnBasedMatchDelegate getJsonStringFromMatch:match] UTF8String], GPGSFALSE, self.callbackId);
 }
 
-- (void)turnBasedMatchViewController:(GPGTurnBasedMatchViewController *)controller
-                     didDeclineMatch:(GPGTurnBasedMatch *)match {
-  NSLog(@"Did decline match was picked. No further action required");
-  [self.parentVc dismissViewControllerAnimated:YES completion:nil];
-}
-
-- (void)turnBasedMatchViewController:(GPGTurnBasedMatchViewController *)controller didTapCompletedMatch:(GPGTurnBasedMatch *)match {
-  NSLog(@"Completed match was viewed. We probably want to just view this");
-  [self.parentVc dismissViewControllerAnimated:YES completion:nil];
-  self.getMatchCallback([[GPGSTurnBasedMatchDelegate getJsonStringFromMatch:match] UTF8String], GPGSFALSE, self.callbackId);
-}
-
-- (void)turnBasedMatchViewController:(GPGTurnBasedMatchViewController *)controller didTapTheirTurnMatch:(GPGTurnBasedMatch *)match {
-  NSLog(@"Their turn match was called. We might want to view the match in progress");
-  [self.parentVc dismissViewControllerAnimated:YES completion:nil];
-  self.getMatchCallback([[GPGSTurnBasedMatchDelegate getJsonStringFromMatch:match] UTF8String], GPGSFALSE, self.callbackId);
-}
-
-- (void)turnBasedMatchViewController:(GPGTurnBasedMatchViewController *)controller
-                          didRematch:(GPGTurnBasedMatch *)match {
+- (void)turnBasedMatchListLauncherDidRematch:(GPGTurnBasedMatch *)match {
   NSLog(@"Did rematch was picked");
-  // I think we can just call the rematch using the new match that was created
-  [self.parentVc dismissViewControllerAnimated:YES completion:nil];
   self.getMatchCallback([[GPGSTurnBasedMatchDelegate getJsonStringFromMatch:match] UTF8String], GPGSFALSE, self.callbackId);
 }
 
-- (void)turnBasedMatchViewControllerDidFinish:(GPGTurnBasedMatchViewController *)controller {
-  NSLog(@"View controller was closed off");
-  [self.parentVc dismissViewControllerAnimated:YES completion:nil];
-  self.getMatchCallback([@"" UTF8String], GPGSTRUE, self.callbackId);
+- (void)turnBasedMatchListLauncherDidDeclineMatch:(GPGTurnBasedMatch *)match {
+  NSLog(@"Did decline match was picked. No further action required");
 }
 
-# pragma mark - GPGPeoplePickerDelegateMethods
+#pragma mark - GPGPlayerPickerDelegate
 
+- (int)minPlayersForPlayerPickerLauncher {
+  return self.minPlayers;
+}
 
-- (void)peoplePickerViewController:(GPGPeoplePickerViewController *)viewController
-                     didPickPeople:(NSArray *)people
-               autoPickPlayerCount:(int)autoPickPlayerCount {
+- (int)maxPlayersForPlayerPickerLauncher {
+  return self.maxPlayers;
+}
 
-  if (self.parentVc) {
-    [self.parentVc dismissViewControllerAnimated:YES completion:nil];
-  }
-  for (NSString *nextPlayerId in people) {
+/**
+ * Called when the user finishes picking people.
+ *
+ *      @param players An array of IDs with type |NSString| corresponding to the player chosen.
+ *      @param autoPickPlayerCount The number of auto-pick players selected by the user.
+ */
+- (void)playerPickerLauncherDidPickPlayers:(NSArray *)players
+                       autoPickPlayerCount:(int)autoPickPlayerCount {
+  for (NSString *nextPlayerId in players) {
     NSLog(@"This is who we picked %@", nextPlayerId);
   }
 
   GPGMultiplayerConfig *matchConfigForCreation = [[GPGMultiplayerConfig alloc] init];
-  matchConfigForCreation.invitedPlayerIds = people;
+  matchConfigForCreation.invitedPlayerIds = players;
   matchConfigForCreation.minAutoMatchingPlayers = autoPickPlayerCount;
   matchConfigForCreation.maxAutoMatchingPlayers = autoPickPlayerCount;
 
@@ -173,14 +146,12 @@ static GPGSTurnBasedMatchDelegate *_sInstance = nil;
       self.getMatchCallback([[GPGSTurnBasedMatchDelegate getJsonStringFromMatch:match] UTF8String], GPGSFALSE, self.callbackId);
     }
   }];
-
 }
 
-- (void)peoplePickerViewControllerDidCancel:(GPGPeoplePickerViewController *)controller {
-  if (self.parentVc) {
-    [self.parentVc dismissViewControllerAnimated:YES completion:nil];
-    self.getMatchCallback(NULL, GPGSTRUE, self.callbackId);
-  }
+#pragma mark - GPGLauncherDelegate
+
+- (void)launcherDismissed {
+  self.getMatchCallback(NULL, GPGSTRUE, self.callbackId);
 }
 
 # pragma mark - Invitation Delegate methods
