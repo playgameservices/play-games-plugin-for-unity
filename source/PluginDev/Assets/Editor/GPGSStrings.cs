@@ -83,9 +83,14 @@ public class GPGSStrings {
 
         public const string LibProjNotFound = "Google Play Services Library Project Not Found";
         public const string LibProjNotFoundBlurb = "Google Play Services library project " +
-                "could not be found your SDK installation. Make sure it is installed (open " +
+            "could not be found your SDK installation. Make sure it is installed (open " +
                 "the SDK manager and go to Extras, and select Google Play Services).";
-                
+        
+        public const string SupportJarNotFound = "Android Support Library v4 Not Found";
+        public const string SupportJarNotFoundBlurb = "Android Support Library v4 " +
+            "could not be found your SDK installation. Make sure it is installed (open " +
+                "the SDK manager and go to Extras, and select 'Android Support Library').";
+        
         public const string LibProjVerNotFound = "The version of your copy of the Google Play " + 
                 "Services Library Project could not be determined. Please make sure it is " +
                 "at least version {0}. Continue?";

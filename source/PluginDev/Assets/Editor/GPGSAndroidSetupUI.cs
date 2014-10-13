@@ -80,7 +80,22 @@ public class GPGSAndroidSetupUI : EditorWindow {
                 GPGSStrings.AndroidSetup.LibProjNotFoundBlurb, GPGSStrings.Ok);
             return;
         }
+
+        string supportJarPath = sdkPath + 
+            GPGSUtil.FixSlashes(
+                "/extras/android/support/v4/android-support-v4.jar");
+        string supportJarDest = 
+			GPGSUtil.FixSlashes("Assets/Plugins/Android/android-support-v4.jar");
         
+        if (!System.IO.File.Exists(supportJarPath)) {
+            Debug.LogError("Android support library v4 not found at: " + supportJarPath);
+            EditorUtility.DisplayDialog(GPGSStrings.AndroidSetup.SupportJarNotFound,
+                                        GPGSStrings.AndroidSetup.SupportJarNotFoundBlurb, GPGSStrings.Ok);
+            return;
+        }
+        
+                
+                                
         // check lib project version
         if (!CheckAndWarnAboutGmsCoreVersion(libProjAM)) {
             return;
@@ -95,6 +110,9 @@ public class GPGSAndroidSetupUI : EditorWindow {
 
         // Copy Google Play Services library
         FileUtil.CopyFileOrDirectory(libProjPath, libProjDestDir);
+
+        // Copy Android Support Library
+        FileUtil.CopyFileOrDirectory(supportJarPath, supportJarDest);
 
         // Generate AndroidManifest.xml
         string manifestBody = GPGSUtil.ReadTextFile("template-AndroidManifest");
