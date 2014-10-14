@@ -107,6 +107,10 @@ public class GPGSAndroidSetupUI : EditorWindow {
 
         // clear out the destination library project
         DeleteDirIfExists(libProjDestDir);
+        
+        // Clear out any stale version of the support jar.
+        System.IO.File.Delete(supportJarDest);
+        
 
         // Copy Google Play Services library
         FileUtil.CopyFileOrDirectory(libProjPath, libProjDestDir);
