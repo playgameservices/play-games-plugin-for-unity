@@ -67,6 +67,9 @@ namespace GooglePlayGames.BasicApi {
         // Return a specific achievement
         Achievement GetAchievement(string achId);
 
+		// Return a list of all achievements
+		List<Achievement> GetAchievements();
+
         // Unlock achievement
         void UnlockAchievement(string achId, Action<bool> callback);
 
