@@ -60,7 +60,8 @@ public class GPGSDocsUI {
                 GPGSStrings.No);
         if (launch) {
             string exeName = sdkPath + GPGSUtil.FixSlashes("/tools/android");
-            string altExeName = sdkPath + GPGSUtil.FixSlashes("/tools/android.exe");
+            string altExeName = sdkPath + GPGSUtil.FixSlashes("/SDK Manager.exe");
+            string alt2ExeName = sdkPath + GPGSUtil.FixSlashes("/tools/android.bat");
 
             EditorUtility.DisplayDialog(
                 GPGSStrings.ExternalLinks.GooglePlayGamesAndroidSdkTitle,
@@ -71,6 +72,8 @@ public class GPGSDocsUI {
                 System.Diagnostics.Process.Start(exeName);
             } else if (System.IO.File.Exists(altExeName)) {
                 System.Diagnostics.Process.Start(altExeName);
+            } else if (System.IO.File.Exists(alt2ExeName)) {
+                System.Diagnostics.Process.Start(alt2ExeName);
             } else {
                 EditorUtility.DisplayDialog(
                     GPGSStrings.ExternalLinks.GooglePlayGamesSdkTitle,
