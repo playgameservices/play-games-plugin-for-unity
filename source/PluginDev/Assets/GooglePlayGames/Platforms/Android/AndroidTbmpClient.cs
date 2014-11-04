@@ -27,6 +27,7 @@ namespace GooglePlayGames.Android {
     internal class AndroidTbmpClient : ITurnBasedMultiplayerClient {
         AndroidClient mClient = null;
         int mMaxMatchDataSize = 0;
+		bool mRegisteredMatchUpdateListener = false;
         
         // the match we got from the notification
         TurnBasedMatch mMatchFromNotification = null;
@@ -229,9 +230,13 @@ namespace GooglePlayGames.Android {
                 Logger.w("Can't register a null match delegate.");
                 return;
             }
-            
+			else{
+		
+			}
+			if (!mRegisteredMatchUpdateListener) {
+				RegisterMatchUpdateListener();
+			}
             mMatchDelegate = deleg;
-            
             // if we have a pending match to deliver, deliver it now
             if (mMatchFromNotification != null) {
                 Logger.d("Delivering pending match to the newly registered delegate.");
@@ -242,7 +247,39 @@ namespace GooglePlayGames.Android {
                 });                
             }
         }
-        
+		private void RegisterMatchUpdateListener() {
+			Logger.d("AndroidClient.RegisterMatchUpdateListener");
+			mClient.CallClientApi("register match update listener", () =>
+			                      {
+				mClient.GHManager.CallGmsApi("games.Games", "TurnBasedMultiplayer",
+				                             "registerMatchUpdateListener", new MatchUpdateProxy(this));
+			}, null);
+			mRegisteredMatchUpdateListener = true;
+		}
+		
+		private class MatchUpdateProxy : AndroidJavaProxy {
+			AndroidTbmpClient mOwner;
+			
+			internal MatchUpdateProxy(AndroidTbmpClient owner)
+			: base(JavaConsts.OnTurnBasedMatchReceivedClass) {
+				mOwner = owner;
+			}
+			
+			public void onTurnBasedMatchReceived(AndroidJavaObject matchObj) {
+				Debug.Log("AndroidTbmpClient.OnTurnBasedMatchReceived");
+				if (mOwner.mMatchDelegate != null) {
+					TurnBasedMatch match = JavaUtil.ConvertMatch(mOwner.mClient.PlayerId, matchObj);
+					PlayGamesHelperObject.RunOnGameThread(() => {
+						mOwner.mMatchDelegate.Invoke(match,false);
+					});
+
+				}
+			}
+			
+			public void onTurnBasedMatchRemoved(string matchId) {
+				Debug.Log("AndroidTbmpClient.OnTurnBasedMatchRemoved");
+			}
+		}
         private void OnSelectOpponentsResult(bool success, AndroidJavaObject opponents,
                                              bool hasAutoMatch, AndroidJavaObject autoMatchCriteria,
                                              Action<bool, TurnBasedMatch> callback, int variant) {

@@ -56,7 +56,8 @@ namespace GooglePlayGames.Android {
                 GmsPkg + ".games.multiplayer.OnInvitationReceivedListener";
         public const string ParticipantResultClass = 
                 GmsPkg + ".games.multiplayer.ParticipantResult";
-        
+		public const string OnTurnBasedMatchReceivedClass =
+			GmsPkg +  ".games.multiplayer.turnbased.OnTurnBasedMatchUpdateReceivedListener";
         // Plugin support package name
         public const string PluginSupportPkg = "com.google.example.games.pluginsupport";
         
