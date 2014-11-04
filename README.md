@@ -551,7 +551,7 @@ frameworks to that list:
 **QuartzCore**<br/>
 **Security**<br/>
 **SystemConfiguration**<br/><br/>
-**libc++.dylib**<br/><br/>
+**libc++.dylib**<br/>
 **libz.dylib**<br/><br/>
 2. Add the following bundles and frameworks from the Google Plus and Google Play
    Games SDK that you have previously downloaded. If you have not downloaded
