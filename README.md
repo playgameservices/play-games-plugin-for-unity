@@ -550,7 +550,7 @@ frameworks to that list:
 **MediaPlayer**<br/>
 **QuartzCore**<br/>
 **Security**<br/>
-**SystemConfiguration**<br/><br/>
+**SystemConfiguration**<br/>
 **libc++.dylib**<br/>
 **libz.dylib**<br/><br/>
 2. Add the following bundles and frameworks from the Google Plus and Google Play
