@@ -215,6 +215,12 @@ namespace GooglePlayGames.IOS {
             return a;
         }
 
+        public List<Achievement> GetAchievements()
+        {
+            Logger.w("IOSClient.GetAchievements is not implemented.");
+            return new List<Achievement>();
+        }
+
         public void UnlockAchievement(string achId, System.Action<bool> callback) {
             Logger.d("IOSClient.UnlockAchievement, achId=" + achId);
 

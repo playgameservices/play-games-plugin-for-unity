@@ -369,12 +369,12 @@ namespace GooglePlayGames {
         }
 
         /// <summary>
-        /// Not implemented yet. Calls the callback with an empty list.
+        /// Load the achievements.
         /// </summary>
+        /// <param name="callback">Callback.</param>
         public void LoadAchievements(Action<IAchievement[]> callback) {
-            Logger.w("PlayGamesPlatform.LoadAchievements is not implemented.");
             if (callback != null) {
-                callback.Invoke(new IAchievement[0]);
+                callback.Invoke(mClient.GetAchievements().ToArray());
             }
         }
 

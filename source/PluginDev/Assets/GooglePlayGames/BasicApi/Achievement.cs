@@ -15,9 +15,10 @@
  */
 
 using System;
+using UnityEngine.SocialPlatforms;
 
 namespace GooglePlayGames.BasicApi {
-    public class Achievement {
+    public class Achievement : IAchievement{
         public string Id = "";
         public bool IsIncremental = false;
         public bool IsRevealed = false;
@@ -35,7 +36,56 @@ namespace GooglePlayGames.BasicApi {
         }
 
         public Achievement() {
+		}
+
+		#region IAchievement implementation
+
+        public void ReportProgress(Action<bool> callback)
+        {
+            PlayGamesPlatform.Instance.ReportProgress(Id, percentCompleted, callback);
         }
+
+        public bool completed
+        {
+            get { return IsUnlocked; }
+        }
+
+        public bool hidden
+        {
+            get { return !IsRevealed; }
+        }
+
+        public string id
+        {
+            get
+            {
+                return Id;
+            }
+            set
+            {
+                Id = value;
+            }
+        }
+
+        public DateTime lastReportedDate
+        {
+            get { throw new NotImplementedException(); }
+        }
+
+        public double percentCompleted
+        {
+            get
+            {
+                return (double)CurrentSteps / (double)TotalSteps;
+            }
+            set
+            {
+                CurrentSteps = (int)Math.Round(TotalSteps * value / 100.0);
+            }
+        }
+
+		#endregion
+
     }
 }
 
