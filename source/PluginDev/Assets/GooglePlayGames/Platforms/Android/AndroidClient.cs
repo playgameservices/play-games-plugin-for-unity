@@ -302,6 +302,8 @@ namespace GooglePlayGames.Android {
                 mUserId = null;
                 mUserDisplayName = null;
                 mSignOutInProgress = false;
+                mUserId = null;
+                mUserDisplayName = null;
                 Logger.d("Now signed out.");
             });
         }
