@@ -174,7 +174,7 @@ namespace GooglePlayGames {
             // authenticate!
             mClient.Authenticate(callback, silent);
         }
-        
+
         /// <summary>
         /// Same as <see cref="Authenticate(Action<bool>,bool)"/>. Provided for compatibility
         /// with ISocialPlatform.
@@ -259,11 +259,12 @@ namespace GooglePlayGames {
         /// <param name='progress'>
         /// Progress of the achievement. If the achievement is standard (not incremental), then
         /// a progress of 0.0 will reveal the achievement and 100.0 will unlock it. Behavior of other
-        /// values is undefined. If the achievement is incremental, then this value is interpreted
-        /// as the total percentage of the achievement's progress that the player should have
-        /// as a result of this call (regardless of the progress they had before). So if the
-        /// player's previous progress was 30% and this call specifies 50.0, the new progress will
-        /// be 50% (not 80%).
+        /// values is undefined.
+        ///
+        /// If the achievement is incremental, then this value is interpreted as the percentage of
+        /// the achievement's progress that the player just made as a result of this call.  So if
+        /// the player's previous progress was 30% and this call specifies 50.0, the new progress
+        /// will be 80% (not 50%).
         /// </param>
         /// <param name='callback'>
         /// Callback that will be called to report the result of the operation: <c>true</c> on
@@ -313,9 +314,7 @@ namespace GooglePlayGames {
                 // increment it to the target percentage (approximate)
                 Logger.d("Progress " + progress +
                         " interpreted as incremental target (approximate).");
-                int targetSteps = (int)(progress * totalSteps);
-                int numSteps = targetSteps - curSteps;
-                Logger.d("Target steps: " + targetSteps + ", cur steps:" + curSteps);
+                int numSteps = (int) (progress / 100.0f * totalSteps);
                 Logger.d("Steps to increment: " + numSteps);
                 if (numSteps > 0) {
                     mClient.IncrementAchievement(achievementID, numSteps, callback);
