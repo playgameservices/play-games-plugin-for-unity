@@ -19,6 +19,8 @@ using System.Collections.Generic;
 using System.Collections;
 using GooglePlayGames.BasicApi.Multiplayer;
 
+using Event = GooglePlayGames.BasicApi.Event;
+
 namespace GooglePlayGames.BasicApi {
     /**
      * Defines an abstract interface for a Play Games Client. Concrete implementations
@@ -78,6 +80,24 @@ namespace GooglePlayGames.BasicApi {
 
         // Show achievements UI
         void ShowAchievementsUI();
+        
+		// Increment event
+		void IncrementEvent(string eventId, int steps, Action<bool> callback);
+		
+		// Get event list
+		List<Event> GetEvents();
+		
+		// Get event by id
+		Event GetEvent(string eveId);
+		
+		// Get quest list
+		List<Quest> GetQuests();
+		
+		// Get quest by id
+		Quest GetQuest(string questId);
+		
+		// Show quests UI with given filters
+		void ShowQuestsUI(int[] questSelectors);
 
         // Show leaderboards UI (if lbId == null, show all leaderboards)
         void ShowLeaderboardUI(string lbId);

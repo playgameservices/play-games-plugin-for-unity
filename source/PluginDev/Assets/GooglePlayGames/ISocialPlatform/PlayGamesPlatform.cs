@@ -376,18 +376,56 @@ namespace GooglePlayGames {
             if (callback != null) {
                 callback.Invoke(new IAchievement[0]);
             }
-        }
-
-        /// <summary>
-        /// Creates an achievement object which may be subsequently used to report an
-        /// achievement.
-        /// </summary>
-        /// <returns>
-        /// The achievement object.
-        /// </returns>
-        public IAchievement CreateAchievement () {
-            return new PlayGamesAchievement();
-        }
+		}
+		
+		/// <summary>
+		/// Creates an achievement object which may be subsequently used to report an
+		/// achievement.
+		/// </summary>
+		/// <returns>
+		/// The achievement object.
+		/// </returns>
+		public IAchievement CreateAchievement () {
+			return new PlayGamesAchievement();
+		}
+        
+		/// <summary>
+		/// Increments an event. This is unique to the Play Games.
+		/// </summary>
+		/// <param name='eventID'>
+		/// The ID of the event to increment. This can be a raw Google Play
+		/// Games event ID (alphanumeric string), or an alias that was previously configured
+		/// by a call to <see cref="AddIdMapping" />.
+		/// </param>
+		/// <param name='steps'>
+		/// The number of steps to increment the event by.
+		/// </param>
+		/// <param name='callback'>
+		/// The callback to call to report the success or failure of the operation. The callback
+		/// will be called with <c>true</c> to indicate success or <c>false</c> for failure.
+		/// </param>
+		public void IncrementEvent(string eventID, int steps, Action<bool> callback) {
+			if (!IsAuthenticated()) {
+				Logger.e("IncrementEvent can only be called after authentication.");
+				if (callback != null) {
+					callback.Invoke(false);
+				}
+				return;
+			}
+			
+			
+			// map ID, if it's in the dictionary
+			Logger.d("IncrementEvent: " + eventID + ", steps " + steps);
+			eventID = MapId(eventID);
+			mClient.IncrementEvent(eventID, steps, callback);
+		}
+		
+		/// <summary>
+		/// Returns the list of current events.
+		/// </summary>
+		public List<GooglePlayGames.BasicApi.Event> LoadEvents() {
+			return mClient.GetEvents();
+		}
 
         /// <summary>
         /// Reports a score to a leaderboard.
@@ -463,10 +501,34 @@ namespace GooglePlayGames {
                 Logger.e("ShowLeaderboardUI can only be called after authentication.");
                 return;
             }
+            
             Logger.d("ShowLeaderboardUI");
             mClient.ShowLeaderboardUI(MapId(mDefaultLbUi));
         }
 
+
+		/// <summary>
+		/// Shows the standard Google Play Games quests user interface, which 
+		/// allows the player to browse quests, according to the provided filters. 
+		/// </summary>
+		public void ShowQuestsUI (int[] questSelectors) {
+			if (!IsAuthenticated()) {
+				Logger.e("ShowQuestsUI can only be called after authentication.");
+				return;
+			}
+			
+			Logger.d("ShowQuestsUI");
+			mClient.ShowQuestsUI(questSelectors);
+		}
+		
+		/// <summary>
+		/// Shows the standard Google Play Games quests user interface, which 
+		/// allows the player to browse all the existing quests in the game.
+		/// </summary>
+		public void ShowQuestsUI () {
+			ShowQuestsUI(QuestsConsts.SELECT_ALL_QUESTS);
+		}
+		
         /// <summary>
         /// Shows the standard Google Play Games leaderboard UI for the given
         /// leaderboard.

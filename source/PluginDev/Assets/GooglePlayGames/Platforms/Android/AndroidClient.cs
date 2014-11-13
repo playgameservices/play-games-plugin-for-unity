@@ -23,6 +23,8 @@ using GooglePlayGames.BasicApi;
 using GooglePlayGames.OurUtils;
 using GooglePlayGames.BasicApi.Multiplayer;
 
+using Event = GooglePlayGames.BasicApi.Event;
+
 namespace GooglePlayGames.Android {
     public class AndroidClient : IPlayGamesClient {
         GameHelperManager mGHManager = null;
@@ -32,10 +34,20 @@ namespace GooglePlayGames.Android {
             NoAuth, // not authenticated
             AuthPending, // we want to authenticate, but GameHelper is busy
             InProgress, // we are authenticating
-            LoadingAchs, // we are signed in and are doing the initial achievement load
+			Loading, // we are signed in and are doing the initial loads
             Done // we are authenticated!
         };
         AuthState mAuthState = AuthState.NoAuth;
+        
+		// In what state of the loading process are we?
+		[Flags] 
+		enum LoadingState {
+			NoLoading    = 0, // no initial loadings are in progress
+			Achievements = 1, // achievements are being loaded
+			Events		 = 2, // events are being loaded
+			Quests       = 4  // quests are being loaded
+		}
+		LoadingState mLoadState = LoadingState.NoLoading;
 
         // are we trying silent authentication? If so, then we can't show UIs in the process:
         // we have to fail instead
@@ -49,6 +61,12 @@ namespace GooglePlayGames.Android {
 
         // the achievements we've loaded
         AchievementBank mAchievementBank = new AchievementBank();
+        
+		// the events we've loaded
+		EventBank mEventBank = new EventBank();
+		
+		// the quests we've loaded
+		QuestBank mQuestBank = new QuestBank();
 
         // Sometimes we have to execute an action on the UI thread involving GamesClient,
         // but we might hit that unlucky moment when GamesClient is still in the process
@@ -110,9 +128,9 @@ namespace GooglePlayGames.Android {
             RunOnUiThread(() => {
                 switch (mGHManager.State) {
                     case GameHelperManager.ConnectionState.Connected:
-                        Logger.d("AUTH: already connected! Proceeding to achievement load phase.");
+                        Logger.d("AUTH: already connected! Proceeding to loading phase.");
                         mAuthCallback = callback;
-                        DoInitialAchievementLoad();
+						DoInitialLoads();
                         break;
                     case GameHelperManager.ConnectionState.Connecting:
                         Logger.d("AUTH: connection in progress; auth now pending.");
@@ -136,11 +154,52 @@ namespace GooglePlayGames.Android {
                 }
             });
         }
+		
+		private void DoInitialLoads() {
+			Logger.d("AUTH: Now performing initial loads...");
+			mAuthState = AuthState.Loading;            
+			DoInitialAchievementLoad();
+			DoInitialEventsLoad();
+			DoInitialQuestsLoad();
+			Logger.d("AUTH: Initial load call made.");
+		}
+		
+		private void OnLoadStart( LoadingState loadState ) {
+			if( mAuthState == AuthState.Loading ) {
+				mLoadState |= loadState;
+			} else {
+				Logger.w("OnLoadStart called unexpectedly in auth state " + mAuthState);
+			}
+		}
+		
+		private void OnLoadSucceeded( LoadingState loadState ) {
+			if( mAuthState == AuthState.Loading ) {
+				mLoadState &= ~loadState;
+				
+				if( mLoadState == LoadingState.NoLoading ) {
+					Logger.d("AUTH: Auth process complete!");
+					mAuthState = AuthState.Done;
+					InvokeAuthCallback(true);
+					
+					// inform the RTMP client and TBMP clients that sign in suceeded
+					CheckForConnectionExtras();
+					mRtmpClient.OnSignInSucceeded();
+					mTbmpClient.OnSignInSucceeded();
+				}
+			} else {
+				Logger.w("OnLoadStart called unexpectedly in auth state " + mAuthState);
+			}
+		}
+		
+		private void OnLoadFailed() {
+			mAuthState = AuthState.NoAuth;
+			InvokeAuthCallback(false);
+		}
 
         // call from UI thread only!
         private void DoInitialAchievementLoad() {
             Logger.d("AUTH: Now performing initial achievement load...");
-            mAuthState = AuthState.LoadingAchs;            
+            OnLoadStart(LoadingState.Achievements);
             mGHManager.CallGmsApiWithResult("games.Games", "Achievements", "load",
                     new OnAchievementsLoadedResultProxy(this), false);
             Logger.d("AUTH: Initial achievement load call made.");
@@ -148,7 +207,7 @@ namespace GooglePlayGames.Android {
         
         // UI thread
         private void OnAchievementsLoaded(int statusCode, AndroidJavaObject buffer) {
-            if (mAuthState == AuthState.LoadingAchs) {
+            if (mAuthState == AuthState.Loading) {
                 Logger.d("AUTH: Initial achievement load finished.");
 
                 if (statusCode == JavaConsts.STATUS_OK || 
@@ -161,23 +220,85 @@ namespace GooglePlayGames.Android {
                     Logger.d("Closing achievement buffer.");
                     buffer.Call("close");
                     
-                    Logger.d("AUTH: Auth process complete!");
-                    mAuthState = AuthState.Done;
-                    InvokeAuthCallback(true);
-                    
-                    // inform the RTMP client and TBMP clients that sign in suceeded
-                    CheckForConnectionExtras();
-                    mRtmpClient.OnSignInSucceeded();
-                    mTbmpClient.OnSignInSucceeded();
+                    OnLoadSucceeded( LoadingState.Achievements );
                 } else {
                     Logger.w("AUTH: Failed to load achievements, status code " + statusCode);
-                    mAuthState = AuthState.NoAuth;
-                    InvokeAuthCallback(false);
+                    OnLoadFailed();
                 }
             } else {
                 Logger.w("OnAchievementsLoaded called unexpectedly in auth state " + mAuthState);
             }
         }
+        
+		// call from UI thread only!
+		private void DoInitialEventsLoad() {
+			Logger.d("AUTH: Now performing initial events load...");
+			OnLoadStart(LoadingState.Events);
+			mGHManager.CallGmsApiWithResult("games.Games", "Events", "load",
+			                                new OnEventsLoadedResultProxy(this), false);
+			Logger.d("AUTH: Initial event load call made.");
+		}
+        
+		// UI thread
+		private void OnEventsLoaded(int statusCode, AndroidJavaObject buffer) {
+			if (mAuthState == AuthState.Loading) {
+				Logger.d("AUTH: Initial event load finished.");
+				
+				if (statusCode == JavaConsts.STATUS_OK || 
+				    statusCode == JavaConsts.STATUS_STALE_DATA ||
+				    statusCode == JavaConsts.STATUS_DEFERRED) {
+					// successful load (either from network or local cache)
+					Logger.d("Processing event buffer.");
+					mEventBank.ProcessBuffer(buffer);
+					
+					Logger.d("Closing event buffer.");
+					buffer.Call("close");
+					
+					OnLoadSucceeded( LoadingState.Events );
+				} else {
+					Logger.w("AUTH: Failed to load events, status code " + statusCode);
+					OnLoadFailed();
+				}
+			} else {
+				Logger.w("OnEventsLoaded called unexpectedly in auth state " + mAuthState);
+			}
+		}
+		
+		// call from UI thread only!
+		private void DoInitialQuestsLoad() {
+			Logger.d("AUTH: Now performing initial quests load...");
+			OnLoadStart(LoadingState.Quests);
+			mGHManager.CallGmsApiWithResult("games.Games", "Quests", "load",
+			                                new OnQuestsLoadedResultProxy(this), 
+			                                QuestsConsts.SELECT_ALL_QUESTS,
+			                                QuestsConsts.SORT_ORDER_ENDING_SOON_FIRST, false);
+			Logger.d("AUTH: Initial quests load call made.");
+		}
+		
+		// UI thread
+		private void OnQuestsLoaded(int statusCode, AndroidJavaObject buffer) {
+			if (mAuthState == AuthState.Loading) {
+				Logger.d("AUTH: Initial quest load finished.");
+				
+				if (statusCode == JavaConsts.STATUS_OK || 
+				    statusCode == JavaConsts.STATUS_STALE_DATA ||
+				    statusCode == JavaConsts.STATUS_DEFERRED) {
+					// successful load (either from network or local cache)
+					Logger.d("Processing quest buffer.");
+					mQuestBank.ProcessBuffer(buffer);
+					
+					Logger.d("Closing quest buffer.");
+					buffer.Call("close");
+					
+					OnLoadSucceeded( LoadingState.Quests );
+				} else {
+					Logger.w("AUTH: Failed to load quests, status code " + statusCode);
+					OnLoadFailed();
+				}
+			} else {
+				Logger.w("OnQuestsLoaded called unexpectedly in auth state " + mAuthState);
+			}
+		}
 
         // UI thread
         private void InvokeAuthCallback(bool success) {
@@ -214,12 +335,12 @@ namespace GooglePlayGames.Android {
             RetrieveUserInfo();
 
             if (mAuthState == AuthState.AuthPending || mAuthState == AuthState.InProgress) {
-                Logger.d("AUTH: Auth succeeded. Proceeding to achievement loading.");
-                DoInitialAchievementLoad();
-            } else if (mAuthState == AuthState.LoadingAchs) {
-                Logger.w("AUTH: Got OnSignInSucceeded() while in achievement loading phase (unexpected).");
-                Logger.w("AUTH: Trying to fix by issuing a new achievement load call.");
-                DoInitialAchievementLoad();
+                Logger.d("AUTH: Auth succeeded. Proceeding to loading.");
+				DoInitialLoads();
+            } else if (mAuthState == AuthState.Loading) {
+                Logger.w("AUTH: Got OnSignInSucceeded() while in loading phase (unexpected).");
+                Logger.w("AUTH: Trying to fix by issuing new load calls.");
+                DoInitialLoads();
             } else {
                 // we will hit this case during the normal lifecycle (for example, Activity
                 // was brought to the foreground and sign in has succeeded even though
@@ -255,9 +376,9 @@ namespace GooglePlayGames.Android {
                 Logger.d("AUTH: FAILED!");
                 mAuthState = AuthState.NoAuth;
                 InvokeAuthCallback(false);
-            } else if (mAuthState == AuthState.LoadingAchs) {
+            } else if (mAuthState == AuthState.Loading) {
                 // we were loading achievements and got disconnected: notify callback
-                Logger.d("AUTH: FAILED (while loading achievements).");
+                Logger.d("AUTH: FAILED (while loading).");
                 mAuthState = AuthState.NoAuth;
                 InvokeAuthCallback(false);
             } else if (mAuthState == AuthState.NoAuth) {
@@ -332,14 +453,55 @@ namespace GooglePlayGames.Android {
                 Logger.d("    result=" + result);
                 int statusCode = JavaUtil.GetStatusCode(result);
                 AndroidJavaObject achBuffer = JavaUtil.CallNullSafeObjectMethod(result, 
-                        "getAchievements");
+                									   "getAchievements");
                 mOwner.OnAchievementsLoaded(statusCode, achBuffer);
                 if (achBuffer != null) {
                     achBuffer.Dispose();
                 }
             }
         }
-
+        
+		private class OnEventsLoadedResultProxy : AndroidJavaProxy {
+			AndroidClient mOwner;
+			
+			internal OnEventsLoadedResultProxy(AndroidClient c) :
+			base(JavaConsts.ResultCallbackClass) {
+				mOwner = c;
+			}
+			
+			public void onResult(AndroidJavaObject result) {
+				Logger.d("OnEventsLoadedResultProxy invoked");
+				Logger.d("    result=" + result);
+				int statusCode = JavaUtil.GetStatusCode(result);
+				AndroidJavaObject eventBuffer = JavaUtil.CallNullSafeObjectMethod(result, 
+                                                		 "getEvents");
+				mOwner.OnEventsLoaded(statusCode, eventBuffer);
+				if (eventBuffer != null) {
+					eventBuffer.Dispose();
+				}
+			}
+		}
+		
+		private class OnQuestsLoadedResultProxy : AndroidJavaProxy {
+			AndroidClient mOwner;
+			
+			internal OnQuestsLoadedResultProxy(AndroidClient c) :
+			base(JavaConsts.ResultCallbackClass) {
+				mOwner = c;
+			}
+			
+			public void onResult(AndroidJavaObject result) {
+				Logger.d("OnQuestsLoadedResultProxy invoked");
+				Logger.d("    result=" + result);
+				int statusCode = JavaUtil.GetStatusCode(result);
+				AndroidJavaObject questBuffer = JavaUtil.CallNullSafeObjectMethod(result, 
+				                                                                  "getQuests");
+				mOwner.OnQuestsLoaded(statusCode, questBuffer);
+				if (questBuffer != null) {
+					questBuffer.Dispose();
+				}
+			}
+		}
 
         // Runs the given action on the UI thread when the state of the GameHelper connection
         // becomes stable (i.e. not in the temporary lapse between Activity startup and
@@ -489,6 +651,59 @@ namespace GooglePlayGames.Android {
                 }
             }, null);
         }
+        
+		// called from game thread
+		public void IncrementEvent(string eventId, int steps, Action<bool> callback) {
+			Logger.d("AndroidClient.IncrementEvent: " + eventId + ", steps " + steps);
+			
+			CallClientApi("increment event " + eventId, () => {
+				mGHManager.CallGmsApi("games.Games", "Events", "increment",
+				                      eventId, steps);
+			}, callback);
+			
+			// update local cache
+			Event e = GetEvent(eventId);
+			if (e != null) {
+				e.Value += steps;
+			}
+		}
+		
+		// called from game thread
+		public List<Event> GetEvents() {
+			return mEventBank.GetEvents();
+		}
+		
+		// called from game thread
+		public Event GetEvent(string eventId) {
+			return mEventBank.GetEvent(eventId);
+		}
+		
+		// called from game thread
+		public List<Quest> GetQuests() {
+			return mQuestBank.GetQuests();
+		}
+		
+		// called from game thread
+		public Quest GetQuest(string questId) {
+			return mQuestBank.GetQuest(questId);
+		}
+		
+		// called from game thread
+		public void ShowQuestsUI(int[] questSelectors) {
+			Logger.d("AndroidClient.ShowQuestsUI.");
+			CallClientApi("show quests ui", () => {
+				using (AndroidJavaObject intent = mGHManager.CallGmsApi<AndroidJavaObject>(
+					"games.Games", "Quests", "getQuestsIntent", questSelectors)) {
+					using (AndroidJavaObject activity = GetActivity()) {
+						Logger.d("About to show quests UI with intent " + intent +
+						         ", activity " + activity);
+						if (intent != null && activity != null) {
+							activity.Call("startActivityForResult", intent, RC_UNUSED);
+						}
+					}
+				}
+			}, null);
+		}
         
         private AndroidJavaObject GetLeaderboardIntent(string lbId) {
             return (lbId == null) ?

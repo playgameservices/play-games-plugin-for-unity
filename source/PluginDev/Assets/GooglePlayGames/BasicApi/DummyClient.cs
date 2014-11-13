@@ -66,10 +66,30 @@ namespace GooglePlayGames.BasicApi {
             if (callback != null) {
                 callback.Invoke(false);
             }
-        }
+		}
+		
+		public void IncrementEvent (string eventId, int steps, Action<bool> callback) { 
+		}
+		
+		public List<Event> GetEvents () {
+			return new List<Event>();
+		}
+		
+		public Event GetEvent (string eveId) {
+			return null;
+		}
+		
+		public List<Quest> GetQuests () {
+			return new List<Quest>();
+    	}
+
+    	public Quest GetQuest (string questId) {
+    		return null;
+    	}
 
         public void ShowAchievementsUI() {}
         public void ShowLeaderboardUI(string lbId) {}
+		public void ShowQuestsUI(int[] questSelectors) {}
         public void SubmitScore(string lbId, long score, Action<bool> callback) {
             if (callback != null) {
                 callback.Invoke(false);
@@ -95,6 +115,7 @@ namespace GooglePlayGames.BasicApi {
         public Invitation GetInvitationFromNotification() { return null; }
         
         public bool HasInvitationFromNotification() { return false; }
+        
     }
 }
 
