@@ -417,8 +417,43 @@ namespace GooglePlayGames {
             string lbId = MapId(board);
             mClient.SubmitScore(lbId, score, callback);
         }
-
-        /// <summary>
+        
+		/// <summary>
+		/// Receives this user score.
+		/// </summary>
+		/// <param name='board'>
+		/// The ID of the leaderboard from which the score is to be received. This may be a raw
+		/// Google Play Games leaderboard ID or an alias configured through a call to
+		/// <see cref="AddIdMapping" />.
+		/// </param>
+		/// <param name='span'>
+		/// Time span to retrieve data for. 
+		/// Valid values are in the <c>LeaderboardScore</c> class.
+		/// </param>
+		/// <param name='collection'>
+		/// The leaderboard collection to retrieve scores for. 
+		/// Valid values are in the <c>LeaderboardScore</c> class.
+		/// </param>
+		/// <param name='callback'>
+		/// The callback to call to report the received score. The callback
+		/// will be called with <c>LeaderboardScore</c> istance, containing
+		/// all the necessary data about current score or <c>null</c> if an error occured.
+		/// </param>
+		public void LoadCurrentScore(string board, int span, int collection, Action<IScore> callback) {
+			if (!IsAuthenticated()) {
+				Logger.e("LoadCurrentScore can only be called after authentication.");
+				if (callback != null) {
+					callback.Invoke(null);
+				}
+				return;
+			}
+			
+			Logger.d("LoadCurrentScore: span=" + span + ", collection=" + collection + ", board=" + board);
+			string lbId = MapId(board);
+			mClient.ReceiveScore(lbId, span, collection, callback);
+		}
+		
+		/// <summary>
         /// Not implemented yet. Calls the callback with an empty list.
         /// </summary>
         public void LoadScores(string leaderboardID, Action<IScore[]> callback) {
