@@ -84,6 +84,10 @@ namespace GooglePlayGames.BasicApi {
 
         // Report a score to given leaderboard
         void SubmitScore(string lbId, long score, Action<bool> callback);
+        
+        // Receive a score from a given leaderboard
+        // according to its span and collection - check out LeaderboardConsts
+		void ReceiveScore(string lbId, int span, int collection, Action<PlayGamesScore> callback);
 
         // Set the buffer encrypter/decrypter used when saving cloud data to local storage.
         // This is only used in platforms where local storage of cloud data is not

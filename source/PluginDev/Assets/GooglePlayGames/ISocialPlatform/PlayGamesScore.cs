@@ -25,6 +25,17 @@ namespace GooglePlayGames {
     public class PlayGamesScore : IScore {
         string mLbId = null;
         long mValue = 0;
+        long mTimestamp = 0;
+        int mRank = 0;
+        
+        internal PlayGamesScore() {}
+        
+		public PlayGamesScore (string mLbId, long timestamp, int rankValue, long value) {
+    		this.mLbId = mLbId;
+			this.mTimestamp = timestamp;
+			this.mRank = rankValue;
+			this.mValue = value;
+    	}
 
         /// <summary>
         /// Reports the score. Equivalent to <see cref="PlayGamesPlatform.ReportScore" />.
@@ -65,11 +76,11 @@ namespace GooglePlayGames {
         }
 
         /// <summary>
-        /// Not implemented. Returns Jan 01, 1970, 00:00:00
+        /// Returns the date of the last score update.
         /// </summary>
         public DateTime date {
             get {
-                return new DateTime(1970, 1, 1, 0, 0, 0);
+				return new DateTime(mTimestamp).AddYears(1970);
             }
         }
 
@@ -92,12 +103,17 @@ namespace GooglePlayGames {
         }
 
         /// <summary>
-        /// Not implemented. Returns 1.
+        /// Returns player rank in the leaderboard.
         /// </summary>
         public int rank {
             get {
-                return 1;
+                return mRank;
             }
         }
+        
+        public override string ToString ()
+    	{
+			return string.Format ("[PlayGamesScore: leaderboardID={0}, value={1}, date={2}, Timestamp={3}, rank={4}]", leaderboardID, value, date, mTimestamp, rank);
+    	}
     }
 }

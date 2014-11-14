@@ -332,14 +332,58 @@ namespace GooglePlayGames.Android {
                 Logger.d("    result=" + result);
                 int statusCode = JavaUtil.GetStatusCode(result);
                 AndroidJavaObject achBuffer = JavaUtil.CallNullSafeObjectMethod(result, 
-                        "getAchievements");
+                									   "getAchievements");
                 mOwner.OnAchievementsLoaded(statusCode, achBuffer);
                 if (achBuffer != null) {
                     achBuffer.Dispose();
                 }
             }
         }
-
+		
+		private class OnLeaderboardScoreReceivedProxy : AndroidJavaProxy {
+			AndroidClient mOwner;
+			Action<PlayGamesScore> receiver;
+			string mLbId;
+			
+			internal OnLeaderboardScoreReceivedProxy(AndroidClient c, string lbId, Action<PlayGamesScore> callback) :
+			base(JavaConsts.ResultCallbackClass) {
+				mOwner = c;
+				mLbId = lbId;
+				receiver = callback;
+			}
+			
+			public void onResult(AndroidJavaObject result) {
+				Logger.d("OnLeaderboardScoreReceivedProxy invoked");
+				Logger.d("    result=" + result);
+				int statusCode = JavaUtil.GetStatusCode(result);
+				AndroidJavaObject scoreObj = JavaUtil.CallNullSafeObjectMethod(result, "getScore");
+				
+				if( scoreObj == null ) {
+					if (statusCode == JavaConsts.STATUS_OK || 
+					    statusCode == JavaConsts.STATUS_STALE_DATA ||
+					    statusCode == JavaConsts.STATUS_DEFERRED) {
+						// successful load (either from network or local cache)
+						// but player has no score in this table
+						// return an empty score
+						receiver.Invoke(new PlayGamesScore());
+					} else {
+						// network error
+						receiver.Invoke(null);
+					}
+				} else {
+					int rank = (int) scoreObj.Call<long>("getRank");
+					long value = scoreObj.Call<long>("getRawScore");
+					long timestamp = scoreObj.Call<long>("getTimestampMillis");
+					
+					PlayGamesScore score = new PlayGamesScore(mLbId, timestamp, rank, value);
+					
+					Logger.d(score.ToString());
+					
+					receiver.Invoke(score);
+					scoreObj.Dispose();
+				}
+			}
+		}
 
         // Runs the given action on the UI thread when the state of the GameHelper connection
         // becomes stable (i.e. not in the temporary lapse between Activity startup and
@@ -522,6 +566,19 @@ namespace GooglePlayGames.Android {
                         "submitScore", lbId, score);
             }, callback);
         }
+        
+		// called from game thread
+		public void ReceiveScore(string lbId, int span, int collection, Action<PlayGamesScore> callback) {
+			Logger.d("AndroidClient.ReceiveScore, lb=" + lbId + ", span=" + span + "collection=" + collection);
+			if(callback == null) {
+				Logger.d("Null callback passed, nowhere to send the result. Aborting.");
+				return;
+			}
+			mGHManager.CallGmsApiWithResult("games.Games", "Leaderboards", 
+			                      "loadCurrentPlayerLeaderboardScore", 
+			                      new OnLeaderboardScoreReceivedProxy(this, lbId, callback),
+			                      lbId, span, collection);
+		}
 
         // called from game thread
         public void LoadState(int slot, OnStateLoadedListener listener) {

@@ -66,15 +66,22 @@ namespace GooglePlayGames.BasicApi {
             if (callback != null) {
                 callback.Invoke(false);
             }
-        }
+		}
 
         public void ShowAchievementsUI() {}
         public void ShowLeaderboardUI(string lbId) {}
+		
         public void SubmitScore(string lbId, long score, Action<bool> callback) {
             if (callback != null) {
                 callback.Invoke(false);
             }
         }
+        public void ReceiveScore (string lbId, int span, int collection, Action<PlayGamesScore> callback)
+    	{
+    		if(callback != null) {
+    			callback.Invoke(null);
+    		}
+    	}
 
         public void LoadState(int slot, OnStateLoadedListener listener) {
             if (listener != null) {
@@ -95,6 +102,7 @@ namespace GooglePlayGames.BasicApi {
         public Invitation GetInvitationFromNotification() { return null; }
         
         public bool HasInvitationFromNotification() { return false; }
+        
     }
 }
 
