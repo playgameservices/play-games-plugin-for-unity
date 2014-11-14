@@ -17,7 +17,6 @@
 #if UNITY_ANDROID
 using System;
 using UnityEngine;
-using UnityEngine.SocialPlatforms;
 using System.Collections;
 using System.Collections.Generic;
 using GooglePlayGames.BasicApi;
@@ -343,10 +342,10 @@ namespace GooglePlayGames.Android {
 		
 		private class OnLeaderboardScoreReceivedProxy : AndroidJavaProxy {
 			AndroidClient mOwner;
-			Action<IScore> receiver;
+			Action<PlayGamesScore> receiver;
 			string mLbId;
 			
-			internal OnLeaderboardScoreReceivedProxy(AndroidClient c, string lbId, Action<IScore> callback) :
+			internal OnLeaderboardScoreReceivedProxy(AndroidClient c, string lbId, Action<PlayGamesScore> callback) :
 			base(JavaConsts.ResultCallbackClass) {
 				mOwner = c;
 				mLbId = lbId;
@@ -376,7 +375,7 @@ namespace GooglePlayGames.Android {
 					long value = scoreObj.Call<long>("getRawScore");
 					long timestamp = scoreObj.Call<long>("getTimestampMillis");
 					
-					IScore score = new PlayGamesScore(mLbId, timestamp, rank, value);
+					PlayGamesScore score = new PlayGamesScore(mLbId, timestamp, rank, value);
 					
 					Logger.d(score.ToString());
 					
@@ -569,7 +568,7 @@ namespace GooglePlayGames.Android {
         }
         
 		// called from game thread
-		public void ReceiveScore(string lbId, int span, int collection, Action<IScore> callback) {
+		public void ReceiveScore(string lbId, int span, int collection, Action<PlayGamesScore> callback) {
 			Logger.d("AndroidClient.ReceiveScore, lb=" + lbId + ", span=" + span + "collection=" + collection);
 			if(callback == null) {
 				Logger.d("Null callback passed, nowhere to send the result. Aborting.");

@@ -450,7 +450,7 @@ namespace GooglePlayGames {
 			
 			Logger.d("LoadCurrentScore: span=" + span + ", collection=" + collection + ", board=" + board);
 			string lbId = MapId(board);
-			mClient.ReceiveScore(lbId, span, collection, callback);
+			mClient.ReceiveScore(lbId, span, collection, (PlayGamesScore score) => { callback.Invoke(score); } );
 		}
 		
 		/// <summary>

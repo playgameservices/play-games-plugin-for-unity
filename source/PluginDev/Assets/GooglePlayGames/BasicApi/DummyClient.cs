@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-using UnityEngine.SocialPlatforms;
 using System;
 using System.Collections.Generic;
 using System.Collections;
@@ -77,7 +76,7 @@ namespace GooglePlayGames.BasicApi {
                 callback.Invoke(false);
             }
         }
-        public void ReceiveScore (string lbId, int span, int collection, Action<IScore> callback)
+        public void ReceiveScore (string lbId, int span, int collection, Action<PlayGamesScore> callback)
     	{
     		if(callback != null) {
     			callback.Invoke(null);
