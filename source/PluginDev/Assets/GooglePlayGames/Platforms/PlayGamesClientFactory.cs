@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Google Inc.
+ * Copyright (C) 2014 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,18 +18,20 @@ using System;
 using UnityEngine;
 using UnityEngine.SocialPlatforms;
 using GooglePlayGames.BasicApi;
+using GooglePlayGames.OurUtils;
 
 namespace GooglePlayGames {
     internal class PlayGamesClientFactory {
         internal static IPlayGamesClient GetPlatformPlayGamesClient() {
             if (Application.isEditor) {
+                Logger.d("Creating IPlayGamesClient in editor, using DummyClient.");
                 return new GooglePlayGames.BasicApi.DummyClient();
             }
-#if UNITY_ANDROID
-            return new GooglePlayGames.Android.AndroidClient();
-#elif UNITY_IPHONE
-            return new GooglePlayGames.IOS.IOSClient();
+#if (UNITY_ANDROID || UNITY_IPHONE)
+            Logger.d("Creating real IPlayGamesClient");
+            return new GooglePlayGames.Native.NativeClient();
 #else
+            Logger.d("Cannot create IPlayGamesClient for unknown platform, returning DummyClient");
             return new GooglePlayGames.BasicApi.DummyClient();
 #endif
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Google Inc.
+ * Copyright (C) 2014 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,36 +18,55 @@ using System;
 using UnityEngine;
 
 namespace GooglePlayGames.OurUtils {
-    public class Logger {
-        static string LOG_PREF = "[Play Games Plugin DLL] ";
-        static bool debugLogEnabled = false;
+public class Logger {
+    static bool debugLogEnabled = false;
 
-        public static bool DebugLogEnabled {
-            get {
-                return debugLogEnabled;
-            }
-            set {
-                debugLogEnabled = value;
-            }
+    public static bool DebugLogEnabled {
+        get {
+            return debugLogEnabled;
         }
-
-        public static void d(string msg) {
-            if (debugLogEnabled) {
-                Debug.Log(LOG_PREF + msg);
-            }
-        }
-
-        public static void w(string msg) {
-            Debug.LogWarning("!!! " + LOG_PREF + " WARNING: " + msg);
-        }
-
-        public static void e(string msg) {
-            Debug.LogWarning("*** " + LOG_PREF + " ERROR: " + msg);
-        }
-
-        public static string describe(byte[] b) {
-            return b == null ? "(null)" : "byte[" + b.Length + "]";
+        set {
+            debugLogEnabled = value;
         }
     }
+
+    private static bool warningLogEnabled = true;
+
+    public static bool WarningLogEnabled {
+        get {
+            return warningLogEnabled;
+        }
+        set {
+            warningLogEnabled = value;
+        }
+    }
+
+    public static void d(string msg) {
+        if (debugLogEnabled) {
+            Debug.Log(ToLogMessage("", "DEBUG", msg));
+        }
+    }
+
+    public static void w(string msg) {
+        if (warningLogEnabled) {
+            Debug.LogWarning(ToLogMessage("!!!", "WARNING", msg));
+        }
+    }
+
+    public static void e(string msg) {
+        if (warningLogEnabled) {
+            Debug.LogWarning(ToLogMessage("***", "ERROR", msg));
+        }
+    }
+
+    public static string describe(byte[] b) {
+        return b == null ? "(null)" : "byte[" + b.Length + "]";
+    }
+
+    private static string ToLogMessage(String prefix, String logType, String msg) {
+        return String.Format("{0} [Play Games Plugin DLL] {1} {2}: {3}",
+            prefix, DateTime.Now.ToString("MM/dd/yy H:mm:ss zzz"), logType, msg);
+    }
+}
 }
 

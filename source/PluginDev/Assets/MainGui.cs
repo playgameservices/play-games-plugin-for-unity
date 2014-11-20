@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2013 Google Inc.
+ * Copyright (C) 2014 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SocialPlatforms;
 using System;
+using System.Linq;
 using GooglePlayGames;
 using GooglePlayGames.BasicApi.Multiplayer;
+using GooglePlayGames.OurUtils;
 
 public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedListener,
         RealTimeMultiplayerListener {
@@ -40,6 +42,10 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
     string mStatus = "Ready.";
     string mLastInvitationId = null;
 
+    string mLastLocalSave = null;
+
+    string mConflictLocalVersion = null;
+    string mConflictServerVersion = null;
     bool mHadCloudConflict = false;
 
     TurnBasedMatch mMatch = null;
@@ -73,10 +79,8 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
     void ShowNotAuthUi() {
         DrawTitle(null);
         DrawStatus();
-        if (GUI.Button(CalcGrid(1, 1), "Authenticate")) {
-            DoAuthenticate(false);
-        } else if (GUI.Button(CalcGrid(1, 2), "Silent Auth")) {
-            DoAuthenticate(true);
+        if (GUI.Button(CalcGrid(1,1), "Authenticate")) {
+            DoAuthenticate();
         }
     }
 
@@ -136,7 +140,9 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
             DoCreateGame();
         } else if (GUI.Button(CalcGrid(0,3), "From Inbox")) {
             DoAcceptFromInbox();
-        } else if (GUI.Button(CalcGrid(1,1), "Send msg")) {
+        } else if (GUI.Button(CalcGrid(1,1), "Broadcast msg")) {
+            DoBroadcastMessage();
+        } else if (GUI.Button(CalcGrid(0,4), "Send msg")) {
             DoSendMessage();
         } else if (GUI.Button(CalcGrid(1,2), "Who Is Here")) {
             DoListParticipants();
@@ -255,14 +261,12 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
         mStandby = false;
     }
 
-    void DoAuthenticate(bool silent) {
-        if (!silent) {
-            SetStandBy("Authenticating...");
-        }
+    void DoAuthenticate() {
+        SetStandBy("Authenticating...");
 
         PlayGamesPlatform.DebugLogEnabled = true;
         PlayGamesPlatform.Activate();
-        PlayGamesPlatform.Instance.Authenticate((bool success) => {
+        Social.localUser.Authenticate((bool success) => {
             EndStandBy();
             if (success) {
                 mStatus = "Authenticated. Hello, " + Social.localUser.userName + " (" +
@@ -270,12 +274,15 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
 
                 // register delegates
                 PlayGamesPlatform.Instance.RegisterInvitationDelegate(OnInvitationReceived);
-                PlayGamesPlatform.Instance.TurnBased.RegisterMatchDelegate(OnMatchFromNotification);
+                if (PlayGamesPlatform.Instance.TurnBased != null) {
+                    PlayGamesPlatform.Instance.TurnBased.RegisterMatchDelegate(
+                        OnMatchFromNotification);
+                }
             } else {
                 mStatus = "*** Failed to authenticate.";
             }
             ShowEffect(success);
-        }, silent);
+        });
     }
 
     void DoSignOut() {
@@ -365,6 +372,8 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
         p.UpdateState(0, System.Text.ASCIIEncoding.Default.GetBytes(word), this);
         EndStandBy();
         mStatus = "Saved string to cloud: " + word;
+        mLastLocalSave = word;
+        Logger.d("Saved string: " + word);
         ShowEffect(true);
     }
 
@@ -378,16 +387,30 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
         }
 
         mStatus += ". conflict=" + (mHadCloudConflict ? "yes" : "no");
+
+        if (mHadCloudConflict) {
+            mStatus += string.Format(" local={0}, server={1}", mConflictLocalVersion,
+                mConflictServerVersion);
+        }
+
         ShowEffect(success);
     }
 
     public byte[] OnStateConflict(int slot, byte[] local, byte[] server) {
         mHadCloudConflict = true;
+
+        mConflictLocalVersion = System.Text.ASCIIEncoding.Default.GetString(local);
+        mConflictServerVersion = System.Text.ASCIIEncoding.Default.GetString(server);
+
+        Logger.d(string.Format("Found conflict! local:{0}, server:{1}",
+            mConflictLocalVersion,
+            mConflictServerVersion
+        ));
         return local;
     }
 
     public void OnStateSaved(bool success, int slot) {
-        mStatus = "Cloud save " + (success ? "successful" : "failed");
+        mStatus = "Cloud save " + (success ? "successful" : "failed") + " word: " + mLastLocalSave;
         ShowEffect(success);
     }
 
@@ -397,8 +420,8 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
         ((PlayGamesPlatform) Social.Active).LoadState(0, this);
     }
 
-    void DoQuickGame(int players) {
-        int opponents = players - 1;
+    void DoQuickGame(uint players) {
+        uint opponents = players - 1;
         SetStandBy("Starting quick game " + players + " players...");
         PlayGamesPlatform.Instance.RealTime.CreateQuickGame(opponents, opponents,
                 0, this);
@@ -433,11 +456,31 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
         mStatus = "Declined incoming invitation.";
     }
 
-    void DoSendMessage() {
+    void DoBroadcastMessage() {
         string word = GenString();
-        PlayGamesPlatform.Instance.RealTime.SendMessageToAll(true,
+
+        bool isReliable = UnityEngine.Random.Range(0, 2) == 0;
+
+        PlayGamesPlatform.Instance.RealTime.SendMessageToAll(isReliable,
                 System.Text.ASCIIEncoding.Default.GetBytes(word));
         mStatus = "Sent message: " + word;
+    }
+
+    void DoSendMessage() {
+        string word = GenString();
+        var connected = PlayGamesPlatform.Instance.RealTime.GetConnectedParticipants();
+        var self = PlayGamesPlatform.Instance.RealTime.GetSelf();
+
+        var nonSelf = connected.Where(p => !p.Equals(self)).ToList();
+
+        bool isReliable = UnityEngine.Random.Range(0, 2) == 0;
+        var recipient = nonSelf[UnityEngine.Random.Range(0, nonSelf.Count)];
+
+        PlayGamesPlatform.Instance.RealTime.SendMessage(isReliable,
+            recipient.ParticipantId,
+            System.Text.ASCIIEncoding.Default.GetBytes(word));
+        mStatus = string.Format("Sent message: {0}, reliable: {1}, recipient: {2}",
+            word, isReliable, recipient.ParticipantId);
     }
 
     void DoLeaveRoom() {
@@ -480,7 +523,9 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
     }
 
     public void OnRealTimeMessageReceived(bool isReliable, string senderId, byte[] data) {
-        mStatus = "Got message: " + System.Text.ASCIIEncoding.Default.GetString(data);
+        mStatus = string.Format("Got message. Reliable:{0} From:{1} Data: {2}",
+            isReliable, senderId,
+            System.Text.ASCIIEncoding.Default.GetString(data));
     }
 
     public void OnRoomSetupProgress(float progress) {
@@ -503,7 +548,6 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
             Debug.Log(">>> participant: " + p.ToString());
         }
     }
-
 
     void OnInvitationReceived(Invitation invitation, bool fromNotification) {
         string inviterName = invitation.Inviter != null ? invitation.Inviter.DisplayName : "(null)";
@@ -628,7 +672,7 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
             // next to play is an automatch player
             return null;
         }
-        
+
         // WARNING: The following code for determining "who is next" MUST NOT BE USED
         // in a production game. It is here for debug purposes only. This code will
         // not take into account the order in which the first round (while there were
@@ -639,10 +683,11 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
         //
         // In your production game, consider storing the play order in the match data
         // to help determine who plays next.
-        
+
         // what is my index in the list of participants?
         int myIndex = -1;
         List<Participant> participants = mMatch.Participants;
+
         for (int i = 0; i < participants.Count; i++) {
             Participant p = participants[i];
             if (p.ParticipantId.Equals(mMatch.SelfParticipantId)) {
@@ -650,17 +695,21 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
                 break;
             }
         }
-        
+
+        GooglePlayGames.OurUtils.Logger.d("My index = " + myIndex);
+
         // who is the next participant in the Joined state?
-        for (int j = 0; j < participants.Count; j++) {
+        for (int j = 1; j <= participants.Count; j++) {
             Participant p = participants[(myIndex + j) % participants.Count];
-            if (p.Status == Participant.ParticipantStatus.Joined) {
+            if (p.Status == Participant.ParticipantStatus.Joined ||
+                p.Status == Participant.ParticipantStatus.NotInvitedYet) {
+                GooglePlayGames.OurUtils.Logger.d("Using index = " + (myIndex + j) % participants.Count);
                 return p.ParticipantId;
             }
         }
-        
+
         Debug.LogError("*** ERROR: Failed to get next participant to play. No one available.");
-        return null;        
+        return null;
     }
 
     void DoTbmpTakeTurn() {
@@ -674,7 +723,7 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
         }
 
         SetStandBy("Taking turn...");
-        PlayGamesPlatform.Instance.TurnBased.TakeTurn(mMatch.MatchId,
+        PlayGamesPlatform.Instance.TurnBased.TakeTurn(mMatch,
                 System.Text.ASCIIEncoding.Default.GetBytes(GenString()),
                 GetNextToPlay(mMatch),
                 (bool success) => {
@@ -701,14 +750,17 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
         // I win; every one else loses
         MatchOutcome outcome = new MatchOutcome();
         foreach (Participant p in mMatch.Participants) {
-            outcome.SetParticipantResult(p.ParticipantId,
-                p.ParticipantId.Equals(mMatch.SelfParticipantId) ?
-                    MatchOutcome.ParticipantResult.Win :
-                    MatchOutcome.ParticipantResult.Loss);
+            if (p.ParticipantId.Equals(mMatch.SelfParticipantId)) {
+                outcome.SetParticipantResult(p.ParticipantId,
+                    MatchOutcome.ParticipantResult.Win, 1);
+            } else {
+                outcome.SetParticipantResult(p.ParticipantId,
+                    MatchOutcome.ParticipantResult.Loss, 2);
+            }
         }
 
         SetStandBy("Finishing match...");
-        PlayGamesPlatform.Instance.TurnBased.Finish(mMatch.MatchId,
+        PlayGamesPlatform.Instance.TurnBased.Finish(mMatch,
                 System.Text.ASCIIEncoding.Default.GetBytes("the end!"),
                 outcome, (bool success) => {
 
@@ -733,7 +785,7 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
         }
 
         SetStandBy("Ack'ing finished match");
-        PlayGamesPlatform.Instance.TurnBased.AcknowledgeFinished(mMatch.MatchId, (bool success) => {
+        PlayGamesPlatform.Instance.TurnBased.AcknowledgeFinished(mMatch, (bool success) => {
             EndStandBy();
             ShowEffect(success);
             mStatus = success ? "Successfully ack'ed finish." : "Failed to ack finish.";
@@ -755,7 +807,7 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
         }
 
         SetStandBy("Leaving match...");
-        PlayGamesPlatform.Instance.TurnBased.Leave(mMatch.MatchId, (bool success) => {
+        PlayGamesPlatform.Instance.TurnBased.Leave(mMatch, (bool success) => {
             EndStandBy();
             ShowEffect(success);
             mStatus = success ? "Successfully left match." : "Failed to leave match.";
@@ -777,7 +829,7 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
         }
 
         SetStandBy("Leaving match during turn...");
-        PlayGamesPlatform.Instance.TurnBased.LeaveDuringTurn(mMatch.MatchId, GetNextToPlay(mMatch),
+        PlayGamesPlatform.Instance.TurnBased.LeaveDuringTurn(mMatch, GetNextToPlay(mMatch),
                 (bool success) => {
             EndStandBy();
             ShowEffect(success);
@@ -801,7 +853,7 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
         }
 
         SetStandBy("Cancelling match...");
-        PlayGamesPlatform.Instance.TurnBased.Cancel(mMatch.MatchId, (bool success) => {
+        PlayGamesPlatform.Instance.TurnBased.Cancel(mMatch, (bool success) => {
             EndStandBy();
             ShowEffect(success);
             mStatus = success ? "Successfully cancelled match." : "Failed to cancel match.";
@@ -823,7 +875,7 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
         }
 
         SetStandBy("Rematching match...");
-        PlayGamesPlatform.Instance.TurnBased.Rematch(mMatch.MatchId,
+        PlayGamesPlatform.Instance.TurnBased.Rematch(mMatch,
                 (bool success, TurnBasedMatch match) => {
             EndStandBy();
             ShowEffect(success);

@@ -1,0 +1,101 @@
+TO FINISH CONFIGURING THE EXPORTED XCODE PROJECT
+
+1. Add these frameworks:
+
+      AddressBook.framework
+      AssetsLibrary.framework
+      CoreData.framework
+      CoreTelephony.framework
+      CoreText.framework
+      Security.framework
+      libc++.dylib
+      libz.dylib
+
+2. Add the following bundles and frameworks from the Google Plus
+   and the Google Play Games C++ SDKs. These can be downloaded from
+   https://developers.google.com/games/services.
+
+      GoogleOpenSource.framework
+      GooglePlus.bundle
+      GooglePlus.framework
+      GooglePlayGames.bundle
+      gpg.framework
+
+   Note: Make sure the bundles are copied to application.  This can be 
+    verified under Build Phases/Copy Bundle Resources.
+
+3. Add the '-ObjC' linker flag. To do this, select the top-level project
+   object, select the 'Unity-iPhone' build target, then go to the
+   Build Settings tab. Search for Other Linker Flags and add
+   the '-ObjC' flag to that list.
+
+4. If you want to run the project in the simulator (as opposed to an
+   actual device, read the notes in the APPENDIX below.
+
+
+Your project is now ready to build and deploy!
+
+
+
+
+
+
+-- APPENDIX: Running on the simulator. --
+You only need to read this section if you intend to run your project
+in the simulator, as opposed to an actual device.
+
+By default, the exported Unity project does not support calling native C
+functions on the simulator, but those are needed for the Google Play Games
+integration. To enable support for them in the simulator, edit the
+Libraries/RegisterMonoModules.cpp file.
+
+You will notice there are two sections near the top of the file that
+are delimited by #if !(TARGET_IPHONE_SIMULATOR) and #endif.
+
+    extern \"C\" {
+        ....
+    #if !(TARGET_IPHONE_SIMULATOR)
+        .. declarations .. (zone A)
+    #endif
+    }
+
+    void RegisterMonoModules()
+    {
+        ...
+    #if !(TARGET_IPHONE_SIMULATOR)
+        ...function calls... (zone B)
+    #endif
+    }
+
+To enable the simulator to make the necessary C function calls, you need to:
+
+1. Find the line that declares the mono_dl_register_symbol() function in Zone A.
+2. Move it to the outside of Zone A, right after the #endif (but still inside
+   the extern \"C\" block)
+3. Find ALL the calls to mono_dl_register_symbol() in Zone B.
+4. Move them ALL outside Zone B, after the #endif (but still inside
+   the RegisterMonoModules() function).
+
+So the final structure should look like:
+
+    extern \"C\" {
+        ....
+    #if !(TARGET_IPHONE_SIMULATOR)
+        .. declarations .. (zone A)
+    #endif
+        void mono_dl_register_symbol(const char* name, void *addr);
+    }
+
+    void RegisterMonoModules()
+    {
+        ...
+    #if !(TARGET_IPHONE_SIMULATOR)
+        ...function calls... (zone B)
+    #endif
+        mono_dl_register_symbol(\"GPGSFooBar1\", (void*)&GPGSFooBar1);
+        mono_dl_register_symbol(\"GPGSFooBar2\", (void*)&GPGSFooBar2);
+        mono_dl_register_symbol(\"GPGSFooBar3\", (void*)&GPGSFooBar3);
+        mono_dl_register_symbol(\"GPGSFooBar4\", (void*)&GPGSFooBar4);
+        ....
+    }
+

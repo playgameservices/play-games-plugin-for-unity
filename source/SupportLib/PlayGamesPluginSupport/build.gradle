@@ -16,7 +16,3 @@ android {
     compileSdkVersion 19
     buildToolsVersion "17.0.0"
 }
-
-dependencies {
-    compile project(':BaseGameUtils')
-}

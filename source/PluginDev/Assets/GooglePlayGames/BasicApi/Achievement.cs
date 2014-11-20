@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Google Inc.
+ * Copyright (C) 2014 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,25 +17,25 @@
 using System;
 
 namespace GooglePlayGames.BasicApi {
-    public class Achievement {
-        public string Id = "";
-        public bool IsIncremental = false;
-        public bool IsRevealed = false;
-        public bool IsUnlocked = false;
-        public int CurrentSteps = 0;
-        public int TotalSteps = 0;
-        public string Description = "";
-        public string Name = "";
+public class Achievement {
+    public string Id = "";
+    public bool IsIncremental = false;
+    public bool IsRevealed = false;
+    public bool IsUnlocked = false;
+    public int CurrentSteps = 0;
+    public int TotalSteps = 0;
+    public string Description = "";
+    public string Name = "";
 
-        public override string ToString () {
-            return string.Format("[Achievement] id={0}, name={1}, desc={2}, type={3}, " +
-                " revealed={4}, unlocked={5}, steps={6}/{7}", Id, Name,
-                Description, IsIncremental ? "INCREMENTAL" : "STANDARD",
-                IsRevealed, IsUnlocked, CurrentSteps, TotalSteps);
-        }
-
-        public Achievement() {
-        }
+    public override string ToString() {
+        return string.Format("[Achievement] id={0}, name={1}, desc={2}, type={3}, " +
+        " revealed={4}, unlocked={5}, steps={6}/{7}", Id, Name,
+            Description, IsIncremental ? "INCREMENTAL" : "STANDARD",
+            IsRevealed, IsUnlocked, CurrentSteps, TotalSteps);
     }
+
+    public Achievement() {
+    }
+}
 }
 

@@ -107,8 +107,8 @@ A typical implementation checks for failures, then launches the game screen:
             byte[] myData = match.Data;
             
             // I can only make a move if the match is active and it's my turn!
-            bool canPlay = (mMatch.Status == TurnBasedMatch.MatchStatus.Active &&
-                mMatch.TurnStatus == TurnBasedMatch.MatchTurnStatus.MyTurn);
+            bool canPlay = (match.Status == TurnBasedMatch.MatchStatus.Active &&
+                match.TurnStatus == TurnBasedMatch.MatchTurnStatus.MyTurn);
             
             // Deserialize game state from myData into scene and
             // go to gameplay screen. If canPlay == true, let user play a move; 
@@ -185,6 +185,10 @@ For more complex games with more participants, the logic might be more complicat
 If, during a player's turn, you determine that the match has come to an end, call `FinishMatch`.
 
 ```csharp
+    using GooglePlayGames.BasicApi.Multiplayer;
+
+    .....;
+
     TurnBasedMatch match = .....;  // our current match
     byte[] finalData = .....; // match data representing the final state of the match
     
@@ -193,7 +197,7 @@ If, during a player's turn, you determine that the match has come to an end, cal
     foreach (Participant p in match.Participants) {
         // decide if participant p has won, lost or tied, and
         // their ranking (1st, 2nd, 3rd, ...):
-        ParticipantResult result = .....;
+        MatchOutcome.ParticipantResult result = .....;
         int placement = ......;
         
         outcome.SetParticipantResult(p.ParticipantId, result, placement);
@@ -292,7 +296,7 @@ If `shouldAutoAccept` is `true`, accept the invitation immediately and start the
             // Invitation should be accepted immediately. This happens if the user already
             // indicated (through the notification UI) that they wish to accept the invitation,
             // so we should not prompt again.
-            ShowWaitScreen();
+            ShowMyCustomWaitingScreen();
             PlayGamesPlatform.Instance.TurnBased.AcceptInvitation(invitation.InvitationId, OnMatchStarted);
         } else {
             // The user has not yet indicated that they want to accept this invitation.
@@ -315,14 +319,14 @@ If `mIncomingInvitation` is not `null`, show an in-game invitation popup on the 
             GUI.Label(labelRect, who + " is challenging you to a match!");
             if (GUI.Button(acceptButtonRect, "Accept!")) {
                 // user wants to accept the invitation!
-                ShowWaitScreen();
+                ShowMyCustomWaitingScreen();
                 PlayGamesPlatform.Instance.TurnBased.AcceptInvitation(
                     mIncomingInvitation.InvitationId, OnMatchStarted);
             }
             if (GUI.Button(declineButtonRect, "Decline")) {
                 // user wants to decline the invitation
                 PlayGamesPlatform.Instance.TurnBased.DeclineInvitation(
-                    mIncomingInvitation.InvitationId, OnMatchStarted);
+                    mIncomingInvitation.InvitationId);
             }
         }
     }

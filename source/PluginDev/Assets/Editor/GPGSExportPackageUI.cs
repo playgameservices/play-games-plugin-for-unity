@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2013 Google Inc.
+ * Copyright (C) 2014 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,15 +28,13 @@ public class GPGSExportPackageUI {
 
         AddToList(exportList, "Assets/Editor");
         AddToList(exportList, "Assets/GooglePlayGames");
-        AddToList(exportList, "Assets/Plugins/Android/BaseGameUtils");
+        AddToList(exportList, "Assets/Plugins/Android/libs");
         AddToList(exportList, "Assets/Plugins/Android/MainLibProj");
-        AddToList(exportList, "Assets/Plugins/GPGSUtils.dll");
         AddToList(exportList, "Assets/Plugins/iOS");
 
         exportList.Remove("Assets/Editor/projsettings.txt");
         exportList.Remove("Assets/Editor/GPGSExportPackageUI.cs");
         exportList.Remove("Assets/Plugins/Android/MainLibProj/AndroidManifest.xml");
-        exportList.Remove("Assets/Plugins/iOS/GPGSParams.h");
 
         string fileList = "Final list of files to export (click for details)\n\n";
         foreach (string s in exportList) {
@@ -45,8 +43,8 @@ public class GPGSExportPackageUI {
         Debug.Log(fileList);
 
         string path = EditorUtility.SaveFilePanel("Save plugin to", "",
-            "GooglePlayGamesPlugin-" + GooglePlayGames.PluginVersion.VersionString + 
-            ".unitypackage", "unitypackage");
+                          "GooglePlayGamesPlugin-" + GooglePlayGames.PluginVersion.VersionString +
+                          ".unitypackage", "unitypackage");
 
         if (path == null || path.Trim().Length == 0) {
             Debug.LogWarning("Cancelled plugin export.");

@@ -1,1 +1,1 @@
-include ':PlayGamesPluginSupport',':BaseGameUtils'
+include ':PlayGamesPluginSupport'
