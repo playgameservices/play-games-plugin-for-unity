@@ -42,9 +42,9 @@ System requirements:
     * Android SDK
     * Google Play Services library, version 6.1.11 or above
 * To deploy on iOS:
-    * XCode 4 or above
-    * Google Plus SDK for iOS
-    * Google Play Games SDK for iOS
+    * XCode 5 or above
+    * Google+ SDK for iOS
+    * Google Play Games C++ SDK
 
 
 ## Upgrading
@@ -76,12 +76,8 @@ as they will be necessary later:
 **iOS**
 
 * Your bundle identifier (e.g. "com.example.AwesomeGame")
-* Your application ID (e.g. 123456789012)*
 * Your client ID (e.g. "46798138751-afwa4iejsfjskj.apps.googleusercontent.com")
 
-_[*] The application ID is the number that Google Play Developer Console
-assigns to your project. Please note that is not the same as your Apple
-application ID._
 
 **Note:** Do not forget to add your test accounts (the accounts with which you
 will try signing in) to the **Testing** section of the Developer Console,
@@ -190,7 +186,6 @@ setting and enter your bundle identifier there.
 Next, click the **File | Play Games - iOS **setup menu item. This will display the
 iOS setup screen, where you must input:
 
-* Your application ID (e.g. 123456789012)
 * Your client ID (e.g. "46798138751-afwa4iejsfjskj.apps.googleusercontent.com")
 * Your bundle identifier (e.g. "com.example.AwesomeGame")
 
@@ -231,6 +226,7 @@ which is a reference to an **ISocialPlatform** interface. The non-standard
 Google Play Games extensions can be accessed by casting the **Social.Active**
 object to the **PlayGamesPlatform** class, where the additional methods are
 available.
+
 
 ## Initialization
 
@@ -486,7 +482,7 @@ fingerprint you entered in the Developer Console during the setup.
 ## Building for iOS
 
 To build your game for iOS, do as you would normally do in Unity. Select **File | Build Settings**, then select the **iOS** platform.
-Click **Player Settings** and make sure that the target iOS platform is 6.0 or above.
+Click **Player Settings** and make sure that the target iOS platform is 7.0 or above.
 
 Then, click **Build** and select an output directory to save the XCode project. Do not use
 the **Build and Run** option, since there are some manual steps you must take in
@@ -534,7 +530,7 @@ settings. If you use **Replace**, however, you might have to reapply some settin
 
 ## Common Build Errors on iOS
 
-**"The current deployment target does not support automated _weak references"**. Make sure your target iOS platform is 6.0 or above. If the target platform is below 6.0, this error will occur during build.
+**"The current deployment target does not support automated _weak references"**. Make sure your target iOS platform is 7.0 or above. If the target platform is below 7.0, this error will occur during build.
 
 **"Dsymutil error"**. Depending on your version of XCode, you may need to disable dSYM file generation. To do this, go to Build Settings |
 Build Options | Debug Information Format | Debug. Select **DWARF** instead of **DWARF with dSYM**.
@@ -640,10 +636,6 @@ That way, you can even submit scores and achievements simultaneously to two or m
 
 In the `GPGSAppController.m` file, you will notice within the `application:didRegisterForRemoteNotificationsWithDeviceToken` method that there is a comment discussing using the sandbox push server. Follow instructions there to switch between the production and sandbox environment and push notification.
 
-
-## Note from Maintainer
-
-The plugin was developed and is currently maintained by [Bruno Oliveira](https://plus.google.com/+BrunoOliveira). Feel free to add me on Google+ and nag me to fix bugs or take a look at your questions on Stack Overflow!
 
 ## Acknowledgements
 
