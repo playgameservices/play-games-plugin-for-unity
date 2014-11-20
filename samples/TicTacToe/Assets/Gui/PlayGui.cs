@@ -113,7 +113,7 @@ public class PlayGui : BaseGui {
 
         // if the match is in the completed state, acknowledge it
         if (mMatch.Status == TurnBasedMatch.MatchStatus.Complete) {
-            PlayGamesPlatform.Instance.TurnBased.AcknowledgeFinished(mMatch.MatchId,
+            PlayGamesPlatform.Instance.TurnBased.AcknowledgeFinished(mMatch,
                     (bool success) => {
                 if (!success) {
                     Debug.LogError("Error acknowledging match finish.");
@@ -302,15 +302,13 @@ public class PlayGui : BaseGui {
         // define the match's outcome
         MatchOutcome outcome = new MatchOutcome();
         outcome.SetParticipantResult(mMatch.SelfParticipantId,
-            winnerIsMe ? MatchOutcome.ParticipantResult.Win :
-                MatchOutcome.ParticipantResult.Loss);
+            winnerIsMe ? MatchOutcome.ParticipantResult.Win : MatchOutcome.ParticipantResult.Loss);
         outcome.SetParticipantResult(GetAdversaryParticipantId(),
-            winnerIsMe ? MatchOutcome.ParticipantResult.Loss :
-                MatchOutcome.ParticipantResult.Win);
+            winnerIsMe ? MatchOutcome.ParticipantResult.Loss : MatchOutcome.ParticipantResult.Win);
 
         // finish the match
         SetStandBy("Sending...");
-        PlayGamesPlatform.Instance.TurnBased.Finish(mMatch.MatchId, mMatchData.ToBytes(),
+        PlayGamesPlatform.Instance.TurnBased.Finish(mMatch, mMatchData.ToBytes(),
                     outcome, (bool success) => {
             EndStandBy();
             mFinalMessage = success ? (winnerIsMe ? "YOU WON!" : "YOU LOST!") :
@@ -320,7 +318,7 @@ public class PlayGui : BaseGui {
 
     void TakeTurn() {
         SetStandBy("Sending...");
-        PlayGamesPlatform.Instance.TurnBased.TakeTurn(mMatch.MatchId, mMatchData.ToBytes(),
+        PlayGamesPlatform.Instance.TurnBased.TakeTurn(mMatch, mMatchData.ToBytes(),
                     DecideNextToPlay(), (bool success) => {
             EndStandBy();
             mFinalMessage = success ? "Done for now!" : "ERROR sending turn.";

@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2013 Google Inc.
+ * Copyright (C) 2014 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -271,34 +271,6 @@ public class GameConsts {
         // Player's laser speed
         public static float[] LaserSpeed = { 0.0f, 20.0f, 22.0f, 24.0f, 26.0f, 28.0f, 30.0f };
     }
-
-    // Achievements IDs (as given by Developer Console)
-    public class Achievements {
-        public const string NotADisaster = "CgkI0ezs4-sVEAIQAQ";
-        public const string PointBlank = "CgkI0ezs4-sVEAIQAg";
-        public const string FullCombo = "CgkI0ezs4-sVEAIQAw";
-        public const string ClearAllLevels = "CgkI0ezs4-sVEAIQBA";
-        public const string PerfectAccuracy = "CgkI0ezs4-sVEAIQEg";
-
-        public static string[] ForRank = { "CgkI0ezs4-sVEAIQBQ", "CgkI0ezs4-sVEAIQBg",
-            "CgkI0ezs4-sVEAIQBw" };
-        public static int[] RankRequired = { 3, 6, 10 };
-
-        public static string[] ForTotalStars = { "CgkI0ezs4-sVEAIQCA", "CgkI0ezs4-sVEAIQCQ",
-            "CgkI0ezs4-sVEAIQCg" };
-        public static int[] TotalStarsRequired = { 12, 24, 36 };
-
-        // incrementals:
-        public static string[] IncGameplaySeconds = {
-            "CgkI0ezs4-sVEAIQCw", "CgkI0ezs4-sVEAIQDA", "CgkI0ezs4-sVEAIQDQ"
-        };
-        public static string[] IncGameplayRounds = {
-            "CgkI0ezs4-sVEAIQDg", "CgkI0ezs4-sVEAIQDw", "CgkI0ezs4-sVEAIQEA"
-        };
-    }
-
-    // Leaderboard ID (as given by Developer Console)
-    public static string LeaderboardId = "CgkI0ezs4-sVEAIQEQ";
 
     public class EndScreen {
         public const float EndTextX = -400;

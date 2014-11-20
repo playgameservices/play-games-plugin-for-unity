@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Google Inc.
+ * Copyright (C) 2014 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ public class GPGSProjectSettings {
 
         if (File.Exists(mFile)) {
             StreamReader rd = new StreamReader(mFile);
-            while (!rd.EndOfStream) {
+            while(!rd.EndOfStream) {
                 string line = rd.ReadLine();
                 if (line == null || line.Trim().Length == 0) {
                     break;

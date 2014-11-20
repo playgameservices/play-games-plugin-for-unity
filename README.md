@@ -22,8 +22,8 @@ following features of the Google Play Games API:<br/>
 * post score to leaderboard
 * cloud save read/write
 * show built-in achievement/leaderboards UI
-* [turn-based multiplayer](TBMP.md) <b>(new)</b>
-* [real-time multiplayer](RTMP.md) <b>(new)</b>
+* [turn-based multiplayer](TBMP.md)
+* [real-time multiplayer](RTMP.md)
 
 All features are available on Android and iOS.
 
@@ -37,10 +37,10 @@ Features:
 
 System requirements:
 
-* Unity&reg; 4.3 or above
+* Unity&reg; 4.5 or above
 * To deploy on Android:
     * Android SDK
-    * Google Play Services library, version 4.2.42 or above
+    * Google Play Services library, version 6.1.11 or above
 * To deploy on iOS:
     * XCode 4 or above
     * Google Plus SDK for iOS
@@ -120,11 +120,10 @@ the **current-build** directory:
     current-build/GooglePlayGamesPluginForUnity-X.YY.ZZ.unitypackage
 
 To install the plugin, simply open your game project in Unity and import that file into
-your project's assets, as you would any other Unity package. In Unity 4.2 and
-4.3, this is accomplished through the **Assets | Import Package | Custom
-Package** menu item (you can also reach this menu it by right-clicking the
-**Assets** folder). After importing, you should see that two new menu items
-were added to the File menu: **"Play Games Android setup"** and **"Play Games
+your project's assets, as you would any other Unity package. This is accomplished through
+the **Assets | Import Package | Custom Package** menu item (you can also reach this menu it
+by right-clicking the **Assets** folder). After importing, you should see that two new menu
+items were added to the File menu: **"Play Games Android setup"** and **"Play Games
 iOS setup"**. If you don't see the new menu items, refresh the assets by
 clicking **Assets | Refresh** and try again.
 
@@ -166,14 +165,14 @@ If you are using Windows, you must make sure that your Java SDK installation can
 right-click **My Computer**, then **Properties**, then go to **Advanced System Properties**
 (or **System Properties** and then click the **Advanced** tab), then
 click **Environment Variables**. On Windows 8, press **Windows Key + W** and
-search for **environment variables**.
+search for **environment variables**
 For more information, consult the documentation for your version of Windows.
 
 
 ## iOS Setup
 
 To configure your Unity game to run with Google Play Games on iOS, download the
-Games SDK and the Google+ iOS SDK, which are available from
+Games C++ SDK and the Google+ iOS SDK, which are available from
 [our downloads page](https://developers.google.com/games/services/downloads/). Unpack the
 downloads into a directory of your choice. The necessary bundles and frameworks
 are:
@@ -181,8 +180,8 @@ are:
 * GoogleOpenSource.framework
 * GooglePlus.bundle
 * GooglePlus.framework
-* PlayGameServices.bundle
-* PlayGameServices.framework
+* GooglePlayGames.bundle
+* gpg.framework
 
 Next, open the iOS build settings dialog. To do so, click **File | Build Settings**,
 select the **iOS** platform, and click **Player Settings**. Find the **Bundle Identifier**
@@ -383,7 +382,7 @@ object first:
     ((PlayGamesPlatform) Social.Active).ShowLeaderboardUI("Cfji293fjsie_QA");
 ```
 
-## Saving Game State to the Cloud
+## Saving Game State to the Cloud (only on Android)
 
 To save game state to the cloud, use the **PlayGamesPlatform.UpdateState**
 method.
@@ -409,7 +408,7 @@ method.
 The **OnStateSaved** method of the **OnStateLoadedListener** will be called to
 indicate the success or failure of the cloud save operation.
 
-## Loading Game State from the Cloud
+## Loading Game State from the Cloud (only on Android)
 
 To load game state from the cloud, use the **PlayGamesPlatform.LoadState**
 method:<br/>
@@ -452,41 +451,6 @@ byte array representing the resolved state:<br/>
         }
     }
 ```
-
-## Using the Cloud Cache Encryption Hook
-
-When the user is offline, cloud save data is stored locally on the device for later
-synchronization. On Android, this cache is maintained by the Google Play Services
-application. However, on iOS, the cache is implemented by the plugin itself by
-writing to files. If you are concerned that a malicious user might try to tamper with
-those cache files, you can install an encryption/decryption hook to provide code
-that the plugin will use to encrypt the buffer before it is written to disk and
-decrypt it once it is read from disk.
-
-**Important:** the encryption/decryption hook will be called only when
-saving files to local disk on operating systems where this feature is not
-already provided by the underlying library (currently, only iOS). Data
-will **not** be encrypted using this method when saved to the server.
-
-````csharp
-    // Define our encrypter/decrypter method:
-    byte[] MyEncrypter(bool encrypt, byte[] data) {
-        if (encrypt) {
-            // data[] is the plain data that we must encrypt.
-            byte[] encryptedData = ....; // your encryption code here
-            return encryptedData;
-        } else {
-            // data[] is the encrypted data that we must decrypt.
-            byte[] plainData = ....; // your decryption code here
-            return plainData;
-        }
-    }
-
-    // Set the cloud cache encrypter/decrypter
-    // (Do this on your initialization, before attempting to sign in,
-    // but after calling PlayGamesPlatform.Activate())
-    ((PlayGamesPlatform) Social.Active).SetCloudCacheEncrypter(MyEncrypter);
-````
 
 ## Multiplayer
 
@@ -540,28 +504,25 @@ list labeled **Unity-iPhone, 1 target, iOS SDK**), then click the **Build Phases
 tab and expand the **Link Binary with Libraries** item. Then, add the following
 frameworks to that list:
 <br/><br/>
+
 **AddressBook.framework**<br/>
 **AssetsLibrary.framework**<br/>
-**CoreData**<br/>
-**CoreLocation**<br/>
-**CoreMotion**<br/>
-**CoreText**<br/>
-**CoreTelephony**<br/>
-**MediaPlayer**<br/>
-**QuartzCore**<br/>
-**Security**<br/>
-**SystemConfiguration**<br/>
+**CoreData.framework**<br/>
+**CoreTelephony.framework**<br/>
+**CoreText.framework**<br/>
+**Security.framework**<br/>
 **libc++.dylib**<br/>
 **libz.dylib**<br/><br/>
+
 2. Add the following bundles and frameworks from the Google Plus and Google Play
-   Games SDK that you have previously downloaded. If you have not downloaded
+   Games C++ SDK that you have previously downloaded. If you have not downloaded
    these files yet, they can be found [in the downloads section](https://developers.google.com/games/services/downloads) of the Google Play Games developer site. To add these frameworks you can simply drag
 and drop those 5 files on the top-level project item (labeled **Unity-iPhone**).<br/><br/>
    	**GoogleOpenSource.framework**<br/>
    	**GooglePlus.bundle**<br/>
    	**GooglePlus.framework**<br/>
-   	**PlayGameServices.bundle**<br/>
-   	**PlayGameServices.framework**<br/><br/>
+   	**GooglePlayGames.bundle**<br/>
+   	**gpg.framework**<br/><br/>
 3. Add the **"-ObjC"** linker flag. To do this, select the top-level project
    object, then go to the **Build Settings**
    tab. Search for **"Other Linker Flags"** using the search tool, double click
@@ -677,9 +638,7 @@ That way, you can even submit scores and achievements simultaneously to two or m
 
 ## Using Production APNS Certificate (iOS)
 
-In the `GPGSAppController.m` file, you will notice within the `application:didRegisterForRemoteNotificationsWithDeviceToken` method that there are two calls;
-one for using a push notification in the sandbox environment, and one for using a push notification in the production environment. You should make sure to
-comment the first call (and uncomment the second) when you're ready to switch to a production environment and push notification.
+In the `GPGSAppController.m` file, you will notice within the `application:didRegisterForRemoteNotificationsWithDeviceToken` method that there is a comment discussing using the sandbox push server. Follow instructions there to switch between the production and sandbox environment and push notification.
 
 
 ## Note from Maintainer

@@ -34,7 +34,7 @@ public class Util {
             MakeVisible(child, visible);
         }
     }
-    
+
     public static Participant GetOpponent(TurnBasedMatch match) {
     	foreach (Participant p in match.Participants) {
     		if (!p.ParticipantId.Equals(match.SelfParticipantId)) {
@@ -43,7 +43,7 @@ public class Util {
     	}
     	return null;
     }
-    
+
     public static string GetOpponentName(TurnBasedMatch match) {
     	Participant p = GetOpponent(match);
     	return p == null ? "(anonymous)" : p.DisplayName;

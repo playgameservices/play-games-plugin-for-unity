@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2013 Google Inc.
+ * Copyright (C) 2014 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ public class Settings  {
     // Replace these by your app's settings (from the Developer Console)
 
     // This is the achievement that we REVEAL
-    public const string AchievementToReveal = 
+    public const string AchievementToReveal =
         "PLACEHOLDER - PUT YOUR ACHIEVEMENT ID HERE"; // <GPGSID>
 
     // This is the achievement that we UNLOCK

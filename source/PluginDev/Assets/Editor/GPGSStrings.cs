@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2013 Google Inc.
+ * Copyright (C) 2014 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,13 +27,13 @@ public class GPGSStrings {
     public const string No = "No";
     public const string Success = "Success";
     public const string Warning = "Warning";
-    
+
     public class PostInstall {
         public const string Title = "Google Play Games Plugin for Unity";
-        public const string Text = "The Google Play Games Plugin for Unity version $VERSION " + 
+        public const string Text = "The Google Play Games Plugin for Unity version $VERSION " +
                 "is now ready to use. If this is a new installation or of you have " +
-                "just upgraded from a previous version, please click the 'Google Play Games' " + 
-                "menu and select 'Android Setup' and/or 'iOS Setup' to set up your " + 
+                "just upgraded from a previous version, please click the 'Google Play Games' " +
+                "menu and select 'Android Setup' and/or 'iOS Setup' to set up your " +
                 "project to build for the corresponding platforms.";
     }
 
@@ -79,27 +79,27 @@ public class GPGSStrings {
 
         public const string SdkNotFound = "Android SDK Not found";
         public const string SdkNotFoundBlurb = "The Android SDK path was not found. " +
-                "Please configure it in the Unity preferences window (under External Tools).";
+            "Please configure it in the Unity preferences window (under External Tools).";
 
         public const string LibProjNotFound = "Google Play Services Library Project Not Found";
         public const string LibProjNotFoundBlurb = "Google Play Services library project " +
             "could not be found your SDK installation. Make sure it is installed (open " +
-                "the SDK manager and go to Extras, and select Google Play Services).";
-        
+            "the SDK manager and go to Extras, and select Google Play Services).";
+
         public const string SupportJarNotFound = "Android Support Library v4 Not Found";
         public const string SupportJarNotFoundBlurb = "Android Support Library v4 " +
-            "could not be found your SDK installation. Make sure it is installed (open " +
+                "could not be found your SDK installation. Make sure it is installed (open " +
                 "the SDK manager and go to Extras, and select 'Android Support Library').";
-        
-        public const string LibProjVerNotFound = "The version of your copy of the Google Play " + 
+
+        public const string LibProjVerNotFound = "The version of your copy of the Google Play " +
                 "Services Library Project could not be determined. Please make sure it is " +
                 "at least version {0}. Continue?";
-                
-        public const string LibProjVerTooOld = "Your copy of the Google Play " + 
-            "Services Library Project is out of date. Please launch the Android SDK manager " + 
+
+        public const string LibProjVerTooOld = "Your copy of the Google Play " +
+            "Services Library Project is out of date. Please launch the Android SDK manager " +
             "and upgrade your Google Play Services bundle to the latest version (your version: " +
             "{0}; required version: {1}). Proceeding may cause problems. Proceed anyway?";
-        
+
         public const string SetupComplete = "Google Play Games configured successfully.";
     }
 
@@ -136,15 +136,15 @@ public class GPGSStrings {
             "and that its path is correctly configured in the Unity preferences window " +
             "(under External Tools).";
     }
-    
+
     public const string AboutTitle = "Google Play Games Plugin for Unity";
-    public const string AboutText = "Copyright (C) 2013 Google Inc.\n\nThis is an open-source " +
-            "plugin that allows cross-platform integration with Google Play games services. " + 
+    public const string AboutText = "Copyright (C) 2014 Google Inc.\n\nThis is an open-source " +
+            "plugin that allows cross-platform integration with Google Play games services. " +
             "For more information, visit the official site on Github:\n\n" +
             "https://github.com/playgameservices/play-games-plugin-for-unity\n\nPlugin version: ";
-            
+
     public const string LicenseTitle = "Google Play Games Plugin for Unity";
-    public const string LicenseText = "Copyright (C) 2013 Google Inc.\n\n" +
+    public const string LicenseText = "Copyright (C) 2014 Google Inc.\n\n" +
             "Licensed under the Apache License, Version 2.0 (the \"License\"); " +
             "you may not use this file except in compliance with the License. " +
             "You may obtain a copy of the License at\n\n" +

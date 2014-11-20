@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Google Inc.
+ * Copyright (C) 2014 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,17 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-public class GPGSUtil {
-    public static string FixSlashes(string path) {
+public static class GPGSUtil {
+
+    private const string GameInfoPath = "Assets/GooglePlayGames/GameInfo.cs";
+    private const string GameInfoTemplatePath = "Assets/Editor/GameInfo.template";
+
+    public static string SlashesToPlatformSeparator(string path) {
         return path.Replace("/", System.IO.Path.DirectorySeparatorChar.ToString());
     }
 
     public static string ReadFile(string filePath) {
-        filePath = FixSlashes(filePath);
+        filePath = SlashesToPlatformSeparator(filePath);
         if (!File.Exists(filePath)) {
             Alert("Plugin error: file not found: " + filePath);
             return null;
@@ -36,16 +40,20 @@ public class GPGSUtil {
         sr.Close();
         return body;
     }
-    
-    public static string ReadTextFile(string name) {
-        return ReadFile(FixSlashes("Assets/Editor/" + name + ".txt"));
+
+    public static string ReadEditorTemplate(string name) {
+        return ReadFile(SlashesToPlatformSeparator("Assets/Editor/" + name + ".txt"));
+    }
+
+    public static string ReadFully(string path) {
+        return ReadFile(SlashesToPlatformSeparator(path));
     }
 
     public static void WriteFile(string file, string body) {
-        file = FixSlashes(file);
-        StreamWriter wr = new StreamWriter(file, false);
-        wr.Write(body);
-        wr.Close();
+        file = SlashesToPlatformSeparator(file);
+        using (var wr = new StreamWriter(file, false)) {
+            wr.Write(body);
+        }
     }
 
     public static bool LooksLikeValidAppId(string s) {
@@ -91,6 +99,25 @@ public class GPGSUtil {
     public static bool HasAndroidSdk() {
         string sdkPath = GetAndroidSdkPath();
         return sdkPath != null && sdkPath.Trim() != "" && System.IO.Directory.Exists(sdkPath);
+    }
+
+    public static void UpdateGameInfo() {
+        string fileBody = GPGSUtil.ReadFully(GameInfoTemplatePath);
+        var appId = GPGSProjectSettings.Instance.Get("proj.AppId", null);
+        if (appId != null) {
+            fileBody = fileBody.Replace("__APPID__", appId);
+        }
+
+        var clientId = GPGSProjectSettings.Instance.Get("ios.ClientId", null);
+        if (clientId != null) {
+            fileBody = fileBody.Replace("__CLIENTID__", clientId);
+        }
+
+        var bundleId = GPGSProjectSettings.Instance.Get("ios.BundleId", null);
+        if (bundleId != null) {
+            fileBody = fileBody.Replace("__BUNDLEID__", bundleId);
+        }
+        GPGSUtil.WriteFile(GameInfoPath, fileBody);
     }
 }
 
