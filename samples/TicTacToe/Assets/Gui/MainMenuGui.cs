@@ -35,12 +35,12 @@ public class MainMenuGui : BaseGui {
 	                                                TextAnchor.MiddleCenter, 60, "Play!");
 	WidgetConfig NotNowButtonCfg = new WidgetConfig(WidgetConfig.WidgetAnchor.Bottom, -0.25f, -0.3f, 0.4f, 0.2f,
 	                                                TextAnchor.MiddleCenter, 60, "Not Now");
-	
+
     private string mErrorMessage = null;
 
     private const int Opponents = 1;
     private const int Variant = 0;
-    
+
     // the match the player is being offered to play right now
     TurnBasedMatch mIncomingMatch = null;
     Invitation mIncomingInvite = null;
@@ -66,36 +66,36 @@ public class MainMenuGui : BaseGui {
 
     protected void OnGotMatch(TurnBasedMatch match, bool shouldAutoLaunch) {
         if (shouldAutoLaunch) {
-        	// if shouldAutoLaunch is true, we know the user has indicated (via an external UI)
-        	// that they wish to play this match right now, so we take the user to the
-        	// game screen without further delay:
+          // if shouldAutoLaunch is true, we know the user has indicated (via an external UI)
+          // that they wish to play this match right now, so we take the user to the
+          // game screen without further delay:
             OnMatchStarted(true, match);
         } else {
-        	// if shouldAutoLaunch is false, this means it's not clear that the user
-        	// wants to jump into the game right away (for example, we might have received
-        	// this match from a background push notification). So, instead, we will
-        	// calmly hold on to the match and show a prompt so they can decide
-        	mIncomingMatch = match;
+          // if shouldAutoLaunch is false, this means it's not clear that the user
+          // wants to jump into the game right away (for example, we might have received
+          // this match from a background push notification). So, instead, we will
+          // calmly hold on to the match and show a prompt so they can decide
+          mIncomingMatch = match;
         }
     }
-    
+
     protected void OnGotInvitation(Invitation invitation, bool shouldAutoAccept) {
-    	if (invitation.InvitationType != Invitation.InvType.TurnBased) {
-    		// wrong type of invitation!
-    		return;
-    	}
-    	
-    	if (shouldAutoAccept) {
-			// if shouldAutoAccept is true, we know the user has indicated (via an external UI)
-			// that they wish to accept this invitation right now, so we take the user to the
-			// game screen without further delay:
-			SetStandBy("Accepting invitation...");
-    		PlayGamesPlatform.Instance.TurnBased.AcceptInvitation(invitation.InvitationId, OnMatchStarted);
-    	} else {
-    		// if shouldAutoAccept is false, we got this invitation in the background, so
-    		// we should not jump directly into the game
-    		mIncomingInvite = invitation;
-    	}
+      if (invitation.InvitationType != Invitation.InvType.TurnBased) {
+        // wrong type of invitation!
+        return;
+      }
+
+      if (shouldAutoAccept) {
+        // if shouldAutoAccept is true, we know the user has indicated (via an external UI)
+        // that they wish to accept this invitation right now, so we take the user to the
+        // game screen without further delay:
+        SetStandBy("Accepting invitation...");
+        PlayGamesPlatform.Instance.TurnBased.AcceptInvitation(invitation.InvitationId, OnMatchStarted);
+      } else {
+        // if shouldAutoAccept is false, we got this invitation in the background, so
+        // we should not jump directly into the game
+        mIncomingInvite = invitation;
+      }
     }
 
     protected override void DoGUI() {
@@ -108,13 +108,13 @@ public class MainMenuGui : BaseGui {
             }
             return;
         }
-        
+
         if (mIncomingMatch != null) {
-        	ShowIncomingMatchUi();
-        	return;
+          ShowIncomingMatchUi();
+          return;
         } else if (mIncomingInvite != null) {
-        	ShowIncomingInviteUi();
-        	return;
+          ShowIncomingInviteUi();
+          return;
         }
 
         if (GuiButton(QuickMatchCfg)) {
@@ -132,32 +132,64 @@ public class MainMenuGui : BaseGui {
             DoSignOut();
         }
     }
-    
+
     void ShowIncomingMatchUi() {
-    	GuiLabel(CenterLabelCfg, "It's your turn against " + Util.GetOpponentName(mIncomingMatch));
-    	if (GuiButton(PlayButtonCfg)) {
-			TurnBasedMatch match = mIncomingMatch;
-    		mIncomingMatch = null;
-			OnMatchStarted(true, match);
-    	} else if (GuiButton(NotNowButtonCfg)) {
-    		mIncomingMatch = null;
-    	}
-    }
-    
-    void ShowIncomingInviteUi() {
-    	string inviterName = mIncomingInvite.Inviter == null ? "Someone" :
-    		mIncomingInvite.Inviter.DisplayName == null ? "Someone" :
-    		mIncomingInvite.Inviter.DisplayName;
-    	GuiLabel(CenterLabelCfg, inviterName + " is challenging you to a match!");
-		Invitation inv = mIncomingInvite;
-		if (GuiButton(AcceptButtonCfg)) {
-			mIncomingInvite = null;
-			SetStandBy("Accepting invitation...");
-			PlayGamesPlatform.Instance.TurnBased.AcceptInvitation(inv.InvitationId, OnMatchStarted);
-		} else if (GuiButton(DeclineButtonCfg)) {
-			mIncomingInvite = null;
-			PlayGamesPlatform.Instance.TurnBased.DeclineInvitation(inv.InvitationId);
-		}
+
+        switch (mIncomingMatch.Status) {
+        case TurnBasedMatch.MatchStatus.Cancelled:
+          GuiLabel (CenterLabelCfg, Util.GetOpponentName (mIncomingMatch) + " declined your invitation");
+          if (GuiButton (OkButtonCfg)) {
+            mIncomingMatch = null;
+          }
+        break;
+        case TurnBasedMatch.MatchStatus.Complete:
+          GuiLabel (CenterLabelCfg, "Your match with " + Util.GetOpponentName (mIncomingMatch) + " is over...");
+          if (GuiButton (OkButtonCfg)) {
+            TurnBasedMatch match = mIncomingMatch;
+            mIncomingMatch = null;
+            OnMatchStarted (true, match);
+          }
+        break;
+
+        default:
+          switch (mIncomingMatch.TurnStatus) {
+          case TurnBasedMatch.MatchTurnStatus.MyTurn:
+            GuiLabel (CenterLabelCfg, "It's your turn against " + Util.GetOpponentName (mIncomingMatch)
+                  + " " + mIncomingMatch.Status + " turn = " + mIncomingMatch.TurnStatus);
+            if (GuiButton (PlayButtonCfg)) {
+              TurnBasedMatch match = mIncomingMatch;
+              mIncomingMatch = null;
+              OnMatchStarted (true, match);
+            } else if (GuiButton (NotNowButtonCfg)) {
+              mIncomingMatch = null;
+            }
+          break;
+          default:
+            GuiLabel (CenterLabelCfg, Util.GetOpponentName (mIncomingMatch) + " accepted your invitation");
+            if (GuiButton (OkButtonCfg)) {
+              mIncomingMatch = null;
+            }
+          break;
+          }
+        break;
+
+	} // end match status
+  }
+
+  void ShowIncomingInviteUi() {
+      string inviterName = mIncomingInvite.Inviter == null ? "Someone" :
+      mIncomingInvite.Inviter.DisplayName == null ? "Someone" :
+      mIncomingInvite.Inviter.DisplayName;
+      GuiLabel(CenterLabelCfg, inviterName + " is challenging you to a match!");
+      Invitation inv = mIncomingInvite;
+      if (GuiButton(AcceptButtonCfg)) {
+        mIncomingInvite = null;
+        SetStandBy("Accepting invitation...");
+        PlayGamesPlatform.Instance.TurnBased.AcceptInvitation(inv.InvitationId, OnMatchStarted);
+      } else if (GuiButton(DeclineButtonCfg)) {
+        mIncomingInvite = null;
+        PlayGamesPlatform.Instance.TurnBased.DeclineInvitation(inv.InvitationId);
+      }
     }
 
     void DoSignOut() {

@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2013 Google Inc.
+ * Copyright (C) 2014 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,14 +33,14 @@ public class GPGSDocsUI {
     [MenuItem("Google Play Games/Downloads/Google+ SDK (iOS)...", false, 200)]
     public static void MenuItemGooglePlusSdk() {
         EditorUtility.DisplayDialog(GPGSStrings.ExternalLinks.GooglePlusSdkTitle,
-                GPGSStrings.ExternalLinks.GooglePlusSdkBlurb, GPGSStrings.Ok);
+            GPGSStrings.ExternalLinks.GooglePlusSdkBlurb, GPGSStrings.Ok);
         Application.OpenURL(GPGSStrings.ExternalLinks.GooglePlusSdkUrl);
     }
 
     [MenuItem("Google Play Games/Downloads/Google Play Games SDK (iOS)...", false, 201)]
     public static void MenuItemGooglePlayGamesSdk() {
         EditorUtility.DisplayDialog(GPGSStrings.ExternalLinks.GooglePlayGamesSdkTitle,
-                GPGSStrings.ExternalLinks.GooglePlayGamesSdkBlurb, GPGSStrings.Ok);
+            GPGSStrings.ExternalLinks.GooglePlayGamesSdkBlurb, GPGSStrings.Ok);
         Application.OpenURL(GPGSStrings.ExternalLinks.GooglePlayGamesUrl);
     }
 
@@ -50,17 +50,19 @@ public class GPGSDocsUI {
         string sdkPath = GPGSUtil.GetAndroidSdkPath();
         if (!GPGSUtil.HasAndroidSdk()) {
             EditorUtility.DisplayDialog(GPGSStrings.AndroidSetup.SdkNotFound,
-                    GPGSStrings.AndroidSetup.SdkNotFoundBlurb, GPGSStrings.Ok);
+                GPGSStrings.AndroidSetup.SdkNotFoundBlurb, GPGSStrings.Ok);
             return;
         }
 
         bool launch = EditorUtility.DisplayDialog(
-                GPGSStrings.ExternalLinks.GooglePlayGamesAndroidSdkTitle,
-                GPGSStrings.ExternalLinks.GooglePlayGamesAndroidSdkBlurb, GPGSStrings.Yes,
-                GPGSStrings.No);
+                          GPGSStrings.ExternalLinks.GooglePlayGamesAndroidSdkTitle,
+                          GPGSStrings.ExternalLinks.GooglePlayGamesAndroidSdkBlurb, GPGSStrings.Yes,
+                          GPGSStrings.No);
         if (launch) {
-            string exeName = sdkPath + GPGSUtil.FixSlashes("/tools/android");
-            string altExeName = sdkPath + GPGSUtil.FixSlashes("/tools/android.exe");
+            string exeName =
+                sdkPath + GPGSUtil.SlashesToPlatformSeparator("/tools/android");
+            string altExeName =
+                sdkPath + GPGSUtil.SlashesToPlatformSeparator("/tools/android.exe");
 
             EditorUtility.DisplayDialog(
                 GPGSStrings.ExternalLinks.GooglePlayGamesAndroidSdkTitle,
@@ -79,18 +81,18 @@ public class GPGSDocsUI {
             }
         }
     }
-    
+
     [MenuItem("Google Play Games/About/About the Plugin...", false, 300)]
     public static void MenuItemAbout() {
         EditorUtility.DisplayDialog(GPGSStrings.AboutTitle, GPGSStrings.AboutText +
-            GooglePlayGames.PluginVersion.VersionString + " (" + 
-            string.Format("0x{0:X8}", GooglePlayGames.PluginVersion.VersionInt) + ")",
+        GooglePlayGames.PluginVersion.VersionString + " (" +
+        string.Format("0x{0:X8}", GooglePlayGames.PluginVersion.VersionInt) + ")",
             GPGSStrings.Ok);
     }
-    
+
     [MenuItem("Google Play Games/About/License...", false, 301)]
     public static void MenuItemLicense() {
         EditorUtility.DisplayDialog(GPGSStrings.LicenseTitle, GPGSStrings.LicenseText,
-                                    GPGSStrings.Ok);
+            GPGSStrings.Ok);
     }
 }

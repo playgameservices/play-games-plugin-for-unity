@@ -1,3 +1,34 @@
+2014-11-14 Version 0.9.10 (codename: doge)
+    This release is a major rearchitecting of the plugin to use
+    the Play Games C++ SDK. This allows us to re-use the same code on
+    all supported platforms, reducing codesize and decreasing the
+    work required to add new features. This release makes few
+    developer-facing API changes, apart from those required for
+    correctness reasons.
+
+    New features:
+        * Post-process build is handled by pure C# code rather than
+          bash / shell scripts.
+        * Implemented on top of the cross platform C++ Play Games SDK
+    API Changes:
+        * Conversions from int to uint where applicable:
+            - TurnBasedMatch.AvailableAutomatchSlots
+            - TurnBasedMatch.Variant
+            - IPlayGamesClient.IncrementAchievement
+            - IRealTimeMultiplayerClient.CreateQuickGame
+            - IRealTimeMultiplayerClient.CreateWithInvitationScreen
+            - ITurnBasedMultiplayerClient.CreateQuickGame
+            - ITurnBasedMultiplayerClient.CreateWithInvitationScreen
+        * Removes support for cloud state on iOS (a crossplatform
+          alternative is coming soon).
+        * Removes cloud state encrypter (only used by iOS).
+        * Real Time multiplayer calls will fail immediately when the
+          current match is being left or is shutdown.
+        * Turn-based multiplayer APIs now take instances of TurnBasedMatch
+          rather than just match ID. This is required for correctness
+          (the previous API allowed silently overwriting updated matches).
+
+
 2014-03-17 Version 0.9.00 (codename: cuiaba)
 
     New features:
@@ -13,10 +44,10 @@
 
 2014-02-04 Version 0.8.01 (codename: brasilia)
 
-    Updates all plug in code to use new Google Play Services 
+    Updates all plug in code to use new Google Play Services
     programming pattern (GoogleApiClient) and provides a few
     bug fixes.
-    
+
     * References to GamesClient and AppStateClient updated to use GoogleApiClient
     * Bug fix: GetUserId() occasionally causing crashes on IOS
     * Bug fix: IsAuthenticated() returning true immediatly after SignOut()

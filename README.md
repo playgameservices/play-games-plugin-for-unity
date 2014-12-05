@@ -12,9 +12,9 @@ _iOS is a trademark of Apple, Inc._
 
 ## Overview
 
-The Google Play Games plugin for Unity allows you to access the Google Play Games 
-API through Unity's [social interface](http://docs.unity3d.com/Documentation/ScriptReference/Social.html). 
-The plugin provides support for the 
+The Google Play Games plugin for Unity allows you to access the Google Play Games
+API through Unity's [social interface](http://docs.unity3d.com/Documentation/ScriptReference/Social.html).
+The plugin provides support for the
 following features of the Google Play Games API:<br/>
 
 * sign in
@@ -22,8 +22,8 @@ following features of the Google Play Games API:<br/>
 * post score to leaderboard
 * cloud save read/write
 * show built-in achievement/leaderboards UI
-* [turn-based multiplayer](TBMP.md) <b>(new)</b>
-* [real-time multiplayer](RTMP.md) <b>(new)</b>
+* [turn-based multiplayer](TBMP.md)
+* [real-time multiplayer](RTMP.md)
 
 All features are available on Android and iOS.
 
@@ -37,14 +37,14 @@ Features:
 
 System requirements:
 
-* Unity&reg; 4.3 or above
+* Unity&reg; 4.5 or above
 * To deploy on Android:
     * Android SDK
-    * Google Play Services library, version 4.2.42 or above
+    * Google Play Services library, version 6.1.11 or above
 * To deploy on iOS:
-    * XCode 4 or above
-    * Google Plus SDK for iOS
-    * Google Play Games SDK for iOS
+    * XCode 5 or above
+    * Google+ SDK for iOS
+    * Google Play Games C++ SDK
 
 
 ## Upgrading
@@ -53,19 +53,19 @@ If you have already integrated your project with a previous version of the plugi
 
 ## Configure Your Game
 
-To use the plugin, you must first [configure your 
-game](https://developers.google.com/games/services/console/enabling) in the 
-Google Play Developer Console. Follow the instructions on creating a client ID 
-for Android and/or iOS (depending on what platforms you intend to deploy or game 
-on). Be particularly careful when entering your package name and your 
-certificate fingerprints, since mistakes on those screens can be difficult to 
+To use the plugin, you must first [configure your
+game](https://developers.google.com/games/services/console/enabling) in the
+Google Play Developer Console. Follow the instructions on creating a client ID
+for Android and/or iOS (depending on what platforms you intend to deploy or game
+on). Be particularly careful when entering your package name and your
+certificate fingerprints, since mistakes on those screens can be difficult to
 recover from.
 
 If you intend to use real-time or turn-based multiplayer in your game, remember
 to activate those features in the Google Play Developer Console when creating
 your application instances.
 
-Please note the following pieces of information when creating your client IDs, 
+Please note the following pieces of information when creating your client IDs,
 as they will be necessary later:
 
 **Android**
@@ -76,26 +76,22 @@ as they will be necessary later:
 **iOS**
 
 * Your bundle identifier (e.g. "com.example.AwesomeGame")
-* Your application ID (e.g. 123456789012)*
 * Your client ID (e.g. "46798138751-afwa4iejsfjskj.apps.googleusercontent.com")
 
-_[*] The application ID is the number that Google Play Developer Console 
-assigns to your project. Please note that is not the same as your Apple 
-application ID._
 
-**Note:** Do not forget to add your test accounts (the accounts with which you 
-will try signing in) to the **Testing** section of the Developer Console, 
+**Note:** Do not forget to add your test accounts (the accounts with which you
+will try signing in) to the **Testing** section of the Developer Console,
 otherwise you will not be able to sign in to your game.
 
 ## Add Achievements and Leaderboards
 
-Add 
-[achievements](https://developers.google.com/games/services/common/concepts/achievements) 
-and 
-[leaderboards](https://developers.google.com/games/services/common/concepts/leaderboards) 
-to your game in the Google Play Developer Console. For each achievement and 
-leaderboard you configure, make sure to note the corresponding **achievement ID** or **leaderboard ID**, as those will be needed when making the API calls. 
-Achievement and leaderboard IDs are alphanumeric strings (e.g. 
+Add
+[achievements](https://developers.google.com/games/services/common/concepts/achievements)
+and
+[leaderboards](https://developers.google.com/games/services/common/concepts/leaderboards)
+to your game in the Google Play Developer Console. For each achievement and
+leaderboard you configure, make sure to note the corresponding **achievement ID** or **leaderboard ID**, as those will be needed when making the API calls.
+Achievement and leaderboard IDs are alphanumeric strings (e.g.
 "Cgkx9eiuwi8_AQ").
 
 ## Load Your Game Project
@@ -106,25 +102,24 @@ If you do not have a game project to work with, you can use the **Minimal** samp
 available in the **samples** directory. Using that sample will allow you to
 quickly test your setup and make sure you can access the API.
 
-If you want to test a larger sample after you are familiar with the plugin, 
+If you want to test a larger sample after you are familiar with the plugin,
 try the **CubicPilot** game.
 More information about building the samples can be found in the
 [samples README](samples/README.md) file.
 
 ## Plugin Installation
 
-To download the plugin, clone this Git repository into your file system (or download it as 
-a ZIP file and unpack it). Then, look for the **unitypackage** file in 
+To download the plugin, clone this Git repository into your file system (or download it as
+a ZIP file and unpack it). Then, look for the **unitypackage** file in
 the **current-build** directory:
 
     current-build/GooglePlayGamesPluginForUnity-X.YY.ZZ.unitypackage
 
 To install the plugin, simply open your game project in Unity and import that file into
-your project's assets, as you would any other Unity package. In Unity 4.2 and
-4.3, this is accomplished through the **Assets | Import Package | Custom
-Package** menu item (you can also reach this menu it by right-clicking the
-**Assets** folder). After importing, you should see that two new menu items
-were added to the File menu: **"Play Games Android setup"** and **"Play Games
+your project's assets, as you would any other Unity package. This is accomplished through
+the **Assets | Import Package | Custom Package** menu item (you can also reach this menu it
+by right-clicking the **Assets** folder). After importing, you should see that two new menu
+items were added to the File menu: **"Play Games Android setup"** and **"Play Games
 iOS setup"**. If you don't see the new menu items, refresh the assets by
 clicking **Assets | Refresh** and try again.
 
@@ -139,10 +134,10 @@ package is available under the **Extras** folder. If it is not installed
 or is out of date, install or update it before proceeding.
 
 Next, set up the path to your Android SDK installation in Unity. This is located in the
-preferences menu, under the **External Tools** section. 
+preferences menu, under the **External Tools** section.
 
-Next, configure your game's package name. To do this, click **File | Build Settings**, 
-select the **Android** platform and click **Player Settings** to show Unity's 
+Next, configure your game's package name. To do this, click **File | Build Settings**,
+select the **Android** platform and click **Player Settings** to show Unity's
 Player Settings window. In that window, look for the **Bundle Identifier** setting
 under **Other Settings**. Enter your package name there (for example
 _com.example.my.awesome.game_).
@@ -162,40 +157,39 @@ If you are using Windows, you must make sure that your Java SDK installation can
 2. Add the Java SDK's `bin` folder to your `PATH` environment variable (for example, `C:\Program Files\Java\jdk1.7.0_45\bin`)
 3. Reboot.
 
-**How to edit environment variables:** In Windows 2000/XP/Vista/7, 
+**How to edit environment variables:** In Windows 2000/XP/Vista/7,
 right-click **My Computer**, then **Properties**, then go to **Advanced System Properties**
 (or **System Properties** and then click the **Advanced** tab), then
 click **Environment Variables**. On Windows 8, press **Windows Key + W** and
-search for **environment variables**.
-For more information, consult the documentation for your version of Windows. 
+search for **environment variables**
+For more information, consult the documentation for your version of Windows.
 
 
 ## iOS Setup
 
-To configure your Unity game to run with Google Play Games on iOS, download the 
-Games SDK and the Google+ iOS SDK, which are available from 
-[our downloads page](https://developers.google.com/games/services/downloads/). Unpack the 
-downloads into a directory of your choice. The necessary bundles and frameworks 
+To configure your Unity game to run with Google Play Games on iOS, download the
+Games C++ SDK and the Google+ iOS SDK, which are available from
+[our downloads page](https://developers.google.com/games/services/downloads/). Unpack the
+downloads into a directory of your choice. The necessary bundles and frameworks
 are:
 
 * GoogleOpenSource.framework
 * GooglePlus.bundle
 * GooglePlus.framework
-* PlayGameServices.bundle
-* PlayGameServices.framework
+* GooglePlayGames.bundle
+* gpg.framework
 
 Next, open the iOS build settings dialog. To do so, click **File | Build Settings**,
 select the **iOS** platform, and click **Player Settings**. Find the **Bundle Identifier**
 setting and enter your bundle identifier there.
 
-Next, click the **File | Play Games - iOS **setup menu item. This will display the 
+Next, click the **File | Play Games - iOS **setup menu item. This will display the
 iOS setup screen, where you must input:
 
-* Your application ID (e.g. 123456789012)
 * Your client ID (e.g. "46798138751-afwa4iejsfjskj.apps.googleusercontent.com")
 * Your bundle identifier (e.g. "com.example.AwesomeGame")
 
-All of these settings must match exactly the values you used when setting up 
+All of these settings must match exactly the values you used when setting up
 your client ID on the Developer Console previously.
 
 When ready, click the **Setup** button to finish the configuration process.
@@ -222,16 +216,17 @@ own code to integrate Play Games services into your game.
 
 ## ISocialPlatform Compliance
 
-The Google Play Games plugin implements a subset of Unity's [social interface](http://docs.unity3d.com/Documentation/ScriptReference/Social.html), for compatibility 
-with games that already use that interface when integrating with other 
-platforms. However, some features are unique to Play Games and are 
-offered as extensions to the standard social interface provided by Unity. 
+The Google Play Games plugin implements a subset of Unity's [social interface](http://docs.unity3d.com/Documentation/ScriptReference/Social.html), for compatibility
+with games that already use that interface when integrating with other
+platforms. However, some features are unique to Play Games and are
+offered as extensions to the standard social interface provided by Unity.
 
-The standard API calls can be accessed through the **Social.Active** object, 
-which is a reference to an **ISocialPlatform** interface. The non-standard 
-Google Play Games extensions can be accessed by casting the **Social.Active** 
-object to the **PlayGamesPlatform** class, where the additional methods are 
-available. 
+The standard API calls can be accessed through the **Social.Active** object,
+which is a reference to an **ISocialPlatform** interface. The non-standard
+Google Play Games extensions can be accessed by casting the **Social.Active**
+object to the **PlayGamesPlatform** class, where the additional methods are
+available.
+
 
 ## Initialization
 
@@ -242,22 +237,22 @@ call **PlayGamesPlatform.Activate**:
     using GooglePlayGames;
     using UnityEngine.SocialPlatforms;
     ...
-    
+
     // recommended for debugging:
     PlayGamesPlatform.DebugLogEnabled = true;
-    
+
     // Activate the Google Play Games platform
     PlayGamesPlatform.Activate();
 ```
 
-After activated, you can access the Play Games platform through 
-**Social.Active**. You should only call **PlayGamesPlatform.Activate** once in 
-your application. Making this call will not display anything on the screen and 
+After activated, you can access the Play Games platform through
+**Social.Active**. You should only call **PlayGamesPlatform.Activate** once in
+your application. Making this call will not display anything on the screen and
 will not interact with the user in any way.
 
 ## Sign in
 
-To sign in, call **Social.localUser.Authenticate**, which is part of the 
+To sign in, call **Social.localUser.Authenticate**, which is part of the
 standard Unity social platform interface.
 
 ```csharp
@@ -270,19 +265,19 @@ standard Unity social platform interface.
     });
 ```
 
-Authentication will show the required consent dialogs. If the user has already 
-signed into the game in the past, this process will be silent and the user will 
+Authentication will show the required consent dialogs. If the user has already
+signed into the game in the past, this process will be silent and the user will
 not have to interact with any dialogs.
 
-Note that you cannot make any games API calls (unlock achievements, post scores, 
-etc) until you get a successful return value from **Authenticate**, so it is 
-good practice to put up a standby screen until the callback is called, to make 
-sure the user can't start playing the game until the authentication process 
+Note that you cannot make any games API calls (unlock achievements, post scores,
+etc) until you get a successful return value from **Authenticate**, so it is
+good practice to put up a standby screen until the callback is called, to make
+sure the user can't start playing the game until the authentication process
 completes.
 
 ## Revealing/Unlocking an Achievement
 
-To unlock an achievement, use the **Social.ReportProgress** method with a 
+To unlock an achievement, use the **Social.ReportProgress** method with a
 progress value of 100.0f:
 
 ```csharp
@@ -295,21 +290,21 @@ progress value of 100.0f:
     });
 ```
 
-Notice that according to the expected behavior of 
-[Social.ReportProgress](http://docs.unity3d.com/Documentation/ScriptReference/Social.ReportProgress.html), 
-a progress of 0.0f means revealing the achievement and a progress of 100.0f 
-means unlocking the achievement. Therefore, to reveal an achievement (that was 
-previously hidden) without unlocking it, simply call Social.ReportProgress with 
+Notice that according to the expected behavior of
+[Social.ReportProgress](http://docs.unity3d.com/Documentation/ScriptReference/Social.ReportProgress.html),
+a progress of 0.0f means revealing the achievement and a progress of 100.0f
+means unlocking the achievement. Therefore, to reveal an achievement (that was
+previously hidden) without unlocking it, simply call Social.ReportProgress with
 a progress of 0.0f.
 
 ## Incrementing an Achievement
 
-If your achievement is incremental, the Play Games implementation of 
-**Social.ReportProgress** will try to behave as closely as possible to the 
-expected behavior according to Unity's social API, but may not be exact. For 
-this reason, we recommend that you do not use Social.ReportProgress for 
-incremental achievements. Instead, use the 
-**PlayGamesPlatform.IncrementAchievement** method, which is a Play Games 
+If your achievement is incremental, the Play Games implementation of
+**Social.ReportProgress** will try to behave as closely as possible to the
+expected behavior according to Unity's social API, but may not be exact. For
+this reason, we recommend that you do not use Social.ReportProgress for
+incremental achievements. Instead, use the
+**PlayGamesPlatform.IncrementAchievement** method, which is a Play Games
 extension.
 
 ```csharp
@@ -337,14 +332,14 @@ To post a score to a leaderboard, call **Social.ReportScore**.
     });
 ```
 
-Note that the platform and the server will automatically discard scores that are 
-lower than the player's existing high score, so you can submit scores freely 
-without any checks to test whether or not the score is greater than the player's 
+Note that the platform and the server will automatically discard scores that are
+lower than the player's existing high score, so you can submit scores freely
+without any checks to test whether or not the score is greater than the player's
 existing score.
 
 ## Showing the Achievements UI
 
-To show the built-in UI for all leaderboards, call 
+To show the built-in UI for all leaderboards, call
 **Social.ShowAchievementsUI**.
 
 ```csharp
@@ -355,7 +350,7 @@ To show the built-in UI for all leaderboards, call
     Social.ShowAchievementsUI();
 ```
 
-This will show a standard UI appropriate for the look and feel of the platform 
+This will show a standard UI appropriate for the look and feel of the platform
 (Android or iOS).
 
 ## Showing the Leaderboard UI
@@ -370,9 +365,9 @@ To show the built-in UI for all leaderboards, call **Social.ShowLeaderboardUI**.
     Social.ShowLeaderboardUI();
 ```
 
-If you wish to show a particular leaderboard instead of all leaderboards, you 
-can pass a leaderboard ID to the method. This, however, is a Play Games 
-extension, so the Social.Active object needs to be cast to a PlayGamesPlatform 
+If you wish to show a particular leaderboard instead of all leaderboards, you
+can pass a leaderboard ID to the method. This, however, is a Play Games
+extension, so the Social.Active object needs to be cast to a PlayGamesPlatform
 object first:
 
 ```csharp
@@ -383,9 +378,9 @@ object first:
     ((PlayGamesPlatform) Social.Active).ShowLeaderboardUI("Cfji293fjsie_QA");
 ```
 
-## Saving Game State to the Cloud
+## Saving Game State to the Cloud (only on Android)
 
-To save game state to the cloud, use the **PlayGamesPlatform.UpdateState** 
+To save game state to the cloud, use the **PlayGamesPlatform.UpdateState**
 method.
 
 ```csharp
@@ -406,14 +401,14 @@ method.
         ...
 ```
 
-The **OnStateSaved** method of the **OnStateLoadedListener** will be called to 
+The **OnStateSaved** method of the **OnStateLoadedListener** will be called to
 indicate the success or failure of the cloud save operation.
 
-## Loading Game State from the Cloud
+## Loading Game State from the Cloud (only on Android)
 
-To load game state from the cloud, use the **PlayGamesPlatform.LoadState** 
+To load game state from the cloud, use the **PlayGamesPlatform.LoadState**
 method:<br/>
- 
+
 ```csharp
     using GooglePlayGames;
     using UnityEngine.SocialPlatforms;
@@ -435,12 +430,12 @@ method:<br/>
 
 ## Resolving State Conflicts
 
-A conflict happens when a device attempts to save state to the cloud but the 
-data currently on the cloud was written by a different device. When this 
-condition occurs, the OnStateConflict method of your OnStateLoadedListener will 
-be called, and you choose between (or merge) the two states and return a new 
+A conflict happens when a device attempts to save state to the cloud but the
+data currently on the cloud was written by a different device. When this
+condition occurs, the OnStateConflict method of your OnStateLoadedListener will
+be called, and you choose between (or merge) the two states and return a new
 byte array representing the resolved state:<br/>
- 
+
 ```csharp
     using GooglePlayGames;
     using UnityEngine.SocialPlatforms;
@@ -453,47 +448,12 @@ byte array representing the resolved state:<br/>
     }
 ```
 
-## Using the Cloud Cache Encryption Hook
-
-When the user is offline, cloud save data is stored locally on the device for later
-synchronization. On Android, this cache is maintained by the Google Play Services
-application. However, on iOS, the cache is implemented by the plugin itself by
-writing to files. If you are concerned that a malicious user might try to tamper with
-those cache files, you can install an encryption/decryption hook to provide code
-that the plugin will use to encrypt the buffer before it is written to disk and
-decrypt it once it is read from disk.
-
-**Important:** the encryption/decryption hook will be called only when
-saving files to local disk on operating systems where this feature is not
-already provided by the underlying library (currently, only iOS). Data
-will **not** be encrypted using this method when saved to the server.
-
-````csharp
-    // Define our encrypter/decrypter method:
-    byte[] MyEncrypter(bool encrypt, byte[] data) {
-        if (encrypt) {
-            // data[] is the plain data that we must encrypt.
-            byte[] encryptedData = ....; // your encryption code here
-            return encryptedData;
-        } else {
-            // data[] is the encrypted data that we must decrypt.
-            byte[] plainData = ....; // your decryption code here
-            return plainData;
-        }
-    }
-
-    // Set the cloud cache encrypter/decrypter
-    // (Do this on your initialization, before attempting to sign in,
-    // but after calling PlayGamesPlatform.Activate())
-    ((PlayGamesPlatform) Social.Active).SetCloudCacheEncrypter(MyEncrypter);
-````
-
 ## Multiplayer
 
-If you wish to integrate **turn-based multiplayer** in your game, refer to the 
+If you wish to integrate **turn-based multiplayer** in your game, refer to the
 [Getting Started with Turn-Based Multiplayer](TBMP.md).
 
-If you wish to integrate **real-time multiplayer** in your game, refer to the 
+If you wish to integrate **real-time multiplayer** in your game, refer to the
 [Getting Started with Real-Time Multiplayer](RTMP.md).
 
 ## Sign out
@@ -513,24 +473,24 @@ After signing out, no further API calls can be made until the user authenticates
 
 ## Building for Android
 
-To build your game for Android, do as you would normally do in Unity. Select 
-**File | Build Settings**, then select the **Android** platform and build. If 
-you are signing your APK file, please make sure that you are signing it with the 
-correct certificate, that is, the one that corresponds to the SHA1 certificate 
+To build your game for Android, do as you would normally do in Unity. Select
+**File | Build Settings**, then select the **Android** platform and build. If
+you are signing your APK file, please make sure that you are signing it with the
+correct certificate, that is, the one that corresponds to the SHA1 certificate
 fingerprint you entered in the Developer Console during the setup.
 
 ## Building for iOS
 
 To build your game for iOS, do as you would normally do in Unity. Select **File | Build Settings**, then select the **iOS** platform.
-Click **Player Settings** and make sure that the target iOS platform is 6.0 or above.
+Click **Player Settings** and make sure that the target iOS platform is 7.0 or above.
 
 Then, click **Build** and select an output directory to save the XCode project. Do not use
 the **Build and Run** option, since there are some manual steps you must take in
 the XCode project before your project can run.
 
-After building the XCode project, the Play Games postprocessor will run to 
-configure the Info.plist settings on your project. You will see a log of the 
-operation, which if successful, will give you additional instructions to finish 
+After building the XCode project, the Play Games postprocessor will run to
+configure the Info.plist settings on your project. You will see a log of the
+operation, which if successful, will give you additional instructions to finish
 configuring your XCode project.
 
 The additional steps are:
@@ -540,38 +500,37 @@ list labeled **Unity-iPhone, 1 target, iOS SDK**), then click the **Build Phases
 tab and expand the **Link Binary with Libraries** item. Then, add the following
 frameworks to that list:
 <br/><br/>
+
 **AddressBook.framework**<br/>
 **AssetsLibrary.framework**<br/>
-**CoreData**<br/>
-**CoreLocation**<br/>
-**CoreMotion**<br/>
-**CoreText**<br/>
-**MediaPlayer**<br/>
-**QuartzCore**<br/>
-**Security**<br/>
-**SystemConfiguration**<br/><br/>
-**libc++.dylib**<br/><br/>
-2. Add the following bundles and frameworks from the Google Plus and Google Play 
-   Games SDK that you have previously downloaded. If you have not downloaded 
+**CoreData.framework**<br/>
+**CoreTelephony.framework**<br/>
+**CoreText.framework**<br/>
+**Security.framework**<br/>
+**libc++.dylib**<br/>
+**libz.dylib**<br/><br/>
+
+2. Add the following bundles and frameworks from the Google Plus and Google Play
+   Games C++ SDK that you have previously downloaded. If you have not downloaded
    these files yet, they can be found [in the downloads section](https://developers.google.com/games/services/downloads) of the Google Play Games developer site. To add these frameworks you can simply drag
 and drop those 5 files on the top-level project item (labeled **Unity-iPhone**).<br/><br/>
    	**GoogleOpenSource.framework**<br/>
    	**GooglePlus.bundle**<br/>
    	**GooglePlus.framework**<br/>
-   	**PlayGameServices.bundle**<br/>
-   	**PlayGameServices.framework**<br/><br/>
-3. Add the **"-ObjC"** linker flag. To do this, select the top-level project 
+   	**GooglePlayGames.bundle**<br/>
+   	**gpg.framework**<br/><br/>
+3. Add the **"-ObjC"** linker flag. To do this, select the top-level project
    object, then go to the **Build Settings**
    tab. Search for **"Other Linker Flags"** using the search tool, double click
    the **Other Linker Flags** item and add **"-ObjC"** to that list (attention to case!).
 
-**Note:** If you export the project a second time to the same XCode project 
-directory, you can use Unity's **Append** option to avoid overwriting these 
+**Note:** If you export the project a second time to the same XCode project
+directory, you can use Unity's **Append** option to avoid overwriting these
 settings. If you use **Replace**, however, you might have to reapply some settings.
 
 ## Common Build Errors on iOS
 
-**"The current deployment target does not support automated _weak references"**. Make sure your target iOS platform is 6.0 or above. If the target platform is below 6.0, this error will occur during build.
+**"The current deployment target does not support automated _weak references"**. Make sure your target iOS platform is 7.0 or above. If the target platform is below 7.0, this error will occur during build.
 
 **"Dsymutil error"**. Depending on your version of XCode, you may need to disable dSYM file generation. To do this, go to Build Settings |
 Build Options | Debug Information Format | Debug. Select **DWARF** instead of **DWARF with dSYM**.
@@ -580,16 +539,16 @@ Build Options | Debug Information Format | Debug. Select **DWARF** instead of **
 
 ## Building for iOS to run on the simulator
 
-To run your game in the simulator as opposed to a real device, you must export 
-it from Unity with the "Simulator SDK" instead of the "Device SDK". To do this, 
-open your game project in Unity, select **File | Build Settings**, select iOS, 
-then click on **Player Settings**. Scroll down to find the **"SDK Version"** 
+To run your game in the simulator as opposed to a real device, you must export
+it from Unity with the "Simulator SDK" instead of the "Device SDK". To do this,
+open your game project in Unity, select **File | Build Settings**, select iOS,
+then click on **Player Settings**. Scroll down to find the **"SDK Version"**
 option, and change it to **"Simulator SDK".**
 
 Then, export your project and perform the post-export steps as described above.
 
-Next, you must manually enable some API entry points that are used by the 
-plugin, but which are by default disabled in the Unity runtime code. To do 
+Next, you must manually enable some API entry points that are used by the
+plugin, but which are by default disabled in the Unity runtime code. To do
 this, open the **Libraries/RegisterMonoModule.cpp** file in your exported project.
 
 You will notice there are two sections near the top of the file that<br/>
@@ -602,7 +561,7 @@ are delimited by **#if !(TARGET_IPHONE_SIMULATOR)** and** #endif**.
             ...declarations... (zone A)
         #endif
     }
-        
+
     void RegisterMonoModules()
     {
         ...
@@ -615,12 +574,12 @@ are delimited by **#if !(TARGET_IPHONE_SIMULATOR)** and** #endif**.
  <br/>
 To enable the simulator to make the necessary C function calls, you need to:
 
-1. Find the line that declares the **mono_dl_register_symbol()** function in 
+1. Find the line that declares the **mono_dl_register_symbol()** function in
    **Zone A**.
-2. Move it to the outside of **Zone A**, right after the **#endif** (but still 
+2. Move it to the outside of **Zone A**, right after the **#endif** (but still
    inside the **extern "C"** block)
 3. Find ALL the calls to **mono_dl_register_symbol()** in **Zone B**.
-4. Move them ALL outside **Zone B**, after the **#endif** (but still inside the 
+4. Move them ALL outside **Zone B**, after the **#endif** (but still inside the
    **RegisterMonoModules()** function).
 
 The final structure should be similar to the following:
@@ -633,7 +592,7 @@ The final structure should be similar to the following:
         #endif
         void mono_dl_register_symbol(const char* name, void *addr);
     }
-        
+
     void RegisterMonoModules()
     {
         ...
@@ -648,11 +607,11 @@ The final structure should be similar to the following:
     }
 ```
 
-**Note:** If you are using the current version of Unity (4.2), re-exporting to an existing 
-XCode project path will overwrite **Libraries/RegisterMonoModule.cpp**, even if 
-you use the **Append** option. Therefore, you must perform these changes every time 
-you export the project. To simplify your workflow, consider copying the files to 
-a different location before re-exporting, and copy them back after the process 
+**Note:** If you are using the current version of Unity (4.2), re-exporting to an existing
+XCode project path will overwrite **Libraries/RegisterMonoModule.cpp**, even if
+you use the **Append** option. Therefore, you must perform these changes every time
+you export the project. To simplify your workflow, consider copying the files to
+a different location before re-exporting, and copy them back after the process
 is complete.
 
 ## (Advanced) Using the Plugin Without Overriding the Default Social Platform
@@ -669,24 +628,18 @@ That way, you can even submit scores and achievements simultaneously to two or m
 
     // Submit achievement to original default social platform
     Social.ReportProgress("MyAchievementIdHere", 100.0f, callback);
-    
+
     // Submit achievement to Google Play
     PlayGamesPlatform.Instance.ReportProgress("MyGooglePlayAchievementIdHere", 100.0f, callback);
 
 ## Using Production APNS Certificate (iOS)
 
-In the `GPGSAppController.m` file, you will notice within the `application:didRegisterForRemoteNotificationsWithDeviceToken` method that there are two calls;
-one for using a push notification in the sandbox environment, and one for using a push notification in the production environment. You should make sure to 
-comment the first call (and uncomment the second) when you're ready to switch to a production environment and push notification.
+In the `GPGSAppController.m` file, you will notice within the `application:didRegisterForRemoteNotificationsWithDeviceToken` method that there is a comment discussing using the sandbox push server. Follow instructions there to switch between the production and sandbox environment and push notification.
 
-
-## Note from Maintainer
-
-The plugin was developed and is currently maintained by [Bruno Oliveira](https://plus.google.com/+BrunoOliveira). Feel free to add me on Google+ and nag me to fix bugs or take a look at your questions on Stack Overflow!
 
 ## Acknowledgements
 
-The iOS library makes use of the [MiniJSON.cs](https://gist.github.com/darktable/1411710) class developed by Calvin Rien (originally based on a parser by Patrick van Bergen), 
+The iOS library makes use of the [MiniJSON.cs](https://gist.github.com/darktable/1411710) class developed by Calvin Rien (originally based on a parser by Patrick van Bergen),
 available under the MIT License.
 
 ## Special Thanks

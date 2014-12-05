@@ -1,13 +1,13 @@
 #!/bin/bash
 #
-# Copyright (C) 2013 Google Inc.
-# 
+# Copyright (C) 2014 Google Inc.
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,21 +22,12 @@ if [ "$?" = "0" ]; then
     exit 1
 fi
 
-echo "Checking for accidentally added GPGSParams.h..."
-git ls-files | grep -v ^selftest/ | grep /GPGSParams.h$
-if [ "$?" = "0" ]; then
-    echo "*** GPGSParams.h should not be committed, since it contains local settings."
-    exit 1
-fi
-
 echo "Checking for accidentally added plugin copies..."
 dup=
-git ls-files | grep -v ^selftest/ | grep -v source/PluginDev | grep /Assets/GooglePlayGames/ 
+git ls-files | grep -v ^selftest/ | grep -v source/PluginDev | grep /Assets/GooglePlayGames/
 [ "$?" = "0" ] && dup=yes
 git ls-files | grep -v ^selftest/ | grep -v source/PluginDev | grep /Assets/Plugins/Android
 [ "$?" = "0" ] && dup=yes
-
-
 
 if [ "$?" = "0" ]; then
     echo "*** It looks like you added a second instance of the plugin to the commit."

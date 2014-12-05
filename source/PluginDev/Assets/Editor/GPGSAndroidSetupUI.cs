@@ -1,5 +1,5 @@
-﻿/*
- * Copyright (C) 2013 Google Inc.
+/*
+ * Copyright (C) 2014 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections;
 using System.IO;
+using GooglePlayGames;
 
 public class GPGSAndroidSetupUI : EditorWindow {
     string mAppId = "";
@@ -56,10 +57,14 @@ public class GPGSAndroidSetupUI : EditorWindow {
     void DoSetup() {
         string sdkPath = GPGSUtil.GetAndroidSdkPath();
         string libProjPath = sdkPath +
-            GPGSUtil.FixSlashes("/extras/google/google_play_services/libproject/google-play-services_lib");
-        string libProjAM = libProjPath + GPGSUtil.FixSlashes("/AndroidManifest.xml");
-        string libProjDestDir = GPGSUtil.FixSlashes("Assets/Plugins/Android/google-play-services_lib");
-        string projAM = GPGSUtil.FixSlashes("Assets/Plugins/Android/MainLibProj/AndroidManifest.xml");
+                             GPGSUtil.SlashesToPlatformSeparator(
+                                 "/extras/google/google_play_services/libproject/google-play-services_lib");
+        string libProjAM =
+            libProjPath + GPGSUtil.SlashesToPlatformSeparator("/AndroidManifest.xml");
+        string libProjDestDir = GPGSUtil.SlashesToPlatformSeparator(
+                                    "Assets/Plugins/Android/google-play-services_lib");
+        string projAM = GPGSUtil.SlashesToPlatformSeparator(
+                            "Assets/Plugins/Android/MainLibProj/AndroidManifest.xml");
 
         GPGSProjectSettings.Instance.Set("proj.AppId", mAppId);
         GPGSProjectSettings.Instance.Save();
@@ -85,7 +90,20 @@ public class GPGSAndroidSetupUI : EditorWindow {
                 GPGSStrings.AndroidSetup.LibProjNotFoundBlurb, GPGSStrings.Ok);
             return;
         }
-        
+
+        string supportJarPath = sdkPath +
+                                GPGSUtil.SlashesToPlatformSeparator(
+                                    "/extras/android/support/v4/android-support-v4.jar");
+        string supportJarDest =
+            GPGSUtil.SlashesToPlatformSeparator("Assets/Plugins/Android/android-support-v4.jar");
+
+        if (!System.IO.File.Exists(supportJarPath)) {
+            Debug.LogError("Android support library v4 not found at: " + supportJarPath);
+            EditorUtility.DisplayDialog(GPGSStrings.AndroidSetup.SupportJarNotFound,
+                GPGSStrings.AndroidSetup.SupportJarNotFoundBlurb, GPGSStrings.Ok);
+            return;
+        }
+
         // check lib project version
         if (!CheckAndWarnAboutGmsCoreVersion(libProjAM)) {
             return;
@@ -98,13 +116,20 @@ public class GPGSAndroidSetupUI : EditorWindow {
         // clear out the destination library project
         DeleteDirIfExists(libProjDestDir);
 
+        // Clear out any stale version of the support jar.
+        System.IO.File.Delete(supportJarDest);
+
         // Copy Google Play Services library
         FileUtil.CopyFileOrDirectory(libProjPath, libProjDestDir);
 
+        // Copy Android Support Library
+        FileUtil.CopyFileOrDirectory(supportJarPath, supportJarDest);
+
         // Generate AndroidManifest.xml
-        string manifestBody = GPGSUtil.ReadTextFile("template-AndroidManifest");
+        string manifestBody = GPGSUtil.ReadEditorTemplate("template-AndroidManifest");
         manifestBody = manifestBody.Replace("___APP_ID___", mAppId);
         GPGSUtil.WriteFile(projAM, manifestBody);
+        GPGSUtil.UpdateGameInfo();
 
         // refresh assets, and we're done
         AssetDatabase.Refresh();
@@ -113,13 +138,13 @@ public class GPGSAndroidSetupUI : EditorWindow {
         EditorUtility.DisplayDialog(GPGSStrings.Success,
             GPGSStrings.AndroidSetup.SetupComplete, GPGSStrings.Ok);
     }
-    
+
     private bool CheckAndWarnAboutGmsCoreVersion(string libProjAMFile) {
         string manifestContents = GPGSUtil.ReadFile(libProjAMFile);
         string[] fields = manifestContents.Split('\"');
         int i;
         long vercode = 0;
-        for (i = 0; i < fields.Length; i++) {
+        for(i = 0; i < fields.Length; i++) {
             if (fields[i].Contains("android:versionCode") && i + 1 < fields.Length) {
                 vercode = System.Convert.ToInt64(fields[i + 1]);
             }
