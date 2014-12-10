@@ -314,7 +314,7 @@ public class PlayGamesPlatform : ISocialPlatform {
             // increment it to the target percentage (approximate)
             Logger.d("Progress " + progress +
             " interpreted as incremental target (approximate).");
-            int targetSteps = (int)(progress * totalSteps);
+            int targetSteps = (int)((progress / 100) * totalSteps);
             int numSteps = targetSteps - curSteps;
             Logger.d("Target steps: " + targetSteps + ", cur steps:" + curSteps);
             Logger.d("Steps to increment: " + numSteps);
