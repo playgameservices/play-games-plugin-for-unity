@@ -116,8 +116,8 @@ namespace GooglePlayGames.UnitTests {
 
             platform.ReportProgress("nonIncremental", 50, SentinelCallback);
 
-            Assert.AreEqual("nonIncremental", mockClient.UnlockedId);
-            Assert.AreEqual(SentinelCallback, mockClient.UnlockedCallback);
+            Assert.IsNull(mockClient.UnlockedId);
+            Assert.IsNull(mockClient.UnlockedCallback);
         }
 
         [Test]
@@ -127,8 +127,8 @@ namespace GooglePlayGames.UnitTests {
 
             platform.ReportProgress("unknown", 50, SentinelCallback);
 
-            Assert.AreEqual("unknown", mockClient.UnlockedId);
-            Assert.AreEqual(SentinelCallback, mockClient.UnlockedCallback);
+            Assert.IsNull(mockClient.UnlockedId);
+            Assert.IsNull(mockClient.UnlockedCallback);
         }
 
         [Test]

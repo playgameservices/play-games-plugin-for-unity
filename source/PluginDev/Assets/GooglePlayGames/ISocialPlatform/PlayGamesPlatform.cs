@@ -321,10 +321,13 @@ public class PlayGamesPlatform : ISocialPlatform {
             if (numSteps > 0) {
                 mClient.IncrementAchievement(achievementID, numSteps, callback);
             }
-        } else {
+        } else if (progress >= 100) {
             // unlock it!
             Logger.d("Progress " + progress + " interpreted as UNLOCK.");
             mClient.UnlockAchievement(achievementID, callback);
+        } else {
+            // not enough to unlock
+            Logger.d("Progress " + progress + " not enough to unlock non-incremental achievement.");
         }
     }
 
