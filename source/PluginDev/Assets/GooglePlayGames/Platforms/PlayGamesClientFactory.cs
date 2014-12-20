@@ -21,20 +21,21 @@ using GooglePlayGames.BasicApi;
 using GooglePlayGames.OurUtils;
 
 namespace GooglePlayGames {
-    internal class PlayGamesClientFactory {
-        internal static IPlayGamesClient GetPlatformPlayGamesClient() {
-            if (Application.isEditor) {
-                Logger.d("Creating IPlayGamesClient in editor, using DummyClient.");
-                return new GooglePlayGames.BasicApi.DummyClient();
-            }
+internal class PlayGamesClientFactory {
+    internal static IPlayGamesClient GetPlatformPlayGamesClient(
+        PlayGamesClientConfiguration config) {
+        if (Application.isEditor) {
+            Logger.d("Creating IPlayGamesClient in editor, using DummyClient.");
+            return new GooglePlayGames.BasicApi.DummyClient();
+        }
 #if (UNITY_ANDROID || UNITY_IPHONE)
-            Logger.d("Creating real IPlayGamesClient");
-            return new GooglePlayGames.Native.NativeClient();
+        Logger.d("Creating real IPlayGamesClient");
+        return new GooglePlayGames.Native.NativeClient(config);
 #else
             Logger.d("Cannot create IPlayGamesClient for unknown platform, returning DummyClient");
             return new GooglePlayGames.BasicApi.DummyClient();
 #endif
-        }
     }
+}
 }
 

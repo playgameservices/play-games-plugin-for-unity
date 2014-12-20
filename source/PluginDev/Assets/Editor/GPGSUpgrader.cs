@@ -21,7 +21,7 @@ using System.IO;
 
 [InitializeOnLoad]
 public class GPGSUpgrader {
-    private static string CUR_VER = "00910";
+    private static string CUR_VER = "00911";
 
     static GPGSUpgrader() {
         string prevVer = GPGSProjectSettings.Instance.Get("lastUpgrade", "00000");

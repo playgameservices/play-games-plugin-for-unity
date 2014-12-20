@@ -26,7 +26,7 @@ internal static class TurnBasedMultiplayerManager {
          /* from(void *) */ IntPtr arg1);
 
     internal delegate void MultiplayerStatusCallback(
-         /* from(MultiplayerStatus_t) */ Status.MultiplayerStatus arg0,
+         /* from(MultiplayerStatus_t) */ CommonErrorStatus.MultiplayerStatus arg0,
          /* from(void *) */ IntPtr arg1);
 
     internal delegate void TurnBasedMatchesCallback(
@@ -164,7 +164,7 @@ internal static class TurnBasedMultiplayerManager {
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(MultiplayerStatus_t) */ Status.MultiplayerStatus TurnBasedMultiplayerManager_TurnBasedMatchResponse_GetStatus(
+    internal static extern /* from(MultiplayerStatus_t) */ CommonErrorStatus.MultiplayerStatus TurnBasedMultiplayerManager_TurnBasedMatchResponse_GetStatus(
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
@@ -176,7 +176,7 @@ internal static class TurnBasedMultiplayerManager {
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(MultiplayerStatus_t) */ Status.MultiplayerStatus TurnBasedMultiplayerManager_TurnBasedMatchesResponse_GetStatus(
+    internal static extern /* from(MultiplayerStatus_t) */ CommonErrorStatus.MultiplayerStatus TurnBasedMultiplayerManager_TurnBasedMatchesResponse_GetStatus(
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
@@ -220,7 +220,7 @@ internal static class TurnBasedMultiplayerManager {
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(UIStatus_t) */ Status.UIStatus TurnBasedMultiplayerManager_MatchInboxUIResponse_GetStatus(
+    internal static extern /* from(UIStatus_t) */ CommonErrorStatus.UIStatus TurnBasedMultiplayerManager_MatchInboxUIResponse_GetStatus(
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
@@ -232,7 +232,7 @@ internal static class TurnBasedMultiplayerManager {
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(UIStatus_t) */ Status.UIStatus TurnBasedMultiplayerManager_PlayerSelectUIResponse_GetStatus(
+    internal static extern /* from(UIStatus_t) */ CommonErrorStatus.UIStatus TurnBasedMultiplayerManager_PlayerSelectUIResponse_GetStatus(
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]

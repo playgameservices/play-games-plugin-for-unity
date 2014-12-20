@@ -23,6 +23,9 @@ using System.Collections.Generic;
 namespace GooglePlayGames.Native.PInvoke {
 static class PInvokeUtilities {
 
+    private static readonly DateTime UnixEpoch =
+        DateTime.SpecifyKind(new DateTime(1970, 1, 1), DateTimeKind.Utc);
+
     internal static HandleRef CheckNonNull(HandleRef reference) {
         if (IsNull(reference)) {
             throw new System.InvalidOperationException();
@@ -37,6 +40,13 @@ static class PInvokeUtilities {
 
     internal static bool IsNull(IntPtr pointer) {
         return pointer.Equals(IntPtr.Zero);
+    }
+
+    internal static DateTime FromMillisSinceUnixEpoch(long millisSinceEpoch) {
+        // DateTime in C# uses Gregorian Calendar rather than millis since epoch.
+        // We account for this by manually constructing a timestamp for Unix Epoch
+        // and incrementing it by the indicated number of milliseconds.
+        return UnixEpoch.Add(TimeSpan.FromMilliseconds(millisSinceEpoch));
     }
 
     internal delegate UIntPtr OutStringMethod(StringBuilder out_string, UIntPtr out_size);

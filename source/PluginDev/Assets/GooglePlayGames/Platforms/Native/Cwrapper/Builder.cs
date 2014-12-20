@@ -32,7 +32,7 @@ internal static class Builder {
 
     internal delegate void OnAuthActionFinishedCallback(
          /* from(AuthOperation_t) */ Types.AuthOperation arg0,
-         /* from(AuthStatus_t) */ Status.AuthStatus arg1,
+         /* from(AuthStatus_t) */ CommonErrorStatus.AuthStatus arg1,
          /* from(void *) */ IntPtr arg2);
 
     internal delegate void OnMultiplayerInvitationEventCallback(

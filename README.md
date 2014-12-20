@@ -40,10 +40,11 @@ System requirements:
 * Unity&reg; 4.5 or above
 * To deploy on Android:
     * Android SDK
+    * Android v4.0 or higher
     * Google Play Services library, version 6.1.11 or above
 * To deploy on iOS:
-    * XCode 5 or above
-    * Google+ SDK for iOS
+    * XCode 5.1 or above
+    * Google Plus SDK for iOS
     * Google Play Games C++ SDK
 
 
@@ -78,6 +79,9 @@ as they will be necessary later:
 * Your bundle identifier (e.g. "com.example.AwesomeGame")
 * Your client ID (e.g. "46798138751-afwa4iejsfjskj.apps.googleusercontent.com")
 
+_[*] The application ID is the number that Google Play Developer Console
+assigns to your project. Please note that is not the same as your Apple
+application ID._
 
 **Note:** Do not forget to add your test accounts (the accounts with which you
 will try signing in) to the **Testing** section of the Developer Console,
@@ -226,7 +230,6 @@ which is a reference to an **ISocialPlatform** interface. The non-standard
 Google Play Games extensions can be accessed by casting the **Social.Active**
 object to the **PlayGamesPlatform** class, where the additional methods are
 available.
-
 
 ## Initialization
 
@@ -635,7 +638,6 @@ That way, you can even submit scores and achievements simultaneously to two or m
 ## Using Production APNS Certificate (iOS)
 
 In the `GPGSAppController.m` file, you will notice within the `application:didRegisterForRemoteNotificationsWithDeviceToken` method that there is a comment discussing using the sandbox push server. Follow instructions there to switch between the production and sandbox environment and push notification.
-
 
 ## Acknowledgements
 

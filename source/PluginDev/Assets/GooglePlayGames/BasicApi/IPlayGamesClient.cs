@@ -82,6 +82,13 @@ public interface IPlayGamesClient {
     string GetUserDisplayName();
 
     /// <summary>
+    /// Returns the user's avatar url, if they are logged in and have an avatar.
+    /// </summary>
+    /// <returns>The URL to load the avatar image. <code>null</code> if they are not logged
+    /// in</returns>
+    string GetUserImageUrl();
+
+    /// <summary>
     /// Returns the achievement corresponding to the passed achievement identifier.
     /// </summary>
     /// <returns>The achievement corresponding to the identifer. <code>null</code> if no such
@@ -181,6 +188,12 @@ public interface IPlayGamesClient {
     /// </summary>
     /// <returns>The tbmp client.</returns>
     Multiplayer.ITurnBasedMultiplayerClient GetTbmpClient();
+
+    /// <summary>
+    /// Gets the saved game client.
+    /// </summary>
+    /// <returns>The saved game client.</returns>
+    SavedGame.ISavedGameClient GetSavedGameClient();
 
     /// <summary>
     /// Registers the invitation delegate.

@@ -51,8 +51,10 @@ internal static class TurnBasedMatch {
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(MultiplayerParticipant_t) */ IntPtr TurnBasedMatch_SuggestedNextParticipant(
-        HandleRef self);
+    internal static extern /* from(size_t) */ UIntPtr TurnBasedMatch_Description(
+        HandleRef self,
+         /* from(char *) */ StringBuilder out_arg,
+         /* from(size_t) */ UIntPtr out_size);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
     internal static extern /* from(MultiplayerParticipant_t) */ IntPtr TurnBasedMatch_PendingParticipant(
@@ -83,10 +85,8 @@ internal static class TurnBasedMatch {
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(size_t) */ UIntPtr TurnBasedMatch_Description(
-        HandleRef self,
-         /* from(char *) */ StringBuilder out_arg,
-         /* from(size_t) */ UIntPtr out_size);
+    internal static extern /* from(MultiplayerParticipant_t) */ IntPtr TurnBasedMatch_SuggestedNextParticipant(
+        HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
     internal static extern /* from(size_t) */ UIntPtr TurnBasedMatch_PreviousMatchData(

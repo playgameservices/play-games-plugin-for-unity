@@ -17,8 +17,8 @@
 using System;
 using C = GooglePlayGames.Native.Cwrapper.TurnBasedMultiplayerManager;
 using Types = GooglePlayGames.Native.Cwrapper.Types;
-using Status = GooglePlayGames.Native.Cwrapper.Status;
-using MultiplayerStatus = GooglePlayGames.Native.Cwrapper.Status.MultiplayerStatus;
+using Status = GooglePlayGames.Native.Cwrapper.CommonErrorStatus;
+using MultiplayerStatus = GooglePlayGames.Native.Cwrapper.CommonErrorStatus.MultiplayerStatus;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 

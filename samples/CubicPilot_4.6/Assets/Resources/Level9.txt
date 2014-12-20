@@ -1,0 +1,72 @@
+# -- Settings --
+dur         60
+
+# -- Intro --
+
+msg Sector J
+wait 2
+
+# -- Enemy waves --
+
+
+:10
+spawn Soldier 0
+wait 1
+spawn Soldier 2
+spawn Soldier -2
+wait 1
+spawn Soldier 4
+spawn Soldier -4
+wait 1
+spawn Soldier 6
+spawn Soldier -6
+wait 5
+end
+
+:10
+spawn SoldierIII 0
+wait 15
+end
+
+:10
+spawn SoldierII 3
+spawn SoldierII -3
+wait 4
+end
+
+:10
+spawn SoldierII 0
+wait 2
+spawn ZigzagSoldier 3
+wait 2
+spawn ZigzagSoldier -3
+wait 4
+end
+
+:10
+spawn Soldier -4
+wait 1
+spawn Soldier -2
+wait 1
+spawn Soldier -0
+wait 1
+spawn Soldier 2
+wait 1
+spawn Soldier 4
+wait 2
+spawn SoldierII 0
+wait 4
+end
+
+:10
+spawn ZigzagSoldier 0
+wait 1
+spawn ZigzagSoldier 0
+wait 1
+spawn ZigzagSoldier 0
+wait 1
+spawn ZigzagSoldier 0
+wait 1
+spawn ZigzagSoldier 0
+wait 4
+end

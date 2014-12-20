@@ -42,11 +42,11 @@ internal static class LeaderboardManager {
          /* from(void *) */ IntPtr arg1);
 
     internal delegate void ShowAllUICallback(
-         /* from(UIStatus_t) */ Status.UIStatus arg0,
+         /* from(UIStatus_t) */ CommonErrorStatus.UIStatus arg0,
          /* from(void *) */ IntPtr arg1);
 
     internal delegate void ShowUICallback(
-         /* from(UIStatus_t) */ Status.UIStatus arg0,
+         /* from(UIStatus_t) */ CommonErrorStatus.UIStatus arg0,
          /* from(void *) */ IntPtr arg1);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
@@ -124,7 +124,7 @@ internal static class LeaderboardManager {
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(ResponseStatus_t) */ Status.ResponseStatus LeaderboardManager_FetchResponse_GetStatus(
+    internal static extern /* from(ResponseStatus_t) */ CommonErrorStatus.ResponseStatus LeaderboardManager_FetchResponse_GetStatus(
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
@@ -136,7 +136,7 @@ internal static class LeaderboardManager {
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(ResponseStatus_t) */ Status.ResponseStatus LeaderboardManager_FetchAllResponse_GetStatus(
+    internal static extern /* from(ResponseStatus_t) */ CommonErrorStatus.ResponseStatus LeaderboardManager_FetchAllResponse_GetStatus(
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
@@ -153,7 +153,7 @@ internal static class LeaderboardManager {
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(ResponseStatus_t) */ Status.ResponseStatus LeaderboardManager_FetchScorePageResponse_GetStatus(
+    internal static extern /* from(ResponseStatus_t) */ CommonErrorStatus.ResponseStatus LeaderboardManager_FetchScorePageResponse_GetStatus(
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
@@ -165,7 +165,7 @@ internal static class LeaderboardManager {
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(ResponseStatus_t) */ Status.ResponseStatus LeaderboardManager_FetchScoreSummaryResponse_GetStatus(
+    internal static extern /* from(ResponseStatus_t) */ CommonErrorStatus.ResponseStatus LeaderboardManager_FetchScoreSummaryResponse_GetStatus(
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
@@ -177,7 +177,7 @@ internal static class LeaderboardManager {
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(ResponseStatus_t) */ Status.ResponseStatus LeaderboardManager_FetchAllScoreSummariesResponse_GetStatus(
+    internal static extern /* from(ResponseStatus_t) */ CommonErrorStatus.ResponseStatus LeaderboardManager_FetchAllScoreSummariesResponse_GetStatus(
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]

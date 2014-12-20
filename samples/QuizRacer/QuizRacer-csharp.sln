@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 
 Project("{BCDE3973-2F1C-15D9-2C8A-2218E8881080}") = "QuizRacer", "Assembly-CSharp-vs.csproj", "{E84A52FD-2480-FE6C-4E16-B3DE13DC9D20}"
 EndProject
+Project("{BCDE3973-2F1C-15D9-2C8A-2218E8881080}") = "QuizRacer", "Assembly-CSharp-Editor-vs.csproj", "{D35A3E3E-3572-C577-6F3D-317DE3ADB50C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,15 +15,23 @@ Global
 		{E84A52FD-2480-FE6C-4E16-B3DE13DC9D20}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E84A52FD-2480-FE6C-4E16-B3DE13DC9D20}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E84A52FD-2480-FE6C-4E16-B3DE13DC9D20}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D35A3E3E-3572-C577-6F3D-317DE3ADB50C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D35A3E3E-3572-C577-6F3D-317DE3ADB50C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D35A3E3E-3572-C577-6F3D-317DE3ADB50C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D35A3E3E-3572-C577-6F3D-317DE3ADB50C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-																																										GlobalSection(MonoDevelopProperties) = preSolution
+										GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Assembly-CSharp.csproj
 		Policies = $0
 		$0.TextStylePolicy = $1
-		$1.inheritsSet = null
+		$1.FileWidth = 120
+		$1.IndentWidth = 8
+		$1.EolMarker = Unix
+		$1.inheritsSet = VisualStudio
+		$1.inheritsScope = text/plain
 		$1.scope = text/x-csharp
 		$0.CSharpFormattingPolicy = $2
 		$2.inheritsSet = Mono

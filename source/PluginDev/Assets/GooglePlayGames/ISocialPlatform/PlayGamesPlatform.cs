@@ -22,6 +22,7 @@ using UnityEngine;
 using GooglePlayGames.BasicApi;
 using GooglePlayGames.OurUtils;
 using GooglePlayGames.BasicApi.Multiplayer;
+using GooglePlayGames.BasicApi.SavedGame;
 
 namespace GooglePlayGames {
 /// <summary>
@@ -34,7 +35,9 @@ namespace GooglePlayGames {
 /// or whose behavior is at variance with the standard are noted as such.
 /// </summary>
 public class PlayGamesPlatform : ISocialPlatform {
-    private static PlayGamesPlatform sInstance = null;
+    private static volatile PlayGamesPlatform sInstance = null;
+
+    private readonly PlayGamesClientConfiguration mConfiguration;
     private PlayGamesLocalUser mLocalUser = null;
     private IPlayGamesClient mClient = null;
 
@@ -44,13 +47,24 @@ public class PlayGamesPlatform : ISocialPlatform {
     // achievement/leaderboard ID mapping table
     private Dictionary<string, string> mIdMap = new Dictionary<string, string>();
 
-    private PlayGamesPlatform() {
-        mLocalUser = new PlayGamesLocalUser(this);
+    private PlayGamesPlatform(PlayGamesClientConfiguration configuration) {
+        this.mLocalUser = new PlayGamesLocalUser(this);
+        this.mConfiguration = configuration;
     }
 
     internal PlayGamesPlatform(IPlayGamesClient client) {
-        mClient = Misc.CheckNotNull(client);
-        mLocalUser = new PlayGamesLocalUser(this);
+        this.mClient = Misc.CheckNotNull(client);
+        this.mLocalUser = new PlayGamesLocalUser(this);
+        this.mConfiguration = PlayGamesClientConfiguration.DefaultConfiguration;
+    }
+
+    public static void InitializeInstance(PlayGamesClientConfiguration configuration) {
+        if (sInstance != null) {
+            Logger.w("PlayGamesPlatform already initialized. Ignoring this call.");
+            return;
+        }
+
+        sInstance = new PlayGamesPlatform(configuration);
     }
 
     /// <summary>
@@ -62,7 +76,8 @@ public class PlayGamesPlatform : ISocialPlatform {
     public static PlayGamesPlatform Instance {
         get {
             if (sInstance == null) {
-                sInstance = new PlayGamesPlatform();
+                Logger.d("Instance was not initialized, using default configuration.");
+                InitializeInstance(PlayGamesClientConfiguration.DefaultConfiguration);
             }
             return sInstance;
         }
@@ -95,6 +110,12 @@ public class PlayGamesPlatform : ISocialPlatform {
     public ITurnBasedMultiplayerClient TurnBased {
         get {
             return mClient.GetTbmpClient();
+        }
+    }
+
+    public ISavedGameClient SavedGame {
+        get {
+            return mClient.GetSavedGameClient();
         }
     }
 
@@ -170,7 +191,7 @@ public class PlayGamesPlatform : ISocialPlatform {
         // make a platform-specific Play Games client
         if (mClient == null) {
             Logger.d("Creating platform-specific Play Games client.");
-            mClient = PlayGamesClientFactory.GetPlatformPlayGamesClient();
+            mClient = PlayGamesClientFactory.GetPlatformPlayGamesClient(mConfiguration);
         }
 
         // authenticate!
@@ -242,6 +263,22 @@ public class PlayGamesPlatform : ISocialPlatform {
         }
         return mClient.GetUserDisplayName();
     }
+
+    /// <summary>
+    /// Returns the user's avatar URL if they have one.
+    /// </summary>
+    /// <returns>
+    /// The URL, or <code>null</code> if the user is not authenticated or does not have
+    /// an avatar.
+    /// </returns>
+    public string GetUserImageUrl() {
+        if (!IsAuthenticated()) {
+            Logger.e("GetUserImageUrl can only be called after authentication.");
+            return null;
+        }
+        return mClient.GetUserImageUrl();
+    }
+
 
     /// <summary>
     /// Reports the progress of an achievement (reveal, unlock or increment). This method attempts

@@ -74,7 +74,7 @@ internal static class PlayerManager {
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(ResponseStatus_t) */ Status.ResponseStatus PlayerManager_FetchSelfResponse_GetStatus(
+    internal static extern /* from(ResponseStatus_t) */ CommonErrorStatus.ResponseStatus PlayerManager_FetchSelfResponse_GetStatus(
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
@@ -86,7 +86,7 @@ internal static class PlayerManager {
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(ResponseStatus_t) */ Status.ResponseStatus PlayerManager_FetchResponse_GetStatus(
+    internal static extern /* from(ResponseStatus_t) */ CommonErrorStatus.ResponseStatus PlayerManager_FetchResponse_GetStatus(
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
@@ -98,7 +98,7 @@ internal static class PlayerManager {
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(ResponseStatus_t) */ Status.ResponseStatus PlayerManager_FetchListResponse_GetStatus(
+    internal static extern /* from(ResponseStatus_t) */ CommonErrorStatus.ResponseStatus PlayerManager_FetchListResponse_GetStatus(
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]

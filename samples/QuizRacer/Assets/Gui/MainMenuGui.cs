@@ -28,7 +28,7 @@ public class MainMenuGui : BaseGui {
             TextAnchor.MiddleCenter, 45, "Sign Out");
 
     public void Start() {
-        InvitationManager.Instance.Setup();
+        // no op
     }
 
     public void Update() {

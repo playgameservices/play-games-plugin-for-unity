@@ -23,8 +23,8 @@ using GooglePlayGames.Native.Cwrapper;
 
 using C = GooglePlayGames.Native.Cwrapper.TurnBasedMultiplayerManager;
 using Types = GooglePlayGames.Native.Cwrapper.Types;
-using Status = GooglePlayGames.Native.Cwrapper.Status;
-using MultiplayerStatus = GooglePlayGames.Native.Cwrapper.Status.MultiplayerStatus;
+using Status = GooglePlayGames.Native.Cwrapper.CommonErrorStatus;
+using MultiplayerStatus = GooglePlayGames.Native.Cwrapper.CommonErrorStatus.MultiplayerStatus;
 
 namespace GooglePlayGames.Native.PInvoke {
 internal class TurnBasedManager {
@@ -206,12 +206,12 @@ internal class TurnBasedManager {
         internal MatchInboxUIResponse(IntPtr selfPointer) : base(selfPointer) {
         }
 
-        internal Status.UIStatus UiStatus() {
+        internal CommonErrorStatus.UIStatus UiStatus() {
             return C.TurnBasedMultiplayerManager_MatchInboxUIResponse_GetStatus(SelfPtr());
         }
 
         internal NativeTurnBasedMatch Match() {
-            if (UiStatus() != Status.UIStatus.VALID) {
+            if (UiStatus() != CommonErrorStatus.UIStatus.VALID) {
                 return null;
             }
 
@@ -236,7 +236,7 @@ internal class TurnBasedManager {
         internal TurnBasedMatchResponse(IntPtr selfPointer) : base(selfPointer) {
         }
 
-        internal Status.MultiplayerStatus ResponseStatus() {
+        internal CommonErrorStatus.MultiplayerStatus ResponseStatus() {
             return C.TurnBasedMultiplayerManager_TurnBasedMatchResponse_GetStatus(SelfPtr());
         }
 
@@ -274,7 +274,7 @@ internal class TurnBasedManager {
             C.TurnBasedMultiplayerManager_TurnBasedMatchesResponse_Dispose(SelfPtr());
         }
 
-        internal Status.MultiplayerStatus Status() {
+        internal CommonErrorStatus.MultiplayerStatus Status() {
             return C.TurnBasedMultiplayerManager_TurnBasedMatchesResponse_GetStatus(SelfPtr());
         }
 

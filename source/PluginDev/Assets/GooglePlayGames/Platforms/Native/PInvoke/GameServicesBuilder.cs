@@ -26,7 +26,7 @@ namespace GooglePlayGames.Native.PInvoke {
 internal class GameServicesBuilder : BaseReferenceHolder {
 
     internal delegate void AuthFinishedCallback(Types.AuthOperation operation,
-        Status.AuthStatus status);
+        CommonErrorStatus.AuthStatus status);
 
     internal delegate void AuthStartedCallback(Types.AuthOperation operation);
 
@@ -39,9 +39,13 @@ internal class GameServicesBuilder : BaseReferenceHolder {
             Callbacks.ToIntPtr(callback));
     }
 
+    internal void EnableSnapshots() {
+        C.GameServices_Builder_EnableSnapshots(SelfPtr());
+    }
+
     [AOT.MonoPInvokeCallback(typeof(C.OnAuthActionFinishedCallback))]
     private static void InternalAuthFinishedCallback(Types.AuthOperation op,
-        Status.AuthStatus status, IntPtr data) {
+        CommonErrorStatus.AuthStatus status, IntPtr data) {
 
         AuthFinishedCallback callback =
             Callbacks.IntPtrToPermanentCallback<AuthFinishedCallback>(data);

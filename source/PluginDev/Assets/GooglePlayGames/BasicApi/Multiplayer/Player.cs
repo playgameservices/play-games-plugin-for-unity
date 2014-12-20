@@ -24,13 +24,15 @@ namespace GooglePlayGames.BasicApi.Multiplayer {
 /// only exists in the context of a particular match.
 /// </summary>
 public class Player {
-    private string mDisplayName = "";
-    private string mPlayerId = "";
+    private readonly string mDisplayName;
+    private readonly string mPlayerId;
+    private readonly string mAvatarUrl;
 
-    internal Player(string displayName, string playerId) {
+    internal Player(string displayName, string playerId, string avatarUrl) {
         mDisplayName = displayName;
         mPlayerId = playerId;
-    }
+        mAvatarUrl = avatarUrl;
+     }
 
     /// Player's display name.
     public string DisplayName {
@@ -43,6 +45,13 @@ public class Player {
     public string PlayerId {
         get {
             return mPlayerId;
+        }
+    }
+
+    /// Player's AvatarUrl - can be null if the user has no avatar.
+    public string AvatarURL {
+        get {
+            return mAvatarUrl;
         }
     }
 

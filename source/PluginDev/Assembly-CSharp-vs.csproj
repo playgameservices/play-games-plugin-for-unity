@@ -19,7 +19,7 @@
 	<DebugType>full</DebugType>
 	<Optimize>false</Optimize>
 	<OutputPath>Temp\bin\Debug\</OutputPath>
-	<DefineConstants>DEBUG;TRACE;UNITY_4_5_2;UNITY_4_5;UNITY_ANDROID;ENABLE_MICROPHONE;ENABLE_TEXTUREID_MAP;ENABLE_UNITYEVENTS;ENABLE_NEW_HIERARCHY ;ENABLE_AUDIO_FMOD;ENABLE_MONO;ENABLE_TERRAIN;ENABLE_SUBSTANCE;ENABLE_GENERICS;INCLUDE_WP8SUPPORT;ENABLE_WWW;ENABLE_IMAGEEFFECTS;ENABLE_WEBCAM;INCLUDE_METROSUPPORT;RENDER_SOFTWARE_CURSOR;ENABLE_NETWORK;ENABLE_PHYSICS;ENABLE_CACHING;ENABLE_CLOTH;UNITY_ANDROID_API;ENABLE_2D_PHYSICS;ENABLE_SHADOWS;ENABLE_AUDIO;ENABLE_NAVMESH_CARVING;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;DEVELOPMENT_BUILD;ENABLE_PROFILER;UNITY_EDITOR;UNITY_EDITOR_OSX;UNITY_PRO_LICENSE</DefineConstants>
+	<DefineConstants>DEBUG;TRACE;UNITY_4_6_1;UNITY_4_6;UNITY_STANDALONE_OSX;ENABLE_MICROPHONE;ENABLE_TEXTUREID_MAP;ENABLE_UNITYEVENTS;ENABLE_NEW_HIERARCHY ;ENABLE_AUDIO_FMOD;UNITY_STANDALONE;ENABLE_MONO;ENABLE_TERRAIN;ENABLE_SUBSTANCE;ENABLE_GENERICS;INCLUDE_WP8SUPPORT;ENABLE_MOVIES;ENABLE_WWW;ENABLE_IMAGEEFFECTS;ENABLE_4_6_FEATURES;INCLUDE_WP_BLUE_SUPPORT;ENABLE_WEBCAM;INCLUDE_METROSUPPORT;RENDER_SOFTWARE_CURSOR;ENABLE_NETWORK;ENABLE_PHYSICS;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_2D_PHYSICS;ENABLE_GAMECENTER;ENABLE_SHADOWS;ENABLE_AUDIO;ENABLE_NAVMESH_CARVING;ENABLE_DUCK_TYPING;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;ENABLE_PROFILER;UNITY_EDITOR;UNITY_EDITOR_OSX;UNITY_PRO_LICENSE</DefineConstants>
 	<ErrorReport>prompt</ErrorReport>
 	<WarningLevel>4</WarningLevel>
 	<NoWarn>0169</NoWarn>
@@ -59,6 +59,10 @@
      <Compile Include="Assets\GooglePlayGames\BasicApi\Multiplayer\RealTimeMultiplayerListener.cs" />
      <Compile Include="Assets\GooglePlayGames\BasicApi\Multiplayer\TurnBasedMatch.cs" />
      <Compile Include="Assets\GooglePlayGames\BasicApi\OnStateLoadedListener.cs" />
+     <Compile Include="Assets\GooglePlayGames\BasicApi\PlayGamesClientConfiguration.cs" />
+     <Compile Include="Assets\GooglePlayGames\BasicApi\SavedGame\ISavedGameClient.cs" />
+     <Compile Include="Assets\GooglePlayGames\BasicApi\SavedGame\ISavedGameMetadata.cs" />
+     <Compile Include="Assets\GooglePlayGames\BasicApi\SavedGame\SavedGameMetadataUpdate.cs" />
      <Compile Include="Assets\GooglePlayGames\GameInfo.cs" />
      <Compile Include="Assets\GooglePlayGames\ISocialPlatform\PlayGamesAchievement.cs" />
      <Compile Include="Assets\GooglePlayGames\ISocialPlatform\PlayGamesLocalUser.cs" />
@@ -74,6 +78,7 @@
      <Compile Include="Assets\GooglePlayGames\Platforms\Native\Cwrapper\AchievementManager.cs" />
      <Compile Include="Assets\GooglePlayGames\Platforms\Native\Cwrapper\AndroidPlatformConfiguration.cs" />
      <Compile Include="Assets\GooglePlayGames\Platforms\Native\Cwrapper\Builder.cs" />
+     <Compile Include="Assets\GooglePlayGames\Platforms\Native\Cwrapper\CommonErrorStatus.cs" />
      <Compile Include="Assets\GooglePlayGames\Platforms\Native\Cwrapper\GameServices.cs" />
      <Compile Include="Assets\GooglePlayGames\Platforms\Native\Cwrapper\InternalHooks.cs" />
      <Compile Include="Assets\GooglePlayGames\Platforms\Native\Cwrapper\IosPlatformConfiguration.cs" />
@@ -93,7 +98,10 @@
      <Compile Include="Assets\GooglePlayGames\Platforms\Native\Cwrapper\ScorePage.cs" />
      <Compile Include="Assets\GooglePlayGames\Platforms\Native\Cwrapper\ScoreSummary.cs" />
      <Compile Include="Assets\GooglePlayGames\Platforms\Native\Cwrapper\Sentinels.cs" />
-     <Compile Include="Assets\GooglePlayGames\Platforms\Native\Cwrapper\Status.cs" />
+     <Compile Include="Assets\GooglePlayGames\Platforms\Native\Cwrapper\SnapshotManager.cs" />
+     <Compile Include="Assets\GooglePlayGames\Platforms\Native\Cwrapper\SnapshotMetadata.cs" />
+     <Compile Include="Assets\GooglePlayGames\Platforms\Native\Cwrapper\SnapshotMetadataChange.cs" />
+     <Compile Include="Assets\GooglePlayGames\Platforms\Native\Cwrapper\SnapshotMetadataChangeBuilder.cs" />
      <Compile Include="Assets\GooglePlayGames\Platforms\Native\Cwrapper\SymbolLocation.cs" />
      <Compile Include="Assets\GooglePlayGames\Platforms\Native\Cwrapper\TurnBasedMatch.cs" />
      <Compile Include="Assets\GooglePlayGames\Platforms\Native\Cwrapper\TurnBasedMatchConfig.cs" />
@@ -103,6 +111,7 @@
      <Compile Include="Assets\GooglePlayGames\Platforms\Native\JavaUtils.cs" />
      <Compile Include="Assets\GooglePlayGames\Platforms\Native\NativeClient.cs" />
      <Compile Include="Assets\GooglePlayGames\Platforms\Native\NativeRealtimeMultiplayerClient.cs" />
+     <Compile Include="Assets\GooglePlayGames\Platforms\Native\NativeSavedGameClient.cs" />
      <Compile Include="Assets\GooglePlayGames\Platforms\Native\NativeTurnBasedMultiplayerClient.cs" />
      <Compile Include="Assets\GooglePlayGames\Platforms\Native\PInvoke\AchievementManager.cs" />
      <Compile Include="Assets\GooglePlayGames\Platforms\Native\PInvoke\AndroidPlatformConfiguration.cs" />
@@ -117,6 +126,8 @@
      <Compile Include="Assets\GooglePlayGames\Platforms\Native\PInvoke\NativeAchievement.cs" />
      <Compile Include="Assets\GooglePlayGames\Platforms\Native\PInvoke\NativePlayer.cs" />
      <Compile Include="Assets\GooglePlayGames\Platforms\Native\PInvoke\NativeRealTimeRoom.cs" />
+     <Compile Include="Assets\GooglePlayGames\Platforms\Native\PInvoke\NativeSnapshotMetadata.cs" />
+     <Compile Include="Assets\GooglePlayGames\Platforms\Native\PInvoke\NativeSnapshotMetadataChange.cs" />
      <Compile Include="Assets\GooglePlayGames\Platforms\Native\PInvoke\NativeTurnBasedMatch.cs" />
      <Compile Include="Assets\GooglePlayGames\Platforms\Native\PInvoke\PInvokeUtilities.cs" />
      <Compile Include="Assets\GooglePlayGames\Platforms\Native\PInvoke\ParticipantResults.cs" />
@@ -127,119 +138,23 @@
      <Compile Include="Assets\GooglePlayGames\Platforms\Native\PInvoke\RealtimeManager.cs" />
      <Compile Include="Assets\GooglePlayGames\Platforms\Native\PInvoke\RealtimeRoomConfig.cs" />
      <Compile Include="Assets\GooglePlayGames\Platforms\Native\PInvoke\RealtimeRoomConfigBuilder.cs" />
+     <Compile Include="Assets\GooglePlayGames\Platforms\Native\PInvoke\SnapshotManager.cs" />
      <Compile Include="Assets\GooglePlayGames\Platforms\Native\PInvoke\TurnBasedManager.cs" />
      <Compile Include="Assets\GooglePlayGames\Platforms\Native\PInvoke\TurnBasedMatchConfig.cs" />
      <Compile Include="Assets\GooglePlayGames\Platforms\Native\PInvoke\TurnBasedMatchConfigBuilder.cs" />
      <Compile Include="Assets\GooglePlayGames\Platforms\Native\UnsupportedAppStateClient.cs" />
+     <Compile Include="Assets\GooglePlayGames\Platforms\Native\UnsupportedSavedGamesClient.cs" />
      <Compile Include="Assets\GooglePlayGames\Platforms\PlayGamesClientFactory.cs" />
      <Compile Include="Assets\GooglePlayGames\PluginVersion.cs" />
      <Compile Include="Assets\MainGui.cs" />
      <Compile Include="Assets\Settings.cs" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-km-rKH\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-hi\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-zu\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-ro\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\color\wallet_primary_text_holo_light.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-sk\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values\maps_attrs.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-ta-rIN\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-bn-rBD\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\bin\AndroidManifest.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\color\common_signin_btn_text_light.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-zh-rHK\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values\wallet_attrs.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-si-rLK\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\color\common_signin_btn_text_dark.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-es-rUS\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-te-rIN\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-kk-rKZ\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\proguard-project.txt" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-in\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-cs\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\README.txt" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-fr\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\drawable\common_signin_btn_text_dark.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-nb\common_strings.xml" />
-     <None Include="Assets\Editor\template-AndroidManifest.txt" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\build.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-sw\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\drawable\common_signin_btn_icon_dark.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-da\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-eu-rES\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-mk-rMK\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-hy-rAM\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-bg\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-be\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-de\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-es\wallet_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-pt-rBR\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-sr\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-nl\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-mr-rIN\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\bin\R.txt" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-mn-rMN\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-el\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\drawable\common_signin_btn_text_light.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-ky-rKG\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-en-rGB\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-ne-rNP\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values\wallet_colors.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-is-rIS\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-ru\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-iw\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-ka-rGE\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\gpg_native_lib\jni\gpg-cpp-sdk\android\licenses.txt" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-zh-rCN\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\drawable\common_signin_btn_icon_light.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values\admob_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-ur-rPK\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-pt-rPT\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-lt\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values\admob_ads_attrs.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-ca\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-fi\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-my-rMM\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-uz-rUZ\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-ja\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-th\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-tl\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values\admob_iap_style.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-ar\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-tr\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-sl\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-af\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-es\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-et-rEE\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values\version.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-kn-rIN\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-hu\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-fr-rCA\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-lo-rLA\common_strings.xml" />
      <None Include="Assets\Editor\projsettings.txt" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-fa\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-zh-rTW\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\color\wallet_secondary_text_holo_dark.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\bin\proguard.txt" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-en-rIN\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-hr\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-pl\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-lv\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-vi\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\MainLibProj\AndroidManifest.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-pt\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-sv\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values\common_colors.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-uk\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values\wallet_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-it\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-am\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-ml-rIN\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-gl-rES\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\AndroidManifest.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-ko\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values-ms-rMY\common_strings.xml" />
-     <None Include="Assets\Plugins\Android\google-play-services_lib\res\values\wallet_styles.xml" />
+     <None Include="Assets\Editor\template-AndroidManifest.txt" />
+     <None Include="Assets\Plugins\Android\gpg_native_lib\jni\gpg-cpp-sdk\ios\licenses.txt" />
+     <None Include="Assets\Plugins\Android\gpg_native_lib\jni\gpg-cpp-sdk\android\licenses.txt" />
+ <Reference Include="UnityEngine.UI">
+ <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/GUISystem/4.6.1/UnityEngine.UI.dll</HintPath>
+ </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

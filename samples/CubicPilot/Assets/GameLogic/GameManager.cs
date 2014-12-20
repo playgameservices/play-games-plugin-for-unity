@@ -18,6 +18,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using GooglePlayGames;
+using GooglePlayGames.BasicApi;
 
 public class GameManager : GooglePlayGames.BasicApi.OnStateLoadedListener {
     private static GameManager sInstance = new GameManager();
@@ -162,6 +163,12 @@ public class GameManager : GooglePlayGames.BasicApi.OnStateLoadedListener {
 
         // Enable/disable logs on the PlayGamesPlatform
         PlayGamesPlatform.DebugLogEnabled = GameConsts.PlayGamesDebugLogsEnabled;
+
+        var config = new PlayGamesClientConfiguration.Builder()
+                        .EnableDeprecatedCloudSave()
+                        .EnableSavedGames()
+                        .Build();
+        PlayGamesPlatform.InitializeInstance(config);
 
         // Activate the Play Games platform. This will make it the default
         // implementation of Social.Active

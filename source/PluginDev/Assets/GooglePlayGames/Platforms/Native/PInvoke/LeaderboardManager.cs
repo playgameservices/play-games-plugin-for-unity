@@ -22,7 +22,7 @@ using GooglePlayGames.OurUtils;
 using C = GooglePlayGames.Native.Cwrapper.LeaderboardManager;
 
 using Types = GooglePlayGames.Native.Cwrapper.Types;
-using Status = GooglePlayGames.Native.Cwrapper.Status;
+using Status = GooglePlayGames.Native.Cwrapper.CommonErrorStatus;
 
 namespace GooglePlayGames.Native {
 internal class LeaderboardManager {
@@ -50,8 +50,8 @@ internal class LeaderboardManager {
     internal void ShowUI(string leaderboardId, Action<Status.UIStatus> callback) {
         Misc.CheckNotNull(callback);
 
-        C.LeaderboardManager_ShowAllUI(mServices.AsHandle(), Callbacks.InternalShowUICallback,
-            Callbacks.ToIntPtr(callback));
+        C.LeaderboardManager_ShowUI(mServices.AsHandle(), leaderboardId,
+            Callbacks.InternalShowUICallback, Callbacks.ToIntPtr(callback));
     }
 }
 }

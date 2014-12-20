@@ -23,7 +23,7 @@ using GooglePlayGames.Native.Cwrapper;
 
 using C = GooglePlayGames.Native.Cwrapper.MultiplayerParticipant;
 using Types = GooglePlayGames.Native.Cwrapper.Types;
-using Status = GooglePlayGames.Native.Cwrapper.Status;
+using Status = GooglePlayGames.Native.Cwrapper.CommonErrorStatus;
 using GooglePlayGames.BasicApi.Multiplayer;
 
 namespace GooglePlayGames.Native.PInvoke {

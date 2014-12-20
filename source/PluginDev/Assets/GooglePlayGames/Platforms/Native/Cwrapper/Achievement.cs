@@ -42,6 +42,10 @@ internal static class Achievement {
          /* from(size_t) */ UIntPtr out_size);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
+    internal static extern /* from(uint64_t) */ ulong Achievement_LastModifiedTime(
+        HandleRef self);
+
+    [DllImport(SymbolLocation.NativeSymbolLocation)]
     internal static extern /* from(size_t) */ UIntPtr Achievement_RevealedIconUrl(
         HandleRef self,
          /* from(char *) */ StringBuilder out_arg,
@@ -77,10 +81,6 @@ internal static class Achievement {
         HandleRef self,
          /* from(char *) */ StringBuilder out_arg,
          /* from(size_t) */ UIntPtr out_size);
-
-    [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(uint64_t) */ ulong Achievement_LastModifiedTime(
-        HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
     internal static extern /* from(size_t) */ UIntPtr Achievement_Name(
