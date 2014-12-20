@@ -21,7 +21,7 @@ using GooglePlayGames.OurUtils;
 
 using C = GooglePlayGames.Native.Cwrapper.PlayerManager;
 using Types = GooglePlayGames.Native.Cwrapper.Types;
-using Status = GooglePlayGames.Native.Cwrapper.Status;
+using Status = GooglePlayGames.Native.Cwrapper.CommonErrorStatus;
 
 namespace GooglePlayGames.Native {
 internal class PlayerManager {

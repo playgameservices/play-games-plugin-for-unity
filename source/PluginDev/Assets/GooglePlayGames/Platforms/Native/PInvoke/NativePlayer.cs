@@ -19,6 +19,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using GooglePlayGames.Native.PInvoke;
 using GooglePlayGames.BasicApi.Multiplayer;
+using Types = GooglePlayGames.Native.Cwrapper.Types;
 
 using C = GooglePlayGames.Native.Cwrapper.Player;
 
@@ -38,12 +39,18 @@ internal class NativePlayer : BaseReferenceHolder {
             (out_string, out_size) => C.Player_Name(SelfPtr(), out_string, out_size));
     }
 
+    internal string AvatarURL() {
+        return PInvokeUtilities.OutParamsToString(
+            (out_string, out_size) => C.Player_AvatarUrl(SelfPtr(),
+                    Types.ImageResolution.ICON, out_string, out_size));
+    }
+
     protected override void CallDispose(HandleRef selfPointer) {
         C.Player_Dispose(selfPointer);
     }
 
     internal Player AsPlayer() {
-        return new Player(Name(), Id());
+        return new Player(Name(), Id(), AvatarURL());
     }
 }
 }

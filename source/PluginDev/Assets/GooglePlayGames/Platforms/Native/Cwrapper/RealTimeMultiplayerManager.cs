@@ -26,11 +26,11 @@ internal static class RealTimeMultiplayerManager {
          /* from(void *) */ IntPtr arg1);
 
     internal delegate void LeaveRoomCallback(
-         /* from(ResponseStatus_t) */ Status.ResponseStatus arg0,
+         /* from(ResponseStatus_t) */ CommonErrorStatus.ResponseStatus arg0,
          /* from(void *) */ IntPtr arg1);
 
     internal delegate void SendReliableMessageCallback(
-         /* from(MultiplayerStatus_t) */ Status.MultiplayerStatus arg0,
+         /* from(MultiplayerStatus_t) */ CommonErrorStatus.MultiplayerStatus arg0,
          /* from(void *) */ IntPtr arg1);
 
     internal delegate void RoomInboxUICallback(
@@ -142,7 +142,7 @@ internal static class RealTimeMultiplayerManager {
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(MultiplayerStatus_t) */ Status.MultiplayerStatus RealTimeMultiplayerManager_RealTimeRoomResponse_GetStatus(
+    internal static extern /* from(MultiplayerStatus_t) */ CommonErrorStatus.MultiplayerStatus RealTimeMultiplayerManager_RealTimeRoomResponse_GetStatus(
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
@@ -154,7 +154,7 @@ internal static class RealTimeMultiplayerManager {
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(UIStatus_t) */ Status.UIStatus RealTimeMultiplayerManager_RoomInboxUIResponse_GetStatus(
+    internal static extern /* from(UIStatus_t) */ CommonErrorStatus.UIStatus RealTimeMultiplayerManager_RoomInboxUIResponse_GetStatus(
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
@@ -166,7 +166,7 @@ internal static class RealTimeMultiplayerManager {
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(UIStatus_t) */ Status.UIStatus RealTimeMultiplayerManager_WaitingRoomUIResponse_GetStatus(
+    internal static extern /* from(UIStatus_t) */ CommonErrorStatus.UIStatus RealTimeMultiplayerManager_WaitingRoomUIResponse_GetStatus(
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
@@ -178,7 +178,7 @@ internal static class RealTimeMultiplayerManager {
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(ResponseStatus_t) */ Status.ResponseStatus RealTimeMultiplayerManager_FetchInvitationsResponse_GetStatus(
+    internal static extern /* from(ResponseStatus_t) */ CommonErrorStatus.ResponseStatus RealTimeMultiplayerManager_FetchInvitationsResponse_GetStatus(
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]

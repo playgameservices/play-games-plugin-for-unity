@@ -32,11 +32,11 @@ internal static class RealTimeRoom {
          /* from(size_t) */ UIntPtr out_size);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(uint64_t) */ ulong RealTimeRoom_CreationTime(
+    internal static extern /* from(uint32_t) */ uint RealTimeRoom_Variant(
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(uint32_t) */ uint RealTimeRoom_Variant(
+    internal static extern /* from(uint64_t) */ ulong RealTimeRoom_CreationTime(
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]

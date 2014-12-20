@@ -30,7 +30,7 @@ internal static class AchievementManager {
          /* from(void *) */ IntPtr arg1);
 
     internal delegate void ShowAllUICallback(
-         /* from(UIStatus_t) */ Status.UIStatus arg0,
+         /* from(UIStatus_t) */ CommonErrorStatus.UIStatus arg0,
          /* from(void *) */ IntPtr arg1);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
@@ -81,7 +81,7 @@ internal static class AchievementManager {
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(ResponseStatus_t) */ Status.ResponseStatus AchievementManager_FetchAllResponse_GetStatus(
+    internal static extern /* from(ResponseStatus_t) */ CommonErrorStatus.ResponseStatus AchievementManager_FetchAllResponse_GetStatus(
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
@@ -98,7 +98,7 @@ internal static class AchievementManager {
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(ResponseStatus_t) */ Status.ResponseStatus AchievementManager_FetchResponse_GetStatus(
+    internal static extern /* from(ResponseStatus_t) */ CommonErrorStatus.ResponseStatus AchievementManager_FetchResponse_GetStatus(
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]

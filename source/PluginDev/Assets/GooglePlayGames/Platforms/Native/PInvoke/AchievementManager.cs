@@ -33,7 +33,7 @@ internal class AchievementManager {
         mServices = Misc.CheckNotNull(services);
     }
 
-    internal void ShowAllUI(Action<Status.UIStatus> callback) {
+    internal void ShowAllUI(Action<CommonErrorStatus.UIStatus> callback) {
         Misc.CheckNotNull(callback);
         C.AchievementManager_ShowAllUI(mServices.AsHandle(),
             Callbacks.InternalShowUICallback, Callbacks.ToIntPtr(callback));
@@ -76,7 +76,7 @@ internal class AchievementManager {
         internal FetchAllResponse (IntPtr selfPointer) : base(selfPointer) {
         }
 
-        internal Status.ResponseStatus Status() {
+        internal CommonErrorStatus.ResponseStatus Status() {
             return C.AchievementManager_FetchAllResponse_GetStatus(SelfPtr());
         }
 

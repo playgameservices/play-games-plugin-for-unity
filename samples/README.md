@@ -10,9 +10,19 @@ with Google Play Games.
 **Cubic Pilot** is a complete game that demonstrates how to use the plugin to implement sign in,
 achievements, leaderboards and cloud save.
 
+**Cubic Pilot_4.6** is a complete game that demonstrates how to use the plugin to implement sign in,
+achievements, leaderboards and cloud save. This sample uses features from **Unity 4.6** for targeting different resolutions and orientations, 
+and external controllers and gamepads such as used with the Nexus Player. Warning: **_You must open this sample in
+Unity 4.6 or greater_**.
+
 **Tic Tac Toe** is a complete game that demonstrates how to use the plugin to implement turn-based multiplayer.
 
 **Quiz Racer** is a complete game that demonstrates how to use the plugin to implement real-time multiplayer.
+
+**Quiz Racer_4.6** is a complete game that demonstrates how to use the plugin to implement
+real-time multiplayer using **Unity 4.6** for targeting different resolutions and orientations, 
+and external controllers and gamepads such as used with the Nexus Player. Warning: **_You must open this sample in
+Unity 4.6 or greater_**.
 
 Note: this text assumes you have already read and are familiar with the
 contents of the [Getting Started Guide](https://github.com/playgameservices/play-games-plugin-for-unity/blob/master/README.md)

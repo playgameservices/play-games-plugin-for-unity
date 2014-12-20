@@ -22,12 +22,12 @@ using System.Text;
 namespace GooglePlayGames.Native.Cwrapper {
 internal static class Score {
     [DllImport(SymbolLocation.NativeSymbolLocation)]
-    [return: MarshalAs(UnmanagedType.I1)]
-    internal static extern /* from(bool) */ bool Score_Valid(
+    internal static extern /* from(uint64_t) */ ulong Score_Value(
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(uint64_t) */ ulong Score_Value(
+    [return: MarshalAs(UnmanagedType.I1)]
+    internal static extern /* from(bool) */ bool Score_Valid(
         HandleRef self);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]

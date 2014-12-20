@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (C) 2014 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,15 +32,34 @@ public class MainGui : MonoBehaviour {
         GUI.skin.button.fontSize = (int)(FontSizeMult * Screen.height);
         GUI.skin.label.fontSize = (int)(FontSizeMult * Screen.height);
 
-        GUI.Label(new Rect(20, 20, Screen.width, Screen.height * 0.25f), mStatusText);
+        GUI.Label(new Rect(20, 20, Screen.width, Screen.height * 0.25f),
+                  mStatusText);
+
+        Rect buttonRect = new Rect(0.25f * Screen.width, 0.10f * Screen.height,
+                          0.5f * Screen.width, 0.25f * Screen.height);
+        Rect imageRect = new Rect(buttonRect.x+buttonRect.width/4f,
+                                  buttonRect.y + buttonRect.height * 1.1f,
+                                  buttonRect.width/2f, buttonRect.width/2f);
 
         if (mWaitingForAuth) {
             return;
         }
 
-        string buttonLabel = Social.localUser.authenticated ? "Sign Out" : "Authenticate";
-        Rect buttonRect = new Rect(0.25f * Screen.width, 0.25f * Screen.height,
-                          0.5f * Screen.width, 0.5f * Screen.height);
+        string buttonLabel;
+
+
+        if (Social.localUser.authenticated) {
+          buttonLabel = "Sign Out";
+          if (Social.localUser.image != null) {
+            GUI.DrawTexture(imageRect, Social.localUser.image,
+                            ScaleMode.ScaleToFit);
+          } else {
+            GUI.Label(imageRect, "No image available");
+          }
+        } else {
+          buttonLabel = "Authenticate";
+          mStatusText = "Ready";
+        }
 
         if (GUI.Button(buttonRect, buttonLabel)) {
             if (!Social.localUser.authenticated) {
@@ -49,7 +68,11 @@ public class MainGui : MonoBehaviour {
                 mStatusText = "Authenticating...";
                 Social.localUser.Authenticate((bool success) => {
                     mWaitingForAuth = false;
-                    mStatusText = success ? "Successfully authenticated" : "Authentication failed.";
+                    if (success) {
+                      mStatusText = "Welcome " + Social.localUser.userName;
+                    } else {
+                      mStatusText = "Authentication failed.";
+                    }
                 });
             } else {
                 // Sign out!

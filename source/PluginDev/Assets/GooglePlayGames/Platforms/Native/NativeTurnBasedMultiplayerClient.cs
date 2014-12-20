@@ -51,7 +51,7 @@ public class NativeTurnBasedMultiplayerClient : ITurnBasedMultiplayerClient {
         Action<bool, TurnBasedMatch> callback) {
         callback = Callbacks.AsOnGameThreadCallback(callback);
         mTurnBasedManager.ShowPlayerSelectUI(minOpponents, maxOpponents, true, result => {
-            if (result.Status() != GooglePlayGames.Native.Cwrapper.Status.UIStatus.VALID) {
+            if (result.Status() != GooglePlayGames.Native.Cwrapper.CommonErrorStatus.UIStatus.VALID) {
                 callback(false, null);
             }
 

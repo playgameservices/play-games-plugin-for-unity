@@ -29,15 +29,7 @@ public class InvitationManager {
     }
 
     private Invitation mInvitation = null;
-    private bool mShouldAutoAccept = false;
-    private bool mSetupDone = false;
-
-    public void Setup() {
-        if (!mSetupDone) {
-            PlayGamesPlatform.Instance.RegisterInvitationDelegate(OnInvitationReceived);
-            mSetupDone = true;
-        }
-    }
+    private bool mShouldAutoAccept = false;   
 
     public void OnInvitationReceived(Invitation inv, bool shouldAutoAccept) {
         mInvitation = inv;

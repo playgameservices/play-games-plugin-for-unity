@@ -17,6 +17,7 @@
 using UnityEngine;
 using System.Collections;
 using GooglePlayGames;
+using GooglePlayGames.BasicApi;
 using GooglePlayGames.BasicApi.Multiplayer;
 
 public class MainMenuGui : BaseGui {
@@ -173,7 +174,7 @@ public class MainMenuGui : BaseGui {
           }
         break;
 
-	} // end match status
+    } // end match status
   }
 
   void ShowIncomingInviteUi() {

@@ -22,8 +22,12 @@ internal abstract class BaseReferenceHolder : IDisposable {
 
     private HandleRef mSelfPointer;
 
+    protected bool IsDisposed() {
+        return PInvokeUtilities.IsNull(mSelfPointer);
+    }
+
     protected HandleRef SelfPtr() {
-        if (PInvokeUtilities.IsNull(mSelfPointer)) {
+        if (IsDisposed()) {
             throw new InvalidOperationException(
                 "Attempted to use object after it was cleaned up");
         }
