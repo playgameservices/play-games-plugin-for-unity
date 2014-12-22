@@ -233,7 +233,7 @@ available.
 
 ## Configuration & Initialization
 
-In order to use some features of the plugin, the default configuration needs to be replaced with a custom configuration.
+In order to save game progress or handle multiplayer invitations and turn notifications, the default configuration needs to be replaced with a custom configuration.
 To do this use the **PlayGamesClientConfiguration**.  If your game does not use these features, then there is no need to 
 initialize the platform configuration.  Once the instance is initialized, make it your default social platform by calling
 **PlayGamesPlatform.Activate**:
@@ -448,7 +448,7 @@ The standard UI for selecting or creating a saved game entry is displayed by cal
 ### Opening a saved game ###
 
 In order to read or write data to a saved game, the saved game needs to be opened. Since the saved game state is cached locally
-on the device and saved to the cloud, it is possible to encountered conflicts in the state of the saved data. A conflict 
+on the device and saved to the cloud, it is possible to encounter conflicts in the state of the saved data. A conflict 
 happens when a device attempts to save state to the cloud but the data currently on the cloud was written by a different device.
 These conflicts need to be resolved when opening the saved game data.  There are 2 open methods that handle conflict resolution,
 the first **OpenWithAutomaticConflictResolution** accepts a standard resolution strategy type and automatically resolves the conflicts.
@@ -561,7 +561,8 @@ To enable support for the legacy Cloud saved service, the plugin must be initial
 ```
 
 To load game state from the cloud, use the **PlayGamesPlatform.LoadState**
-method.  Once the data is loaded, it should be saved using the Saved Game data API. <br/>
+method.  Once the data is loaded, you should consider migrating it to Saved Game data.
+
 
 ```csharp
     using GooglePlayGames;
@@ -581,6 +582,18 @@ method.  Once the data is loaded, it should be saved using the Saved Game data A
         }
         ....
 ```
+
+## Migrating from Cloud Save to Saved Games
+
+If your game has existing saved data using Cloud Saved app state, you should consider migrating to SavedGames API.  One possible approach for
+migrating is:
+
+1. Call **FetchAllSavedGames** to get the list of all Saved Games.
+2. For each Cloud saved slot your game may have, check for a saved game with a filename of something like "migratedSlot_x" where x is the slot number.
+3. if the file exists, then you can consider the saved data has been migrated. Call one of the open APIs, such as **OpenWithAutomaticConflictResolution**
+to read the saved game data.
+4. if the file does not exist, then load the state data by calling **LoadState**, and then save it a filename called "migratedSlot_x".
+
 
 ## Resolving State Conflicts
 

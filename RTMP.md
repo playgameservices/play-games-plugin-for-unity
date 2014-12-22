@@ -203,9 +203,9 @@ When finished with your real-time game, leave the room:
 
 This will trigger a call to your listener's `OnLeftRoom`.
 
-## Install an Invitation Delegate
+## Register an Invitation Delegate
 
-To be notified of incoming invitations (and also to allow the user to accept an invitation they received via push notification), install an invitation delegate in the plugin instance configuration:
+To be notified of incoming invitations (and also to allow the user to accept an invitation they received via push notification), register an invitation delegate in the plugin instance configuration:
 
 ```csharp
 

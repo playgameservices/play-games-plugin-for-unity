@@ -267,9 +267,9 @@ If it **is** the player's turn, use `LeaveDuringTurn`. You must specify the next
     });
 ```
 
-## Install an Invitation Delegate
+## Register an Invitation Delegate
 
-To be notified of incoming turn-based invitations (and also to allow the user to accept an invitation they received via push notification), install an invitation delegate in the plugin instance configuration:
+To be notified of incoming turn-based invitations (and also to allow the user to accept an invitation they received via push notification), register an invitation delegate in the plugin instance configuration:
 
 ```csharp
 
@@ -352,9 +352,9 @@ If `mIncomingInvitation` is not `null`, show an in-game invitation popup on the 
     }
 ```
 
-## Match Delegate
+## Register a Match Delegate
 
-Apart from invitation, your game might receive matches to play. This happens, for example, when it's the player's turn to play on a given match that was already happening. To handle these, install a match delegate:
+Apart from invitation, your game might receive matches to play. This happens, for example, when it's the player's turn to play on a given match that was already happening. To handle these, register a match delegate:
 
 ```csharp
      
