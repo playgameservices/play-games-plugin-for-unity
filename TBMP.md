@@ -269,11 +269,31 @@ If it **is** the player's turn, use `LeaveDuringTurn`. You must specify the next
 
 ## Install an Invitation Delegate
 
-To be notified of incoming turn-based invitations (and also to allow the user to accept an invitation they received via push notification), install an invitation delegate immediately after sign in:
+To be notified of incoming turn-based invitations (and also to allow the user to accept an invitation they received via push notification), install an invitation delegate in the plugin instance configuration:
 
 ```csharp
-    // register an invitation delegate
-    PlayGamesPlatform.Instance.RegisterInvitationDelegate(OnInvitationReceived);
+
+    using GooglePlayGames;
+    using GooglePlayGames.BasicApi;
+    using UnityEngine.SocialPlatforms;
+
+    PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder()
+	    // registers a callback to handle game invitations.
+    	.WithInvitationDelegate(OnInvitationReceived) 
+
+	    // registers a callback for turn based match notifications.
+	    .WithMatchDelegate(OnGotMatch) 
+
+    	.Build();
+
+    PlayGamesPlatform.InitializeInstance(config);
+
+    // recommended for debugging:
+    PlayGamesPlatform.DebugLogEnabled = true;
+
+    // Activate the Google Play Games platform
+    PlayGamesPlatform.Activate();
+
 ```
 
 Whenever the player receives an invitation, this delegate will be invoked. The delegate is invoked with two arguments: the invitation and a boolean flag indicating whether or not the invitation should be immediately accepted:
@@ -332,14 +352,12 @@ If `mIncomingInvitation` is not `null`, show an in-game invitation popup on the 
     }
 ```
 
-## Install a Match Delegate
+## Match Delegate
 
 Apart from invitation, your game might receive matches to play. This happens, for example, when it's the player's turn to play on a given match that was already happening. To handle these, install a match delegate:
 
 ```csharp
-    // (after successful sign in)
-    PlayGamesPlatform.Instance.TurnBased.RegisterMatchDelegate(OnGotMatch);
-    
+     
     // match delegate:
     void OnGotMatch(TurnBasedMatch match, bool shouldAutoLaunch) {
         if (shouldAutoLaunch) {

@@ -205,12 +205,29 @@ This will trigger a call to your listener's `OnLeftRoom`.
 
 ## Install an Invitation Delegate
 
-To be notified of incoming invitations (and also to allow the user to accept an invitation they received via push notification), install an invitation delegate immediately after sign in:
+To be notified of incoming invitations (and also to allow the user to accept an invitation they received via push notification), install an invitation delegate in the plugin instance configuration:
 
 ```csharp
-    // register an invitation delegate
-    PlayGamesPlatform.Instance.RegisterInvitationDelegate(OnInvitationReceived);
+
+    using GooglePlayGames;
+    using GooglePlayGames.BasicApi;
+    using UnityEngine.SocialPlatforms;
+
+    PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder()
+	    // registers a callback to handle game invitations.
+    	.WithInvitationDelegate(OnInvitationReceived) 
+    	.Build();
+
+    PlayGamesPlatform.InitializeInstance(config);
+
+    // recommended for debugging:
+    PlayGamesPlatform.DebugLogEnabled = true;
+
+    // Activate the Google Play Games platform
+    PlayGamesPlatform.Activate();
+
 ```
+
 
 Whenever the player receives an invitation, this delegate will be invoked. The delegate is invoked with two arguments: the invitation and a boolean flag indicating whether or not the invitation should be immediately accepted:
 
