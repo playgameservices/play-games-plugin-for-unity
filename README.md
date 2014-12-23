@@ -231,21 +231,39 @@ Google Play Games extensions can be accessed by casting the **Social.Active**
 object to the **PlayGamesPlatform** class, where the additional methods are
 available.
 
-## Initialization
+## Configuration & Initialization
 
-To initialize the plugin and make it your default social platform,
-call **PlayGamesPlatform.Activate**:
+In order to save game progress or handle multiplayer invitations and turn notifications, the default configuration needs to be replaced with a custom configuration.
+To do this use the **PlayGamesClientConfiguration**.  If your game does not use these features, then there is no need to 
+initialize the platform configuration.  Once the instance is initialized, make it your default social platform by calling
+**PlayGamesPlatform.Activate**:
 
 ```csharp
-    using GooglePlayGames;
-    using UnityEngine.SocialPlatforms;
-    ...
+
+using GooglePlayGames;
+using GooglePlayGames.BasicApi;
+using UnityEngine.SocialPlatforms;
+
+PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder()
+	// enables saving game progress.		
+	.EnableSavedGames() 
+
+	// registers a callback to handle game invitations received while the game is not running.
+	.WithInvitationDelegate(<callback method>) 
+
+	// registers a callback for turn based match notifications received while the game is not running.
+	.WithMatchDelegate(<callback method>) 
+
+	.Build();
+
+    PlayGamesPlatform.InitializeInstance(config);
 
     // recommended for debugging:
     PlayGamesPlatform.DebugLogEnabled = true;
 
     // Activate the Google Play Games platform
     PlayGamesPlatform.Activate();
+
 ```
 
 After activated, you can access the Play Games platform through
@@ -381,36 +399,170 @@ object first:
     ((PlayGamesPlatform) Social.Active).ShowLeaderboardUI("Cfji293fjsie_QA");
 ```
 
-## Saving Game State to the Cloud (only on Android)
+## Saving Game State to the Cloud
 
-To save game state to the cloud, use the **PlayGamesPlatform.UpdateState**
-method.
+For details on saved games concepts and APIs please refer to the  [documentation](https://developers.google.com/games/services/common/concepts/savedgames).
+
+
+To enable support for saved games, the plugin must be initialized with saved games enabled by calling 
+**PlayGamesPlatform.InitializeInstance**:
 
 ```csharp
-    using GooglePlayGames;
-    using UnityEngine.SocialPlatforms;
-    using GooglePlayGames.BasicApi;
-    public class MyClass : OnStateLoadedListener {
-        void SaveState() {
-            // serialize your game state to a byte array:
-            byte[] mySaveState = ...;
-            int slot = 0; // slot number to use
-            ((PlayGamesPlatform) Social.Active).UpdateState(slot,
-                mySaveState, this);
-        }
-        public void OnStateSaved(bool success, int slot) {
-            // handle success or failure
-        }
-        ...
+
+	PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder()
+		// enables saving game progress.		
+		.EnableSavedGames()
+		.Build();
+	PlayGamesPlatform.InitializeInstance(config);
 ```
 
-The **OnStateSaved** method of the **OnStateLoadedListener** will be called to
-indicate the success or failure of the cloud save operation.
+### Displaying saved games UI ###
 
-## Loading Game State from the Cloud (only on Android)
+The standard UI for selecting or creating a saved game entry is displayed by calling:
+
+```csharp
+
+	void ShowSelectUI() {
+		int maxNumToDisplay = 5;
+		bool allowCreateNew = false;
+		bool allowDelete = true;
+
+		ISavedGameClient savedGameClient = ((PlayGamesPlatform)Social.Active).SavedGame;
+		savedGameClient.ShowSelectSavedGameUI("Select saved game",
+						 	maxNumToDisplay,
+							allowCreateNew, allowDelete,
+							OnSavedGameSelected);
+	}
+
+
+	public void OnSavedGameSelected (SelectUIStatus status, ISavedGameMetadata game) {
+		if (status == SelectUIStatus.SavedGameSelected) {
+				// handle selected game save
+		} else {
+			// handle cancel or error
+		}
+	}
+
+```
+
+### Opening a saved game ###
+
+In order to read or write data to a saved game, the saved game needs to be opened. Since the saved game state is cached locally
+on the device and saved to the cloud, it is possible to encounter conflicts in the state of the saved data. A conflict 
+happens when a device attempts to save state to the cloud but the data currently on the cloud was written by a different device.
+These conflicts need to be resolved when opening the saved game data.  There are 2 open methods that handle conflict resolution,
+the first **OpenWithAutomaticConflictResolution** accepts a standard resolution strategy type and automatically resolves the conflicts.
+The other method, **OpenWithManualConflictResolution** accepts a callback method to allow the manual resolution of the conflict.
+
+See __GooglePlayGames/BasicApi/SavedGame/ISavedGameClient.cs__ for more details on these methods.
+
+```csharp
+
+	void OpenSavedGame(string filename) {
+		ISavedGameClient savedGameClient = ((PlayGamesPlatform)Social.Active).SavedGame;
+	
+		savedGameClient.OpenWithAutomaticConflictResolution(filename, DataSource.ReadCacheOrNetwork,
+						ConflictResolutionStrategy.UseLongestPlaytime, OnSavedGameOpened);
+	}
+
+	public void OnSavedGameOpened(SavedGameRequestStatus status, ISavedGameMetadata game) {
+		
+		if (status == SavedGameRequestStatus.Success) {
+			// handle reading or writing of saved game.
+		} else {
+			// handle error
+		}
+	}
+
+```
+
+### Writing a saved game ###
+
+Once the saved game file is opened, it can be written to save the the game state.  This is done by calling **CommitUpdate**.
+There are four parameters to CommitUpdate:
+
+1. the saved game metadata passed to the callback passed to one of the Open calls.
+2. the updates to make to the metadata.
+3. the actual byte array of data
+4. a callback to call when the commit is complete.
+
+```csharp
+
+	void SaveGame (ISavedGameMetadata game, byte[] savedData, TimeSpan totalPlaytime) {
+
+		ISavedGameClient savedGameClient = ((PlayGamesPlatform)Social.Active).SavedGame;
+		
+		SavedGameMetadataUpdate.Builder builder = new SavedGameMetadataUpdate.Builder();
+		builder = builder
+				.WithUpdatedPlayTime(totalPlaytime)
+				.WithUpdatedDescription("Saved game at " + DateTime.Now());
+		if (savedImage != null) {
+			byte[] pngData = savedImage.EncodeToPNG();
+			builder = builder.WithUpdatedPngCoverImage(pngData);
+		}
+
+		SavedGameMetadataUpdate updatedMetadata = builder.Build();
+
+		savedGameClient.CommitUpdate(game, updatedMetadata, savedData, OnSavedGameWritten);
+	}
+
+	public void OnSavedGameWritten (SavedGameRequestStatus status, ISavedGameMetadata game) {
+
+		if (status == SavedGameRequestStatus.Success) {
+			// handle reading or writing of saved game.
+		} else {
+			// handle error
+		}
+	}
+
+```
+
+### Reading a saved game ###
+
+Once the saved game file is opened, it can be read to load the game state.  This is done by calling **ReadBinaryData**.
+
+
+```csharp
+
+	void LoadGameData (ISavedGameMetadata game) {
+
+		ISavedGameClient savedGameClient = ((PlayGamesPlatform)Social.Active).SavedGame;
+		savedGameClient.ReadBinaryData(game, OnSavedGameDataRead);
+	}
+
+	public void OnSavedGameDataRead (SavedGameRequestStatus status, byte[] data) {
+
+		if (status == SavedGameRequestStatus.Success) {
+			// handle processing the byte array data
+		} else {
+			// handle error
+		}
+	}
+
+```
+
+
+## Loading Legacy 'Cloud Save service' Game State from the Cloud (only on Android)
+
+__NOTICE: Cloud Save service has been deprecated and existing games should migrate saved data to
+Saved Games as soon as possible.__
+
+To enable support for the legacy Cloud saved service, the plugin must be initialized with saved games enabled by calling 
+**PlayGamesPlatform.InitializeInstance**:
+
+```csharp
+
+	PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder()
+		// enables legacy cloud save	
+		.EnableDeprecatedCloudSave()
+		.EnableSavedGames()
+		.Build();
+	PlayGamesPlatform.InitializeInstance(config);
+```
 
 To load game state from the cloud, use the **PlayGamesPlatform.LoadState**
-method:<br/>
+method.  Once the data is loaded, you should consider migrating it to Saved Game data.
+
 
 ```csharp
     using GooglePlayGames;
@@ -423,13 +575,25 @@ method:<br/>
         }
         public void OnStateLoaded(bool success, int slot, byte[] data) {
             if (success) {
-                // do something with data[]
+                // do something with data[] and save it using SavedGame API.
             } else {
                 // handle failure
             }
         }
         ....
 ```
+
+## Migrating from Cloud Save to Saved Games
+
+If your game has existing saved data using Cloud Saved app state, you should consider migrating to SavedGames API.  One possible approach for
+migrating is:
+
+1. Call **FetchAllSavedGames** to get the list of all Saved Games.
+2. For each Cloud saved slot your game may have, check for a saved game with a filename of something like "migratedSlot_x" where x is the slot number.
+3. if the file exists, then you can consider the saved data has been migrated. Call one of the open APIs, such as **OpenWithAutomaticConflictResolution**
+to read the saved game data.
+4. if the file does not exist, then load the state data by calling **LoadState**, and then save it a filename called "migratedSlot_x".
+
 
 ## Resolving State Conflicts
 
