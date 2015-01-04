@@ -314,6 +314,10 @@ public class PlayGamesPlatform : ISocialPlatform {
             // increment it to the target percentage (approximate)
             Logger.d("Progress " + progress +
             " interpreted as incremental target (approximate).");
+            if (progress >= 0.0 && progress <= 1.0) {
+                // in a previous version, incremental progress was reported by using the range [0-1]
+                Logger.w("Progress " + progress + " is less than or equal to 1. You might be trying to use values in the range of [0,1], while values are expected to be within the range [0,100]. If you are using the latter, you can safely ignore this message.");
+            }
             int targetSteps = (int)((progress / 100) * totalSteps);
             int numSteps = targetSteps - curSteps;
             Logger.d("Target steps: " + targetSteps + ", cur steps:" + curSteps);
