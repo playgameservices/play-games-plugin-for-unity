@@ -114,10 +114,10 @@ namespace GooglePlayGames.UnitTests {
             Achievement nonIncremental = new Achievement();
             mockClient.CurrentAchievement = nonIncremental;
 
-            platform.ReportProgress("nonIncremental", 0.5, SentinelCallback);
+            platform.ReportProgress("nonIncremental", 50, SentinelCallback);
 
-            Assert.AreEqual("nonIncremental", mockClient.UnlockedId);
-            Assert.AreEqual(SentinelCallback, mockClient.UnlockedCallback);
+            Assert.IsNull(mockClient.UnlockedId);
+            Assert.IsNull(mockClient.UnlockedCallback);
         }
 
         [Test]
@@ -125,10 +125,10 @@ namespace GooglePlayGames.UnitTests {
             var mockClient = new AchievementClient();
             var platform = new PlayGamesPlatform(mockClient);
 
-            platform.ReportProgress("unknown", 0.5, SentinelCallback);
+            platform.ReportProgress("unknown", 50, SentinelCallback);
 
-            Assert.AreEqual("unknown", mockClient.UnlockedId);
-            Assert.AreEqual(SentinelCallback, mockClient.UnlockedCallback);
+            Assert.IsNull(mockClient.UnlockedId);
+            Assert.IsNull(mockClient.UnlockedCallback);
         }
 
         [Test]
@@ -136,7 +136,7 @@ namespace GooglePlayGames.UnitTests {
             var mockClient = new AchievementClient();
             var platform = new PlayGamesPlatform(mockClient);
 
-            IncrementViaReportProgress(mockClient, platform, 0, 100, 1.0);
+            IncrementViaReportProgress(mockClient, platform, 0, 100, 100);
 
             Assert.AreEqual("incremental", mockClient.IncrementedId);
             Assert.AreEqual(100, mockClient.IncrementedSteps.Value);
@@ -147,7 +147,7 @@ namespace GooglePlayGames.UnitTests {
             var mockClient = new AchievementClient();
             var platform = new PlayGamesPlatform(mockClient);
 
-            IncrementViaReportProgress(mockClient, platform, 0, 100, 0.25);
+            IncrementViaReportProgress(mockClient, platform, 0, 100, 25);
 
             Assert.AreEqual("incremental", mockClient.IncrementedId);
             Assert.AreEqual(25, mockClient.IncrementedSteps.Value);
@@ -158,7 +158,7 @@ namespace GooglePlayGames.UnitTests {
             var mockClient = new AchievementClient();
             var platform = new PlayGamesPlatform(mockClient);
 
-            IncrementViaReportProgress(mockClient, platform, 25, 100, 0.6);
+            IncrementViaReportProgress(mockClient, platform, 25, 100, 60);
 
             Assert.AreEqual("incremental", mockClient.IncrementedId);
             // Our target is 50 steps, initial value is 25 - delta of 25.
@@ -170,7 +170,7 @@ namespace GooglePlayGames.UnitTests {
             var mockClient = new AchievementClient();
             var platform = new PlayGamesPlatform(mockClient);
 
-            IncrementViaReportProgress(mockClient, platform, 25, 100, 0.1);
+            IncrementViaReportProgress(mockClient, platform, 25, 100, 10);
 
             Assert.IsNull(mockClient.IncrementedId);
             Assert.IsNull(mockClient.IncrementedSteps);
@@ -181,7 +181,7 @@ namespace GooglePlayGames.UnitTests {
             var mockClient = new AchievementClient();
             var platform = new PlayGamesPlatform(mockClient);
 
-            IncrementViaReportProgress(mockClient, platform, 25, 100, 0.25);
+            IncrementViaReportProgress(mockClient, platform, 25, 100, 25);
 
             Assert.IsNull(mockClient.IncrementedId);
             Assert.IsNull(mockClient.IncrementedSteps);
@@ -192,7 +192,7 @@ namespace GooglePlayGames.UnitTests {
             var mockClient = new AchievementClient();
             var platform = new PlayGamesPlatform(mockClient);
 
-            IncrementViaReportProgress(mockClient, platform, 0, 100, 2.0);
+            IncrementViaReportProgress(mockClient, platform, 0, 100, 200);
 
             Assert.AreEqual("incremental", mockClient.IncrementedId);
             Assert.AreEqual(200, mockClient.IncrementedSteps.Value);
