@@ -172,12 +172,18 @@ public class LevelController : MonoBehaviour {
 
             if (mGameState == GameState.GameOver) {
                 // game over -- restart current level
+                StartCoroutine(CaptureScreenshot());
                 GameManager.Instance.RestartLevel();
             } else {
                 // level cleared! Record progress and advance to next.
                 GameManager.Instance.FinishLevelAndGoToNext(mScore, CalcStars());
             }
         }
+    }
+
+    IEnumerator CaptureScreenshot() {
+        yield return new WaitForEndOfFrame();
+        GameManager.Instance.CaptureScreenshot();
     }
 
     int CalcStars() {
@@ -314,6 +320,7 @@ public class LevelController : MonoBehaviour {
             ShowCenteredMessage(mGameOverReason == GameOverReason.CiviliansDied ?
                 Strings.GameOverCiviliansDied : Strings.GameOverPlayerDied,
                 Strings.RetryingIn);
+            GameManager.Instance.AutoSave();
             break;
         case GameState.Won:
             // show the "Level Cleared" message
@@ -329,6 +336,7 @@ public class LevelController : MonoBehaviour {
             Gu.Label(Gu.Center(0), Gu.Middle(GameConsts.StarsMessageY),
                 Gu.Dim(GameConsts.StarsMessageFontSize),
                 Strings.StarsMessage[stars]);
+            GameManager.Instance.AutoSave();
             break;
         }
     }

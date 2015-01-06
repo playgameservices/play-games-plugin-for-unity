@@ -38,6 +38,7 @@ public static class Strings {
     public const string GamePaused = "Game Paused";
     public const string ResumeGame = "Resume";
     public const string QuitGame = "Quit";
+    public const string SaveGame = "Save Progress";
 
     public const string AccuracyFmt = "Accuracy: {0}%";
 
