@@ -17,6 +17,7 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using System;
 
 public class MainMenuEvents : MonoBehaviour {
 
@@ -26,6 +27,8 @@ public class MainMenuEvents : MonoBehaviour {
     public GameObject signinMessage;
     public GameObject achievementButton;
     public GameObject highScoreButton;
+    public GameObject loadButton;
+    public GameObject saveButton;
     public GameObject levelSelectionPanel;
 
 
@@ -66,6 +69,8 @@ public class MainMenuEvents : MonoBehaviour {
         }
         achievementButton.SetActive(authenticated);
         highScoreButton.SetActive(authenticated);
+        loadButton.SetActive(authenticated);
+        saveButton.SetActive(authenticated);
     }
 
     public void OnSignIn() {
@@ -97,6 +102,16 @@ public class MainMenuEvents : MonoBehaviour {
         }
     }
 
+    public void OnLoadProgress() {
+        Beep();
+        GameManager.Instance.LoadFromCloud();
+    }
+
+    public void OnSaveProgress() {
+        Beep();
+        GameManager.Instance.SaveProgress();
+    }
+
     void ShowLevelSelection() {
         levelSelectionPanel.SetActive (true);
 
@@ -104,6 +119,7 @@ public class MainMenuEvents : MonoBehaviour {
         achievementButton.GetComponent<Button>().interactable = false;
         highScoreButton.GetComponent<Button>().interactable = false;
         signinButton.GetComponent<Button>().interactable = false;
+        loadButton.GetComponent<Button>().interactable = false;
 
 
         Button[] levels = levelSelectionPanel.GetComponentsInChildren<Button>();
@@ -111,7 +127,8 @@ public class MainMenuEvents : MonoBehaviour {
         for(int i=0;i<levels.Length;i++) {
             // create new local var for closure for click listener
             int level = i;
-            texts[i].text = "Level " + (i+1);
+            texts[i].text = "Sector " + Convert.ToChar('A' + i) +
+                    "\n"+ GameManager.Instance.Progress.GetLevelProgress(i).Score;
             levels[i].interactable =
                 GameManager.Instance.Progress.IsLevelUnlocked(i);
             levels[i].onClick.AddListener(()=> {

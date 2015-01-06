@@ -48,6 +48,8 @@ public class Strings {
 
     public const string Achievements = "Achievements";
     public const string Leaderboards = "High Scores";
+    public const string LoadGame = "Load Progress";
+    public const string SaveGame = "Save Progress";
 
     public const string SignInBlurb = "Sign in to unlock achievements, post scores\n" +
         "and save your progress to the cloud!";
