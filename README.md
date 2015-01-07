@@ -476,7 +476,7 @@ There are four parameters to CommitUpdate:
 
 ```csharp
     void SaveGame (ISavedGameMetadata game, byte[] savedData, TimeSpan totalPlaytime) {
-        ISavedGameClient savedGameClient = ((PlayGamesPlatform)Social.Active).SavedGame;
+        ISavedGameClient savedGameClient = PlayGamesPlatform.Instance.SavedGame;
 
         SavedGameMetadataUpdate.Builder builder = new SavedGameMetadataUpdate.Builder();
         builder = builder
