@@ -234,36 +234,30 @@ available.
 ## Configuration & Initialization
 
 In order to save game progress or handle multiplayer invitations and turn notifications, the default configuration needs to be replaced with a custom configuration.
-To do this use the **PlayGamesClientConfiguration**.  If your game does not use these features, then there is no need to 
+To do this use the **PlayGamesClientConfiguration**.  If your game does not use these features, then there is no need to
 initialize the platform configuration.  Once the instance is initialized, make it your default social platform by calling
 **PlayGamesPlatform.Activate**:
 
 ```csharp
+    using GooglePlayGames;
+    using GooglePlayGames.BasicApi;
+    using UnityEngine.SocialPlatforms;
 
-using GooglePlayGames;
-using GooglePlayGames.BasicApi;
-using UnityEngine.SocialPlatforms;
-
-PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder()
-	// enables saving game progress.		
-	.EnableSavedGames() 
-
-	// registers a callback to handle game invitations received while the game is not running.
-	.WithInvitationDelegate(<callback method>) 
-
-	// registers a callback for turn based match notifications received while the game is not running.
-	.WithMatchDelegate(<callback method>) 
-
-	.Build();
+    PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder()
+        // enables saving game progress.
+        .EnableSavedGames()
+        // registers a callback to handle game invitations received while the game is not running.
+        .WithInvitationDelegate(<callback method>)
+        // registers a callback for turn based match notifications received while the
+        // game is not running.
+        .WithMatchDelegate(<callback method>)
+        .Build();
 
     PlayGamesPlatform.InitializeInstance(config);
-
     // recommended for debugging:
     PlayGamesPlatform.DebugLogEnabled = true;
-
     // Activate the Google Play Games platform
     PlayGamesPlatform.Activate();
-
 ```
 
 After activated, you can access the Play Games platform through
@@ -307,7 +301,7 @@ progress value of 100.0f:
     ...
     // unlock achievement (achievement ID "Cfjewijawiu_QA")
     Social.ReportProgress("Cfjewijawiu_QA", 100.0f, (bool success) => {
-        // handle success or failure
+      // handle success or failure
     });
 ```
 
@@ -333,7 +327,7 @@ extension.
     using UnityEngine.SocialPlatforms;
     ...
     // increment achievement (achievement ID "Cfjewijawiu_QA") by 5 steps
-    ((PlayGamesPlatform) Social.Active).IncrementAchievement(
+    PlayGamesPlatform.Instance.IncrementAchievement(
         "Cfjewijawiu_QA", 5, (bool success) => {
             // handle success or failure
     });
@@ -396,7 +390,7 @@ object first:
     using UnityEngine.SocialPlatforms;
     ...
     // show leaderboard UI
-    ((PlayGamesPlatform) Social.Active).ShowLeaderboardUI("Cfji293fjsie_QA");
+    PlayGamesPlatform.Instance.ShowLeaderboardUI("Cfji293fjsie_QA");
 ```
 
 ## Saving Game State to the Cloud
@@ -404,16 +398,15 @@ object first:
 For details on saved games concepts and APIs please refer to the  [documentation](https://developers.google.com/games/services/common/concepts/savedgames).
 
 
-To enable support for saved games, the plugin must be initialized with saved games enabled by calling 
+To enable support for saved games, the plugin must be initialized with saved games enabled by calling
 **PlayGamesPlatform.InitializeInstance**:
 
 ```csharp
-
-	PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder()
-		// enables saving game progress.		
-		.EnableSavedGames()
-		.Build();
-	PlayGamesPlatform.InitializeInstance(config);
+    PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder()
+        // enables saving game progress.
+        .EnableSavedGames()
+        .Build();
+    PlayGamesPlatform.InitializeInstance(config);
 ```
 
 ### Displaying saved games UI ###
@@ -421,34 +414,33 @@ To enable support for saved games, the plugin must be initialized with saved gam
 The standard UI for selecting or creating a saved game entry is displayed by calling:
 
 ```csharp
+    void ShowSelectUI() {
+        int maxNumToDisplay = 5;
+        bool allowCreateNew = false;
+        bool allowDelete = true;
 
-	void ShowSelectUI() {
-		int maxNumToDisplay = 5;
-		bool allowCreateNew = false;
-		bool allowDelete = true;
-
-		ISavedGameClient savedGameClient = ((PlayGamesPlatform)Social.Active).SavedGame;
-		savedGameClient.ShowSelectSavedGameUI("Select saved game",
-						 	maxNumToDisplay,
-							allowCreateNew, allowDelete,
-							OnSavedGameSelected);
-	}
+        ISavedGameClient savedGameClient = PlayGamesPlatform.Instance.SavedGame;
+        savedGameClient.ShowSelectSavedGameUI("Select saved game",
+            maxNumToDisplay,
+            allowCreateNew,
+            allowDelete,
+            OnSavedGameSelected);
+    }
 
 
-	public void OnSavedGameSelected (SelectUIStatus status, ISavedGameMetadata game) {
-		if (status == SelectUIStatus.SavedGameSelected) {
-				// handle selected game save
-		} else {
-			// handle cancel or error
-		}
-	}
-
+    public void OnSavedGameSelected (SelectUIStatus status, ISavedGameMetadata game) {
+        if (status == SelectUIStatus.SavedGameSelected) {
+            // handle selected game save
+        } else {
+            // handle cancel or error
+        }
+    }
 ```
 
 ### Opening a saved game ###
 
 In order to read or write data to a saved game, the saved game needs to be opened. Since the saved game state is cached locally
-on the device and saved to the cloud, it is possible to encounter conflicts in the state of the saved data. A conflict 
+on the device and saved to the cloud, it is possible to encounter conflicts in the state of the saved data. A conflict
 happens when a device attempts to save state to the cloud but the data currently on the cloud was written by a different device.
 These conflicts need to be resolved when opening the saved game data.  There are 2 open methods that handle conflict resolution,
 the first **OpenWithAutomaticConflictResolution** accepts a standard resolution strategy type and automatically resolves the conflicts.
@@ -457,23 +449,19 @@ The other method, **OpenWithManualConflictResolution** accepts a callback method
 See __GooglePlayGames/BasicApi/SavedGame/ISavedGameClient.cs__ for more details on these methods.
 
 ```csharp
+    void OpenSavedGame(string filename) {
+        ISavedGameClient savedGameClient = PlayGamesPlatform.Instance.SavedGame;
+        savedGameClient.OpenWithAutomaticConflictResolution(filename, DataSource.ReadCacheOrNetwork,
+            ConflictResolutionStrategy.UseLongestPlaytime, OnSavedGameOpened);
+    }
 
-	void OpenSavedGame(string filename) {
-		ISavedGameClient savedGameClient = ((PlayGamesPlatform)Social.Active).SavedGame;
-	
-		savedGameClient.OpenWithAutomaticConflictResolution(filename, DataSource.ReadCacheOrNetwork,
-						ConflictResolutionStrategy.UseLongestPlaytime, OnSavedGameOpened);
-	}
-
-	public void OnSavedGameOpened(SavedGameRequestStatus status, ISavedGameMetadata game) {
-		
-		if (status == SavedGameRequestStatus.Success) {
-			// handle reading or writing of saved game.
-		} else {
-			// handle error
-		}
-	}
-
+    public void OnSavedGameOpened(SavedGameRequestStatus status, ISavedGameMetadata game) {
+        if (status == SavedGameRequestStatus.Success) {
+            // handle reading or writing of saved game.
+        } else {
+            // handle error
+        }
+    }
 ```
 
 ### Writing a saved game ###
@@ -487,33 +475,44 @@ There are four parameters to CommitUpdate:
 4. a callback to call when the commit is complete.
 
 ```csharp
+    void SaveGame (ISavedGameMetadata game, byte[] savedData, TimeSpan totalPlaytime) {
+        ISavedGameClient savedGameClient = PlayGamesPlatform.Instance.SavedGame;
 
-	void SaveGame (ISavedGameMetadata game, byte[] savedData, TimeSpan totalPlaytime) {
+        SavedGameMetadataUpdate.Builder builder = new SavedGameMetadataUpdate.Builder();
+        builder = builder
+            .WithUpdatedPlayedTime(totalPlaytime)
+            .WithUpdatedDescription("Saved game at " + DateTime.Now());
+        if (savedImage != null) {
+            // This assumes that savedImage is an instance of Texture2D
+            // and that you have already called a function equivalent to
+            // getScreenshot() to set savedImage
+            // NOTE: see sample definition of getScreenshot() method below
+            byte[] pngData = savedImage.EncodeToPNG();
+            builder = builder.WithUpdatedPngCoverImage(pngData);
+        }
+        SavedGameMetadataUpdate updatedMetadata = builder.Build();
+        savedGameClient.CommitUpdate(game, updatedMetadata, savedData, OnSavedGameWritten);
+    }
 
-		ISavedGameClient savedGameClient = ((PlayGamesPlatform)Social.Active).SavedGame;
-		
-		SavedGameMetadataUpdate.Builder builder = new SavedGameMetadataUpdate.Builder();
-		builder = builder
-				.WithUpdatedPlayTime(totalPlaytime)
-				.WithUpdatedDescription("Saved game at " + DateTime.Now());
-		if (savedImage != null) {
-			byte[] pngData = savedImage.EncodeToPNG();
-			builder = builder.WithUpdatedPngCoverImage(pngData);
-		}
+    public void OnSavedGameWritten (SavedGameRequestStatus status, ISavedGameMetadata game) {
+        if (status == SavedGameRequestStatus.Success) {
+            // handle reading or writing of saved game.
+        } else {
+            // handle error
+        }
+    }
 
-		SavedGameMetadataUpdate updatedMetadata = builder.Build();
+    public Texture2D getScreenshot() {
+        // Create a 2D texture that is 1024x700 pixels from which the PNG will be
+        // extracted
+        Texture2D screenShot = new Texture2D(1024, 700);
 
-		savedGameClient.CommitUpdate(game, updatedMetadata, savedData, OnSavedGameWritten);
-	}
-
-	public void OnSavedGameWritten (SavedGameRequestStatus status, ISavedGameMetadata game) {
-
-		if (status == SavedGameRequestStatus.Success) {
-			// handle reading or writing of saved game.
-		} else {
-			// handle error
-		}
-	}
+        // Takes the screenshot from top left hand corner of screen and maps to top
+        // left hand corner of screenShot texture
+        screenShot.ReadPixels(
+            new Rect(0, 0, Screen.width, (Screen.width/1024)*700), 0, 0);
+        return screenShot;
+    }
 
 ```
 
@@ -523,22 +522,18 @@ Once the saved game file is opened, it can be read to load the game state.  This
 
 
 ```csharp
+    void LoadGameData (ISavedGameMetadata game) {
+        ISavedGameClient savedGameClient = PlayGamesPlatform.Instance.SavedGame;
+        savedGameClient.ReadBinaryData(game, OnSavedGameDataRead);
+    }
 
-	void LoadGameData (ISavedGameMetadata game) {
-
-		ISavedGameClient savedGameClient = ((PlayGamesPlatform)Social.Active).SavedGame;
-		savedGameClient.ReadBinaryData(game, OnSavedGameDataRead);
-	}
-
-	public void OnSavedGameDataRead (SavedGameRequestStatus status, byte[] data) {
-
-		if (status == SavedGameRequestStatus.Success) {
-			// handle processing the byte array data
-		} else {
-			// handle error
-		}
-	}
-
+    public void OnSavedGameDataRead (SavedGameRequestStatus status, byte[] data) {
+        if (status == SavedGameRequestStatus.Success) {
+            // handle processing the byte array data
+        } else {
+            // handle error
+        }
+    }
 ```
 
 
@@ -547,17 +542,16 @@ Once the saved game file is opened, it can be read to load the game state.  This
 __NOTICE: Cloud Save service has been deprecated and existing games should migrate saved data to
 Saved Games as soon as possible.__
 
-To enable support for the legacy Cloud saved service, the plugin must be initialized with saved games enabled by calling 
+To enable support for the legacy Cloud saved service, the plugin must be initialized with saved games enabled by calling
 **PlayGamesPlatform.InitializeInstance**:
 
 ```csharp
-
-	PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder()
-		// enables legacy cloud save	
-		.EnableDeprecatedCloudSave()
-		.EnableSavedGames()
-		.Build();
-	PlayGamesPlatform.InitializeInstance(config);
+    PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder()
+        // enables legacy cloud save
+        .EnableDeprecatedCloudSave()
+        .EnableSavedGames()
+        .Build();
+    PlayGamesPlatform.InitializeInstance(config);
 ```
 
 To load game state from the cloud, use the **PlayGamesPlatform.LoadState**
@@ -571,7 +565,7 @@ method.  Once the data is loaded, you should consider migrating it to Saved Game
     public class MyClass : OnStateLoadedListener {
         void LoadState() {
             int slot = 0; // slot number to use
-            ((PlayGamesPlatform) Social.Active).LoadState(slot, this);
+            PlayGamesPlatform.Instance.LoadState(slot, this);
         }
         public void OnStateLoaded(bool success, int slot, byte[] data) {
             if (success) {
@@ -632,7 +626,7 @@ To sign the user out, use the **PlayGamesPlatform.SignOut** method.
     using UnityEngine.SocialPlatforms;
 
     // sign out
-    ((PlayGamesPlatform) Social.Active).SignOut();
+    PlayGamesPlatform.Instance.SignOut();
 ```
 
 After signing out, no further API calls can be made until the user authenticates again.
@@ -681,11 +675,11 @@ frameworks to that list:
    Games C++ SDK that you have previously downloaded. If you have not downloaded
    these files yet, they can be found [in the downloads section](https://developers.google.com/games/services/downloads) of the Google Play Games developer site. To add these frameworks you can simply drag
 and drop those 5 files on the top-level project item (labeled **Unity-iPhone**).<br/><br/>
-   	**GoogleOpenSource.framework**<br/>
-   	**GooglePlus.bundle**<br/>
-   	**GooglePlus.framework**<br/>
-   	**GooglePlayGames.bundle**<br/>
-   	**gpg.framework**<br/><br/>
+     **GoogleOpenSource.framework**<br/>
+     **GooglePlus.bundle**<br/>
+     **GooglePlus.framework**<br/>
+     **GooglePlayGames.bundle**<br/>
+     **gpg.framework**<br/><br/>
 3. Add the **"-ObjC"** linker flag. To do this, select the top-level project
    object, then go to the **Build Settings**
    tab. Search for **"Other Linker Flags"** using the search tool, double click
@@ -816,4 +810,3 @@ This section lists people who have contributed to this project by writing code, 
 * [antonlicht](https://github.com/antonlicht) for fixing a bug with the parameter type of showErrorDialog on the support library.
 * [pR0Ps](https://github.com/pR0Ps) for fixing an issue where OnAchievementsLoaded was not accepting an OPERATION_DEFERRED result code as a success.
 * [friikyeu](https://github.com/friikyeu) for helping debug [an issue](https://github.com/playgameservices/play-games-plugin-for-unity/issues/25) that caused API calls to be queued up rather than executed even when connected.
-
