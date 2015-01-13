@@ -18,8 +18,8 @@ using System;
 
 namespace GooglePlayGames {
 public class PluginVersion {
-    public const int VersionInt = 0x0910;
-    public const string VersionString = "0.9.10";
+    public const int VersionInt = 0x0911;
+    public const string VersionString = "0.9.11";
 
     // minimum version of the Google Play Services library project
     public const long MinGmsCoreVersionCode = 6111000;

@@ -22,7 +22,7 @@ using System.Text;
 namespace GooglePlayGames.Native.Cwrapper {
 internal static class GameServices {
     internal delegate void FlushCallback(
-         /* from(FlushStatus_t) */ Status.FlushStatus arg0,
+         /* from(FlushStatus_t) */ CommonErrorStatus.FlushStatus arg0,
          /* from(void *) */ IntPtr arg1);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]

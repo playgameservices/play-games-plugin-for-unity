@@ -22,7 +22,24 @@ using System.Text;
 namespace GooglePlayGames.Native.Cwrapper {
 internal static class ParticipantResults {
     [DllImport(SymbolLocation.NativeSymbolLocation)]
+    internal static extern /* from(ParticipantResults_t) */ IntPtr ParticipantResults_WithResult(
+        HandleRef self,
+         /* from(char const *) */ string participant_id,
+         /* from(uint32_t) */ uint placing,
+         /* from(MatchResult_t) */ Types.MatchResult result);
+
+    [DllImport(SymbolLocation.NativeSymbolLocation)]
+    [return: MarshalAs(UnmanagedType.I1)]
+    internal static extern /* from(bool) */ bool ParticipantResults_Valid(
+        HandleRef self);
+
+    [DllImport(SymbolLocation.NativeSymbolLocation)]
     internal static extern /* from(MatchResult_t) */ Types.MatchResult ParticipantResults_MatchResultForParticipant(
+        HandleRef self,
+         /* from(char const *) */ string participant_id);
+
+    [DllImport(SymbolLocation.NativeSymbolLocation)]
+    internal static extern /* from(uint32_t) */ uint ParticipantResults_PlaceForParticipant(
         HandleRef self,
          /* from(char const *) */ string participant_id);
 
@@ -31,23 +48,6 @@ internal static class ParticipantResults {
     internal static extern /* from(bool) */ bool ParticipantResults_HasResultsForParticipant(
         HandleRef self,
          /* from(char const *) */ string participant_id);
-
-    [DllImport(SymbolLocation.NativeSymbolLocation)]
-    [return: MarshalAs(UnmanagedType.I1)]
-    internal static extern /* from(bool) */ bool ParticipantResults_Valid(
-        HandleRef self);
-
-    [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(uint32_t) */ uint ParticipantResults_PlaceForParticipant(
-        HandleRef self,
-         /* from(char const *) */ string participant_id);
-
-    [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(ParticipantResults_t) */ IntPtr ParticipantResults_WithResult(
-        HandleRef self,
-         /* from(char const *) */ string participant_id,
-         /* from(uint32_t) */ uint placing,
-         /* from(MatchResult_t) */ Types.MatchResult result);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
     internal static extern void ParticipantResults_Dispose(

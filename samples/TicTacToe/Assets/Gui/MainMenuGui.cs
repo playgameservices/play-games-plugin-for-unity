@@ -27,14 +27,14 @@ public class MainMenuGui : BaseGui {
     WidgetConfig SignOutCfg = new WidgetConfig(WidgetConfig.WidgetAnchor.Bottom, 0.2f, -0.15f, 0.4f, 0.15f,
             TextAnchor.MiddleCenter, 45, "Sign Out");
     WidgetConfig OkButtonCfg = new WidgetConfig(0.0f, 0.4f, 0.4f, 0.2f, 60, "OK");
-	WidgetConfig AcceptButtonCfg = new WidgetConfig(WidgetConfig.WidgetAnchor.Bottom, 0.25f, -0.3f, 0.4f, 0.2f,
-	                                                TextAnchor.MiddleCenter, 60, "Accept");
-	WidgetConfig DeclineButtonCfg = new WidgetConfig(WidgetConfig.WidgetAnchor.Bottom, -0.25f, -0.3f, 0.4f, 0.2f,
-	                                                TextAnchor.MiddleCenter, 60, "Decline");
-	WidgetConfig PlayButtonCfg = new WidgetConfig(WidgetConfig.WidgetAnchor.Bottom, 0.25f, -0.3f, 0.4f, 0.2f,
-	                                                TextAnchor.MiddleCenter, 60, "Play!");
-	WidgetConfig NotNowButtonCfg = new WidgetConfig(WidgetConfig.WidgetAnchor.Bottom, -0.25f, -0.3f, 0.4f, 0.2f,
-	                                                TextAnchor.MiddleCenter, 60, "Not Now");
+    WidgetConfig AcceptButtonCfg = new WidgetConfig(WidgetConfig.WidgetAnchor.Bottom, 0.25f, -0.3f, 0.4f, 0.2f,
+                                                    TextAnchor.MiddleCenter, 60, "Accept");
+    WidgetConfig DeclineButtonCfg = new WidgetConfig(WidgetConfig.WidgetAnchor.Bottom, -0.25f, -0.3f, 0.4f, 0.2f,
+                                                    TextAnchor.MiddleCenter, 60, "Decline");
+    WidgetConfig PlayButtonCfg = new WidgetConfig(WidgetConfig.WidgetAnchor.Bottom, 0.25f, -0.3f, 0.4f, 0.2f,
+                                                    TextAnchor.MiddleCenter, 60, "Play!");
+    WidgetConfig NotNowButtonCfg = new WidgetConfig(WidgetConfig.WidgetAnchor.Bottom, -0.25f, -0.3f, 0.4f, 0.2f,
+                                                    TextAnchor.MiddleCenter, 60, "Not Now");
 
     private string mErrorMessage = null;
 
@@ -64,6 +64,12 @@ public class MainMenuGui : BaseGui {
         gameObject.GetComponent<PlayGui>().LaunchMatch(match);
     }
 
+
+    public void HandleMatchTurn(TurnBasedMatch match, bool shouldAutoLaunch) {
+        MakeActive();
+        OnGotMatch(match, shouldAutoLaunch);
+    }
+
     protected void OnGotMatch(TurnBasedMatch match, bool shouldAutoLaunch) {
         if (shouldAutoLaunch) {
           // if shouldAutoLaunch is true, we know the user has indicated (via an external UI)
@@ -79,6 +85,11 @@ public class MainMenuGui : BaseGui {
         }
     }
 
+    public void HandleInvitation(Invitation invitation, bool shouldAutoAccept) {
+        MakeActive();
+        OnGotInvitation(invitation, shouldAutoAccept);
+    }
+
     protected void OnGotInvitation(Invitation invitation, bool shouldAutoAccept) {
       if (invitation.InvitationType != Invitation.InvType.TurnBased) {
         // wrong type of invitation!
@@ -91,6 +102,7 @@ public class MainMenuGui : BaseGui {
         // game screen without further delay:
         SetStandBy("Accepting invitation...");
         PlayGamesPlatform.Instance.TurnBased.AcceptInvitation(invitation.InvitationId, OnMatchStarted);
+
       } else {
         // if shouldAutoAccept is false, we got this invitation in the background, so
         // we should not jump directly into the game
@@ -154,8 +166,7 @@ public class MainMenuGui : BaseGui {
         default:
           switch (mIncomingMatch.TurnStatus) {
           case TurnBasedMatch.MatchTurnStatus.MyTurn:
-            GuiLabel (CenterLabelCfg, "It's your turn against " + Util.GetOpponentName (mIncomingMatch)
-                  + " " + mIncomingMatch.Status + " turn = " + mIncomingMatch.TurnStatus);
+            GuiLabel (CenterLabelCfg, "It's your turn against " + Util.GetOpponentName (mIncomingMatch));
             if (GuiButton (PlayButtonCfg)) {
               TurnBasedMatch match = mIncomingMatch;
               mIncomingMatch = null;
@@ -173,7 +184,7 @@ public class MainMenuGui : BaseGui {
           }
         break;
 
-	} // end match status
+    } // end match status
   }
 
   void ShowIncomingInviteUi() {

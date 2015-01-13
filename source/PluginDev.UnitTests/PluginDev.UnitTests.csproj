@@ -42,12 +42,15 @@
     <Compile Include="GooglePlayGames\OutUtils\MiscTests.cs" />
     <Compile Include="GooglePlayGames\ISocialPlatform\PlayGamesPlatformTest.cs" />
     <Compile Include="GooglePlayGames\ISocialPlatform\BaseMockPlayGamesClient.cs" />
+    <Compile Include="GooglePlayGames\Platforms\Native\NativeSavedGameClientTest.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="GooglePlayGames\" />
     <Folder Include="GooglePlayGames\ISocialPlatform\" />
     <Folder Include="GooglePlayGames\OutUtils\" />
+    <Folder Include="GooglePlayGames\Platforms\" />
+    <Folder Include="GooglePlayGames\Platforms\Native\" />
   </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>

@@ -68,7 +68,7 @@ public class MainMenuGUI : MonoBehaviour {
                 this.enabled = false;
             }
         }
-
+  
         if (authenticated && DrawAchButton()) {
             Beep();
             GameManager.Instance.ShowAchievementsUI();
@@ -77,6 +77,11 @@ public class MainMenuGUI : MonoBehaviour {
         if (authenticated && DrawLbButton()) {
             Beep();
             GameManager.Instance.ShowLeaderboardUI();
+        }
+
+        if (authenticated && DrawLoadButton()) {
+             Beep ();
+             GameManager.Instance.LoadFromCloud();
         }
 
         if (!authenticated && DrawSignInButton()) {
@@ -126,7 +131,7 @@ public class MainMenuGUI : MonoBehaviour {
         Gu.SetColor(Color.white);
         return Gu.Button(
             Gu.Center(-w/2),
-            (int)Util.Interpolate(0.0f, Screen.height, 1.0f, Gu.Middle(-h/2),
+            (int)Util.Interpolate(0.0f, Screen.height, 1.0f, Gu.Middle(-h/2) + 50f,
                 mTransition.NormalizedElapsed),
             Gu.Dim(w), Gu.Dim(h),
             Gu.Dim(GameConsts.Menu.PlayButtonFontSize),
@@ -144,6 +149,19 @@ public class MainMenuGUI : MonoBehaviour {
             Gu.Dim(w), Gu.Dim(h),
             Gu.Dim(GameConsts.Menu.AchFontSize),
             Strings.Achievements);
+    }
+
+    bool DrawLoadButton() {
+                float w = GameConsts.Menu.LoadButtonWidth;
+                float h = GameConsts.Menu.LoadButtonHeight;
+                float x = GameConsts.Menu.LoadButtonX;
+                float y = GameConsts.Menu.LoadButtonY;
+                return Gu.Button(Gu.Center(x),
+                                 (int)Util.Interpolate(0.0f, Screen.height, 1.0f, Gu.Middle(y),
+                                      mTransition.NormalizedElapsed),
+                                 Gu.Dim(w), Gu.Dim(h),
+                                 Gu.Dim(GameConsts.Menu.AchFontSize),
+                                 Strings.LoadGame);
     }
 
     bool DrawLbButton() {

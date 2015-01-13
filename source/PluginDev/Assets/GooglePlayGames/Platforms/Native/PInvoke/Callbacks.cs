@@ -23,11 +23,11 @@ using GooglePlayGames.Native.Cwrapper;
 namespace GooglePlayGames.Native.PInvoke {
 static class Callbacks {
 
-    internal static readonly Action<Status.UIStatus> NoopUICallback = status => {
+    internal static readonly Action<CommonErrorStatus.UIStatus> NoopUICallback = status => {
         Logger.d("Received UI callback: " + status);
     };
 
-    internal delegate void ShowUICallbackInternal(Status.UIStatus status, IntPtr data);
+    internal delegate void ShowUICallbackInternal(CommonErrorStatus.UIStatus status, IntPtr data);
 
     internal static IntPtr ToIntPtr<T>(Action<T> callback, Func<IntPtr, T> conversionFunction)
         where T : BaseReferenceHolder {
@@ -90,9 +90,9 @@ static class Callbacks {
     }
 
     [AOT.MonoPInvokeCallback(typeof(ShowUICallbackInternal))]
-    internal static void InternalShowUICallback(Status.UIStatus status, IntPtr data) {
+    internal static void InternalShowUICallback(CommonErrorStatus.UIStatus status, IntPtr data) {
         Logger.d("Showing UI Internal callback: " + status);
-        var callback = IntPtrToTempCallback<Action<Status.UIStatus>>(data);
+        var callback = IntPtrToTempCallback<Action<CommonErrorStatus.UIStatus>>(data);
 
         try {
             callback(status);

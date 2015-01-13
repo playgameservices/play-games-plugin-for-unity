@@ -18,8 +18,12 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using GooglePlayGames;
+using GooglePlayGames.BasicApi.SavedGame;
+using System;
 
-public class GameManager : GooglePlayGames.BasicApi.OnStateLoadedListener {
+using GooglePlayGames.BasicApi;
+
+public class GameManager {
     private static GameManager sInstance = new GameManager();
     private int mLevel = 0;
 
@@ -39,6 +43,9 @@ public class GameManager : GooglePlayGames.BasicApi.OnStateLoadedListener {
 
     // cloud save callbacks
     private GooglePlayGames.BasicApi.OnStateLoadedListener mAppStateListener;
+
+        private bool mSaving;
+        private Texture2D mScreenImage;
 
     public static GameManager Instance {
         get {
@@ -60,13 +67,18 @@ public class GameManager : GooglePlayGames.BasicApi.OnStateLoadedListener {
         FlushAchievements();
         UnlockProgressBasedAchievements();
         PostToLeaderboard();
-        SaveToCloud();
     }
 
     public void RestartLevel() {
-        SaveProgress();
         ReportAllProgress();
         Application.LoadLevel("GameplayScene");
+    }
+
+    public void CaptureScreenshot() {
+                mScreenImage = new Texture2D(Screen.width, Screen.height);
+                mScreenImage.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
+                mScreenImage.Apply();
+                Debug.Log ("Captured screen: " + mScreenImage);
     }
 
     public void FinishLevelAndGoToNext(int score, int stars) {
@@ -88,7 +100,6 @@ public class GameManager : GooglePlayGames.BasicApi.OnStateLoadedListener {
     }
 
     public void GoToLevel(int level) {
-        ReportAllProgress();
         mLevel = level;
         Application.LoadLevel("GameplayScene");
     }
@@ -153,15 +164,20 @@ public class GameManager : GooglePlayGames.BasicApi.OnStateLoadedListener {
         }
     }
 
-    #if UNITY_ANDROID || UNITY_IOS
     public void Authenticate() {
         if (Authenticated || mAuthenticating) {
             Debug.LogWarning("Ignoring repeated call to Authenticate().");
             return;
         }
 
+
         // Enable/disable logs on the PlayGamesPlatform
         PlayGamesPlatform.DebugLogEnabled = GameConsts.PlayGamesDebugLogsEnabled;
+
+        PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder()
+                        .EnableSavedGames()
+                        .Build();
+        PlayGamesPlatform.InitializeInstance(config);
 
         // Activate the Play Games platform. This will make it the default
         // implementation of Social.Active
@@ -175,8 +191,7 @@ public class GameManager : GooglePlayGames.BasicApi.OnStateLoadedListener {
         Social.localUser.Authenticate((bool success) => {
             mAuthenticating = false;
             if (success) {
-                // if we signed in successfully, load data from cloud
-                LoadFromCloud();
+               Debug.Log("Login successful!");
             } else {
                 // no need to show error message (error messages are shown automatically
                 // by plugin)
@@ -184,11 +199,7 @@ public class GameManager : GooglePlayGames.BasicApi.OnStateLoadedListener {
             }
         });
     }
-    #else
-    public void Authenticate() {
-        mAuthenticating = false;
-    }
-    #endif
+
 
     void ProcessCloudData(byte[] cloudData) {
         if (cloudData == null) {
@@ -201,11 +212,14 @@ public class GameManager : GooglePlayGames.BasicApi.OnStateLoadedListener {
         mProgress.MergeWith(progress);
     }
 
-    void LoadFromCloud() {
+    public void LoadFromCloud() {
         // Cloud save is not in ISocialPlatform, it's a Play Games extension,
         // so we have to break the abstraction and use PlayGamesPlatform:
         Debug.Log("Loading game progress from the cloud.");
-        ((PlayGamesPlatform) Social.Active).LoadState(0, this);
+        mSaving = false;
+        ((PlayGamesPlatform)Social.Active).SavedGame.ShowSelectSavedGameUI(
+                "Select saved game to load",
+                4, false, false, SavedGameSelected);
     }
 
     void SaveToCloud() {
@@ -213,47 +227,86 @@ public class GameManager : GooglePlayGames.BasicApi.OnStateLoadedListener {
             // Cloud save is not in ISocialPlatform, it's a Play Games extension,
             // so we have to break the abstraction and use PlayGamesPlatform:
             Debug.Log("Saving progress to the cloud...");
-            ((PlayGamesPlatform) Social.Active).UpdateState(0, mProgress.ToBytes(), this);
+            mSaving = true;
+            ((PlayGamesPlatform)Social.Active).SavedGame.ShowSelectSavedGameUI(
+                "Save game progress",
+                4, true, true, SavedGameSelected);
         }
     }
 
-    // Data was successfully loaded from the cloud
-    public void OnStateLoaded(bool success, int slot, byte[] data) {
-        Debug.Log("Cloud load callback, success=" + success);
-        if (success) {
+    public void SavedGameSelected(SelectUIStatus status, ISavedGameMetadata game) {
+
+        Debug.Log("opening saved game:  " + game);
+        if (status == SelectUIStatus.SavedGameSelected) {
+            string filename = game.Filename;
+            if(mSaving && (filename == null || filename.Length == 0)) {
+                filename = "save" + DateTime.Now.ToBinary();
+            }
+            //open the data.
+            ((PlayGamesPlatform)Social.Active).SavedGame.OpenWithAutomaticConflictResolution(
+                     filename,
+                     DataSource.ReadCacheOrNetwork,
+                     ConflictResolutionStrategy.UseLongestPlaytime,
+                     SavedGameOpened);
+        } else {
+            Debug.LogWarning("Error selecting save game: " + status);
+        }
+    }
+
+    public void SavedGameOpened(SavedGameRequestStatus status, ISavedGameMetadata game) {
+        if(status == SavedGameRequestStatus.Success) {
+            if(mSaving) {
+                if(mScreenImage == null) {
+                    CaptureScreenshot();
+                }
+
+                byte[] pngData = null;
+                if (mScreenImage != null) {
+                    pngData = mScreenImage.EncodeToPNG();
+                }
+
+                Debug.Log("Saving to " + game);
+                byte[] data = mProgress.ToBytes();
+                TimeSpan playedTime = mProgress.TotalPlayingTime;
+                SavedGameMetadataUpdate.Builder builder =
+                        new SavedGameMetadataUpdate.Builder()
+                                .WithUpdatedPlayedTime(playedTime)
+                                .WithUpdatedDescription(
+                                    "Saved Game at " + DateTime.Now);
+
+                if (pngData != null) {
+                    Debug.Log("Save image of len " + pngData.Length);
+                    builder = builder.WithUpdatedPngCoverImage(pngData);
+                } else {
+                    Debug.Log ("No image avail");
+                }
+                SavedGameMetadataUpdate updatedMetadata  = builder.Build();
+                ((PlayGamesPlatform)Social.Active).SavedGame.CommitUpdate(
+                        game, updatedMetadata, data, SavedGameWritten);
+            } else {
+                ((PlayGamesPlatform)Social.Active).SavedGame.ReadBinaryData(
+                        game, SavedGameLoaded);
+            }
+        } else {
+            Debug.LogWarning("Error opening game: " + status);
+        }
+    }
+
+
+    public void SavedGameLoaded(SavedGameRequestStatus status, byte[] data) {
+        if (status == SavedGameRequestStatus.Success) {
+            Debug.Log("SaveGameLoaded, success=" + status);
             ProcessCloudData(data);
         } else {
-            Debug.LogWarning("Failed to load from cloud. Network problems?");
+            Debug.LogWarning("Error reading game: " + status);
         }
-
-        // regardless of success, this is the end of the auth process
-        mAuthenticating = false;
-
-        // report any progress we have to report
-        ReportAllProgress();
     }
 
-    // Conflict in cloud data occurred
-    public byte[] OnStateConflict(int slot, byte[] local, byte[] server) {
-        Debug.Log("Conflict callback called. Resolving conflict.");
-
-        // decode byte arrays into game progress and merge them
-        GameProgress localProgress = local == null ?
-            new GameProgress() : GameProgress.FromBytes(local);
-        GameProgress serverProgress = server == null ?
-            new GameProgress() : GameProgress.FromBytes(server);
-        localProgress.MergeWith(serverProgress);
-
-        // resolve conflict
-        return localProgress.ToBytes();
-    }
-
-    public void OnStateSaved(bool success, int slot) {
-        if (!success) {
-            Debug.LogWarning("Failed to save state to the cloud.");
-
-            // try to save later:
-            mProgress.Dirty = true;
+    public void SavedGameWritten(SavedGameRequestStatus status, ISavedGameMetadata game) {
+        if(status == SavedGameRequestStatus.Success) {
+            Debug.Log ("Game " + game.Description + " written");
+        } else {
+            Debug.LogWarning("Error saving game: " + status);
         }
     }
 
@@ -300,3 +353,4 @@ public class GameManager : GooglePlayGames.BasicApi.OnStateLoadedListener {
         }
     }
 }
+

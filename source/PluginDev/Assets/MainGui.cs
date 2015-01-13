@@ -22,17 +22,36 @@ using System;
 using System.Linq;
 using GooglePlayGames;
 using GooglePlayGames.BasicApi.Multiplayer;
+using GooglePlayGames.BasicApi.SavedGame;
 using GooglePlayGames.OurUtils;
+using GooglePlayGames.BasicApi;
 
 public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedListener,
         RealTimeMultiplayerListener {
     const int Margin = 20, Spacing = 10;
     const float FontSizeFactor = 35;
     const int GridCols = 2;
-    const int GridRows = 8;
+    const int GridRows = 9;
+
+    private static readonly PlayGamesClientConfiguration ClientConfiguration =
+        new PlayGamesClientConfiguration.Builder()
+            .EnableSavedGames()
+            .EnableDeprecatedCloudSave()
+            .Build();
 
     // which UI are we showing?
-    enum Ui { Main, Multiplayer, Rtmp, Tbmp, TbmpMatch };
+    enum Ui {
+        Main,
+        Multiplayer,
+        Rtmp,
+        SavedGame,
+        EditSavedGameName,
+        WriteSavedGame,
+        ResolveSaveConflict,
+        Tbmp,
+        TbmpMatch
+    };
+
     Ui mUi = Ui.Main;
 
     public GUISkin GuiSkin;
@@ -41,6 +60,15 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
     string mStandbyMessage = "";
     string mStatus = "Ready.";
     string mLastInvitationId = null;
+
+    string mSavedGameFilename = "default_name";
+    ISavedGameMetadata mCurrentSavedGame = null;
+    string mSavedGameFileContent = "";
+    IConflictResolver mConflictResolver = null;
+    ISavedGameMetadata mConflictOriginal = null;
+    string mConflictOriginalData = null;
+    ISavedGameMetadata mConflictUnmerged = null;
+    string mConflictUnmergedData = null;
 
     string mLastLocalSave = null;
 
@@ -73,7 +101,7 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
     }
 
     void DrawStatus() {
-        GUI.Label(CalcGrid(0, 6, 2, 2), mStatus);
+        GUI.Label(CalcGrid(0, 7, 2, 2), mStatus);
     }
 
     void ShowNotAuthUi() {
@@ -112,6 +140,10 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
             mUi = Ui.Multiplayer;
         }
 
+        if (GUI.Button(CalcGrid(0, 6), "Saved Game")) {
+            mUi = Ui.SavedGame;
+        }
+
         if (GUI.Button(CalcGrid(1,5), "Sign Out")) {
             DoSignOut();
         }
@@ -126,6 +158,213 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
         } else if (GUI.Button(CalcGrid(1,1), "TBMP")) {
             mUi = Ui.Tbmp;
         } else if (GUI.Button(CalcGrid(1,5), "Back")) {
+            mUi = Ui.Main;
+        }
+    }
+
+    void ShowEditSavedGameName() {
+        DrawTitle("EDIT SAVED GAME FILENAME");
+        DrawStatus();
+
+        mSavedGameFilename = GUI.TextArea(CalcGrid(0, 1), mSavedGameFilename);
+
+        if (GUI.Button(CalcGrid(1, 7), "Back")) {
+            mUi = Ui.SavedGame;
+        }
+    }
+
+    void ShowResolveConflict() {
+        DrawTitle("RESOLVE SAVE GAME CONFLICT");
+        DrawStatus();
+
+        if (mConflictResolver == null) {
+            mStatus = "No pending conflict";
+            mUi = Ui.SavedGame;
+            return;
+        }
+
+        GUI.Label(CalcGrid(0, 1, 2, 2),
+            "Original: " + mConflictOriginal.Filename + ":" + mConflictOriginal.Description + "\n" +
+            "Data: " + mConflictOriginalData);
+
+        GUI.Label(CalcGrid(0, 2, 2, 2),
+            "Unmerged: " + mConflictUnmerged.Filename + ":" + mConflictUnmerged.Description + "\n" +
+            "Data: " + mConflictUnmergedData);
+
+        if (GUI.Button(CalcGrid(0, 3), "Use Original")) {
+            mConflictResolver.ChooseMetadata(mConflictOriginal);
+            SetStandBy("Choosing original, retrying open");
+            mUi = Ui.SavedGame;
+        } else if (GUI.Button(CalcGrid(1, 3), "Use Unmerged")) {
+            mConflictResolver.ChooseMetadata(mConflictUnmerged);
+            SetStandBy("Choosing unmerged, retrying open");
+            mUi = Ui.SavedGame;
+        }
+
+        if (GUI.Button(CalcGrid(1, 7), "Back")) {
+            mUi = Ui.SavedGame;
+        }
+    }
+
+    void ShowWriteSavedGame() {
+        DrawTitle("WRITE SAVED GAME");
+        DrawStatus();
+
+        mSavedGameFileContent = GUI.TextArea(CalcGrid(0, 1), mSavedGameFileContent);
+
+        if (mCurrentSavedGame == null || !mCurrentSavedGame.IsOpen) {
+            mStatus = "No opened saved game selected.";
+            mUi = Ui.SavedGame;
+            return;
+        }
+
+        var update = new SavedGameMetadataUpdate.Builder()
+            .WithUpdatedDescription("Saved at " + DateTime.Now.ToString())
+            .WithUpdatedPlayedTime(mCurrentSavedGame.TotalTimePlayed.Add(TimeSpan.FromHours(1)))
+            .Build();
+
+        if (GUI.Button(CalcGrid(0, 7), "Write")) {
+            SetStandBy("Writing update");
+            PlayGamesPlatform.Instance.SavedGame.CommitUpdate(
+                mCurrentSavedGame,
+                update,
+                System.Text.ASCIIEncoding.Default.GetBytes(mSavedGameFileContent),
+                (status, updated) => {
+                    mStatus = "Write status was: " + status;
+                    mUi = Ui.SavedGame;
+                    EndStandBy();
+                });
+            mCurrentSavedGame = null;
+        } else if (GUI.Button(CalcGrid(1, 7), "Cancel")) {
+            mUi = Ui.SavedGame;
+        }
+    }
+
+    void OpenSavedGame(ConflictResolutionStrategy strategy) {
+        SetStandBy("Opening using strategy: " + strategy);
+        PlayGamesPlatform.Instance.SavedGame.OpenWithAutomaticConflictResolution(
+            mSavedGameFilename,
+            DataSource.ReadNetworkOnly,
+            strategy,
+            (status, openedFile) => {
+                mStatus = "Open status for file " + mSavedGameFilename + ": " + status + "\n";
+                if (openedFile != null) {
+                    mStatus += "Successfully opened file: " + openedFile.ToString();
+                    Logger.d("Opened file: " + openedFile.ToString());
+                    mCurrentSavedGame = openedFile;
+                }
+                EndStandBy();
+            });
+    }
+
+    void DoReadSavedGame() {
+        if (mCurrentSavedGame == null) {
+            ShowEffect(false);
+            mStatus = "No save game selected";
+            return;
+        }
+
+        if (!mCurrentSavedGame.IsOpen) {
+            ShowEffect(false);
+            mStatus = "Current saved game is not open. Open it first.";
+            return;
+        }
+
+        SetStandBy("Reading file: " + mSavedGameFilename);
+        var openedFile = mSavedGameFilename;
+        PlayGamesPlatform.Instance.SavedGame.ReadBinaryData(mCurrentSavedGame,
+            (status, binaryData) => {
+                mStatus = "Reading file " + openedFile + ", status: " + status + "\n";
+
+                if (binaryData != null) {
+                    var stringContent = System.Text.ASCIIEncoding.Default.GetString(binaryData);
+                    mStatus += "File content: " + stringContent;
+                    mSavedGameFileContent = stringContent;
+                } else {
+                    mSavedGameFileContent = "";
+                }
+                EndStandBy();
+            });
+    }
+
+    void DoShowSavedGameUI() {
+        SetStandBy("Showing saved game UI");
+        PlayGamesPlatform.Instance.SavedGame.ShowSelectSavedGameUI(
+            "Saved Game UI", 10, false, false,
+            (status, savedGame) => {
+                mStatus = "UI Status: " + status;
+                if (savedGame != null) {
+                    mStatus +=
+                        "Retrieved saved game with description: " + savedGame.Description;
+                    mCurrentSavedGame = savedGame;
+                }
+                EndStandBy();
+            });
+    }
+
+    void DoOpenManual() {
+        SetStandBy("Manual opening file: " + mSavedGameFilename);
+        PlayGamesPlatform.Instance.SavedGame.OpenWithManualConflictResolution(
+            mSavedGameFilename,
+            DataSource.ReadNetworkOnly,
+            true,
+            (resolver, original, originalData, unmerged, unmergedData) => {
+                Logger.d("Entering conflict callback");
+                mConflictResolver = resolver;
+                mConflictOriginal = original;
+                mConflictOriginalData = System.Text.ASCIIEncoding.Default.GetString(originalData);
+                mConflictUnmerged = unmerged;
+                mConflictUnmergedData = System.Text.ASCIIEncoding.Default.GetString(unmergedData);
+                mUi = Ui.ResolveSaveConflict;
+                EndStandBy();
+                Logger.d("Encountered manual open conflict.");
+            },
+            (status, openedFile) => {
+                mStatus = "Open status for file " + mSavedGameFilename + ": " + status + "\n";
+                if (openedFile != null) {
+                    mStatus += "Successfully opened file: " + openedFile.ToString();
+                    Logger.d("Opened file: " + openedFile.ToString());
+                    mCurrentSavedGame = openedFile;
+                }
+                EndStandBy();
+            }
+        );
+    }
+
+    void DoFetchAll() {
+        SetStandBy("Fetching All Saved Games");
+        PlayGamesPlatform.Instance.SavedGame.FetchAllSavedGames(
+            DataSource.ReadNetworkOnly,
+            (status, savedGames) => {
+                mStatus = "Fetch All Status: " + status + "\n";
+                mStatus += "Saved Games: [" +
+                    string.Join(",", savedGames.Select(g => g.Filename).ToArray()) + "]";
+                savedGames.ForEach(g => Logger.d("Retrieved save game: " + g.ToString()));
+                EndStandBy();
+            });
+    }
+
+    void ShowSavedGameUi() {
+        DrawTitle("SAVED GAME - Using file: " + mSavedGameFilename);
+        DrawStatus();
+
+        if (GUI.Button(CalcGrid(0, 1), "Show UI")) {
+            DoShowSavedGameUI();
+        } else if (GUI.Button(CalcGrid(1, 1), "Open Manual")) {
+            DoOpenManual();
+        } else if (GUI.Button(CalcGrid(0, 2), "Open Keep Original")) {
+            OpenSavedGame(ConflictResolutionStrategy.UseOriginal);
+        } else if (GUI.Button(CalcGrid(1, 2), "Open Keep Unmerged")) {
+            OpenSavedGame(ConflictResolutionStrategy.UseUnmerged);
+        } else if (GUI.Button(CalcGrid(0, 3), "Read")) {
+            DoReadSavedGame();
+        } else if (GUI.Button(CalcGrid(1, 3), "Write")) {
+            mUi = Ui.WriteSavedGame;
+        } else if (GUI.Button(CalcGrid(0, 4), "Fetch All")) {
+            DoFetchAll();
+        } else if (GUI.Button(CalcGrid(1, 4), "Edit Filename")) {
+            mUi = Ui.EditSavedGameName;
+        } else if (GUI.Button(CalcGrid(1, 6), "Back")) {
             mUi = Ui.Main;
         }
     }
@@ -215,7 +454,6 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
             new Color(0.8f, 0.0f, 0.0f, 1.0f);
     }
 
-
     int CalcFontSize() {
         return (int)(Screen.width * FontSizeFactor / 1000.0f);
     }
@@ -226,6 +464,7 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
         GUI.skin = GuiSkin;
         GUI.skin.label.fontSize = CalcFontSize();
         GUI.skin.button.fontSize = CalcFontSize();
+        GUI.skin.textArea.fontSize = CalcFontSize();
 
         if (mStandby) {
             ShowStandbyUi();
@@ -236,6 +475,18 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
                     break;
                 case Ui.Multiplayer:
                     ShowMultiplayerUi();
+                    break;
+                case Ui.EditSavedGameName:
+                    ShowEditSavedGameName();
+                    break;
+                case Ui.WriteSavedGame:
+                    ShowWriteSavedGame();
+                    break;
+                case Ui.SavedGame:
+                    ShowSavedGameUi();
+                    break;
+                case Ui.ResolveSaveConflict:
+                    ShowResolveConflict();
                     break;
                 case Ui.Tbmp:
                     ShowTbmpUi();
@@ -265,6 +516,7 @@ public class MainGui : MonoBehaviour, GooglePlayGames.BasicApi.OnStateLoadedList
         SetStandBy("Authenticating...");
 
         PlayGamesPlatform.DebugLogEnabled = true;
+        PlayGamesPlatform.InitializeInstance(ClientConfiguration);
         PlayGamesPlatform.Activate();
         Social.localUser.Authenticate((bool success) => {
             EndStandBy();

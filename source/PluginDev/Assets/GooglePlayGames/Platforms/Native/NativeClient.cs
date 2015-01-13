@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 #if (UNITY_ANDROID || UNITY_IPHONE)
-using System;
-using System.Linq;
 using GooglePlayGames.BasicApi;
-using GooglePlayGames.Native.PInvoke;
-using UnityEngine;
-using GooglePlayGames.OurUtils;
-using System.Collections.Generic;
 using GooglePlayGames.BasicApi.Multiplayer;
+using GooglePlayGames.BasicApi.SavedGame;
+using GooglePlayGames.Native.PInvoke;
+using GooglePlayGames.OurUtils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 using Types = GooglePlayGames.Native.Cwrapper.Types;
-using Status = GooglePlayGames.Native.Cwrapper.Status;
+using Status = GooglePlayGames.Native.Cwrapper.CommonErrorStatus;
 
 namespace GooglePlayGames.Native {
 public class NativeClient : IPlayGamesClient {
@@ -43,9 +44,11 @@ public class NativeClient : IPlayGamesClient {
     private readonly object GameServicesLock = new object();
     private readonly object AuthStateLock = new object();
 
+    private readonly PlayGamesClientConfiguration mConfiguration;
     private GameServices mServices;
     private volatile NativeTurnBasedMultiplayerClient mTurnBasedClient;
     private volatile NativeRealtimeMultiplayerClient mRealTimeClient;
+    private volatile ISavedGameClient mSavedGameClient;
     private volatile AppStateClient mAppStateClient;
     private volatile Action<Invitation, bool> mInvitationDelegate;
     private volatile Dictionary<String, Achievement> mAchievements = null;
@@ -56,8 +59,9 @@ public class NativeClient : IPlayGamesClient {
     private volatile uint mAuthGeneration = 0;
     private volatile bool mSilentAuthFailed = false;
 
-    public NativeClient() {
+    public NativeClient(PlayGamesClientConfiguration configuration) {
         PlayGamesHelperObject.CreateObject();
+        this.mConfiguration = Misc.CheckNotNull(configuration);
     }
 
     private GameServices GameServices() {
@@ -127,15 +131,37 @@ public class NativeClient : IPlayGamesClient {
 
             using (var builder = GameServicesBuilder.Create()) {
                 using (var config = CreatePlatformConfiguration(builder)) {
+                    // We need to make sure that the invitation delegate is registered before the
+                    // services object is initialized - otherwise we might miss a callback if
+                    // the game was opened because of a user accepting an invitation through
+                    // a system notification.
+                    RegisterInvitationDelegate(mConfiguration.InvitationDelegate);
+
                     builder.SetOnAuthFinishedCallback(HandleAuthTransition);
                     builder.SetOnTurnBasedMatchEventCallback((eventType, matchId, match)
                         => mTurnBasedClient.HandleMatchEvent(eventType, matchId, match));
                     builder.SetOnMultiplayerInvitationEventCallback(HandleInvitation);
+                    if (mConfiguration.EnableSavedGames) {
+                        builder.EnableSnapshots();
+                    }
                     mServices = builder.Build(config);
                     mTurnBasedClient =
                         new NativeTurnBasedMultiplayerClient(this, new TurnBasedManager(mServices));
+
+                    mTurnBasedClient.RegisterMatchDelegate(mConfiguration.MatchDelegate);
+
                     mRealTimeClient =
                         new NativeRealtimeMultiplayerClient(this, new RealtimeManager(mServices));
+
+                    if (mConfiguration.EnableSavedGames) {
+                        mSavedGameClient =
+                            new NativeSavedGameClient(new SnapshotManager(mServices));
+                    } else {
+                        mSavedGameClient = new UnsupportedSavedGamesClient(
+                            "You must enable saved games before it can be used. " +
+                            "See PlayGamesClientConfiguration.Builder.EnableSavedGames.");
+                    }
+
                     mAppStateClient = CreateAppStateClient();
                     mAuthState = AuthState.SilentPending;
                 }
@@ -145,9 +171,15 @@ public class NativeClient : IPlayGamesClient {
 
     private AppStateClient CreateAppStateClient() {
         #if UNITY_ANDROID
-        return new AndroidAppStateClient(mServices);
+        if (mConfiguration.EnableDeprecatedCloudSave) {
+            return new AndroidAppStateClient(mServices);
+        } else {
+            return new UnsupportedAppStateClient(
+                "You must explicitly enable cloud save - see " +
+                "PlayGamesClientConfiguration.Builder.EnableDeprecatedCloudSave.");
+        }
         #else
-        return new UnsupportedAppStateClient();
+        return new UnsupportedAppStateClient("App State is not supported on this platform.");
         #endif
     }
 
@@ -426,6 +458,14 @@ public class NativeClient : IPlayGamesClient {
         return mUser.DisplayName;
     }
 
+    public string GetUserImageUrl() {
+        if (mUser == null) {
+          return null;
+        }
+
+        return mUser.AvatarURL;
+    }
+
     public Achievement GetAchievement(string achId) {
         if (mAchievements == null || !mAchievements.ContainsKey(achId)) {
             return null;
@@ -582,6 +622,12 @@ public class NativeClient : IPlayGamesClient {
     public GooglePlayGames.BasicApi.Multiplayer.ITurnBasedMultiplayerClient GetTbmpClient() {
         lock (GameServicesLock) {
             return mTurnBasedClient;
+        }
+    }
+
+    public GooglePlayGames.BasicApi.SavedGame.ISavedGameClient GetSavedGameClient() {
+        lock (GameServicesLock) {
+            return mSavedGameClient;
         }
     }
 

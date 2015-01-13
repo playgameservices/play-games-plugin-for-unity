@@ -21,8 +21,8 @@ using System.Collections.Generic;
 
 using C = GooglePlayGames.Native.Cwrapper.RealTimeMultiplayerManager;
 using Types = GooglePlayGames.Native.Cwrapper.Types;
-using Status = GooglePlayGames.Native.Cwrapper.Status;
-using MultiplayerStatus = GooglePlayGames.Native.Cwrapper.Status.MultiplayerStatus;
+using Status = GooglePlayGames.Native.Cwrapper.CommonErrorStatus;
+using MultiplayerStatus = GooglePlayGames.Native.Cwrapper.CommonErrorStatus.MultiplayerStatus;
 using System.Runtime.InteropServices;
 
 namespace GooglePlayGames.Native.PInvoke {

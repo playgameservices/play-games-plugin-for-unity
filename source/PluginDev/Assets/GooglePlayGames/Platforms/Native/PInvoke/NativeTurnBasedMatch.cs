@@ -23,7 +23,7 @@ using GooglePlayGames.Native.Cwrapper;
 
 using C = GooglePlayGames.Native.Cwrapper.TurnBasedMatch;
 using Types = GooglePlayGames.Native.Cwrapper.Types;
-using Status = GooglePlayGames.Native.Cwrapper.Status;
+using Status = GooglePlayGames.Native.Cwrapper.CommonErrorStatus;
 using TBM = GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch;
 using GooglePlayGames.BasicApi.Multiplayer;
 

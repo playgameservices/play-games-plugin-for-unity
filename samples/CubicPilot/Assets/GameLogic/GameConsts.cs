@@ -43,8 +43,8 @@ public class GameConsts {
     public const float EnemySpawnX = ArenaMaxX + 5.0f;
 
     // auto advance time (retry when game over, or advance to next level)
-    public const float AutoRetryTime = 3.0f;
-    public const float AutoAdvanceTime = 5.0f;
+    public const float AutoRetryTime = 5.0f;
+    public const float AutoAdvanceTime = 10.0f;
 
     // how long enemies stay in "I've been hit" color after being hit
     public const float EnemyHitColorDuration = 0.5f;
@@ -144,7 +144,7 @@ public class GameConsts {
     public class Menu {
         public const float TransitionDuration = 0.5f;
 
-        public const float TitleY = 200;
+        public const float TitleY = 100;
         public const float TitleFontSize = 100;
 
         // "Please wait" message settings:
@@ -158,7 +158,7 @@ public class GameConsts {
         // Achievements and leaderboards buttons
         public const float AchButtonWidth = PlayButtonWidth;
         public const float AchButtonHeight = PlayButtonHeight;
-        public const float AchButtonY = -AchButtonHeight/2;
+        public const float AchButtonY = -AchButtonHeight/2 - 200;
         public const float AchButtonX = -420 - AchButtonWidth/2;
         public const float AchFontSize = 40;
         public const float LbButtonWidth = AchButtonWidth;
@@ -166,6 +166,11 @@ public class GameConsts {
         public const float LbButtonX = 420 - LbButtonWidth/2;
         public const float LbButtonY = AchButtonY;
         public const float LbFontSize = AchFontSize;
+        public const float LoadButtonWidth = PlayButtonWidth;
+        public const float LoadButtonHeight = PlayButtonHeight;
+        public const float LoadButtonX = AchButtonX + LoadButtonWidth + 20;
+        public const float LoadButtonY = AchButtonY;
+
 
         // Sign-in button
         public const float SignInButtonWidth = 360;

@@ -15,7 +15,10 @@
  */
 
 using System;
+using System.Collections;
 using UnityEngine.SocialPlatforms;
+using UnityEngine;
+using System.Collections.Generic;
 
 namespace GooglePlayGames {
 /// <summary>
@@ -24,8 +27,13 @@ namespace GooglePlayGames {
 public class PlayGamesLocalUser : PlayGamesUserProfile, ILocalUser {
     PlayGamesPlatform mPlatform;
 
+    private WWW mAvatarUrl;
+    private Texture2D mImage;
+
     internal PlayGamesLocalUser(PlayGamesPlatform plaf) {
         mPlatform = plaf;
+        mAvatarUrl = null;
+        mImage = null;
     }
 
     /// <summary>
@@ -123,6 +131,44 @@ public class PlayGamesLocalUser : PlayGamesUserProfile, ILocalUser {
     public new UserState state {
         get {
             return UserState.Online;
+        }
+    }
+
+    /// <summary>
+    /// Loads the local user's image from the url.  Loading urls
+    /// is asynchronous so the return from this call is fast,
+    /// the image is returned once it is loaded.  null is returned
+    /// up to that point.
+    /// </summary>
+    private Texture2D LoadImage() {
+        string url = mPlatform.GetUserImageUrl();
+
+        // the url can be null if the user does not have an
+        // avatar configured.
+        if (url != null) {
+          if (mAvatarUrl == null) {
+              mAvatarUrl = new WWW(url);
+          }
+          if(mAvatarUrl.isDone) {
+              return mAvatarUrl.texture;
+          }
+        }
+        // if there is no url, always return null.
+        return null;
+    }
+
+    /// <summary>
+    /// Gets the display image of the user.
+    /// </summary>
+    /// <returns>
+    /// null if the user has no avatar, or it has not loaded yet.
+    /// </returns>
+    public new Texture2D image {
+        get {
+            if (mImage == null) {
+              mImage = LoadImage();
+            }
+            return mImage;
         }
     }
 }

@@ -17,6 +17,7 @@
 using UnityEngine;
 using System.Collections;
 using GooglePlayGames;
+using GooglePlayGames.BasicApi;
 
 public class WelcomeGui : BaseGui {
     WidgetConfig TitleCfg = new WidgetConfig(0.0f, -0.3f, 1.0f, 0.2f, 100, "QuizRacer");
@@ -33,8 +34,15 @@ public class WelcomeGui : BaseGui {
             }
         };
 
+        var config = new PlayGamesClientConfiguration.Builder()
+            .WithInvitationDelegate(InvitationManager.Instance.OnInvitationReceived)
+            .Build();
+
+        PlayGamesPlatform.InitializeInstance(config);
+
         // make Play Games the default social implementation
         PlayGamesPlatform.Activate();
+
 
         // enable debug logs (note: we do this because this is a sample; on your production
         // app, you probably don't want this turned on by default, as it will fill the user's

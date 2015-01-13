@@ -172,12 +172,18 @@ public class LevelController : MonoBehaviour {
 
             if (mGameState == GameState.GameOver) {
                 // game over -- restart current level
+                StartCoroutine(CaptureScreenshot());
                 GameManager.Instance.RestartLevel();
             } else {
                 // level cleared! Record progress and advance to next.
                 GameManager.Instance.FinishLevelAndGoToNext(mScore, CalcStars());
             }
         }
+    }
+
+    IEnumerator CaptureScreenshot() {
+                yield return new WaitForEndOfFrame();
+                GameManager.Instance.CaptureScreenshot();
     }
 
     int CalcStars() {
@@ -314,6 +320,7 @@ public class LevelController : MonoBehaviour {
             ShowCenteredMessage(mGameOverReason == GameOverReason.CiviliansDied ?
                 Strings.GameOverCiviliansDied : Strings.GameOverPlayerDied,
                 Strings.RetryingIn);
+            ShowLoadAndSave();
             break;
         case GameState.Won:
             // show the "Level Cleared" message
@@ -329,8 +336,41 @@ public class LevelController : MonoBehaviour {
             Gu.Label(Gu.Center(0), Gu.Middle(GameConsts.StarsMessageY),
                 Gu.Dim(GameConsts.StarsMessageFontSize),
                 Strings.StarsMessage[stars]);
+            ShowLoadAndSave();
             break;
         }
+    }
+
+    void ShowLoadAndSave() {
+        if(DrawQuitButton()) {
+            GameManager.Instance.QuitToMenu();
+        }
+        if(DrawSaveButton()) {
+            GameManager.Instance.SaveProgress();
+        }
+
+    }
+
+    bool DrawSaveButton() {
+        float w = GameConsts.Menu.AchButtonWidth;
+        float h = GameConsts.Menu.AchButtonHeight;
+        float x =  200;
+        float y =  200;
+        return Gu.Button(Gu.Center(x), Gu.Middle(y),
+                         Gu.Dim(w), Gu.Dim(h),
+                         Gu.Dim(GameConsts.Menu.AchFontSize),
+                         Strings.SaveGame);
+    }
+
+    bool DrawQuitButton() {
+        float w = GameConsts.Menu.AchButtonWidth;
+        float h = GameConsts.Menu.AchButtonHeight;
+        float x =  - 500;
+        float y =  200;
+        return Gu.Button(Gu.Center(x), Gu.Middle(y),
+                         Gu.Dim(w), Gu.Dim(h),
+                         Gu.Dim(GameConsts.Menu.AchFontSize),
+                         Strings.QuitGame);
     }
 
     void DrawHud() {

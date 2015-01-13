@@ -23,7 +23,7 @@ using GooglePlayGames.Native.PInvoke;
 
 
 using Types = GooglePlayGames.Native.Cwrapper.Types;
-using Status = GooglePlayGames.Native.Cwrapper.Status;
+using Status = GooglePlayGames.Native.Cwrapper.CommonErrorStatus;
 
 namespace GooglePlayGames.Native {
 public class NativeRealtimeMultiplayerClient : IRealTimeMultiplayerClient {
@@ -149,7 +149,7 @@ public class NativeRealtimeMultiplayerClient : IRealTimeMultiplayerClient {
                         return;
                     }
 
-                    // We are not cleaning up the invitation here to workaround a bug in the 
+                    // We are not cleaning up the invitation here to workaround a bug in the
                     // C++ SDK where it holds a reference to un-owned memory rather than making a
                     // copy. This is cleaned up after the callback comes back instead.
                     var invitation = response.Invitation();
@@ -158,10 +158,10 @@ public class NativeRealtimeMultiplayerClient : IRealTimeMultiplayerClient {
                         Logger.d("About to accept invitation " + invitation.Id());
                         newRoom.StartRoomCreation(mNativeClient.GetUserId(),
                             () => mRealtimeManager.AcceptInvitation(invitation, helper,
-                                acceptResponse => { 
+                                acceptResponse => {
                                     // Clean up the invitation here (see above comment).
                                     using (invitation) {
-                                        newRoom.HandleRoomResponse(acceptResponse); 
+                                        newRoom.HandleRoomResponse(acceptResponse);
                                     }
                                 }));
                     }
@@ -693,6 +693,7 @@ public class NativeRealtimeMultiplayerClient : IRealTimeMultiplayerClient {
             if (!response.RequestSucceeded()) {
                 mContainingSession.EnterState(new ShutdownState(mContainingSession));
                 mContainingSession.OnGameThreadListener().RoomConnected(false);
+                return;
             }
 
             mContainingSession.EnterState(new ConnectingState(response.Room(), mContainingSession));
@@ -857,13 +858,11 @@ public class NativeRealtimeMultiplayerClient : IRealTimeMultiplayerClient {
                 var freshParticipant = updatedParticipants[participantId];
                 var staleParticipant = mNativeParticipants[participantId];
 
-                if (staleParticipant.IsConnectedToRoom()
-                    && !freshParticipant.IsConnectedToRoom()) {
+                if (staleParticipant.IsConnectedToRoom() && !freshParticipant.IsConnectedToRoom()) {
                     newlyLeft.Add(participantId);
                 }
 
-                if (!staleParticipant.IsConnectedToRoom()
-                    && freshParticipant.IsConnectedToRoom()) {
+                if (!staleParticipant.IsConnectedToRoom() && freshParticipant.IsConnectedToRoom()) {
                     newlyConnected.Add(participantId);
                 }
             }
@@ -884,20 +883,26 @@ public class NativeRealtimeMultiplayerClient : IRealTimeMultiplayerClient {
 
             // Check whether the current player was disconnected from the room.
             if (newlyLeft.Contains(GetSelf().ParticipantId)) {
-                Logger.e("Player was unexpectedly disconnected from the multiplayer session.");
-                LeaveRoom();
-                return;
+                Logger.w("Player was disconnected from the multiplayer session.");
             }
 
-            // Otherwise inform the client about changes in room participants.
+            // Strip out the participant ID of the local player - this player is not a "peer".
+            var selfId = GetSelf().ParticipantId;
+            newlyConnected = newlyConnected.Where(peerId => !peerId.Equals(selfId)).ToList();
+            newlyLeft = newlyLeft.Where(peerId => !peerId.Equals(selfId)).ToList();
+
+            // Otherwise inform the client about changes in room participants, screening out
+            // results about the local player.
             if (newlyConnected.Count > 0) {
                 newlyConnected.Sort();
-                mSession.OnGameThreadListener().PeersConnected(newlyConnected.ToArray());
+                mSession.OnGameThreadListener()
+                    .PeersConnected(newlyConnected.Where(peer => !peer.Equals(selfId)).ToArray());
             }
 
             if (newlyLeft.Count > 0) {
                 newlyLeft.Sort();
-                mSession.OnGameThreadListener().PeersDisconnected(newlyLeft.ToArray());
+                mSession.OnGameThreadListener()
+                    .PeersDisconnected(newlyLeft.Where(peer => !peer.Equals(selfId)).ToArray());
             }
         }
 

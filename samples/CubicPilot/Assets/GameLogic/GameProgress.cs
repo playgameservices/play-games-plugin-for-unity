@@ -26,6 +26,9 @@ public class GameProgress {
     private int mPilotExp = 0; // pilot experience points
     private LevelProgress[] mProgress;
 
+    private TimeSpan mPlayingTime;
+    private DateTime mLoadedTime;
+
     // do we have modifications to write to disk/cloud?
     private bool mDirty = false;
 
@@ -85,14 +88,25 @@ public class GameProgress {
             mPilotExp = other.mPilotExp;
             mDirty = true;
         }
+        if (other.mPlayingTime  > mPlayingTime) {
+             mPlayingTime = other.mPlayingTime;
+        }
+    }
+
+    public TimeSpan TotalPlayingTime {
+        get {
+                TimeSpan delta = DateTime.Now.Subtract(mLoadedTime);
+                return mPlayingTime.Add(delta);
+        }
     }
 
     public override string ToString () {
-        string s = "GPv2:" + mPilotExp.ToString();
+        string s = "GPv3:" + mPilotExp.ToString();
         int i;
         for (i = 0; i < LevelCount; i++) {
             s += ":" + mProgress[i].ToString();
         }
+        s += ":" + TotalPlayingTime.TotalMilliseconds;
         return s;
     }
 
@@ -103,7 +117,7 @@ public class GameProgress {
     public static GameProgress FromString(string s) {
         GameProgress gp = new GameProgress();
         string[] p = s.Split(new char[] { ':' });
-        if (!p[0].Equals("GPv2")) {
+        if (!p[0].StartsWith("GPv")) {
             Debug.LogError("Failed to parse game progress from: " + s);
             return gp;
         }
@@ -112,6 +126,13 @@ public class GameProgress {
         for (i = 2; i < p.Length && i - 2 < LevelCount; i++) {
             gp.GetLevelProgress(i - 2).SetFromString(p[i]);
         }
+        if(p[0].Equals("GPv3")) {
+            double val = Double.Parse(p[p.Length -1]);
+            gp.mPlayingTime = TimeSpan.FromMilliseconds(val>0f?val:0f);
+        } else {
+            gp.mPlayingTime = new TimeSpan();
+        }
+        gp.mLoadedTime = DateTime.Now;
         return gp;
     }
 

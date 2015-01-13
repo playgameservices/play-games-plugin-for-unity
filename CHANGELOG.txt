@@ -1,3 +1,21 @@
+Version 0.9.11 (codename: extra-dogey)
+    New features:
+        * Image property of IUserProfile implemented
+        * An implementation of Saved Games is now available. This obviates the old
+          cloud save feature, which is deprecated and will be removed. See
+          ISavedGameClient.cs for more details.
+    API Changes:
+        * RTMP Clients will no longer automatically call LeaveRoom when
+          they are removed from the connected set. Also, the local player
+          will never appear as a participant in
+          OnPeersConnected/OnPeersDisconnected.
+        * The PlayGamesPlatform must be configured before it can be used.
+          See PlayGamesClientConfiguration, PlayGamesPlatform.InitializeInstance,
+          and PlayGamesClientFactory.GetPlatformPlayGamesClient.
+    Bug Fixes:
+        * #309 - LeaderboardManager calls ShowAllUI when using leaderboard id
+
+
 2014-11-14 Version 0.9.10 (codename: doge)
     This release is a major rearchitecting of the plugin to use
     the Play Games C++ SDK. This allows us to re-use the same code on

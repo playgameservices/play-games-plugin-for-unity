@@ -23,7 +23,7 @@ using GooglePlayGames.Native.Cwrapper;
 
 using C = GooglePlayGames.Native.Cwrapper.RealTimeEventListenerHelper;
 using Types = GooglePlayGames.Native.Cwrapper.Types;
-using Status = GooglePlayGames.Native.Cwrapper.Status;
+using Status = GooglePlayGames.Native.Cwrapper.CommonErrorStatus;
 
 namespace GooglePlayGames.Native.PInvoke {
 internal class RealTimeEventListenerHelper : BaseReferenceHolder {

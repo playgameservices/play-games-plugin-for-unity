@@ -17,22 +17,31 @@
 using UnityEngine;
 using System.Collections;
 using GooglePlayGames;
+using GooglePlayGames.BasicApi;
+using GooglePlayGames.BasicApi.Multiplayer;
 
 public class WelcomeGui : BaseGui {
     WidgetConfig TitleCfg = new WidgetConfig(0.0f, -0.3f, 1.0f, 0.2f, 100, "Tic Tac Toss");
     WidgetConfig PlayCfg = new WidgetConfig(0.0f, 0.0f, 0.8f, 0.2f, 60, "Play!");
     bool mAuthOnStart = true;
-
+    bool mInMatch = false;
     System.Action<bool> mAuthCallback;
 
     void Start() {
         mAuthCallback = (bool success) => {
             EndStandBy();
-            if (success) {
+            if (success && !mInMatch) {
                 SwitchToMain();
             }
         };
 
+        PlayGamesClientConfiguration config = 
+              new PlayGamesClientConfiguration.Builder()
+                .WithInvitationDelegate(OnGotInvitation)
+                .WithMatchDelegate(OnGotMatch)
+                .Build();
+
+        PlayGamesPlatform.InitializeInstance(config);
         // make Play Games the default social implementation
         PlayGamesPlatform.Activate();
 
@@ -55,6 +64,22 @@ public class WelcomeGui : BaseGui {
             PlayGamesPlatform.Instance.localUser.Authenticate(mAuthCallback);
         }
     }
+
+
+    protected void OnGotInvitation(Invitation invitation, bool shouldAutoAccept) {
+        if (invitation.InvitationType != Invitation.InvType.TurnBased) {
+            // wrong type of invitation!
+            return;
+        }
+        mInMatch = true;
+        gameObject.GetComponent<MainMenuGui>().HandleInvitation(invitation, shouldAutoAccept);
+    }
+
+    protected void OnGotMatch(TurnBasedMatch match, bool shouldAutoLaunch) {
+        mInMatch = true;
+        gameObject.GetComponent<MainMenuGui>().HandleMatchTurn(match, shouldAutoLaunch);
+    }
+
 
     void SwitchToMain() {
         gameObject.GetComponent<MainMenuGui>().MakeActive();
