@@ -55,6 +55,11 @@ public class GPGSAndroidSetupUI : EditorWindow {
     }
 
     void DoSetup() {
+		PerformSetup(mAppId);
+	}
+
+	//Provide static access to setup for facilitating automated builds.
+	public static void PerformSetup(string appId) {
         string sdkPath = GPGSUtil.GetAndroidSdkPath();
         string libProjPath = sdkPath +
                              GPGSUtil.SlashesToPlatformSeparator(
@@ -66,11 +71,11 @@ public class GPGSAndroidSetupUI : EditorWindow {
         string projAM = GPGSUtil.SlashesToPlatformSeparator(
                             "Assets/Plugins/Android/MainLibProj/AndroidManifest.xml");
 
-        GPGSProjectSettings.Instance.Set("proj.AppId", mAppId);
+        GPGSProjectSettings.Instance.Set("proj.AppId", appId);
         GPGSProjectSettings.Instance.Save();
 
         // check for valid app id
-        if (!GPGSUtil.LooksLikeValidAppId(mAppId)) {
+        if (!GPGSUtil.LooksLikeValidAppId(appId)) {
             GPGSUtil.Alert(GPGSStrings.Setup.AppIdError);
             return;
         }
@@ -127,7 +132,7 @@ public class GPGSAndroidSetupUI : EditorWindow {
 
         // Generate AndroidManifest.xml
         string manifestBody = GPGSUtil.ReadEditorTemplate("template-AndroidManifest");
-        manifestBody = manifestBody.Replace("___APP_ID___", mAppId);
+        manifestBody = manifestBody.Replace("___APP_ID___", appId);
         GPGSUtil.WriteFile(projAM, manifestBody);
         GPGSUtil.UpdateGameInfo();
 
@@ -139,7 +144,7 @@ public class GPGSAndroidSetupUI : EditorWindow {
             GPGSStrings.AndroidSetup.SetupComplete, GPGSStrings.Ok);
     }
 
-    private bool CheckAndWarnAboutGmsCoreVersion(string libProjAMFile) {
+    private static bool CheckAndWarnAboutGmsCoreVersion(string libProjAMFile) {
         string manifestContents = GPGSUtil.ReadFile(libProjAMFile);
         string[] fields = manifestContents.Split('\"');
         int i;
@@ -163,14 +168,14 @@ public class GPGSAndroidSetupUI : EditorWindow {
         return true;
     }
 
-    private void EnsureDirExists(string dir) {
+    private static void EnsureDirExists(string dir) {
         dir = dir.Replace("/", System.IO.Path.DirectorySeparatorChar.ToString());
         if (!System.IO.Directory.Exists(dir)) {
             System.IO.Directory.CreateDirectory(dir);
         }
     }
 
-    private void DeleteDirIfExists(string dir) {
+    private static void DeleteDirIfExists(string dir) {
         if (System.IO.Directory.Exists(dir)) {
             System.IO.Directory.Delete(dir, true);
         }

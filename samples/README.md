@@ -67,6 +67,11 @@ Settings** to set up the game for iOS.
 In each of those dialogs, enter the corresponding configuration values as
 set up in the Developer Console.
 
+## Import the packaged asset containing the sample
+
+Each sample is packaged as a Unity package.  This package should be imported into your project, and the 
+scenes selected in the build dialog.
+
 ## Build and Run
 
 Follow the instructions on the **Getting Started Guide** to build and run the
