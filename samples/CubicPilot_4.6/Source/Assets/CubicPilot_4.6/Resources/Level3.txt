@@ -1,0 +1,44 @@
+# -- Settings --
+dur        40
+
+# -- Intro --
+
+msg Sector D
+wait 2
+
+# -- Enemy waves --
+
+:10
+spawn Soldier 4
+spawn Soldier -4
+wait 4
+end
+
+:10
+spawn Tank -7
+spawn Soldier 3
+wait 1
+spawn Tank -6
+wait 4
+end
+
+:10
+spawn InvTank 7
+spawn Soldier 3
+wait 1
+spawn InvTank 6
+wait 4
+end
+
+:10
+spawn Soldier -4
+spawn Soldier 4
+wait 4
+end
+
+:10
+spawn ZigzagSoldier -2
+wait 2
+spawn ZigzagSoldier 2
+wait 4
+end

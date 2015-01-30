@@ -1,0 +1,89 @@
+# -- Settings --
+dur         90
+
+# -- Intro --
+
+msg Sector L
+wait 2
+
+# -- Enemy waves --
+
+:10
+spawn SoldierIII 3
+wait 5
+spawn SoldierIII -3
+wait 20
+end
+
+:10
+spawn Soldier 0
+wait 1
+spawn Soldier 2
+spawn Soldier -2
+wait 1
+spawn Soldier 4
+spawn Soldier -4
+wait 1
+spawn Soldier 6
+spawn Soldier -6
+wait 4
+spawn Tank -7
+spawn InvTank 7
+end
+
+
+:10
+spawn SoldierII 3
+wait 2
+spawn SoldierII 0
+wait 2
+spawn Tank -7
+spawn InvTank 7
+spawn SoldierII -3
+wait 3
+end
+
+:10
+spawn SoldierII 0
+wait 2
+spawn ZigzagSoldier 3
+wait 2
+spawn ZigzagSoldier -3
+wait 3
+spawn Tank -7
+spawn InvTank 7
+end
+
+:10
+spawn Tank -7
+spawn InvTank 7
+spawn Soldier -4
+wait 1
+spawn Soldier -2
+wait 1
+spawn SoldierII 0
+wait 1
+spawn Soldier 2
+wait 1
+spawn Soldier 4
+wait 2
+spawn SoldierII 0
+wait 3
+spawn Tank -7
+spawn InvTank 7
+end
+
+:10
+spawn ZigzagSoldier 0
+wait 1
+spawn ZigzagSoldier 0
+wait 1
+spawn SoldierII 0
+wait 1
+spawn ZigzagSoldier 0
+wait 1
+spawn ZigzagSoldier 0
+wait 3
+spawn Tank -7
+spawn InvTank 7
+end
