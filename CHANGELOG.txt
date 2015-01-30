@@ -1,3 +1,7 @@
+Version 0.9.12 (codename: auto-dogey)
+    New features:
+        * Refactored AndroidSetup script to facilitate automated builds.
+	* Refactored Samples to be packaged as custom packaged Assets vs. projects.
 Version 0.9.11 (codename: extra-dogey)
     New features:
         * Image property of IUserProfile implemented
