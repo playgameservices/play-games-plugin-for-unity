@@ -150,7 +150,12 @@ public class GPGSAndroidSetupUI : EditorWindow {
         int i;
         long vercode = 0;
         for(i = 0; i < fields.Length; i++) {
-            if (fields[i].Contains("android:versionCode") && i + 1 < fields.Length) {
+            // check for the newer version attribute
+            if (fields[i].Contains("com.google.android.gms.version")) {
+				// newer SDK, so it is OK
+				return true;
+            }
+            else if (fields[i].Contains("android:versionCode") && i + 1 < fields.Length) {
                 vercode = System.Convert.ToInt64(fields[i + 1]);
             }
         }
