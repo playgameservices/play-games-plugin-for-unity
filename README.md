@@ -354,7 +354,7 @@ existing score.
 
 ## Showing the Achievements UI
 
-To show the built-in UI for all leaderboards, call
+To show the built-in UI for all achievements, call
 **Social.ShowAchievementsUI**.
 
 ```csharp
