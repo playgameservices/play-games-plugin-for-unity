@@ -1,0 +1,9 @@
+NOTES ON UPGRADING
+
+If you have already integrated the plugin and want to upgrade it to a newer version,
+simply import the new plugin package into your existing project.
+
+After upgrading, redo setup (click "Google Play Games | Android Setup" and/or 
+"Google Play Games | iOS Setup" on the menu). Do this even if you had already done
+this before on this project.
+

@@ -1,0 +1,96 @@
+#!/bin/bash
+#
+# Copyright (C) 2014 Google Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+echo "Checking for accidentally added projsettings.txt..."
+git ls-files | grep -v ^selftest/ | grep /projsettings.txt$
+if [ "$?" = "0" ]; then
+    echo "*** projsettings.txt should not be committed, since it contains local settings."
+    exit 1
+fi
+
+echo "Checking for accidentally added plugin copies..."
+dup=
+git ls-files | grep -v ^selftest/ | grep -v source/PluginDev | grep /Assets/GooglePlayGames/
+[ "$?" = "0" ] && dup=yes
+git ls-files | grep -v ^selftest/ | grep -v source/PluginDev | grep /Assets/Plugins/Android
+[ "$?" = "0" ] && dup=yes
+
+if [ "$?" = "0" ]; then
+    echo "*** It looks like you added a second instance of the plugin to the commit."
+    echo "*** To commit to the repo, the only copy of the plugin files should be in PluginDev."
+    exit 1
+fi
+
+echo "Checking for accidentally added Google Play Services lib project..."
+git ls-files | grep -v ^selftest/ | grep google-play-services_lib
+if [ "$?" = "0" ]; then
+    echo "*** It looks like you added the Google Play Services lib project"
+    echo "*** to the commit. It should not be added to the repo!"
+    exit 1
+fi
+
+echo "Checking for accidentally added MainLibProj/AndroidManifest.xml"
+git ls-files | grep -v ^selftest/ | grep MainLibProj/AndroidManifest.xml
+if [ "$?" = "0" ]; then
+    echo "*** MainLibProj/AndroidManifest.xml files should not be added to the commit."
+    exit 1
+fi
+
+echo "Checking for accidentally added APKs."
+git ls-files | grep .apk$
+if [ "$?" = "0" ]; then
+    echo "*** APK files should not be added to the repo."
+    exit 1
+fi
+
+echo "Checking for accidentally added non-placeholder Google Play Games IDs..."
+# what files contain Google Play Games IDs?
+for csfile in `find . -name '*.cs'`; do
+    if grep -q "// <GPGSID>" $csfile; then
+        echo "Checking $csfile"
+        mistakes=`grep -n "// <GPGSID>" $csfile | grep -v PLACEHOLDER`
+        if [ "$?" = "0" ]; then
+            echo "*** $csfile has actual Google Play Games IDs!"
+            echo "$mistakes"
+            echo "***"
+            echo "*** Only PLACEHOLDERs should be commited to the repository."
+            echo "*** Please replace the concrete IDs by 'PLACEHOLDER' before committing."
+            exit 1
+        fi
+    fi
+done
+
+echo "Checking for DO-NOT-COMMIT files..."
+git ls-files | grep -i do-not-commit
+if [ "$?" = "0" ]; then
+    echo "*** Error: can't commit some files named DO-NOT-COMMIT."
+    exit 1
+fi
+
+echo "Checking for Library directories..."
+git ls-files | grep /Library/
+if [ "$?" = "0" ]; then
+    echo "*** Error: can't commit Library directories of Unity projects."
+    echo "*** Instead, make sure the the project is set to use meta files as"
+    echo "*** version control (Project Settings | Editor | Version Control),"
+    echo "*** and don't commit the Library/ directory."
+    exit 1
+fi
+
+
+echo "All presubmit test passed."
+

@@ -1,0 +1,52 @@
+/*
+ * Copyright (C) 2014 Google Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+#if (UNITY_ANDROID || UNITY_IPHONE)
+using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using System.Text;
+
+namespace GooglePlayGames.Native.Cwrapper {
+internal static class GameServices {
+    internal delegate void FlushCallback(
+         /* from(FlushStatus_t) */ CommonErrorStatus.FlushStatus arg0,
+         /* from(void *) */ IntPtr arg1);
+
+    [DllImport(SymbolLocation.NativeSymbolLocation)]
+    internal static extern void GameServices_Flush(
+        HandleRef self,
+         /* from(GameServices_FlushCallback_t) */ FlushCallback callback,
+         /* from(void *) */ IntPtr callback_arg);
+
+    [DllImport(SymbolLocation.NativeSymbolLocation)]
+    [return: MarshalAs(UnmanagedType.I1)]
+    internal static extern /* from(bool) */ bool GameServices_IsAuthorized(
+        HandleRef self);
+
+    [DllImport(SymbolLocation.NativeSymbolLocation)]
+    internal static extern void GameServices_Dispose(
+        HandleRef self);
+
+    [DllImport(SymbolLocation.NativeSymbolLocation)]
+    internal static extern void GameServices_SignOut(
+        HandleRef self);
+
+    [DllImport(SymbolLocation.NativeSymbolLocation)]
+    internal static extern void GameServices_StartAuthorizationUI(
+        HandleRef self);
+}
+}
+#endif // (UNITY_ANDROID || UNITY_IPHONE)
