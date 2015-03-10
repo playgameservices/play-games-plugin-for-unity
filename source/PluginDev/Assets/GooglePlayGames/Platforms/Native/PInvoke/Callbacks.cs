@@ -52,10 +52,9 @@ static class Callbacks {
         // the garbage collector runs before the native code invokes the callback, chaos will
         // ensue.
         //
-        // To handle this, we manually pin the callback in memory (this means it cannot be
-        // collected or moved) - the GCHandle will be freed when the callback returns the and
-        // handle is converted back to callback via IntPtrToCallback.
-        var handle = GCHandle.Alloc(callback, GCHandleType.Pinned);
+        // To handle this, we create a normal GCHandle. The GCHandle will be freed when the
+		// callback returns the and handle is converted back to callback via IntPtrToCallback.
+        var handle = GCHandle.Alloc(callback);
 
         return GCHandle.ToIntPtr(handle);
     }
