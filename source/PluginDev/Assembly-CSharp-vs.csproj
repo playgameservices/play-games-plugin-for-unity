@@ -150,7 +150,9 @@
      <Compile Include="Assets\MainGui.cs" />
      <Compile Include="Assets\Settings.cs" />
      <None Include="Assets\GooglePlayGames\Editor\template-AndroidManifest.txt" />
+     <None Include="Assets\Plugins\Android\gpg_native_lib\jni\gpg-cpp-sdk\android\licenses.txt" />
      <None Include="Assets\GooglePlayGames\Editor\projsettings.txt" />
+     <None Include="Assets\Plugins\Android\gpg_native_lib\jni\gpg-cpp-sdk\ios\licenses.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>/Applications/Unity_4.6.2f1/Unity.app/Contents/UnityExtensions/Unity/GUISystem/4.6.2/UnityEngine.UI.dll</HintPath>
  </Reference>

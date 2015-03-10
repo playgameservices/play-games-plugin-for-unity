@@ -1,3 +1,5 @@
 .DS_Store
 
 siteconfig-DO-NOT-COMMIT/
+
+**/build/intermediates/

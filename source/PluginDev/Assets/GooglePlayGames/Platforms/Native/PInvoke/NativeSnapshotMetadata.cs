@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-#if (UNITY_ANDROID || UNITY_IPHONE)
+#if (UNITY_ANDROID || (UNITY_IPHONE && !NO_GPGS))
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
