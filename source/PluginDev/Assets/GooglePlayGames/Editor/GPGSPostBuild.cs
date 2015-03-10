@@ -39,7 +39,6 @@ namespace GooglePlayGames {
             #if NO_GPGS
             // remove plugin code from generated project
             string pluginDir = pathToBuiltProject + "/Libraries/Plugins/iOS";
-            
             GPGSUtil.WriteFile(pluginDir + "/GPGSAppController.mm", "// Empty since NO_GPGS is defined\n");
             return;
             #endif

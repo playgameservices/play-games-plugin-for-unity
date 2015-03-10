@@ -689,6 +689,15 @@ and drop those 5 files on the top-level project item (labeled **Unity-iPhone**).
 directory, you can use Unity's **Append** option to avoid overwriting these
 settings. If you use **Replace**, however, you might have to reapply some settings.
 
+## Excluding all Google Play Game Services when building for iOS
+
+This plugin can be disabled for building on iOS.  What this means is that the libraries and references
+originating in the GooglePlayGames namespace are excluded from the build.  It does not affect code that
+has been written by you, such as calls to the GPGS API.
+
+To disable the Google Play Game Services in the iOS build, open the iOS player settings.  Then in the "Other Settings"
+panel, find the entry named "Scripting Define Symbol" and add a symbol named: NO_GPGS (case sensitive).
+
 ## Common Build Errors on iOS
 
 **"The current deployment target does not support automated _weak references"**. Make sure your target iOS platform is 7.0 or above. If the target platform is below 7.0, this error will occur during build.

@@ -1,11 +1,13 @@
 Version 0.9.15 (codename: auto-dogey5)
+    New Features:
+        * #276 Added support for excluding Google Play Game Services for iOS build (NO_GPGS)
     Bug Fixes:
-        * Moved Editor scripts into GooglePlayGames/Editor to reduce script sprawl.
-        * Corrected Download menu item text.
-        * Added support for new android-support jar location.
-        * Removed Google play services version check when building.
-	* Fixed player image not refreshed when changing players.
-        * Removed armeabi libraries which broke Unity 5 building.
+        * #376 Moved Editor scripts into GooglePlayGames/Editor to reduce script sprawl.
+        * #331 Corrected Download menu item text.
+        * #331 Added support for new android-support jar location.
+        * #331 Removed Google play services version check when building.
+	* #361 Fixed player image not refreshed when changing players.
+        * #318 Removed armeabi libraries which broke Unity 5 building.
 Version 0.9.12 (codename: auto-dogey)
     New features:
         * Refactored AndroidSetup script to facilitate automated builds.
