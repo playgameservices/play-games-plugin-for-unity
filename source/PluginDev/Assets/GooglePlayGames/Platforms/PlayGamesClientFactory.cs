@@ -28,7 +28,7 @@ internal class PlayGamesClientFactory {
             Logger.d("Creating IPlayGamesClient in editor, using DummyClient.");
             return new GooglePlayGames.BasicApi.DummyClient();
         }
-#if (UNITY_ANDROID || UNITY_IPHONE)
+#if (UNITY_ANDROID || (UNITY_IPHONE && !NO_GPGS))
         Logger.d("Creating real IPlayGamesClient");
         return new GooglePlayGames.Native.NativeClient(config);
 #else

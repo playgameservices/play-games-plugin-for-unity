@@ -4,16 +4,12 @@ pushd .
 
 cd SupportLib
 
-./gradlew build
+gradle clean
+gradle build
 
 popd
 
-for i in PluginDev ../samples/QuizRacer ../samples/TicTacToe; do
-    if [ -d $i/Assets/Plugins/Android ]; then
-        cp -vf SupportLib/PlayGamesPluginSupport/build/bundles/debug/classes.jar $i/Assets/Plugins/Android/MainLibProj/libs/play-games-plugin-support.jar
-    else
-        "*** Skipping $i because $i/Assets/Plugins/Android does not exist."
-    fi
-done
-
+jar xvf SupportLib/PlayGamesPluginSupport/build/outputs/aar/PlayGamesPluginSupport-debug.aar classes.jar
+cp -vf classes.jar PluginDev/Assets/Plugins/Android/MainLibProj/libs/play-games-plugin-support.jar
+rm classes.jar
 
