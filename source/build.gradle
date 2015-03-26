@@ -1,0 +1,101 @@
+task 'buildprops' << {
+	ext.ndk_root = System.getenv("ANDROID_NDK_ROOT")
+	ext.sdk_root = System.getenv("ANDROID_HOME")
+	ext.unity_exe ='/Applications/Unity/Unity.app/Contents/MacOS/Unity'
+	ext.pluginProj = file('PluginDev').absolutePath
+	ext.exportPath = file('build/plugin.unitypackage').absolutePath
+
+}
+
+task unity_package(dependsOn:'export_package') << {
+	println "Packaging Complete!"
+}
+
+task cleanup_package(type: Delete) << {
+	ext.path = file('PluginDev').absolutePath + "/Assets/GooglePlayGames/Editor/projsettings.txt"
+	delete '${ext.path}'
+}
+
+
+task export_package << {
+	exec {
+		executable "${buildprops.unity_exe}"
+			args "-g.building", "-batchmode", "-projectPath", "${buildprops.pluginProj}", "-logFile", "build/unity.log",  "-exportPackage", "Assets/GooglePlayGames", "Assets/Plugins", "${buildprops.exportPath}", "-quit"
+
+	}
+
+}
+
+export_package.dependsOn 'copy_libs'
+export_package.dependsOn 'cleanup_package'
+export_package.dependsOn 'support_jar'
+
+
+task get_gpg_cpp_sdk << {
+	//TODO: pull from url
+	println "got it!"
+}
+
+task check_ndk(dependsOn:'buildprops') << {
+
+	if (buildprops.ndk_root == "") {
+		throw new GradleException('ANDROID_NDK_ROOT not set')
+	}
+	else {
+		if (System.getenv("ANDROID_HOME") == null) {
+			throw new GradleException('ANDROID_HOME not set')
+		}
+		println("OK");
+	}
+}
+
+
+// The ndk work needs to happen in the jni directory - it is baked into the
+// ndk environment.
+//
+task compile_gpg << {
+	exec {
+		workingDir "build/jni"
+			executable "${buildprops.ndk_root}/ndk-build"
+	}
+}
+compile_gpg.dependsOn 'check_ndk'
+compile_gpg.dependsOn 'copy_gpg_sdk'
+compile_gpg.dependsOn 'copy_native'
+
+task copy_native << {
+	copy {
+	from {'native'}
+	into {'build/jni'}
+	}
+}
+
+task copy_gpg_sdk << {
+ copy {
+	from zipTree('gpg_cpp_sdk.zip')
+    	// Determine the destination directory later
+    	into {'build/jni' }
+}
+}
+
+task copy_libs (dependsOn: 'compile_gpg') << {
+	copy {
+	  from {'build/libs'}
+	into {'PluginDev/Assets/Plugins/Android/libs' }
+	}
+}
+
+task build_java_support_lib(type: GradleBuild) {
+    buildFile = 'SupportLib/build.gradle'
+    tasks = ['build']
+}
+
+task support_jar(dependsOn:'build_java_support_lib') << {
+	copy {
+	 from zipTree('SupportLib/PlayGamesPluginSupport/build/outputs/aar/PlayGamesPluginSupport-debug.aar')
+	 into {'PluginDev/Assets/Plugins/Android/MainLibProj/libs'}
+	 include {'**/classes.jar'}
+	exclude { details -> !details.file.name.endsWith('.jar')}
+	rename ('classes.jar','play-games-plugin-support.jar')
+	}
+}

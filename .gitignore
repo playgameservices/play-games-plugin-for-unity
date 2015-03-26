@@ -2,4 +2,22 @@
 
 siteconfig-DO-NOT-COMMIT/
 
+source/build/
+
+StyleCop.Cache
+StyleCop.Cache.meta
+
 **/build/intermediates/
+
+samples/**/obj
+
+samples/**/Temp
+
+samples/**/Assets/GooglePlayGames/
+samples/**/Assets/GooglePlayGames.meta
+samples/**/Assets/Plugins.meta
+samples/**/Assets/Plugins/
+samples/**/Library/
+samples/**/Library.meta
+samples/**/ProjectSettings/
+samples/**/ProjectSettings.meta
