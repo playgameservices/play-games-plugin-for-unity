@@ -22,10 +22,12 @@ following features of the Google Play Games API:<br/>
 * post score to leaderboard
 * cloud save read/write
 * show built-in achievement/leaderboards UI
+* events and quests
+* [nearby connections](NEARBY.md)
 * [turn-based multiplayer](TBMP.md)
 * [real-time multiplayer](RTMP.md)
 
-All features are available on Android and iOS.
+All features except the nearby connections are available on Android and iOS.
 
 Features:
 
@@ -41,11 +43,11 @@ System requirements:
 * To deploy on Android:
     * Android SDK
     * Android v4.0 or higher
-    * Google Play Services library, version 6.1.11 or above
+    * Google Play Services library, version 7.0 or above
 * To deploy on iOS:
     * XCode 5.1 or above
     * Google Plus SDK for iOS
-    * Google Play Games C++ SDK
+    * Google Play Games C++ SDK version 1.4 or above
 
 
 ## Upgrading
@@ -98,6 +100,12 @@ leaderboard you configure, make sure to note the corresponding **achievement ID*
 Achievement and leaderboard IDs are alphanumeric strings (e.g.
 "Cgkx9eiuwi8_AQ").
 
+## Add Events and Quests 
+Events and Quests are a way to introduce new challenges for players to complete and 
+incentivizing them with some in-game reward or benefit if they succeed.
+Read more about how to configure and use Events and Quests on 
+[Game Concepts - Events and Quests](https://developers.google.com/games/services/common/concepts/quests)
+
 ## Load Your Game Project
 
 Next, load your game project into the Unity editor.
@@ -146,7 +154,7 @@ Player Settings window. In that window, look for the **Bundle Identifier** setti
 under **Other Settings**. Enter your package name there (for example
 _com.example.my.awesome.game_).
 
-Next, click the **File | Play Games - Android setup** menu item. This will display the Android setup screen, where you must input your Application ID (e.g. 12345678012).
+Next, click the **Assets | Google Play Games | Android setup** menu item. This will display the Android setup screen, where you must input your Application ID (e.g. 12345678012).
 
 After filling in the application ID, click the **Setup** button.
 
@@ -180,14 +188,14 @@ are:
 * GoogleOpenSource.framework
 * GooglePlus.bundle
 * GooglePlus.framework
-* GooglePlayGames.bundle
+* gpg.bundle
 * gpg.framework
 
 Next, open the iOS build settings dialog. To do so, click **File | Build Settings**,
 select the **iOS** platform, and click **Player Settings**. Find the **Bundle Identifier**
 setting and enter your bundle identifier there.
 
-Next, click the **File | Play Games - iOS **setup menu item. This will display the
+Next, click the **Assets | Google Play Games | iOS setup...** menu item. This will display the
 iOS setup screen, where you must input:
 
 * Your client ID (e.g. "46798138751-afwa4iejsfjskj.apps.googleusercontent.com")
@@ -231,7 +239,18 @@ Google Play Games extensions can be accessed by casting the **Social.Active**
 object to the **PlayGamesPlatform** class, where the additional methods are
 available.
 
-## Configuration & Initialization
+## Nearby Connections Configuration
+In order to use nearby connections, a service id which uniquely identifies the set of applications that can interact needs to be
+configured.  This is done by clicking the **Assets | Google Play Games | Nearby Connections setup...** menu item. This will display the
+nearby conections setup screen.  On this screen enter the service ID you want to use.  It should be something that identifies your application,
+and  follows the same rules as the bundle id (for example: com.example.myawesomegame.nearby). Once you enter the id, press **Setup**.
+
+To use nearby connections, the player does not need to be authenticated, and no play console configuration is needed.
+
+For detailed information on nearby connection usage, please refer to [nearby connections](NEARBY.md).
+
+
+## Configuration & Initialization Play Game Services
 
 In order to save game progress or handle multiplayer invitations and turn notifications, the default configuration needs to be replaced with a custom configuration.
 To do this use the **PlayGamesClientConfiguration**.  If your game does not use these features, then there is no need to
@@ -536,6 +555,9 @@ Once the saved game file is opened, it can be read to load the game state.  This
     }
 ```
 
+## Events and Quests
+
+TBD - Coming soon (wilkinsonclay)
 
 ## Loading Legacy 'Cloud Save service' Game State from the Cloud (only on Android)
 
@@ -678,7 +700,7 @@ and drop those 5 files on the top-level project item (labeled **Unity-iPhone**).
      **GoogleOpenSource.framework**<br/>
      **GooglePlus.bundle**<br/>
      **GooglePlus.framework**<br/>
-     **GooglePlayGames.bundle**<br/>
+     **gpg.bundle**<br/>
      **gpg.framework**<br/><br/>
 3. Add the **"-ObjC"** linker flag. To do this, select the top-level project
    object, then go to the **Build Settings**
@@ -777,7 +799,7 @@ The final structure should be similar to the following:
     }
 ```
 
-**Note:** If you are using the current version of Unity (4.2), re-exporting to an existing
+**Note:** Some versions of Unity (4.2), re-exporting to an existing
 XCode project path will overwrite **Libraries/RegisterMonoModule.cpp**, even if
 you use the **Append** option. Therefore, you must perform these changes every time
 you export the project. To simplify your workflow, consider copying the files to
@@ -805,11 +827,6 @@ That way, you can even submit scores and achievements simultaneously to two or m
 ## Using Production APNS Certificate (iOS)
 
 In the `GPGSAppController.m` file, you will notice within the `application:didRegisterForRemoteNotificationsWithDeviceToken` method that there is a comment discussing using the sandbox push server. Follow instructions there to switch between the production and sandbox environment and push notification.
-
-## Acknowledgements
-
-The iOS library makes use of the [MiniJSON.cs](https://gist.github.com/darktable/1411710) class developed by Calvin Rien (originally based on a parser by Patrick van Bergen),
-available under the MIT License.
 
 ## Special Thanks
 

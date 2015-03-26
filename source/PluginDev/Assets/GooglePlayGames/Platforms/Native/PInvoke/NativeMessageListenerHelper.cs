@@ -15,7 +15,7 @@
 // </copyright>
 
 // Android only feature
-//#if (UNITY_ANDROID)
+#if (UNITY_ANDROID)
 
 namespace GooglePlayGames.Native.PInvoke
 {
@@ -108,4 +108,4 @@ namespace GooglePlayGames.Native.PInvoke
 
     }
 }
-//#endif // #if (UNITY_ANDROID)
+#endif // #if (UNITY_ANDROID)

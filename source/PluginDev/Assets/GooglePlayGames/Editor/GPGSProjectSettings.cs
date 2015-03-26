@@ -43,24 +43,28 @@ namespace GooglePlayGames
         private GPGSProjectSettings()
         {
             string ds = Path.DirectorySeparatorChar.ToString();
-            mFile = "Assets/GooglePlayGames/Editor/projsettings.txt".Replace("/", ds);
-            
+            mFile = "ProjectSettings/GooglePlayGameSettings.txt".Replace("/", ds);
+
             StreamReader rd = null;
 
-            // check for the file in the old location
-            if (!File.Exists(mFile))
-            {
-                string oldFile = "Assets/Editor/projsettings.txt".Replace("/", ds);
-                if (File.Exists(oldFile))
+            // read the settings file, this list is all the locations it can be in order of precedence.
+            string[] fileLocations =
                 {
-                    rd = new StreamReader(oldFile);
+                    mFile,
+                    "Assets/GooglePlayGames/Editor/projsettings.txt".Replace("/", ds),
+                    "Assets/Editor/projsettings.txt".Replace("/", ds)
+                };
+            
+            foreach (string f in fileLocations)
+            {
+                if (File.Exists(f))
+                {
+                    // assign the reader and break out of the loop
+                    rd = new StreamReader(f);
+                    break;
                 }
             }
-            else
-            {
-                rd = new StreamReader(mFile);
-            }
-
+                
             if (rd != null)
             {
                 while (!rd.EndOfStream)

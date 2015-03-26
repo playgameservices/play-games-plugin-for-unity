@@ -7,6 +7,9 @@ source/build/
 StyleCop.Cache
 StyleCop.Cache.meta
 
+
+**/ProjectSettings/GooglePlayGameSettings.txt
+
 **/build/intermediates/
 
 samples/**/obj
