@@ -23,7 +23,7 @@ namespace GooglePlayGames {
     public class GPGSAndroidSetupUI : EditorWindow {
         string mAppId = "";
 
-        [MenuItem("Google Play Games/Android Setup...", false, 0)]
+        [MenuItem("Window/Google Play Games/Android Setup...", false, 0)]
         public static void MenuItemGPGSAndroidSetup() {
             EditorWindow.GetWindow(typeof(GPGSAndroidSetupUI));
         }
