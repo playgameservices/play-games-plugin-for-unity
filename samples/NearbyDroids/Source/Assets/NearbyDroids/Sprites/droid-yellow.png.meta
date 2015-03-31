@@ -1,0 +1,759 @@
+fileFormatVersion: 2
+guid: abe38de33082644e6818d5de467adf03
+timeCreated: 1427749299
+licenseType: Pro
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: droid-yellow_0
+    21300002: droid-yellow_1
+    21300004: droid-yellow_2
+    21300006: droid-yellow_3
+    21300008: droid-yellow_4
+    21300010: droid-yellow_5
+    21300012: droid-yellow_6
+    21300014: droid-yellow_7
+    21300016: droid-yellow_8
+    21300018: droid-yellow_9
+    21300020: droid-yellow_10
+    21300022: droid-yellow_11
+    21300024: droid-yellow_12
+    21300026: droid-yellow_13
+    21300028: droid-yellow_14
+    21300030: droid-yellow_15
+    21300032: droid-yellow_16
+    21300034: droid-yellow_17
+    21300036: droid-yellow_18
+    21300038: droid-yellow_19
+    21300040: droid-yellow_20
+    21300042: droid-yellow_21
+    21300044: droid-yellow_22
+    21300046: droid-yellow_23
+    21300048: droid-yellow_24
+    21300050: droid-yellow_25
+    21300052: droid-yellow_26
+    21300054: droid-yellow_27
+    21300056: droid-yellow_28
+    21300058: droid-yellow_29
+    21300060: droid-yellow_30
+    21300062: droid-yellow_31
+    21300064: droid-yellow_32
+    21300066: droid-yellow_33
+    21300068: droid-yellow_34
+    21300070: droid-yellow_35
+    21300072: droid-yellow_36
+    21300074: droid-yellow_37
+    21300076: droid-yellow_38
+    21300078: droid-yellow_39
+    21300080: droid-yellow_40
+    21300082: droid-yellow_41
+    21300084: droid-yellow_42
+    21300086: droid-yellow_43
+    21300088: droid-yellow_44
+    21300090: droid-yellow_45
+    21300092: droid-yellow_46
+    21300094: droid-yellow_47
+    21300096: droid-yellow_48
+    21300098: droid-yellow_49
+    21300100: droid-yellow_50
+    21300102: droid-yellow_51
+    21300104: droid-yellow_52
+    21300106: droid-yellow_53
+    21300108: droid-yellow_54
+    21300110: droid-yellow_55
+    21300112: droid-yellow_56
+    21300114: droid-yellow_57
+    21300116: droid-yellow_58
+    21300118: droid-yellow_59
+    21300120: droid-yellow_60
+    21300122: droid-yellow_61
+    21300124: droid-yellow_62
+    21300126: droid-yellow_63
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: .25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 8
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -1
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: .5, y: .5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 256
+  alphaIsTransparency: 1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    sprites:
+    - name: droid-yellow_0
+      rect:
+        serializedVersion: 2
+        x: 27
+        y: 19
+        width: 193
+        height: 225
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_1
+      rect:
+        serializedVersion: 2
+        x: 305
+        y: 19
+        width: 178
+        height: 218
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_2
+      rect:
+        serializedVersion: 2
+        x: 544
+        y: 12
+        width: 170
+        height: 217
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_3
+      rect:
+        serializedVersion: 2
+        x: 776
+        y: 12
+        width: 185
+        height: 217
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_4
+      rect:
+        serializedVersion: 2
+        x: 1046
+        y: 12
+        width: 170
+        height: 217
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_5
+      rect:
+        serializedVersion: 2
+        x: 1324
+        y: 4
+        width: 170
+        height: 225
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_6
+      rect:
+        serializedVersion: 2
+        x: 1587
+        y: 4
+        width: 178
+        height: 225
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_7
+      rect:
+        serializedVersion: 2
+        x: 1842
+        y: 4
+        width: 162
+        height: 233
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_8
+      rect:
+        serializedVersion: 2
+        x: 2097
+        y: 4
+        width: 154
+        height: 233
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_9
+      rect:
+        serializedVersion: 2
+        x: 2344
+        y: 4
+        width: 162
+        height: 233
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_10
+      rect:
+        serializedVersion: 2
+        x: 2606
+        y: 4
+        width: 155
+        height: 233
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_11
+      rect:
+        serializedVersion: 2
+        x: 2861
+        y: 4
+        width: 162
+        height: 240
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_12
+      rect:
+        serializedVersion: 2
+        x: 3116
+        y: 12
+        width: 162
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_13
+      rect:
+        serializedVersion: 2
+        x: 3371
+        y: 12
+        width: 162
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_14
+      rect:
+        serializedVersion: 2
+        x: 3626
+        y: 12
+        width: 162
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_15
+      rect:
+        serializedVersion: 2
+        x: 3888
+        y: 12
+        width: 155
+        height: 240
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_16
+      rect:
+        serializedVersion: 2
+        x: 4406
+        y: 19
+        width: 169
+        height: 237
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_17
+      rect:
+        serializedVersion: 2
+        x: 4660
+        y: 19
+        width: 147
+        height: 237
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_18
+      rect:
+        serializedVersion: 2
+        x: 4892
+        y: 19
+        width: 170
+        height: 225
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_19
+      rect:
+        serializedVersion: 2
+        x: 5124
+        y: 19
+        width: 185
+        height: 233
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_20
+      rect:
+        serializedVersion: 2
+        x: 5657
+        y: 19
+        width: 169
+        height: 233
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_21
+      rect:
+        serializedVersion: 2
+        x: 5896
+        y: 19
+        width: 185
+        height: 218
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_22
+      rect:
+        serializedVersion: 2
+        x: 6143
+        y: 19
+        width: 193
+        height: 233
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_23
+      rect:
+        serializedVersion: 2
+        x: 6406
+        y: 19
+        width: 185
+        height: 237
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_24
+      rect:
+        serializedVersion: 2
+        x: 6668
+        y: 19
+        width: 185
+        height: 237
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_25
+      rect:
+        serializedVersion: 2
+        x: 6962
+        y: 12
+        width: 169
+        height: 225
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_26
+      rect:
+        serializedVersion: 2
+        x: 7216
+        y: 12
+        width: 155
+        height: 217
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_27
+      rect:
+        serializedVersion: 2
+        x: 7440
+        y: 12
+        width: 178
+        height: 217
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_28
+      rect:
+        serializedVersion: 2
+        x: 7749
+        y: 12
+        width: 124
+        height: 217
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_29
+      rect:
+        serializedVersion: 2
+        x: 7973
+        y: 4
+        width: 162
+        height: 225
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_30
+      rect:
+        serializedVersion: 2
+        x: 8243
+        y: 4
+        width: 178
+        height: 225
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_31
+      rect:
+        serializedVersion: 2
+        x: 8498
+        y: 4
+        width: 170
+        height: 233
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_32
+      rect:
+        serializedVersion: 2
+        x: 8753
+        y: 4
+        width: 155
+        height: 233
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_33
+      rect:
+        serializedVersion: 2
+        x: 9000
+        y: 4
+        width: 162
+        height: 233
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_34
+      rect:
+        serializedVersion: 2
+        x: 9255
+        y: 4
+        width: 162
+        height: 233
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_35
+      rect:
+        serializedVersion: 2
+        x: 9518
+        y: 12
+        width: 162
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_36
+      rect:
+        serializedVersion: 2
+        x: 9772
+        y: 12
+        width: 163
+        height: 225
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_37
+      rect:
+        serializedVersion: 2
+        x: 10027
+        y: 12
+        width: 162
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_38
+      rect:
+        serializedVersion: 2
+        x: 10282
+        y: 12
+        width: 162
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_39
+      rect:
+        serializedVersion: 2
+        x: 10815
+        y: 175
+        width: 116
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_40
+      rect:
+        serializedVersion: 2
+        x: 11062
+        y: 19
+        width: 178
+        height: 225
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_41
+      rect:
+        serializedVersion: 2
+        x: 11317
+        y: 19
+        width: 154
+        height: 237
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_42
+      rect:
+        serializedVersion: 2
+        x: 11579
+        y: 19
+        width: 139
+        height: 233
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_43
+      rect:
+        serializedVersion: 2
+        x: 12305
+        y: 19
+        width: 178
+        height: 225
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_44
+      rect:
+        serializedVersion: 2
+        x: 12545
+        y: 19
+        width: 193
+        height: 233
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_45
+      rect:
+        serializedVersion: 2
+        x: 13101
+        y: 19
+        width: 185
+        height: 218
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_46
+      rect:
+        serializedVersion: 2
+        x: 13363
+        y: 12
+        width: 178
+        height: 225
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_47
+      rect:
+        serializedVersion: 2
+        x: 13618
+        y: 12
+        width: 178
+        height: 225
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_48
+      rect:
+        serializedVersion: 2
+        x: 13873
+        y: 12
+        width: 154
+        height: 217
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_49
+      rect:
+        serializedVersion: 2
+        x: 14081
+        y: 12
+        width: 193
+        height: 217
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_50
+      rect:
+        serializedVersion: 2
+        x: 14383
+        y: 4
+        width: 169
+        height: 225
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_51
+      rect:
+        serializedVersion: 2
+        x: 14637
+        y: 4
+        width: 186
+        height: 225
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_52
+      rect:
+        serializedVersion: 2
+        x: 14900
+        y: 4
+        width: 170
+        height: 225
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_53
+      rect:
+        serializedVersion: 2
+        x: 15155
+        y: 4
+        width: 162
+        height: 233
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_54
+      rect:
+        serializedVersion: 2
+        x: 15410
+        y: 4
+        width: 154
+        height: 233
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_55
+      rect:
+        serializedVersion: 2
+        x: 15657
+        y: 4
+        width: 158
+        height: 233
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_56
+      rect:
+        serializedVersion: 2
+        x: 4267
+        y: 89
+        width: 54
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_57
+      rect:
+        serializedVersion: 2
+        x: 5394
+        y: 89
+        width: 54
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_58
+      rect:
+        serializedVersion: 2
+        x: 7687
+        y: 74
+        width: 62
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_59
+      rect:
+        serializedVersion: 2
+        x: 10537
+        y: 74
+        width: 38
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_60
+      rect:
+        serializedVersion: 2
+        x: 10799
+        y: 12
+        width: 155
+        height: 155
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_61
+      rect:
+        serializedVersion: 2
+        x: 11780
+        y: 97
+        width: 70
+        height: 78
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_62
+      rect:
+        serializedVersion: 2
+        x: 12050
+        y: 89
+        width: 54
+        height: 86
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid-yellow_63
+      rect:
+        serializedVersion: 2
+        x: 12807
+        y: 97
+        width: 62
+        height: 78
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
