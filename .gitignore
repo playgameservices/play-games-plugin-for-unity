@@ -22,5 +22,3 @@ samples/**/Assets/Plugins.meta
 samples/**/Assets/Plugins/
 samples/**/Library/
 samples/**/Library.meta
-samples/**/ProjectSettings/
-samples/**/ProjectSettings.meta
