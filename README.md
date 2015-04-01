@@ -154,7 +154,7 @@ Player Settings window. In that window, look for the **Bundle Identifier** setti
 under **Other Settings**. Enter your package name there (for example
 _com.example.my.awesome.game_).
 
-Next, click the **Assets | Google Play Games | Android setup** menu item. This will display the Android setup screen, where you must input your Application ID (e.g. 12345678012).
+Next, click the **Window |Google Play Games|Setup - Android setup** menu item. This will display the Android setup screen, where you must input your Application ID (e.g. 12345678012).
 
 After filling in the application ID, click the **Setup** button.
 
@@ -195,8 +195,7 @@ Next, open the iOS build settings dialog. To do so, click **File | Build Setting
 select the **iOS** platform, and click **Player Settings**. Find the **Bundle Identifier**
 setting and enter your bundle identifier there.
 
-Next, click the **Assets | Google Play Games | iOS setup...** menu item. This will display the
-iOS setup screen, where you must input:
+Next, click the **Window | Google Play Games | Setup  - iOS **setup menu item. This will display the iOS setup screen, where you must input:
 
 * Your client ID (e.g. "46798138751-afwa4iejsfjskj.apps.googleusercontent.com")
 * Your bundle identifier (e.g. "com.example.AwesomeGame")

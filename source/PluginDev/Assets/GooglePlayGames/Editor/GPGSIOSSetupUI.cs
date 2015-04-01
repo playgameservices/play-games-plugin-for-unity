@@ -26,7 +26,7 @@ namespace GooglePlayGames
     private string mClientId = string.Empty;
     private string mBundleId = string.Empty;
 
-    [MenuItem("Assets/Google Play Games/iOS Setup...", false, 2)]
+    [MenuItem("Window/Google Play Games/Setup/iOS setup...", false, 2)]
     public static void MenuItemGPGSIOSSetup()
     {
       EditorWindow.GetWindow(typeof(GPGSIOSSetupUI));
