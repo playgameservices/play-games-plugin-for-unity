@@ -27,12 +27,7 @@ namespace GooglePlayGames {
         private string mClientId = "";
         private string mBundleId = "";
 
-        [MenuItem("Google Play Games/iOS Setup...", false, 1)]
-        public static void MenuItemGPGSIOSSetup() {
-            EditorWindow.GetWindow(typeof(GPGSIOSSetupUI));
-        }
-
-        [MenuItem("File/Play Games - iOS setup...")]
+        [MenuItem("Window/Google Play Games/Setup/iOS setup...")]
         public static void MenuItemFileGPGSIOSSetup() {
             EditorWindow.GetWindow(typeof(GPGSIOSSetupUI));
         }
