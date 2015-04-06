@@ -40,6 +40,23 @@ namespace NearbyDroids
         // Used to make movement more efficient.
         private float inverseMoveTime;
 
+        // true indicates the movement should be sent to the 
+        // game manager to broadcast to other players.
+        private bool broadcastMovement;
+
+        public bool BroadcastMovement
+        {
+            get
+            {
+                return broadcastMovement;
+            }
+
+            set
+            {
+                broadcastMovement = value;
+            }
+        }
+
         // Protected, virtual functions can be overridden by inheriting classes.
         protected virtual void Start()
         {
@@ -76,8 +93,8 @@ namespace NearbyDroids
             // Check if anything was hit
             if (hit.transform == null)
             {
-                // If nothing was hit, start SmoothMovement co-routine passing in the Vector2 end as destination
-                StartCoroutine(SmoothMovement(end));
+                // If nothing was hit, start SmoothMovement co-routine passing in the  end as destination
+                MoveTo(end);
 
                 // Return true to say that Move was successful
                 return true;
@@ -109,10 +126,28 @@ namespace NearbyDroids
                 // Return and loop until sqrRemainingDistance is close enough to zero to end the function
                 yield return null;
             }
+
+            if (BroadcastMovement)
+            {
+                Debug.Log("Logging Change for " + gameObject.name);
+                GameManager.Instance.OnObjectChanged(gameObject.GetComponent<Shareable>());
+            }
+            else
+            {
+                Debug.Log("Skipping logging change for " + gameObject.name);
+            }
         }
 
-        // The virtual keyword means AttemptMove can be overridden by inheriting classes using the override keyword.
-        // AttemptMove takes a generic parameter T to specify the type of component we expect our unit to interact with if blocked (Player for Enemies, Wall for Player).
+        public void MoveTo(Vector3 pos)
+        {
+            StartCoroutine(SmoothMovement(pos));
+        }
+
+        // The virtual keyword means AttemptMove can be overridden by
+        // inheriting classes using the override keyword.
+        // AttemptMove takes a generic parameter T to specify the type
+        // of component we expect our unit to interact with if blocked
+        // (Player for Enemies, Wall for Player).
         protected virtual void AttemptMove<T>(int xDir, int yDir)
             where T : Component
         {
@@ -129,18 +164,23 @@ namespace NearbyDroids
                 return;
             }
 
-            // Get a component reference to the component of type T attached to the object that was hit
+            // Get a component reference to the component of type T
+            // attached to the object that was hit
             T hitComponent = hit.transform.GetComponent<T>();
 
-            // If canMove is false and hitComponent is not equal to null, meaning MovingObject is blocked and has hit something it can interact with.
+            // If canMove is false and hitComponent is not equal to null,
+            // meaning MovingObject is blocked and has hit something 
+            // it can interact with.
             if (!canMove && hitComponent != null)
             {
-                // Call the OnCantMove function and pass it hitComponent as a parameter.
+                // Call the OnCantMove function and pass it hitComponent
+                // as a parameter.
                 OnCantMove(hitComponent);
             }
         }
 
-        // The abstract modifier indicates that the thing being modified has a missing or incomplete implementation.
+        // The abstract modifier indicates that the thing being modified has 
+        // a missing or incomplete implementation.
         // OnCantMove will be overriden by functions in the inheriting classes.
         protected abstract void OnCantMove<T>(T component)
             where T : Component;

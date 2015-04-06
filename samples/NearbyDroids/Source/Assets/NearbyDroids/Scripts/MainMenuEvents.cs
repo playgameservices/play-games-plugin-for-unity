@@ -16,6 +16,7 @@
 
 namespace NearbyDroids
 {
+    using GooglePlayGames.BasicApi.Nearby;
     using UnityEngine;
 
     /// <summary>
@@ -23,12 +24,14 @@ namespace NearbyDroids
     /// </summary>
     public class MainMenuEvents : MonoBehaviour
     {
+        // references to other parts of the UI
         public GameObject mainMenuPanel;
         public GameObject multiplayerRoomPanel;
         public GameObject createRoomGroup;
 
         internal void Awake()
         {
+            // show the main menu at start
             if (mainMenuPanel != null)
             {
                 mainMenuPanel.SetActive(true);
@@ -36,39 +39,37 @@ namespace NearbyDroids
             }
         }
 
+        /// <summary>
+        /// Starts single player game play.
+        /// </summary>
         public void Play()
         {
+            // read player preferences for the name and avatar.
             string defaultPlayerName = PlayerPrefs.GetString(Multiplayer.PlayerNameKey);
             if (defaultPlayerName == null)
             {
                 defaultPlayerName = "Me";
             }
 
-            int charIndex = PlayerPrefs.GetInt(Multiplayer.CharacterIndexKey, 0);
+            int avatarIndex = PlayerPrefs.GetInt(Multiplayer.AvatarIndexKey, 0);
 
-            PlayerInfo.AddPendingPlayer(string.Empty, string.Empty, defaultPlayerName, charIndex);
-            if (GameManager.Instance != null)
-            {
-                GameManager.Instance.StartPlaying();
-            }
-            else
-            {
-                Application.LoadLevel(1);
-            }
+            PlayerInfo.AddPendingPlayer(
+                new NearbyPlayer(defaultPlayerName), avatarIndex);
+            
+            GameManager.Instance.StartPlaying(GameManager.GameType.SinglePlayer);
         }
 
+        /// <summary>
+        /// Shows the main menu
+        /// </summary>
         public void MainMenu()
         {
-            if (GameManager.Instance != null)
-            {
-                GameManager.Instance.StopPlaying();
-            }
-            else
-            {
-                Application.LoadLevel(0);
-            }
+            GameManager.Instance.StopPlaying();
         }
 
+        /// <summary>
+        /// Creates the room for a multi player game.
+        /// </summary>
         public void CreateRoom()
         {
             mainMenuPanel.SetActive(false);
@@ -77,6 +78,9 @@ namespace NearbyDroids
             multiplayerRoomPanel.GetComponent<Multiplayer>().Joining = false;
         }
 
+        /// <summary>
+        /// Joins the room of a multi player game.
+        /// </summary>
         public void JoinRoom()
         {
             mainMenuPanel.SetActive(false);

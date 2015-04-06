@@ -13,6 +13,7 @@ GameObject:
   - 114: {fileID: 11482262}
   - 61: {fileID: 6109578}
   - 50: {fileID: 5064020}
+  - 114: {fileID: 11494940}
   m_Layer: 8
   m_Name: Player3
   m_TagString: Player
@@ -95,6 +96,17 @@ MonoBehaviour:
   restartLevelDelay: 1
   pointsPerCoin: 10
   pointsPerGem: 20
+--- !u!114 &11494940
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 174788}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a50147908d8bd4611a281d930de40bbd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!212 &21229352
 SpriteRenderer:
   m_ObjectHideFlags: 1

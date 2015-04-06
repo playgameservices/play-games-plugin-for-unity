@@ -411,6 +411,75 @@ object first:
     PlayGamesPlatform.Instance.ShowLeaderboardUI("Cfji293fjsie_QA");
 ```
 
+## Recording Events
+Incrementing an event is very simple, just call the following method:
+
+```csharp
+    using GooglePlayGames;
+    ...
+    // Increments the event with Id "YOUR_EVENT_ID" by 1
+    PlayGamesPlatform.Instance.Events.IncrementEvent(YOUR_EVENT_ID, 1);
+```
+This call is "fire and forget", it will handle batching and execution for you in the background.
+
+## Viewing/Accepting/Completing Quests
+In order to accept a quest, view quests in progress, or claim the reward for completing a quest
+your app must present the quests UI.  To bring up the UI, call the following method:
+
+```csharp
+    using GooglePlayGames;
+    ...
+    PlayGamesPlatform.Instance.Quests.ShowAllQuestsUI(
+        (QuestUiResult result, IQuest quest, IQuestMilestone milestone) => {
+        // ...
+    });
+```
+After the user dismisses the quests UI or takes some action within the UI, your application 
+will receive a callback.  If the user has tried to accept a quest or claim a quest milestone
+reward, you should take the appropriate action.  The code below demonstrates one way to handle
+user actions:
+
+```csharp
+    public void ViewQuests()
+    {
+        PlayGamesPlatform.Instance.Quests.ShowAllQuestsUI(
+            (QuestUiResult result, IQuest quest, IQuestMilestone milestone) => {
+            if (result == QuestUiResult.UserRequestsQuestAcceptance)
+            {
+                AcceptQuest(quest);
+            }
+
+            if (result == QuestUiResult.UserRequestsMilestoneClaiming)
+            {
+                ClaimMilestone(milestone);
+            }
+        });
+    }
+
+    private void AcceptQuest(IQuest toAccept)
+    {
+        PlayGamesPlatform.Instance.Quests.Accept(toAccept,
+                                                  (QuestAcceptStatus status, IQuest quest) => {
+            if (status == QuestAcceptStatus.Success)
+            {
+                // ...
+            }
+        });
+    }
+
+    private void ClaimMilestone(IQuestMilestone toClaim)
+    {
+        PlayGamesPlatform.Instance.Quests.ClaimMilestone(toClaim,
+                                                          (QuestClaimMilestoneStatus status, IQuest quest, IQuestMilestone milestone) => {
+            if (status == QuestClaimMilestoneStatus.Success)
+            {
+                // ...
+            }
+        });
+    }
+```
+
+
 ## Saving Game State to the Cloud
 
 For details on saved games concepts and APIs please refer to the  [documentation](https://developers.google.com/games/services/common/concepts/savedgames).
