@@ -39,6 +39,16 @@ namespace GooglePlayGames.Native
             this.mManager = Misc.CheckNotNull(manager);
         }
 
+        public int MaxUnreliableMessagePayloadLength()
+        {
+            return NearbyConnectionConfiguration.MaxUnreliableMessagePayloadLength;
+        }
+
+        public int MaxReliableMessagePayloadLength()
+        {
+            return NearbyConnectionConfiguration.MaxReliableMessagePayloadLength;
+        }
+
         public void SendReliable(List<string> recipientEndpointIds, byte[] payload)
         {
             InternalSend(recipientEndpointIds, payload, true);
@@ -72,6 +82,23 @@ namespace GooglePlayGames.Native
                 return;
             }
 
+            if (isReliable)
+            {
+                if (payload.Length > MaxReliableMessagePayloadLength())
+                {
+                    throw new InvalidOperationException("cannot send more than "
+                        + MaxReliableMessagePayloadLength() + " bytes");
+                }
+            }
+            else
+            {
+                if (payload.Length > MaxUnreliableMessagePayloadLength())
+                {
+                    throw new InvalidOperationException("cannot send more than "
+                        + MaxUnreliableMessagePayloadLength() + " bytes");
+                }
+            }
+
             foreach (var recipient in recipientEndpointIds)
             {
                 if (isReliable)
@@ -93,7 +120,7 @@ namespace GooglePlayGames.Native
             Misc.CheckNotNull(resultCallback, "resultCallback");
             Misc.CheckNotNull(requestCallback, "connectionRequestCallback");
 
-            if (advertisingDuration.HasValue && advertisingDuration.Value.Ticks <= 0)
+            if (advertisingDuration.HasValue && advertisingDuration.Value.Ticks < 0)
             {
                 throw new InvalidOperationException("advertisingDuration must be positive");
             }

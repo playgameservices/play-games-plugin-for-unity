@@ -23,7 +23,7 @@ namespace GooglePlayGames
 
     public class GPGSExportPackageUI
     {
-        [MenuItem("Assets/Google Play Games/Export Plugin Package...", false, 999)]
+        [MenuItem("Window/Google Play Games/Export Plugin Package...", false, 999)]
         public static void MenuItemGPGSExportUIPackage()
         {
             List<string> exportList = new List<string>();

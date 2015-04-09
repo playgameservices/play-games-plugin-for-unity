@@ -23,7 +23,7 @@ namespace GooglePlayGames
     {
         private string mNearbyServiceId = string.Empty;
 
-        [MenuItem("Assets/Google Play Games/Nearby Connections setup...", false, 3)]
+        [MenuItem("Window/Google Play Games/Setup/Nearby Connections setup...", false, 3)]
         public static void MenuItemFileGPGSAndroidSetup()
         {
             EditorWindow.GetWindow(typeof(NearbyConnectionUI));

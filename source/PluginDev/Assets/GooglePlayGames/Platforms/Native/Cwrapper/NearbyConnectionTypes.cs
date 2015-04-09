@@ -18,134 +18,140 @@
 #if (UNITY_ANDROID)
 
 
-namespace GooglePlayGames.Native.Cwrapper {
-using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
-internal static class NearbyConnectionTypes {
-    internal enum ConnectionResponse_ResponseCode {
-        ACCEPTED = 1,
-        REJECTED = 2,
-        NETWORK_ERROR = 3,
-    }
+namespace GooglePlayGames.Native.Cwrapper
+{
+    using System;
+    using System.Runtime.InteropServices;
+    using System.Text;
+
+    internal static class NearbyConnectionTypes
+    {
+        internal enum ConnectionResponse_ResponseCode
+        {
+            ACCEPTED = 1,
+            REJECTED = 2,
+            ERROR_INTERNAL = -1,
+            ERROR_NETWORK_NOT_CONNECTED = -2,
+            ERROR_ENDPOINT_ALREADY_CONNECTED = -3,
+            ERROR_ENDPOINT_NOT_CONNECTED = -4
+        }
 
 
-    internal delegate void ConnectionRequestCallback(
-         /* from(int64_t) */ long arg0,
-         /* from(ConnectionRequest_t) */ IntPtr arg1,
-         /* from(void *) */ IntPtr arg2);
+        internal delegate void ConnectionRequestCallback(
+        /* from(int64_t) */ long arg0,
+        /* from(ConnectionRequest_t) */ IntPtr arg1,
+        /* from(void *) */ IntPtr arg2);
 
-    internal delegate void StartAdvertisingCallback(
-         /* from(int64_t) */ long arg0,
-         /* from(StartAdvertisingResult_t) */ IntPtr arg1,
-         /* from(void *) */ IntPtr arg2);
+        internal delegate void StartAdvertisingCallback(
+        /* from(int64_t) */ long arg0,
+        /* from(StartAdvertisingResult_t) */ IntPtr arg1,
+        /* from(void *) */ IntPtr arg2);
 
-    internal delegate void ConnectionResponseCallback(
-         /* from(int64_t) */ long arg0,
-         /* from(ConnectionResponse_t) */ IntPtr arg1,
-         /* from(void *) */ IntPtr arg2);
+        internal delegate void ConnectionResponseCallback(
+        /* from(int64_t) */ long arg0,
+        /* from(ConnectionResponse_t) */ IntPtr arg1,
+        /* from(void *) */ IntPtr arg2);
 
-    [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern void AppIdentifier_Dispose(
-        HandleRef self);
+        [DllImport(SymbolLocation.NativeSymbolLocation)]
+        internal static extern void AppIdentifier_Dispose(
+            HandleRef self);
 
-    [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(size_t) */ UIntPtr AppIdentifier_GetIdentifier(
-        HandleRef self,
-         /* from(char *) */ StringBuilder out_arg,
-         /* from(size_t) */ UIntPtr out_size);
+        [DllImport(SymbolLocation.NativeSymbolLocation)]
+        internal static extern /* from(size_t) */ UIntPtr AppIdentifier_GetIdentifier(
+            HandleRef self,
+         /* from(char *) */StringBuilder out_arg,
+         /* from(size_t) */UIntPtr out_size);
 
-    [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern void StartAdvertisingResult_Dispose(
-        HandleRef self);
+        [DllImport(SymbolLocation.NativeSymbolLocation)]
+        internal static extern void StartAdvertisingResult_Dispose(
+            HandleRef self);
 
-    [DllImport(SymbolLocation.NativeSymbolLocation)]
-    [return: MarshalAs(UnmanagedType.I4)]
+        [DllImport(SymbolLocation.NativeSymbolLocation)]
+        [return: MarshalAs(UnmanagedType.I4)]
         internal static extern /* from(uint32_t) */ int StartAdvertisingResult_GetStatus(
             HandleRef self);
 
-    [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(size_t) */ UIntPtr StartAdvertisingResult_GetLocalEndpointName(
-        HandleRef self,
-         /* from(char *) */ StringBuilder out_arg,
-         /* from(size_t) */ UIntPtr out_size);
+        [DllImport(SymbolLocation.NativeSymbolLocation)]
+        internal static extern /* from(size_t) */ UIntPtr StartAdvertisingResult_GetLocalEndpointName(
+            HandleRef self,
+         /* from(char *) */StringBuilder out_arg,
+         /* from(size_t) */UIntPtr out_size);
 
-    [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern void EndpointDetails_Dispose(
-        HandleRef self);
+        [DllImport(SymbolLocation.NativeSymbolLocation)]
+        internal static extern void EndpointDetails_Dispose(
+            HandleRef self);
 
-    [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(size_t) */ UIntPtr EndpointDetails_GetEndpointId(
-        HandleRef self,
-         /* from(char *) */ StringBuilder out_arg,
-         /* from(size_t) */ UIntPtr out_size);
+        [DllImport(SymbolLocation.NativeSymbolLocation)]
+        internal static extern /* from(size_t) */ UIntPtr EndpointDetails_GetEndpointId(
+            HandleRef self,
+         /* from(char *) */StringBuilder out_arg,
+         /* from(size_t) */UIntPtr out_size);
 
-    [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(size_t) */ UIntPtr EndpointDetails_GetDeviceId(
-        HandleRef self,
-         /* from(char *) */ StringBuilder out_arg,
-         /* from(size_t) */ UIntPtr out_size);
+        [DllImport(SymbolLocation.NativeSymbolLocation)]
+        internal static extern /* from(size_t) */ UIntPtr EndpointDetails_GetDeviceId(
+            HandleRef self,
+         /* from(char *) */StringBuilder out_arg,
+         /* from(size_t) */UIntPtr out_size);
 
-    [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(size_t) */ UIntPtr EndpointDetails_GetName(
-        HandleRef self,
-         /* from(char *) */ StringBuilder out_arg,
-         /* from(size_t) */ UIntPtr out_size);
+        [DllImport(SymbolLocation.NativeSymbolLocation)]
+        internal static extern /* from(size_t) */ UIntPtr EndpointDetails_GetName(
+            HandleRef self,
+         /* from(char *) */StringBuilder out_arg,
+         /* from(size_t) */UIntPtr out_size);
 
-    [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(size_t) */ UIntPtr EndpointDetails_GetServiceId(
-        HandleRef self,
-         /* from(char *) */ StringBuilder out_arg,
-         /* from(size_t) */ UIntPtr out_size);
+        [DllImport(SymbolLocation.NativeSymbolLocation)]
+        internal static extern /* from(size_t) */ UIntPtr EndpointDetails_GetServiceId(
+            HandleRef self,
+         /* from(char *) */StringBuilder out_arg,
+         /* from(size_t) */UIntPtr out_size);
 
-    [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern void ConnectionRequest_Dispose(
-        HandleRef self);
+        [DllImport(SymbolLocation.NativeSymbolLocation)]
+        internal static extern void ConnectionRequest_Dispose(
+            HandleRef self);
 
-    [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(size_t) */ UIntPtr ConnectionRequest_GetRemoteEndpointId(
-        HandleRef self,
-         /* from(char *) */ StringBuilder out_arg,
-         /* from(size_t) */ UIntPtr out_size);
+        [DllImport(SymbolLocation.NativeSymbolLocation)]
+        internal static extern /* from(size_t) */ UIntPtr ConnectionRequest_GetRemoteEndpointId(
+            HandleRef self,
+         /* from(char *) */StringBuilder out_arg,
+         /* from(size_t) */UIntPtr out_size);
 
-    [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(size_t) */ UIntPtr ConnectionRequest_GetRemoteDeviceId(
-        HandleRef self,
-         /* from(char *) */ StringBuilder out_arg,
-         /* from(size_t) */ UIntPtr out_size);
+        [DllImport(SymbolLocation.NativeSymbolLocation)]
+        internal static extern /* from(size_t) */ UIntPtr ConnectionRequest_GetRemoteDeviceId(
+            HandleRef self,
+         /* from(char *) */StringBuilder out_arg,
+         /* from(size_t) */UIntPtr out_size);
 
-    [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(size_t) */ UIntPtr ConnectionRequest_GetRemoteEndpointName(
-        HandleRef self,
-         /* from(char *) */ StringBuilder out_arg,
-         /* from(size_t) */ UIntPtr out_size);
+        [DllImport(SymbolLocation.NativeSymbolLocation)]
+        internal static extern /* from(size_t) */ UIntPtr ConnectionRequest_GetRemoteEndpointName(
+            HandleRef self,
+         /* from(char *) */StringBuilder out_arg,
+         /* from(size_t) */UIntPtr out_size);
 
-    [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(size_t) */ UIntPtr ConnectionRequest_GetPayload(
-        HandleRef self,
-        [In, Out] /* from(uint8_t *) */ byte[] out_arg,
-         /* from(size_t) */ UIntPtr out_size);
+        [DllImport(SymbolLocation.NativeSymbolLocation)]
+        internal static extern /* from(size_t) */ UIntPtr ConnectionRequest_GetPayload(
+            HandleRef self,
+            [In, Out] /* from(uint8_t *) */ byte[] out_arg,
+         /* from(size_t) */UIntPtr out_size);
 
-    [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern void ConnectionResponse_Dispose(
-        HandleRef self);
+        [DllImport(SymbolLocation.NativeSymbolLocation)]
+        internal static extern void ConnectionResponse_Dispose(
+            HandleRef self);
 
-    [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(size_t) */ UIntPtr ConnectionResponse_GetRemoteEndpointId(
-        HandleRef self,
-         /* from(char *) */ StringBuilder out_arg,
-         /* from(size_t) */ UIntPtr out_size);
+        [DllImport(SymbolLocation.NativeSymbolLocation)]
+        internal static extern /* from(size_t) */ UIntPtr ConnectionResponse_GetRemoteEndpointId(
+            HandleRef self,
+         /* from(char *) */StringBuilder out_arg,
+         /* from(size_t) */UIntPtr out_size);
 
-    [DllImport(SymbolLocation.NativeSymbolLocation)]
+        [DllImport(SymbolLocation.NativeSymbolLocation)]
         internal static extern /* from(ConnectionResponse_ResponseCode_t) */ NearbyConnectionTypes.ConnectionResponse_ResponseCode ConnectionResponse_GetStatus(
-        HandleRef self);
+            HandleRef self);
 
-    [DllImport(SymbolLocation.NativeSymbolLocation)]
-    internal static extern /* from(size_t) */ UIntPtr ConnectionResponse_GetPayload(
-        HandleRef self,
-        [In, Out] /* from(uint8_t *) */ byte[] out_arg,
-         /* from(size_t) */ UIntPtr out_size);
-}
+        [DllImport(SymbolLocation.NativeSymbolLocation)]
+        internal static extern /* from(size_t) */ UIntPtr ConnectionResponse_GetPayload(
+            HandleRef self,
+            [In, Out] /* from(uint8_t *) */ byte[] out_arg,
+         /* from(size_t) */UIntPtr out_size);
+    }
 }
 #endif // (UNITY_ANDROID || UNITY_IPHONE)

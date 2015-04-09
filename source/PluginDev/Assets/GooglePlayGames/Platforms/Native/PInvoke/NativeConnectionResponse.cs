@@ -60,12 +60,19 @@ internal class NativeConnectionResponse : BaseReferenceHolder
             {
                 case C.ConnectionResponse_ResponseCode.ACCEPTED:
                     return ConnectionResponse.Accepted(localClientId, RemoteEndpointId(), Payload());
-                case C.ConnectionResponse_ResponseCode.NETWORK_ERROR:
-                    return ConnectionResponse.NetworkError(localClientId, RemoteEndpointId());
+                case C.ConnectionResponse_ResponseCode.ERROR_ENDPOINT_ALREADY_CONNECTED:
+                    return ConnectionResponse.AlreadyConnected(localClientId, RemoteEndpointId());
                 case C.ConnectionResponse_ResponseCode.REJECTED:
                     return ConnectionResponse.Rejected(localClientId, RemoteEndpointId());
+                case C.ConnectionResponse_ResponseCode.ERROR_ENDPOINT_NOT_CONNECTED:
+                    return ConnectionResponse.EndpointNotConnected(localClientId, RemoteEndpointId());
+                case C.ConnectionResponse_ResponseCode.ERROR_NETWORK_NOT_CONNECTED:
+                    return ConnectionResponse.NetworkNotConnected(localClientId, RemoteEndpointId());
+                case C.ConnectionResponse_ResponseCode.ERROR_INTERNAL:
+                    return ConnectionResponse.InternalError(localClientId, RemoteEndpointId());
                 default:
-                    throw new InvalidOperationException("Found connection response of unknown type");
+                    throw new InvalidOperationException("Found connection response of unknown type: " +
+                        ResponseCode());
             }
         }
 

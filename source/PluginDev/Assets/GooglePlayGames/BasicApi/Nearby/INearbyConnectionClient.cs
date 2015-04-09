@@ -21,6 +21,11 @@ namespace GooglePlayGames.BasicApi.Nearby
 
     public interface INearbyConnectionClient
     {
+
+        int MaxUnreliableMessagePayloadLength();
+
+        int MaxReliableMessagePayloadLength();
+
         void SendReliable(List<string> recipientEndpointIds, byte[] payload);
 
         void SendUnreliable(List<string> recipientEndpointIds, byte[] payload);

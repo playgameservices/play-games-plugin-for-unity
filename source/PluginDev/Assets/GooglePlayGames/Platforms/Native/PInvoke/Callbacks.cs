@@ -217,10 +217,8 @@ namespace GooglePlayGames.Native.PInvoke
 
                 if (toInvokeOnGameThread == null)
                 {
-                    Logger.e("CWCW: NULL  callback on GameThread");
                     return;
                 }
-                Logger.e("CWCW: Calling on GameTherar!  callback on GameThread " + result);
                 PlayGamesHelperObject.RunOnGameThread(() => toInvokeOnGameThread(result));
             };
         }

@@ -197,7 +197,7 @@ namespace GooglePlayGames.Native.PInvoke
         {
             Debug.Log("Initializing ServiceId property!!!!");
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID && !UNITY_EDITOR
             using (var jc = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
             {
                 using (var activity = jc.GetStatic<AndroidJavaObject>("currentActivity"))

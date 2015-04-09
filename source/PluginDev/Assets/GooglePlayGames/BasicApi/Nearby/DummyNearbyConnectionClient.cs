@@ -20,6 +20,18 @@ namespace GooglePlayGames.BasicApi.Nearby
 
     public class DummyNearbyConnectionClient : INearbyConnectionClient
     {
+
+
+        public int MaxUnreliableMessagePayloadLength()
+        {
+            return NearbyConnectionConfiguration.MaxUnreliableMessagePayloadLength;
+        }
+
+        public int MaxReliableMessagePayloadLength()
+        {
+            return NearbyConnectionConfiguration.MaxReliableMessagePayloadLength;
+        }
+
         public void SendReliable(System.Collections.Generic.List<string> recipientEndpointIds, byte[] payload)
         {
             Debug.LogError("SendReliable called from dummy implementation");
@@ -59,7 +71,7 @@ namespace GooglePlayGames.BasicApi.Nearby
 
         public void StartDiscovery(string serviceId, System.TimeSpan? advertisingTimeout, IDiscoveryListener listener)
         {
-            Debug.LogError("AcceptConnectionRequest in dummy implementation called");
+            Debug.LogError("StartDiscovery in dummy implementation called");
         }
 
         public void StopDiscovery(string serviceId)
