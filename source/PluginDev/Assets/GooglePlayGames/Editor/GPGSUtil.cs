@@ -159,7 +159,7 @@ namespace GooglePlayGames
                                     GPGSUtil.SlashesToPlatformSeparator(
                                         "/extras/android/support/v4/android-support-v4.jar");
             string supportJarDest =
-                GPGSUtil.SlashesToPlatformSeparator("Assets/Plugins/Android/android-support-v4.jar");
+                GPGSUtil.SlashesToPlatformSeparator("Assets/Plugins/Android/libs/android-support-v4.jar");
 
             string libProjPath = sdkPath +
                                  GPGSUtil.SlashesToPlatformSeparator(
