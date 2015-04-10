@@ -25,15 +25,12 @@ namespace NearbyDroids
     /// </summary>
     public class EnemyController : MovingObject
     {
-        // The amount of food points to subtract from the player when attacking.
+        // The amount of points to subtract from the player when attacking.
         public int playerDamage;
 
         // Variable of type Animator to store a reference to the enemy's
         // Animator component.
         private Animator animator;
-
-        // Transform to attempt to move toward each turn.
-        private Transform target;
 
         // Boolean to determine whether or not enemy should skip a turn or
         // move this turn.
@@ -50,19 +47,25 @@ namespace NearbyDroids
             // Get and store a reference to the attached Animator component.
             animator = GetComponent<Animator>();
 
-            // Find the Player GameObject using it's tag and store a reference
-            // to its transform component.
-            target = GameObject.FindGameObjectWithTag("Player").transform;
-
             // Call the start function of our base class MovingObject.
             base.Start();
         }
 
         internal void Update()
         {
-            if (animator.GetCurrentAnimatorStateInfo(0).IsName("Dead"))
+            if (animator == null)
             {
-                enabled = false;
+                animator = GetComponent<Animator>();
+            }
+
+            if (animator != null)
+            {
+                if (animator.GetCurrentAnimatorStateInfo(0).IsName("Dead"))
+                {
+                    Debug.Log("animator state is dead!");
+                    // turn off this script since this enemy is dead.
+                    enabled = false;
+                }
             }
         }
 
@@ -107,6 +110,27 @@ namespace NearbyDroids
             int xDir = 0;
             int yDir = 0;
 
+            // Find the Player GameObject using it's tag and store a reference
+            // to its transform component.
+            // This could be a place for some optimization so the players could
+            // be cached.  Special attention is needed for when new players show up...
+            GameObject[] targets = GameObject.FindGameObjectsWithTag("Player");
+            Transform target = null;
+            float minDistMagnitude = float.MaxValue;
+            foreach (GameObject targ in targets)
+            {
+                PlayerController player = targ.GetComponent<PlayerController>();
+                if (targ.activeSelf && player.Player.Score >= 0)
+                {
+                    float d = (transform.position - targ.transform.position).sqrMagnitude;
+                    if (target == null || d < minDistMagnitude)
+                    {
+                        target = targ.transform;
+                        minDistMagnitude = d;
+                    }
+                }
+            }
+
             // If the difference in positions is approximately zero 
             // (Epsilon) do the following:
             float diff = Mathf.Abs(target.position.x - transform.position.x);
@@ -150,7 +174,7 @@ namespace NearbyDroids
         {
             if (component.gameObject.tag == "enemy")
             {
-                animator.SetTrigger("explode");
+                Explode();
             }
             else
             {
@@ -174,10 +198,15 @@ namespace NearbyDroids
         private void OnTriggerEnter2D(Collider2D other)
         {
             // Check if the tag of the trigger collided with is Exit.
-            if (other.tag == "deadly")
+            if (other.tag == "deadly" || other.tag == "Player")
             {
                 animator.Play("enemy_die");
             }
+        }
+
+        public void Explode()
+        {
+            animator.SetTrigger("explode");
         }
     }
 }

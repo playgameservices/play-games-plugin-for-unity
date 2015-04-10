@@ -10,6 +10,7 @@ GameObject:
   - 4: {fileID: 426566}
   - 212: {fileID: 21281822}
   - 61: {fileID: 6176802}
+  - 114: {fileID: 11427452}
   m_Layer: 0
   m_Name: cardboard-coin_2
   m_TagString: powerup
@@ -42,6 +43,17 @@ BoxCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Size: {x: .321500003, y: .315250009}
+--- !u!114 &11427452
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 142366}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a50147908d8bd4611a281d930de40bbd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!212 &21281822
 SpriteRenderer:
   m_ObjectHideFlags: 1

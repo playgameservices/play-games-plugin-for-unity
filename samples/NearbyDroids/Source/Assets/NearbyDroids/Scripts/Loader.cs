@@ -29,12 +29,12 @@ namespace NearbyDroids
 
         internal void Awake()
         {
-            // Check if a GameManager has already been assigned to static variable GameManager.instance or if it's still null
+            // Check if a GameManager has already been assigned to
+            // static variable GameManager.instance or if it's still null
             if (GameManager.Instance == null)
             {
                 // Instantiate gameManager prefab
-                GameObject mgr = Instantiate(gameManager) as GameObject;
-                mgr.GetComponent<GameManager>().StartPlaying();
+                Instantiate(gameManager);
             }
         }
     }

@@ -11,6 +11,8 @@ GameObject:
   - 212: {fileID: 21240548}
   - 95: {fileID: 9516232}
   - 61: {fileID: 6180998}
+  - 114: {fileID: 11462818}
+  - 114: {fileID: 11466914}
   m_Layer: 0
   m_Name: buzz
   m_TagString: deadly
@@ -60,6 +62,28 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &11462818
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 125586}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4405ac03164024063892e5eab571211d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &11466914
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 125586}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a50147908d8bd4611a281d930de40bbd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!212 &21240548
 SpriteRenderer:
   m_ObjectHideFlags: 1

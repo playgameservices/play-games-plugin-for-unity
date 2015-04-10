@@ -16,62 +16,80 @@
 
 namespace NearbyDroids
 {
+    using System;
     using System.Collections.Generic;
+    using System.IO;
+    using System.Runtime.Serialization.Formatters.Binary;
+    using GooglePlayGames;
     using UnityEngine;
     using UnityEngine.UI;
 
+    /// <summary>
+    /// Player info for the gamemanager.  This keeps track of the ids and
+    /// scores of the players, as well as references to UI elements for the 
+    /// player.  The PlayerInfo is not passed to other players, but the
+    /// PlayerData member object is passed around.
+    /// </summary>
     public class PlayerInfo : ScriptableObject
     {
-        private static Dictionary<string, PlayerInfo> playerScores = new Dictionary<string, PlayerInfo>();
+        // serializer for player info - this is needed for the connection request
+        // payload.
+        private static BinaryFormatter bf = new BinaryFormatter();
 
+        // all users so we can look them up and iterate over them.
+        private static Dictionary<string, PlayerInfo> allPlayers =
+            new Dictionary<string, PlayerInfo>();
+
+        // UI element references
         private GameObject scorePanel;
         private Text scoreText;
         private Text nameText;
 
-        // device id is stably unique to a device.
-        private string deviceId;
-
-        // endpoint is the current endpoint for the player.  This can change
-        // if there is a network issue or something which causes a reconnection.
-        private string endpointId;
+        // flag indicating of the player has moved in this turn.
+        private bool moved;
 
         /// <summary>
-        ///  the avatar index for this player.
+        /// The player's name and connection information.
         /// </summary>
-        private int charIndex;
+        private NearbyPlayer player;
 
-        // the score
-        private int score = 0;
+        /// <summary>
+        /// Keep the state of the player in a struct so it can be serialized
+        /// easily.
+        /// </summary>
+        private PlayerData dataState;
 
         public static IEnumerable<PlayerInfo> AllPlayers
         {
             get
             {
-                return playerScores.Values;
+                return allPlayers.Values;
             }
         }
 
-        public string Name
+        public static PlayerInfo LocalPlayer
         {
             get
             {
-                return name;
+                return GetPlayer(
+                    PlayGamesPlatform.Nearby.LocalDeviceId());
             }
         }
 
-        public string DeviceId
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="NearbyDroids.PlayerInfo"/> has moved.
+        /// </summary>
+        /// <value><c>true</c> if moved; otherwise, <c>false</c>.</value>
+        public bool Moved
         {
             get
             {
-                return deviceId;
+                return moved;
             }
-        }
 
-        public string EndpointId
-        {
-            get
+            set
             {
-                return endpointId;
+                moved = value;
             }
         }
 
@@ -79,12 +97,12 @@ namespace NearbyDroids
         {
             get
             {
-                return score;
+                return dataState.score;
             }
 
             set
             {
-                score = value;
+                dataState.score = value;
             }
         }
 
@@ -92,64 +110,116 @@ namespace NearbyDroids
         {
             get
             {
-                return charIndex;
+                return dataState.avatarIndex;
             }
         }
 
-        public static PlayerInfo CreatePlayer(
-            GameObject scorePanel,
-            string name, 
-            string deviceId,
-            string endpointId,
-            GameObject prefab)
+        public string DeviceId
         {
-            PlayerInfo info = playerScores.ContainsKey(deviceId) ? playerScores[deviceId] : null;
-
-            if (info == null)
+            get
             {
-                info = ScriptableObject.CreateInstance<PlayerInfo>();
-                playerScores.Add(deviceId, info);
+                return player.DeviceId;
+            }
+        }
+
+        public NearbyPlayer Player
+        {
+            get
+            {
+                return player;
+            }
+        }
+
+        public PlayerData DataState
+        {
+            get
+            {
+                return this.dataState;
+            }
+
+            set
+            {
+                dataState = value;
+            }
+        }
+
+        public GameObject ScorePanel
+        {
+            get
+            {
+                return scorePanel;
+            }
+
+            set
+            {
+                scorePanel = value;
+            }
+        }
+
+        public Text NameText
+        {
+            get
+            {
+                return nameText;
+            }
+
+            set
+            {
+                nameText = value;
+            }
+        }
+
+        public Text ScoreText
+        {
+            get
+            {
+                return scoreText;
+            }
+
+            set
+            {
+                scoreText = value;
+            }
+        }
+
+        public bool IsLocal
+        {
+            get
+            {
+                return this.player.IsLocal;
+            }
+        }
+
+        public byte[] SerializedData
+        {
+            get
+            {
+                MemoryStream m = new MemoryStream();
+                bf.Serialize(m, dataState); 
+                m.Flush();
+                return m.ToArray();
+            }
+        }
+
+        internal void SetDataState(byte[] data)
+        {
+            if (data == null || data.Length == 0)
+            {
+                dataState = new PlayerData();
             }
             else
             {
-                DestroyObject(info.scorePanel);
+                MemoryStream s = new MemoryStream(data);
+                PlayerData d = bf.Deserialize(s) as PlayerData;
+
+                // Note: Could handle versioning conversions here...
+                dataState = d;
             }
-
-            GameObject score = Instantiate(prefab) as GameObject;
-            info.scorePanel = score;
-
-            score.transform.SetParent(scorePanel.transform, false);
-            score.name = "score_" + name;
-            Text[] texts = score.GetComponentsInChildren<Text>();
-            foreach (Text t in texts)
-            {
-                if (t.gameObject.name.EndsWith("name"))
-                {
-                    info.nameText = t;
-                }
-                else if (t.gameObject.name.EndsWith("score"))
-                {
-                    info.scoreText = t;
-                }
-            }
-
-            info.nameText.text = name;
-            info.scoreText.text = "0";
-            info.deviceId = deviceId;
-            info.endpointId = endpointId;
-            info.scorePanel = score;
-
-            LayoutRebuilder.MarkLayoutForRebuild(scorePanel.GetComponent<RectTransform>());
-
-            return info;
         }
 
-        internal static void UpdateScores()
+        public static void ClearAllPlayers()
         {
-            foreach (PlayerInfo p in playerScores.Values)
-            {
-                p.scoreText.text = string.Empty + p.score;
-            }
+            allPlayers.Clear();
         }
 
         public static int GetScore(string deviceId)
@@ -157,7 +227,7 @@ namespace NearbyDroids
             PlayerInfo p = GetPlayer(deviceId);
             if (p != null)
             {
-                return p.score;
+                return p.dataState.score;
             }
 
             return 0;
@@ -168,8 +238,8 @@ namespace NearbyDroids
             PlayerInfo p = GetPlayer(deviceId);
             if (p != null)
             {
-                p.score += value;
-                return p.score;
+                p.dataState.score += value;
+                return p.dataState.score;
             }
 
             return 0;
@@ -177,27 +247,127 @@ namespace NearbyDroids
 
         public static PlayerInfo GetPlayer(string deviceId)
         {
-            return playerScores[deviceId];
+            if (allPlayers.ContainsKey(deviceId))
+            {
+                return allPlayers[deviceId];
+            }
+            else
+            {
+                Debug.Log("Could not find player for deviceId " + deviceId);
+            }
+
+            return null;
         }
 
-        public static void AddPendingPlayer(string deviceId, string endpointId, string name, int charIndex)
+        public static PlayerInfo AddPendingPlayer(NearbyPlayer player, byte[] data)
         {
-            PlayerInfo info = playerScores.ContainsKey(deviceId) ? playerScores[deviceId] : null;
+            PlayerInfo info;
+            if (allPlayers.ContainsKey(player.DeviceId))
+            {
+                info = allPlayers[player.DeviceId];
+            }
+            else
+            {
+                info = null;
+            }
 
             if (info == null)
             {
                 info = ScriptableObject.CreateInstance<PlayerInfo>();
-                playerScores.Add(deviceId, info);
+                allPlayers.Add(player.DeviceId, info);
             }
             else
             {
                 DestroyObject(info.scorePanel);
             }
+                
+            info.SetDataState(data);
+            info.player = player;
+            info.dataState.Name = player.Name;
+            info.dataState.deviceId = player.DeviceId;
 
-            info.deviceId = deviceId;
-            info.endpointId = endpointId;
-            info.name = name;
-            info.charIndex = charIndex;
+            return info;
+        }
+
+        public static PlayerInfo AddPendingPlayer(NearbyPlayer player, int charIndex)
+        {
+            PlayerInfo info;
+            if (allPlayers.ContainsKey(player.DeviceId))
+            {
+                info = allPlayers[player.DeviceId];
+            }
+            else
+            {
+                info = null;
+            }
+
+            if (info == null)
+            {
+                info = ScriptableObject.CreateInstance<PlayerInfo>();
+                allPlayers.Add(player.DeviceId, info);
+            }
+            else
+            {
+                DestroyObject(info.scorePanel);
+                info.scorePanel = null;
+            }
+
+            info.player = player;
+            info.dataState = new PlayerData();
+            info.dataState.avatarIndex = charIndex;
+            info.dataState.deviceId = player.DeviceId;
+            info.dataState.Name = player.Name;
+            return info;
+        }
+
+        public static void RemovePendingPlayer(string deviceId)
+        {
+            allPlayers.Remove(deviceId);
+        }
+
+        [Serializable]
+        public class PlayerData
+        {
+            internal readonly int CurrentVersion = 1;
+            internal int version = 1;
+            internal string deviceId;
+            internal string name;
+            internal int avatarIndex;
+            internal int score;
+
+            public string DeviceId
+            {
+                get
+                {
+                    return deviceId;
+                }
+            }
+
+            public string Name
+            {
+                get
+                {
+                    return name;
+                }
+
+                set
+                {
+                    name = value;
+                }
+            }
+
+            public int AvatarIndex
+            {
+                get
+                {
+                    return avatarIndex;
+                }
+
+                set
+                {
+                    avatarIndex = value;
+                }
+            }
         }
     }
 }

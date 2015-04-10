@@ -254,8 +254,8 @@ RectTransform:
   m_RootOrder: 3
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 322.000031, y: -320.827515}
-  m_SizeDelta: {x: 644.000061, y: 65.8717346}
+  m_AnchoredPosition: {x: 400, y: -330.62738}
+  m_SizeDelta: {x: 800, y: 70}
   m_Pivot: {x: .5, y: .5}
 --- !u!114 &117024606
 MonoBehaviour:
@@ -534,8 +534,8 @@ RectTransform:
   m_RootOrder: 1
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 322.000031, y: -66.881691}
-  m_SizeDelta: {x: 644.000061, y: 42.0199127}
+  m_AnchoredPosition: {x: 400, y: -72.8136902}
+  m_SizeDelta: {x: 800, y: 45.6273727}
   m_Pivot: {x: .5, y: .5}
 --- !u!114 &353173723
 MonoBehaviour:
@@ -937,7 +937,7 @@ MonoBehaviour:
   m_Script: {fileID: 1997211142, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_AllowActivationOnStandalone: 0
+  m_AllowActivationOnStandalone: 1
 --- !u!114 &510204158
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -954,7 +954,7 @@ MonoBehaviour:
   m_SubmitButton: Submit
   m_CancelButton: Cancel
   m_InputActionsPerSecond: 10
-  m_AllowActivationOnMobileDevice: 0
+  m_AllowActivationOnMobileDevice: 1
 --- !u!114 &510204159
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1093,8 +1093,8 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 322.000031, y: -22.9358673}
-  m_SizeDelta: {x: 644.000061, y: 45.8717346}
+  m_AnchoredPosition: {x: 400, y: -25}
+  m_SizeDelta: {x: 800, y: 50}
   m_Pivot: {x: .5, y: .5}
 --- !u!114 &552065079
 MonoBehaviour:
@@ -1968,6 +1968,8 @@ GameObject:
   - 222: {fileID: 795316253}
   - 114: {fileID: 795316252}
   - 114: {fileID: 795316254}
+  - 114: {fileID: 795316256}
+  - 114: {fileID: 795316255}
   m_Layer: 5
   m_Name: PlayerList
   m_TagString: Untagged
@@ -1989,8 +1991,8 @@ RectTransform:
   m_RootOrder: 2
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 322.000031, y: -187.891647}
-  m_SizeDelta: {x: 644.000061, y: 200}
+  m_AnchoredPosition: {x: 400, y: -195.62738}
+  m_SizeDelta: {x: 800, y: 200}
   m_Pivot: {x: .5, y: .5}
 --- !u!114 &795316252
 MonoBehaviour:
@@ -2037,6 +2039,38 @@ MonoBehaviour:
   m_PreferredHeight: -1
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
+--- !u!114 &795316255
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 795316250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1297475563, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 0
+  m_Spacing: 0
+  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandHeight: 0
+--- !u!114 &795316256
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 795316250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1184210157, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_AllowSwitchOff: 0
 --- !u!1 &861218600
 GameObject:
   m_ObjectHideFlags: 0
@@ -2511,8 +2545,8 @@ RectTransform:
   m_RootOrder: 2
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -5.7220459e-06, y: 4.10082139e-05}
-  m_SizeDelta: {x: -156, y: -147}
+  m_AnchoredPosition: {x: 5.02292678e-05, y: -1.14440918e-05}
+  m_SizeDelta: {x: 6.10349998e-05, y: -59}
   m_Pivot: {x: .5, y: .5}
 --- !u!114 &1063648748
 MonoBehaviour:
@@ -3438,8 +3472,8 @@ RectTransform:
   m_RootOrder: 1
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 387.000031, y: -32.9358673}
-  m_SizeDelta: {x: 100, y: 45.8717346}
+  m_AnchoredPosition: {x: 465, y: -35}
+  m_SizeDelta: {x: 100, y: 50}
   m_Pivot: {x: .5, y: .5}
 --- !u!114 &1315951347
 MonoBehaviour:
@@ -3480,8 +3514,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1019551037}
-        m_MethodName: MainMenu
+      - m_Target: {fileID: 1696803284}
+        m_MethodName: CancelMultiplayer
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3590,7 +3624,7 @@ MonoBehaviour:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
     m_FontSize: 14
     m_FontStyle: 0
-    m_BestFit: 0
+    m_BestFit: 1
     m_MinSize: 10
     m_MaxSize: 40
     m_Alignment: 4
@@ -3963,8 +3997,8 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 257.000031, y: -32.9358673}
-  m_SizeDelta: {x: 100, y: 45.8717346}
+  m_AnchoredPosition: {x: 335, y: -35}
+  m_SizeDelta: {x: 100, y: 50}
   m_Pivot: {x: .5, y: .5}
 --- !u!114 &1537730702
 MonoBehaviour:
@@ -4004,7 +4038,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1537730703}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1696803284}
+        m_MethodName: EnterRoom
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine, Version=0.0.0.0,
+            Culture=neutral, PublicKeyToken=null
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &1537730703
@@ -4273,13 +4319,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7e286ad1058a46fdb1b2e5bd7173677, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  roomName: {fileID: 465517258}
-  playerName: {fileID: 752283983}
+  roomNameField: {fileID: 465517258}
+  playerNameField: {fileID: 752283983}
   charGroup: {fileID: 1095076061}
   autoConnect: {fileID: 600945395}
   allowJoinDuringGame: {fileID: 566815496}
-  lobbyPanel: {fileID: 1063648746}
   statusText: {fileID: 353173723}
+  lobbyPanel: {fileID: 1063648746}
+  lobbyListArea: {fileID: 795316250}
+  itemChoicePrefab: {fileID: 183110, guid: 5023c1282dbdf4b5083c33c5822cd93c, type: 2}
 --- !u!1 &1794864665
 GameObject:
   m_ObjectHideFlags: 0
@@ -4466,7 +4514,7 @@ MonoBehaviour:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
     m_FontSize: 14
     m_FontStyle: 0
-    m_BestFit: 0
+    m_BestFit: 1
     m_MinSize: 10
     m_MaxSize: 40
     m_Alignment: 4
@@ -4893,6 +4941,7 @@ GameObject:
   - 92: {fileID: 2018506714}
   - 124: {fileID: 2018506713}
   - 81: {fileID: 2018506712}
+  - 114: {fileID: 2018506717}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -4965,6 +5014,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
+--- !u!114 &2018506717
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2018506711}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8addcd6384aa456db8a9f613362234e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameManager: {fileID: 170594, guid: fcb488f3e9c3545f0805e7cab30ed973, type: 2}
 --- !u!1 &2068804388
 GameObject:
   m_ObjectHideFlags: 0

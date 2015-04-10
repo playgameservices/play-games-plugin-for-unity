@@ -45,6 +45,11 @@ MonoBehaviour:
   dropCount:
     minimum: 1
     maximum: 5
+  playerAvatars:
+  - {fileID: 114342, guid: e3ecd4d82b2904d6281fb4c11d814d66, type: 2}
+  - {fileID: 116104, guid: f1bba7be3d16646138ebbbcec960e32e, type: 2}
+  - {fileID: 163202, guid: 50c1824203aa146b6a72d09f5db44944, type: 2}
+  - {fileID: 174788, guid: af65c1bb70ef94833bbf8f2be7290f78, type: 2}
   floorTiles:
   - {fileID: 146896, guid: 2d63df6d400dd4927b6f7f0c8d8aeb5f, type: 2}
   dropTiles:
@@ -72,11 +77,6 @@ MonoBehaviour:
   levelStartDelay: 2
   turnDelay: .100000001
   scorePrefab: {fileID: 149922, guid: 41c51b7f701ac4c35b89dcabcf75c4d7, type: 2}
-  playerAvatars:
-  - {fileID: 114342, guid: e3ecd4d82b2904d6281fb4c11d814d66, type: 2}
-  - {fileID: 116104, guid: f1bba7be3d16646138ebbbcec960e32e, type: 2}
-  - {fileID: 163202, guid: 50c1824203aa146b6a72d09f5db44944, type: 2}
-  - {fileID: 174788, guid: af65c1bb70ef94833bbf8f2be7290f78, type: 2}
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
