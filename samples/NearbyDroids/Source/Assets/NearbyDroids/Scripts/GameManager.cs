@@ -658,14 +658,18 @@ namespace NearbyDroids
 
             UpdateScores();
 
-            if (sharingTimer >= sharingInterval)
+            // if not multiplayer, skip the notification.
+            if (gameType != GameType.SinglePlayer)
             {
-                NotifyChanges();
-                sharingTimer = 0;
-            }
-            else
-            {
-                sharingTimer += Time.deltaTime;
+                if (sharingTimer >= sharingInterval)
+                {
+                    NotifyChanges();
+                    sharingTimer = 0;
+                }
+                else
+                {
+                    sharingTimer += Time.deltaTime;
+                }
             }
         }
 
