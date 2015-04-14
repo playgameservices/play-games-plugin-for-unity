@@ -253,7 +253,7 @@ public interface ISavedGameClient {
 
     /// <summary>
     /// Reads the binary data of the passed saved game. The passed metadata must be opened (i.e.
-    /// <see cref="ISavedGameMetadata.IsOpen/> returns true). The callback will always be executed
+    /// <see cref="ISavedGameMetadata.IsOpen"/> returns true). The callback will always be executed
     /// on the game thread.
     /// </summary>
     /// <param name="metadata">The metadata for the saved game whose binary data we want to read.
