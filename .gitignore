@@ -22,3 +22,6 @@ samples/**/Assets/Plugins.meta
 samples/**/Assets/Plugins/
 samples/**/Library/
 samples/**/Library.meta
+
+source/PluginDev/ProjectSettings/GraphicsSettings.asset
+source/PluginDev/ProjectSettings/ProjectSettings.asset
