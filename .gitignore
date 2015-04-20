@@ -24,4 +24,4 @@ samples/**/Library/
 samples/**/Library.meta
 
 source/PluginDev/ProjectSettings/GraphicsSettings.asset
-source/PluginDev/ProjectSettings/ProjectSettings.asset
+source/PluginDev/ProjectSettings/NavMeshAreas.asset

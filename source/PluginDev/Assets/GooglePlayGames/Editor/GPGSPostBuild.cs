@@ -53,7 +53,7 @@ namespace GooglePlayGames
                 GPGSUtil.WriteFile(pluginDir + "/GPGSAppController.mm", "// Empty since NO_GPGS is defined\n");
                 return;
             }
-            #endif
+            #else
 
             if (GetBundleId() == null)
             {
@@ -72,6 +72,7 @@ namespace GooglePlayGames
                 utility: true,
                 title: "Building for IOS",
                 focus: true);
+            #endif
         }
 
         /// <summary>
