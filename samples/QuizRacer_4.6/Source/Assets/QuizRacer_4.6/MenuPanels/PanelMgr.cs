@@ -89,10 +89,6 @@ public class PanelMgr : MonoBehaviour {
                 }
             }
         }
-        /// uncomment to log which element has the focus, and create a private int ct;
-        //if(ct++ % 40 == 0) {
-        //    Debug.Log("focus: " + EventSystem.current.currentSelectedGameObject);
-        //}
 
     }
 
