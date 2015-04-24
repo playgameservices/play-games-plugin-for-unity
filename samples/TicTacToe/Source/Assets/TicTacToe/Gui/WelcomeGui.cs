@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-using UnityEngine;
-using System.Collections;
 using GooglePlayGames;
 using GooglePlayGames.BasicApi;
 using GooglePlayGames.BasicApi.Multiplayer;
+using UnityEngine;
 
 public class WelcomeGui : BaseGui {
     WidgetConfig TitleCfg = new WidgetConfig(0.0f, -0.3f, 1.0f, 0.2f, 100, "Tic Tac Toss");
@@ -28,6 +27,7 @@ public class WelcomeGui : BaseGui {
     System.Action<bool> mAuthCallback;
 
     void Start() {
+        Screen.orientation = ScreenOrientation.Portrait;
         mAuthCallback = (bool success) => {
             EndStandBy();
             if (success && !mInMatch) {
