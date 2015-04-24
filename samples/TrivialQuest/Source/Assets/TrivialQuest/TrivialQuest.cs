@@ -18,19 +18,21 @@ namespace TrivialQuest
 {
     using UnityEngine;
     using UnityEngine.UI;
-    using System.Collections;
     using GooglePlayGames;
     using GooglePlayGames.BasicApi;
     using GooglePlayGames.BasicApi.Quests;
-    using GooglePlayGames.BasicApi.Events;
 
     public class TrivialQuest : MonoBehaviour
     {
+        // Note: DO NOT edit or reomve the GPGSID markers next to the achievement/leaderboard
+        // IDs. They are used by the git pre-commit script to check if you are accidentally
+        // trying to commit actual IDs instead of placeholders to the repository.
 
-        private static string EVENT_ATTACK_RED = "REPLACE_ME";
-        private static string EVENT_ATTACK_GREEN = "REPLACE_ME";
-        private static string EVENT_ATTACK_BLUE = "REPLACE_ME";
-        private static string EVENT_ATTACK_YELLOW = "REPLACE_ME";
+        private static string EVENT_ATTACK_RED = "PLACEHOLDER"; // <GPGSID>
+        private static string EVENT_ATTACK_GREEN = "PLACEHOLDER"; // <GPGSID>
+        private static string EVENT_ATTACK_BLUE = "PLACEHOLDER"; // <GPGSID>
+        private static string EVENT_ATTACK_YELLOW = "PLACEHOLDER"; // <GPGSID>
+
         private GameObject[] signedInObjects;
         private GameObject[] signedOutObjects;
         private Text statusText;
@@ -46,7 +48,8 @@ namespace TrivialQuest
             statusText = GameObject.Find("statusText").GetComponent<Text>();
 
             // Google Play Games
-            PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder().Build();
+            PlayGamesClientConfiguration config = 
+                new PlayGamesClientConfiguration.Builder().Build();
             PlayGamesPlatform.DebugLogEnabled = true;
             PlayGamesPlatform.InitializeInstance(config);
             PlayGamesPlatform.Activate();
@@ -77,8 +80,10 @@ namespace TrivialQuest
         {
             if (success)
             {
-                statusText.text = "Signed In: " + PlayGamesPlatform.Instance.localUser.userName;
-            } else
+                statusText.text = "Signed In: " +
+                    PlayGamesPlatform.Instance.localUser.userName;
+            }
+            else
             {
                 statusText.text = "Sign-in failed.";
             }
@@ -104,49 +109,54 @@ namespace TrivialQuest
         {
             Debug.Log("clicked:ViewQuests");
             PlayGamesPlatform.Instance.Quests.ShowAllQuestsUI(
-                (QuestUiResult result, IQuest quest, IQuestMilestone milestone) => {
-                if (result == QuestUiResult.UserRequestsQuestAcceptance)
+                (QuestUiResult result, IQuest quest, IQuestMilestone milestone) =>
                 {
-                    Debug.Log("User Requests Quest Acceptance");
-                    AcceptQuest(quest);
-                }
+                    if (result == QuestUiResult.UserRequestsQuestAcceptance)
+                    {
+                        Debug.Log("User Requests Quest Acceptance");
+                        AcceptQuest(quest);
+                    }
 
-                if (result == QuestUiResult.UserRequestsMilestoneClaiming)
-                {
-                    Debug.Log("User Requests Milestone Claim");
-                    ClaimMilestone(milestone);
-                }
-            });
+                    if (result == QuestUiResult.UserRequestsMilestoneClaiming)
+                    {
+                        Debug.Log("User Requests Milestone Claim");
+                        ClaimMilestone(milestone);
+                    }
+                });
         }
 
         private void AcceptQuest(IQuest toAccept)
         {
             Debug.Log("Accepting Quest: " + toAccept);
             PlayGamesPlatform.Instance.Quests.Accept(toAccept,
-                                                      (QuestAcceptStatus status, IQuest quest) => {
-                if (status == QuestAcceptStatus.Success)
+                (QuestAcceptStatus status, IQuest quest) =>
                 {
-                    statusText.text = "Quest Accepted: " + quest.Name;
-                } else
-                {
-                    statusText.text = "Quest Accept Failed: " + status;
-                }
-            });
+                    if (status == QuestAcceptStatus.Success)
+                    {
+                        statusText.text = "Quest Accepted: " + quest.Name;
+                    }
+                    else
+                    {
+                        statusText.text = "Quest Accept Failed: " + status;
+                    }
+                });
         }
 
         private void ClaimMilestone(IQuestMilestone toClaim)
         {
             Debug.Log("Claiming Milestone: " + toClaim);
             PlayGamesPlatform.Instance.Quests.ClaimMilestone(toClaim,
-                                                              (QuestClaimMilestoneStatus status, IQuest quest, IQuestMilestone milestone) => {
-                if (status == QuestClaimMilestoneStatus.Success)
+                (QuestClaimMilestoneStatus status, IQuest quest, IQuestMilestone milestone) =>
                 {
-                    statusText.text = "Milestone Claimed";
-                } else
-                {
-                    statusText.text = "Milestone Claim Failed: " + status;
-                }
-            });
+                    if (status == QuestClaimMilestoneStatus.Success)
+                    {
+                        statusText.text = "Milestone Claimed";
+                    }
+                    else
+                    {
+                        statusText.text = "Milestone Claim Failed: " + status;
+                    }
+                });
         }
 
         public void AttackRed()
@@ -173,6 +183,4 @@ namespace TrivialQuest
             PlayGamesPlatform.Instance.Events.IncrementEvent(EVENT_ATTACK_GREEN, 1);
         }
     }
-
 }
-
