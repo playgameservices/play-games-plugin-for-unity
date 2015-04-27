@@ -543,6 +543,7 @@ public class NativeClient : IPlayGamesClient {
             return;
         }
 
+        achievement.CurrentSteps += steps;
         GameServices().AchievementManager().Increment(achId, Convert.ToUInt32(steps));
         callback(true);
     }
