@@ -343,8 +343,6 @@ namespace GooglePlayGames
                 callback.Invoke(new IUserProfile[0]);
             }
         }
-
-<<<<<<< HEAD
         /// <summary>
         /// Returns the user's Google ID.
         /// </summary>
