@@ -5,11 +5,12 @@ Version 0.9.20 (codename: ewokian)
    Bug Fixes:
        * #275 Plugin crashes when sending invite for iOS RTMP
        * #326 Not always receiving invitations in iOS
+       * #363 Save Games not working on iOS
        * #375 Authentication Return calls before initialization done
        * #379 OnPeersDisconnected(string[] participantIds) is never called
+       * #443 ERROR_NOT_AUTHORIZED on re-login
        * #453 NO_GPGS causes unreachable code warnings
        * #454 Error building Player: IOException: android-support-v4.jar already exists
-       * #443 ERROR_NOT_AUTHORIZED on re-login
 Version 0.9.15 (codename: auto-dogey5)
     New Features:
         * #276 Added support for excluding Google Play Game Services for iOS build (NO_GPGS)

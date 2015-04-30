@@ -1,15 +1,3 @@
-<!--
-Conversion notes (using libgdc version 57):
-
-  * source doc: https://docs.google.com/a/google.com/open?id=1CKZ7fI2TKMR7tfYI4o-WFPqxYnV26Hlphi5yXQtnNGc
-
-General notes:
-  * NOTE: Check tables and code blocks for accurate conversion.
-  * Check for XXX image in any img tags.
-  * Please report any bugs (See go/gdocs-convert for more information).
-    Note in bug report that this is libgdc version 57.
-  * doMarkdown(): 4.563 seconds.
--->
 # NearbyConnections
  Google Play Games plugin for Unity: Nearby Connections
 

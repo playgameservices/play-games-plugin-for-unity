@@ -28,6 +28,7 @@ following features of the Google Play Games API:<br/>
 * [real-time multiplayer](RTMP.md)
 
 All features except the nearby connections are available on Android and iOS.
+The Nearby connections feature is currently only available on Android.
 
 Features:
 
@@ -130,9 +131,9 @@ the **current-build** directory:
 To install the plugin, simply open your game project in Unity and import that file into
 your project's assets, as you would any other Unity package. This is accomplished through
 the **Assets | Import Package | Custom Package** menu item (you can also reach this menu it
-by right-clicking the **Assets** folder). After importing, you should see that two new menu
-items were added to the File menu: **"Play Games Android setup"** and **"Play Games
-iOS setup"**. If you don't see the new menu items, refresh the assets by
+by right-clicking the **Assets** folder). After importing, you should see that 
+a new menu item was added to the Window menu: **"Google Play Games"**.
+If you don't see the new menu items, refresh the assets by
 clicking **Assets | Refresh** and try again.
 
 ## Android Setup
@@ -240,7 +241,7 @@ available.
 
 ## Nearby Connections Configuration
 In order to use nearby connections, a service id which uniquely identifies the set of applications that can interact needs to be
-configured.  This is done by clicking the **Assets | Google Play Games | Nearby Connections setup...** menu item. This will display the
+configured.  This is done by clicking the **Window | Google Play Games | Nearby Connections setup...** menu item. This will display the
 nearby conections setup screen.  On this screen enter the service ID you want to use.  It should be something that identifies your application,
 and  follows the same rules as the bundle id (for example: com.example.myawesomegame.nearby). Once you enter the id, press **Setup**.
 
@@ -622,11 +623,6 @@ Once the saved game file is opened, it can be read to load the game state.  This
         }
     }
 ```
-
-## Events and Quests
-
-TBD - Coming soon (wilkinsonclay)
-
 ## Loading Legacy 'Cloud Save service' Game State from the Cloud (only on Android)
 
 __NOTICE: Cloud Save service has been deprecated and existing games should migrate saved data to
