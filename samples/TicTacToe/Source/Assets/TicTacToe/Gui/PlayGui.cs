@@ -197,7 +197,7 @@ public class PlayGui : BaseGui {
                     XBlockPrefabName : OBlockPrefabName);
             o.AddComponent<AimController>().SetFireDelegate(OnBlockFired);
             o.AddComponent<CollisionSfx>();
-            o.rigidbody.mass = PlayerBlockMass;
+            o.GetComponent<Rigidbody>().mass = PlayerBlockMass;
         }
 
         RecalculateMarks();
@@ -337,7 +337,7 @@ public class PlayGui : BaseGui {
         for (x = 0; x < MatchData.BoardSize; x++) {
             for (y = 0; y < MatchData.BoardSize; y++) {
                 string objName = LargeMarkPrefix + markName + x + y;
-                GameObject.Find(objName).renderer.enabled = (mMatchData != null) ?
+                GameObject.Find(objName).GetComponent<Renderer>().enabled = (mMatchData != null) ?
                         (mMatchData.GetMark(x, y) == mark) : false;
             }
         }

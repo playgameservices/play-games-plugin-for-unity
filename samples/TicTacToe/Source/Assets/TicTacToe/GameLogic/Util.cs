@@ -25,8 +25,8 @@ public class Util {
         if (obj == null) {
             return;
         }
-        if (obj.renderer != null) {
-            obj.renderer.enabled = visible;
+        if (obj.GetComponent<Renderer>() != null) {
+            obj.GetComponent<Renderer>().enabled = visible;
         }
         int i;
         for (i = 0; i < obj.transform.childCount; i++) {

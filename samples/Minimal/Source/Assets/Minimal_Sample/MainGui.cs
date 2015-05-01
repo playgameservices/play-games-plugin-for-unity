@@ -56,9 +56,10 @@ public class MainGui : MonoBehaviour {
           } else {
             GUI.Label(imageRect, "No image available");
           }
+
+          mStatusText = "Ready";
         } else {
           buttonLabel = "Authenticate";
-          mStatusText = "Ready";
         }
 
         if (GUI.Button(buttonRect, buttonLabel)) {

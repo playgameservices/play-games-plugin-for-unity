@@ -1,0 +1,770 @@
+fileFormatVersion: 2
+guid: 8e5ae38e229954072851ac97bf2c2c4b
+timeCreated: 1427424861
+licenseType: Pro
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: droid4_strip_0
+    21300002: droid4_strip_1
+    21300004: droid4_strip_2
+    21300006: droid4_strip_3
+    21300008: droid4_strip_4
+    21300010: droid4_strip_5
+    21300012: droid4_strip_6
+    21300014: droid4_strip_7
+    21300016: droid4_strip_8
+    21300018: droid4_strip_9
+    21300020: droid4_strip_10
+    21300022: droid4_strip_11
+    21300024: droid4_strip_12
+    21300026: droid4_strip_13
+    21300028: droid4_strip_14
+    21300030: droid4_strip_15
+    21300032: droid4_strip_16
+    21300034: droid4_strip_17
+    21300036: droid4_strip_18
+    21300038: droid4_strip_19
+    21300040: droid4_strip_20
+    21300042: droid4_strip_21
+    21300044: droid4_strip_22
+    21300046: droid4_strip_23
+    21300048: droid4_strip_24
+    21300050: droid4_strip_25
+    21300052: droid4_strip_26
+    21300054: droid4_strip_27
+    21300056: droid4_strip_28
+    21300058: droid4_strip_29
+    21300060: droid4_strip_30
+    21300062: droid4_strip_31
+    21300064: droid4_strip_32
+    21300066: droid4_strip_33
+    21300068: droid4_strip_34
+    21300070: droid4_strip_35
+    21300072: droid4_strip_36
+    21300074: droid4_strip_37
+    21300076: droid4_strip_38
+    21300078: droid4_strip_39
+    21300080: droid4_strip_40
+    21300082: droid4_strip_41
+    21300084: droid4_strip_42
+    21300086: droid4_strip_43
+    21300088: droid4_strip_44
+    21300090: droid4_strip_45
+    21300092: droid4_strip_46
+    21300094: droid4_strip_47
+    21300096: droid4_strip_48
+    21300098: droid4_strip_49
+    21300100: droid4_strip_50
+    21300102: droid4_strip_51
+    21300104: droid4_strip_52
+    21300106: droid4_strip_53
+    21300108: droid4_strip_54
+    21300110: droid4_strip_55
+    21300112: droid4_strip_56
+    21300114: droid4_strip_57
+    21300116: droid4_strip_58
+    21300118: droid4_strip_59
+    21300120: droid4_strip_60
+    21300122: droid4_strip_61
+    21300124: droid4_strip_62
+    21300126: droid4_strip_63
+    21300128: droid4_strip_64
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: .25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 8
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -1
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: .5, y: .5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 256
+  alphaIsTransparency: 1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    sprites:
+    - name: droid4_strip_0
+      rect:
+        serializedVersion: 2
+        x: 294
+        y: 20
+        width: 180
+        height: 240
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_1
+      rect:
+        serializedVersion: 2
+        x: 545
+        y: 20
+        width: 172
+        height: 240
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_2
+      rect:
+        serializedVersion: 2
+        x: 788
+        y: 20
+        width: 156
+        height: 240
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_3
+      rect:
+        serializedVersion: 2
+        x: 999
+        y: 20
+        width: 180
+        height: 240
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_4
+      rect:
+        serializedVersion: 2
+        x: 1234
+        y: 20
+        width: 188
+        height: 236
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_5
+      rect:
+        serializedVersion: 2
+        x: 1477
+        y: 20
+        width: 188
+        height: 240
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_6
+      rect:
+        serializedVersion: 2
+        x: 1728
+        y: 20
+        width: 180
+        height: 240
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_7
+      rect:
+        serializedVersion: 2
+        x: 1963
+        y: 20
+        width: 188
+        height: 236
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_8
+      rect:
+        serializedVersion: 2
+        x: 2206
+        y: 20
+        width: 188
+        height: 240
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_9
+      rect:
+        serializedVersion: 2
+        x: 2457
+        y: 20
+        width: 188
+        height: 240
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_10
+      rect:
+        serializedVersion: 2
+        x: 2708
+        y: 20
+        width: 203
+        height: 240
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_11
+      rect:
+        serializedVersion: 2
+        x: 2982
+        y: 20
+        width: 172
+        height: 236
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_12
+      rect:
+        serializedVersion: 2
+        x: 3209
+        y: 20
+        width: 180
+        height: 236
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_13
+      rect:
+        serializedVersion: 2
+        x: 3428
+        y: 20
+        width: 188
+        height: 236
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_14
+      rect:
+        serializedVersion: 2
+        x: 3672
+        y: 28
+        width: 195
+        height: 228
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_15
+      rect:
+        serializedVersion: 2
+        x: 3946
+        y: 28
+        width: 188
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_16
+      rect:
+        serializedVersion: 2
+        x: 4196
+        y: 28
+        width: 181
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_17
+      rect:
+        serializedVersion: 2
+        x: 4447
+        y: 28
+        width: 172
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_18
+      rect:
+        serializedVersion: 2
+        x: 4682
+        y: 28
+        width: 172
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_19
+      rect:
+        serializedVersion: 2
+        x: 4925
+        y: 35
+        width: 165
+        height: 225
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_20
+      rect:
+        serializedVersion: 2
+        x: 5168
+        y: 35
+        width: 165
+        height: 225
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_21
+      rect:
+        serializedVersion: 2
+        x: 5411
+        y: 35
+        width: 165
+        height: 225
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_22
+      rect:
+        serializedVersion: 2
+        x: 5662
+        y: 35
+        width: 157
+        height: 225
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_23
+      rect:
+        serializedVersion: 2
+        x: 5905
+        y: 28
+        width: 156
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_24
+      rect:
+        serializedVersion: 2
+        x: 6148
+        y: 28
+        width: 164
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_25
+      rect:
+        serializedVersion: 2
+        x: 6391
+        y: 28
+        width: 164
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_26
+      rect:
+        serializedVersion: 2
+        x: 6634
+        y: 28
+        width: 164
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_27
+      rect:
+        serializedVersion: 2
+        x: 6877
+        y: 28
+        width: 187
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_28
+      rect:
+        serializedVersion: 2
+        x: 7128
+        y: 20
+        width: 179
+        height: 240
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_29
+      rect:
+        serializedVersion: 2
+        x: 7378
+        y: 20
+        width: 164
+        height: 240
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_30
+      rect:
+        serializedVersion: 2
+        x: 7582
+        y: 20
+        width: 188
+        height: 240
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_31
+      rect:
+        serializedVersion: 2
+        x: 7825
+        y: 20
+        width: 187
+        height: 240
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_32
+      rect:
+        serializedVersion: 2
+        x: 8068
+        y: 20
+        width: 180
+        height: 240
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_33
+      rect:
+        serializedVersion: 2
+        x: 8311
+        y: 20
+        width: 188
+        height: 240
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_34
+      rect:
+        serializedVersion: 2
+        x: 8553
+        y: 20
+        width: 189
+        height: 236
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_35
+      rect:
+        serializedVersion: 2
+        x: 8796
+        y: 20
+        width: 188
+        height: 240
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_36
+      rect:
+        serializedVersion: 2
+        x: 9040
+        y: 20
+        width: 203
+        height: 240
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_37
+      rect:
+        serializedVersion: 2
+        x: 9306
+        y: 20
+        width: 196
+        height: 236
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_38
+      rect:
+        serializedVersion: 2
+        x: 9565
+        y: 20
+        width: 180
+        height: 236
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_39
+      rect:
+        serializedVersion: 2
+        x: 9799
+        y: 20
+        width: 188
+        height: 236
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_40
+      rect:
+        serializedVersion: 2
+        x: 10019
+        y: 20
+        width: 188
+        height: 236
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_41
+      rect:
+        serializedVersion: 2
+        x: 10262
+        y: 28
+        width: 188
+        height: 228
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_42
+      rect:
+        serializedVersion: 2
+        x: 10521
+        y: 28
+        width: 187
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_43
+      rect:
+        serializedVersion: 2
+        x: 10787
+        y: 28
+        width: 180
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_44
+      rect:
+        serializedVersion: 2
+        x: 11030
+        y: 28
+        width: 180
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_45
+      rect:
+        serializedVersion: 2
+        x: 11273
+        y: 35
+        width: 164
+        height: 225
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_46
+      rect:
+        serializedVersion: 2
+        x: 11516
+        y: 35
+        width: 164
+        height: 225
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_47
+      rect:
+        serializedVersion: 2
+        x: 11759
+        y: 35
+        width: 164
+        height: 225
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_48
+      rect:
+        serializedVersion: 2
+        x: 12002
+        y: 35
+        width: 164
+        height: 225
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_49
+      rect:
+        serializedVersion: 2
+        x: 12244
+        y: 35
+        width: 165
+        height: 225
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_50
+      rect:
+        serializedVersion: 2
+        x: 12488
+        y: 35
+        width: 164
+        height: 225
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_51
+      rect:
+        serializedVersion: 2
+        x: 12738
+        y: 28
+        width: 157
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_52
+      rect:
+        serializedVersion: 2
+        x: 12981
+        y: 28
+        width: 157
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_53
+      rect:
+        serializedVersion: 2
+        x: 13224
+        y: 28
+        width: 157
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_54
+      rect:
+        serializedVersion: 2
+        x: 13467
+        y: 28
+        width: 180
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_55
+      rect:
+        serializedVersion: 2
+        x: 13710
+        y: 28
+        width: 180
+        height: 232
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_56
+      rect:
+        serializedVersion: 2
+        x: 13961
+        y: 20
+        width: 172
+        height: 240
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_57
+      rect:
+        serializedVersion: 2
+        x: 14188
+        y: 20
+        width: 172
+        height: 240
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_58
+      rect:
+        serializedVersion: 2
+        x: 14431
+        y: 20
+        width: 172
+        height: 240
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_59
+      rect:
+        serializedVersion: 2
+        x: 14658
+        y: 20
+        width: 188
+        height: 236
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_60
+      rect:
+        serializedVersion: 2
+        x: 14901
+        y: 20
+        width: 187
+        height: 240
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_61
+      rect:
+        serializedVersion: 2
+        x: 15146
+        y: 20
+        width: 186
+        height: 240
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_62
+      rect:
+        serializedVersion: 2
+        x: 15387
+        y: 20
+        width: 188
+        height: 236
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_63
+      rect:
+        serializedVersion: 2
+        x: 15630
+        y: 20
+        width: 187
+        height: 240
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid4_strip_64
+      rect:
+        serializedVersion: 2
+        x: 15873
+        y: 20
+        width: 176
+        height: 240
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
