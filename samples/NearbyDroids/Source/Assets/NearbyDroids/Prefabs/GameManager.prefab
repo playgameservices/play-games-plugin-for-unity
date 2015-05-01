@@ -1,0 +1,90 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &170594
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 416730}
+  - 114: {fileID: 11478312}
+  - 114: {fileID: 11493858}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &416730
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 170594}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+--- !u!114 &11478312
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 170594}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a20c5b7d3069e49c78102fa3d01685c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  columns: 8
+  rows: 8
+  dropCount:
+    minimum: 1
+    maximum: 5
+  playerAvatars:
+  - {fileID: 114342, guid: e3ecd4d82b2904d6281fb4c11d814d66, type: 2}
+  - {fileID: 116104, guid: f1bba7be3d16646138ebbbcec960e32e, type: 2}
+  - {fileID: 163202, guid: 50c1824203aa146b6a72d09f5db44944, type: 2}
+  - {fileID: 174788, guid: af65c1bb70ef94833bbf8f2be7290f78, type: 2}
+  floorTiles:
+  - {fileID: 146896, guid: 2d63df6d400dd4927b6f7f0c8d8aeb5f, type: 2}
+  dropTiles:
+  - {fileID: 186332, guid: dda3984e948444a1e85fdee3b8427f66, type: 2}
+  - {fileID: 142366, guid: 9e8d103fb49c44d528fe7a5be0a46232, type: 2}
+  enemyTiles:
+  - {fileID: 174672, guid: 8d90bb63c4c004a5ca5c706cf79ed271, type: 2}
+  outerWallTiles:
+  - {fileID: 183252, guid: 76e40dfbdd5ef46cf83b4a740373e544, type: 2}
+  - {fileID: 137530, guid: edf6861c7470d434cac0676359a28976, type: 2}
+  deadlyTiles:
+  - {fileID: 125586, guid: 8130923cdef0444afa6b5718fbeced55, type: 2}
+  exitTile: {fileID: 155640, guid: 18e867d7f4221418698b3910c11eb38a, type: 2}
+--- !u!114 &11493858
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 170594}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83c258679608348a9a7a139007ecc2eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  levelStartDelay: 2
+  turnDelay: .100000001
+  scorePrefab: {fileID: 149922, guid: 41c51b7f701ac4c35b89dcabcf75c4d7, type: 2}
+--- !u!1001 &100100000
+Prefab:
+  m_ObjectHideFlags: 1
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 170594}
+  m_IsPrefabParent: 1

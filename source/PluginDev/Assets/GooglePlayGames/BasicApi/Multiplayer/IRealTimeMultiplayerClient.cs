@@ -1,31 +1,32 @@
-/*
- * Copyright (C) 2014 Google Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// <copyright file="IRealTimeMultiplayerClient.cs" company="Google Inc.">
+// Copyright (C) 2014 Google Inc.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//    limitations under the License.
+// </copyright>
 
-using System;
-using System.Collections.Generic;
-using System.Collections;
-using GooglePlayGames.BasicApi.Multiplayer;
+namespace GooglePlayGames.BasicApi.Multiplayer
+{
+  using System;
+  using System.Collections.Generic;
+  using GooglePlayGames.BasicApi.Multiplayer;
 
-namespace GooglePlayGames.BasicApi.Multiplayer {
-/// <summary>
-/// API entry point for Real-Time multiplayer. To know more about multiplayer,
-/// terminology, etc, please refer to the online guide at:
-/// https://github.com/playgameservices/play-games-plugin-for-unity
-/// </summary>
-public interface IRealTimeMultiplayerClient {
+  /// <summary>
+  /// API entry point for Real-Time multiplayer. To know more about multiplayer,
+  /// terminology, etc, please refer to the online guide at:
+  /// https://github.com/playgameservices/play-games-plugin-for-unity
+  /// </summary>
+  public interface IRealTimeMultiplayerClient
+  {
     /// <summary>
     /// Creates a game with random automatch opponents. No UI will be shown.
     /// The participants will be automatically selected among users who are currently
@@ -45,7 +46,7 @@ public interface IRealTimeMultiplayerClient {
     /// <param name="variant">Variant. Use 0 for default.</param>
     /// <param name="listener">Listener. The listener to notify of relevant events.</param>
     void CreateQuickGame(uint minOpponents, uint maxOpponents, uint variant,
-                             Multiplayer.RealTimeMultiplayerListener listener);
+                         Multiplayer.RealTimeMultiplayerListener listener);
 
     /// <summary>
     /// Creates a game with an invitation screen. An invitation screen will be shown
@@ -66,7 +67,7 @@ public interface IRealTimeMultiplayerClient {
     /// <param name="listener">Listener. This listener will be notified of relevant
     /// events.</param>
     void CreateWithInvitationScreen(uint minOpponents, uint maxOppponents, uint variant,
-                                        Multiplayer.RealTimeMultiplayerListener listener);
+                                    Multiplayer.RealTimeMultiplayerListener listener);
 
     /// <summary>
     /// Creates a real-time game starting with the inbox screen. On the inbox screen,
@@ -174,5 +175,5 @@ public interface IRealTimeMultiplayerClient {
     /// </summary>
     /// <param name="invitationId">Invitation id to decline.</param>
     void DeclineInvitation(string invitationId);
-}
+  }
 }

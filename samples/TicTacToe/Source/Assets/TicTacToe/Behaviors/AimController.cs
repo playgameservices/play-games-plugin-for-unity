@@ -39,8 +39,8 @@ public class AimController : MonoBehaviour {
 
     void Start () {
         // initially, disable the object's physics
-        gameObject.rigidbody.isKinematic = true;
-        gameObject.rigidbody.useGravity = false;
+        gameObject.GetComponent<Rigidbody>().isKinematic = true;
+        gameObject.GetComponent<Rigidbody>().useGravity = false;
 
         // store the initial position
         mStartPos = gameObject.transform.position;
@@ -110,9 +110,9 @@ public class AimController : MonoBehaviour {
         } else {
             Vector3 force = (mStartPos - gameObject.transform.position) * ForceFactor;
             force += displacement * new Vector3(0.0f, ForceUpFactor, 0.0f);
-            gameObject.rigidbody.useGravity = true;
-            gameObject.rigidbody.isKinematic = false;
-            gameObject.rigidbody.AddForce(force);
+            gameObject.GetComponent<Rigidbody>().useGravity = true;
+            gameObject.GetComponent<Rigidbody>().isKinematic = false;
+            gameObject.GetComponent<Rigidbody>().AddForce(force);
 
             if (mThrowSfx != null) {
                 AudioSource.PlayClipAtPoint(mThrowSfx, Vector3.zero);
