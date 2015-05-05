@@ -1,4 +1,4 @@
-Version 0.9.20 (codename: ewokian)
+2015-05-01 Version 0.9.20 (codename: ewokian)
    New Features:
        * Support for Events and Quests
        * Support for Nearby Connections
