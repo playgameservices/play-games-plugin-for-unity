@@ -18,7 +18,7 @@ TO FINISH CONFIGURING THE EXPORTED XCODE PROJECT
       GoogleOpenSource.framework
       GooglePlus.bundle
       GooglePlus.framework
-      GooglePlayGames.bundle
+      gpg.bundle
       gpg.framework
 
    Note: Make sure the bundles are copied to application.  This can be 
