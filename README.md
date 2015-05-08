@@ -419,7 +419,7 @@ Incrementing an event is very simple, just call the following method:
     using GooglePlayGames;
     ...
     // Increments the event with Id "YOUR_EVENT_ID" by 1
-    PlayGamesPlatform.Instance.Events.IncrementEvent(YOUR_EVENT_ID, 1);
+    PlayGamesPlatform.Instance.Events.IncrementEvent("YOUR_EVENT_ID", 1);
 ```
 This call is "fire and forget", it will handle batching and execution for you in the background.
 
