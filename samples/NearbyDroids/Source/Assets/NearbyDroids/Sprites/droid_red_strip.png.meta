@@ -1,0 +1,704 @@
+fileFormatVersion: 2
+guid: 053deb032fe334920afb51d8251f1087
+timeCreated: 1427748367
+licenseType: Pro
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: droid_red_strip_0
+    21300002: droid_red_strip_1
+    21300004: droid_red_strip_2
+    21300006: droid_red_strip_3
+    21300008: droid_red_strip_4
+    21300010: droid_red_strip_5
+    21300012: droid_red_strip_6
+    21300014: droid_red_strip_7
+    21300016: droid_red_strip_8
+    21300018: droid_red_strip_9
+    21300020: droid_red_strip_10
+    21300022: droid_red_strip_11
+    21300024: droid_red_strip_12
+    21300026: droid_red_strip_13
+    21300028: droid_red_strip_14
+    21300030: droid_red_strip_15
+    21300032: droid_red_strip_16
+    21300034: droid_red_strip_17
+    21300036: droid_red_strip_18
+    21300038: droid_red_strip_19
+    21300040: droid_red_strip_20
+    21300042: droid_red_strip_21
+    21300044: droid_red_strip_22
+    21300046: droid_red_strip_23
+    21300048: droid_red_strip_24
+    21300050: droid_red_strip_25
+    21300052: droid_red_strip_26
+    21300054: droid_red_strip_27
+    21300056: droid_red_strip_28
+    21300058: droid_red_strip_29
+    21300060: droid_red_strip_30
+    21300062: droid_red_strip_31
+    21300064: droid_red_strip_32
+    21300066: droid_red_strip_33
+    21300068: droid_red_strip_34
+    21300070: droid_red_strip_35
+    21300072: droid_red_strip_36
+    21300074: droid_red_strip_37
+    21300076: droid_red_strip_38
+    21300078: droid_red_strip_39
+    21300080: droid_red_strip_40
+    21300082: droid_red_strip_41
+    21300084: droid_red_strip_42
+    21300086: droid_red_strip_43
+    21300088: droid_red_strip_44
+    21300090: droid_red_strip_45
+    21300092: droid_red_strip_46
+    21300094: droid_red_strip_47
+    21300096: droid_red_strip_48
+    21300098: droid_red_strip_49
+    21300100: droid_red_strip_50
+    21300102: droid_red_strip_51
+    21300104: droid_red_strip_52
+    21300106: droid_red_strip_53
+    21300108: droid_red_strip_54
+    21300110: droid_red_strip_55
+    21300112: droid_red_strip_56
+    21300114: droid_red_strip_57
+    21300116: droid_red_strip_58
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: .25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 8
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -1
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: .5, y: .5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 256
+  alphaIsTransparency: 1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    sprites:
+    - name: droid_red_strip_0
+      rect:
+        serializedVersion: 2
+        x: 51
+        y: 24
+        width: 178
+        height: 208
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_1
+      rect:
+        serializedVersion: 2
+        x: 305
+        y: 24
+        width: 171
+        height: 215
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_2
+      rect:
+        serializedVersion: 2
+        x: 565
+        y: 24
+        width: 164
+        height: 215
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_3
+      rect:
+        serializedVersion: 2
+        x: 811
+        y: 24
+        width: 158
+        height: 215
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_4
+      rect:
+        serializedVersion: 2
+        x: 1065
+        y: 17
+        width: 164
+        height: 222
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_5
+      rect:
+        serializedVersion: 2
+        x: 1318
+        y: 17
+        width: 164
+        height: 222
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_6
+      rect:
+        serializedVersion: 2
+        x: 1578
+        y: 17
+        width: 165
+        height: 215
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_7
+      rect:
+        serializedVersion: 2
+        x: 1838
+        y: 17
+        width: 158
+        height: 215
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_8
+      rect:
+        serializedVersion: 2
+        x: 2092
+        y: 17
+        width: 157
+        height: 215
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_9
+      rect:
+        serializedVersion: 2
+        x: 2352
+        y: 10
+        width: 157
+        height: 222
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_10
+      rect:
+        serializedVersion: 2
+        x: 2605
+        y: 10
+        width: 158
+        height: 215
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_11
+      rect:
+        serializedVersion: 2
+        x: 2859
+        y: 10
+        width: 164
+        height: 229
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_12
+      rect:
+        serializedVersion: 2
+        x: 3126
+        y: 10
+        width: 178
+        height: 208
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_13
+      rect:
+        serializedVersion: 2
+        x: 3386
+        y: 10
+        width: 164
+        height: 222
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_14
+      rect:
+        serializedVersion: 2
+        x: 3605
+        y: 17
+        width: 178
+        height: 208
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_15
+      rect:
+        serializedVersion: 2
+        x: 3845
+        y: 93
+        width: 68
+        height: 76
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_16
+      rect:
+        serializedVersion: 2
+        x: 3913
+        y: 17
+        width: 123
+        height: 215
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_17
+      rect:
+        serializedVersion: 2
+        x: 4119
+        y: 17
+        width: 171
+        height: 222
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_18
+      rect:
+        serializedVersion: 2
+        x: 4365
+        y: 17
+        width: 185
+        height: 215
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_19
+      rect:
+        serializedVersion: 2
+        x: 4612
+        y: 107
+        width: 68
+        height: 69
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_20
+      rect:
+        serializedVersion: 2
+        x: 4680
+        y: 24
+        width: 123
+        height: 222
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_21
+      rect:
+        serializedVersion: 2
+        x: 4879
+        y: 24
+        width: 184
+        height: 222
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_22
+      rect:
+        serializedVersion: 2
+        x: 5166
+        y: 24
+        width: 178
+        height: 215
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_23
+      rect:
+        serializedVersion: 2
+        x: 5426
+        y: 24
+        width: 158
+        height: 208
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_24
+      rect:
+        serializedVersion: 2
+        x: 5652
+        y: 24
+        width: 178
+        height: 208
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_25
+      rect:
+        serializedVersion: 2
+        x: 5892
+        y: 31
+        width: 192
+        height: 201
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_26
+      rect:
+        serializedVersion: 2
+        x: 6186
+        y: 24
+        width: 178
+        height: 208
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_27
+      rect:
+        serializedVersion: 2
+        x: 6447
+        y: 24
+        width: 178
+        height: 208
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_28
+      rect:
+        serializedVersion: 2
+        x: 6707
+        y: 24
+        width: 157
+        height: 215
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_29
+      rect:
+        serializedVersion: 2
+        x: 6953
+        y: 24
+        width: 165
+        height: 215
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_30
+      rect:
+        serializedVersion: 2
+        x: 7207
+        y: 17
+        width: 164
+        height: 222
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_31
+      rect:
+        serializedVersion: 2
+        x: 7467
+        y: 17
+        width: 164
+        height: 215
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_32
+      rect:
+        serializedVersion: 2
+        x: 7727
+        y: 17
+        width: 158
+        height: 215
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_33
+      rect:
+        serializedVersion: 2
+        x: 7980
+        y: 10
+        width: 158
+        height: 222
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_34
+      rect:
+        serializedVersion: 2
+        x: 8241
+        y: 10
+        width: 157
+        height: 215
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_35
+      rect:
+        serializedVersion: 2
+        x: 8494
+        y: 10
+        width: 157
+        height: 222
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_36
+      rect:
+        serializedVersion: 2
+        x: 8747
+        y: 10
+        width: 171
+        height: 229
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_37
+      rect:
+        serializedVersion: 2
+        x: 9008
+        y: 10
+        width: 184
+        height: 215
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_38
+      rect:
+        serializedVersion: 2
+        x: 9275
+        y: 10
+        width: 157
+        height: 222
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_39
+      rect:
+        serializedVersion: 2
+        x: 9528
+        y: 17
+        width: 144
+        height: 215
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_40
+      rect:
+        serializedVersion: 2
+        x: 9740
+        y: 93
+        width: 62
+        height: 76
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_41
+      rect:
+        serializedVersion: 2
+        x: 10007
+        y: 17
+        width: 171
+        height: 222
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_42
+      rect:
+        serializedVersion: 2
+        x: 10247
+        y: 24
+        width: 185
+        height: 208
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_43
+      rect:
+        serializedVersion: 2
+        x: 10500
+        y: 100
+        width: 69
+        height: 76
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_44
+      rect:
+        serializedVersion: 2
+        x: 10569
+        y: 24
+        width: 123
+        height: 222
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_45
+      rect:
+        serializedVersion: 2
+        x: 10760
+        y: 100
+        width: 62
+        height: 76
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_46
+      rect:
+        serializedVersion: 2
+        x: 10822
+        y: 24
+        width: 123
+        height: 222
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_47
+      rect:
+        serializedVersion: 2
+        x: 11062
+        y: 24
+        width: 150
+        height: 208
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_48
+      rect:
+        serializedVersion: 2
+        x: 11267
+        y: 24
+        width: 192
+        height: 208
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_49
+      rect:
+        serializedVersion: 2
+        x: 11561
+        y: 24
+        width: 158
+        height: 208
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_50
+      rect:
+        serializedVersion: 2
+        x: 11828
+        y: 24
+        width: 178
+        height: 208
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_51
+      rect:
+        serializedVersion: 2
+        x: 12082
+        y: 24
+        width: 164
+        height: 215
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_52
+      rect:
+        serializedVersion: 2
+        x: 12335
+        y: 24
+        width: 158
+        height: 215
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_53
+      rect:
+        serializedVersion: 2
+        x: 12582
+        y: 17
+        width: 164
+        height: 222
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_54
+      rect:
+        serializedVersion: 2
+        x: 12842
+        y: 17
+        width: 164
+        height: 215
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_55
+      rect:
+        serializedVersion: 2
+        x: 13102
+        y: 17
+        width: 158
+        height: 215
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_56
+      rect:
+        serializedVersion: 2
+        x: 13355
+        y: 17
+        width: 158
+        height: 215
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_57
+      rect:
+        serializedVersion: 2
+        x: 13616
+        y: 10
+        width: 157
+        height: 222
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: droid_red_strip_58
+      rect:
+        serializedVersion: 2
+        x: 13869
+        y: 10
+        width: 154
+        height: 222
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,52 +1,65 @@
-﻿/*
- * Copyright (C) 2014 Google Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+﻿// <copyright file="GPGSPostBuild.cs" company="Google Inc.">
+// Copyright (C) 2014 Google Inc.
+//
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
+//
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//    limitations under the License.
+// </copyright>
 
-using System;
-using UnityEditor.Callbacks;
-using UnityEditor;
-using UnityEngine;
-using System.Diagnostics;
-using GooglePlayGames;
-using GooglePlayGames.Editor.Util;
-using System.Text.RegularExpressions;
+namespace GooglePlayGames
+{
+    using System;
+    using UnityEditor.Callbacks;
+    using UnityEditor;
+    using UnityEngine;
+    using GooglePlayGames;
+    using GooglePlayGames.Editor.Util;
+    using System.Text.RegularExpressions;
 
-namespace GooglePlayGames {
-    public static class GPGSPostBuild {
-
+    public static class GPGSPostBuild
+    {
         private const string UrlTypes = "CFBundleURLTypes";
         private const string UrlBundleName = "CFBundleURLName";
         private const string UrlScheme = "CFBundleURLSchemes";
 
         [PostProcessBuild]
-        public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject) {
+        public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
+        {
+#if UNITY_4_6
             if (target != BuildTarget.iPhone) {
                 return;
             }
+#else
+            if (target != BuildTarget.iOS)
+            {
+                return;
+            }
+#endif
 
             #if NO_GPGS
+            Debug.Log("Removing AppController code since NO_GPGS is defined");
             // remove plugin code from generated project
             string pluginDir = pathToBuiltProject + "/Libraries/Plugins/iOS";
-            GPGSUtil.WriteFile(pluginDir + "/GPGSAppController.mm", "// Empty since NO_GPGS is defined\n");
-            return;
-            #endif
+            if (System.IO.Directory.Exists(pluginDir))
+            {
+                GPGSUtil.WriteFile(pluginDir + "/GPGSAppController.mm", "// Empty since NO_GPGS is defined\n");
+                return;
+            }
+            #else
 
-            if (GetBundleId() == null) {
+            if (GetBundleId() == null)
+            {
                 UnityEngine.Debug.LogError("The iOS bundle ID has not been set up through the " +
-                "'iOS Setup' submenu of 'Google Play Games' - the generated xcode project will " +
-                "not work properly.");
+                    "'iOS Setup' submenu of 'Google Play Games' - the generated xcode project will " +
+                    "not work properly.");
                 return;
             }
 
@@ -59,6 +72,7 @@ namespace GooglePlayGames {
                 utility: true,
                 title: "Building for IOS",
                 focus: true);
+            #endif
         }
 
         /// <summary>
@@ -71,11 +85,13 @@ namespace GooglePlayGames {
         /// <para>We make use of the apple-provided PlistBuddy utility to edit the plist file.</para>
         /// </summary>
         /// <param name="pathToPlist">Path to plist.</param>
-        private static void UpdateGeneratedInfoPlistFile(string pathToPlist) {
+        private static void UpdateGeneratedInfoPlistFile(string pathToPlist)
+        {
             PlistBuddyHelper buddy = PlistBuddyHelper.ForPlistFile(pathToPlist);
 
             // If the top-level UrlTypes field doesn't exist, add it here.
-            if (buddy.EntryValue(UrlTypes) == null) {
+            if (buddy.EntryValue(UrlTypes) == null)
+            {
                 buddy.AddArray(UrlTypes);
             }
 
@@ -91,17 +107,18 @@ namespace GooglePlayGames {
         /// </summary>
         /// <param name="buddy">Buddy.</param>
         /// <param name="index">Index.</param>
-        private static void EnsureGamesUrlScheme(PlistBuddyHelper buddy, int index) {
+        private static void EnsureGamesUrlScheme(PlistBuddyHelper buddy, int index)
+        {
             buddy.RemoveEntry(UrlTypes, index, UrlScheme);
             buddy.AddArray(UrlTypes, index, UrlScheme);
             buddy.AddString(PlistBuddyHelper.ToEntryName(UrlTypes, index, UrlScheme, 0),
                 GetBundleId());
         }
 
-        private static string GetBundleId() {
+        private static string GetBundleId()
+        {
             return GPGSProjectSettings.Instance.Get("ios.BundleId", null);
         }
-
 
         /// <summary>
         /// Finds the index of the CFBundleURLTypes array where the entry for Play Games is stored. If
@@ -109,13 +126,16 @@ namespace GooglePlayGames {
         /// </summary>
         /// <returns>The index in the CFBundleURLTypes array corresponding to Play Games.</returns>
         /// <param name="buddy">The helper corresponding to the plist file.</param>
-        private static int GamesUrlSchemeIndex(PlistBuddyHelper buddy) {
+        private static int GamesUrlSchemeIndex(PlistBuddyHelper buddy)
+        {
             int index = 0;
 
-            while(buddy.EntryValue(UrlTypes, index) != null) {
+            while (buddy.EntryValue(UrlTypes, index) != null)
+            {
                 var urlName = buddy.EntryValue(UrlTypes, index, UrlBundleName);
 
-                if (GetBundleId().Equals(urlName)) {
+                if (GetBundleId().Equals(urlName))
+                {
                     return index;
                 }
 
@@ -135,7 +155,8 @@ namespace GooglePlayGames {
         /// this just adds the '-fobjc-arc' flag for the Play Games ObjC source files.
         /// </summary>
         /// <param name="pbxprojPath">Pbxproj path.</param>
-        private static void UpdateGeneratedPbxproj(string pbxprojPath) {
+        private static void UpdateGeneratedPbxproj(string pbxprojPath)
+        {
             // We're looking for lines in the form:
             // ... = {isa = PBXBuildFile; fileRef = DEADBEEF /* GPGSFileName.mm */; };
             // And we want to append "settings = {COMPILER_FLAGS = "-fobjc-arc"};" to the content in
