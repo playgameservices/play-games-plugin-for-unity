@@ -4,9 +4,7 @@
 <strong>Copyright (c) 2015 Google Inc. All rights reserved.</strong>
 
 This is a guide to the Nearby connections feature of the Google Play Games
-plugin
-
-for Unity®.
+plugin for Unity®.
 
 <em>Note: this project is not in any way endorsed or supervised by Unity
 Technologies.</em>
@@ -58,7 +56,7 @@ The Nearby  Connections API needs to be initialized before using.  This is done
 by calling Initialize:
 
 
-```
+```c#
 void Awake() {
     PlayGamesPlatform.InitializeNearby((client) =>
     {
@@ -74,8 +72,8 @@ advertising device is the 'host' in a multiplayer game, while the connecting
 device is the client.
 
 
-```
-List&lt;string> appIdentifiers = new List&lt;string>();
+```c#
+List<string> appIdentifiers = new List&lt;string>();
 appIdentifiers.Add(PlayGamesPlatform.Nearby.GetAppBundleId());
      PlayGamesPlatform.Nearby.StartAdvertising(
                 "Awesome Game Host",  // User-friendly name
@@ -83,18 +81,16 @@ appIdentifiers.Add(PlayGamesPlatform.Nearby.GetAppBundleId());
                 TimeSpan.FromSeconds(0),// 0 = advertise forever
                 (AdvertisingResult result) =>
         			{
-            		Debug.Log("OnAdvertisingResult: " + result);
+            		    Debug.Log("OnAdvertisingResult: " + result);
         			},
                	(ConnectionRequest request) =>
         			{
-            		Debug.Log("Received connection request: " +
-               
-request.RemoteEndpoint.DeviceId + " " +
-request.RemoteEndpoint.EndpointId + " " +
-request.RemoteEndpoint.Name)
-});
-
-
+            		    Debug.Log("Received connection request: " +
+                            request.RemoteEndpoint.DeviceId + " " +
+                            request.RemoteEndpoint.EndpointId + " " +
+                            request.RemoteEndpoint.Name)
+                    }
+                );
 ```
 ## Discovery
 
@@ -104,8 +100,7 @@ Connections.startDiscovery() should match the value provided in the manifest of
 the advertising app. See the previous section for information on how apps
 advertise nearby games.
 
-
-```
+```c#
 IDiscoveryListener listener;
 
 PlayGamesPlatform.Nearby.StartDiscovery(
@@ -113,58 +108,54 @@ PlayGamesPlatform.Nearby.StartDiscovery(
                 TimeSpan.FromSeconds(0),
                 listener);
 ```
+
 The IDiscoveryListener interface defines two methods that are called as the
 discovered endpoints change:
 
-
-```
+```c#
 public void OnEndpointFound(EndpointDetails discoveredEndpoint)
 {
-Debug.Log("Found Endpoint: " +
-discoveredEndpoint.DeviceId + " " +
-discoveredEndpoint.EndpointId + " " + 
-discoveredEndpoint.Name);
+    Debug.Log("Found Endpoint: " +
+              discoveredEndpoint.DeviceId + " " +
+              discoveredEndpoint.EndpointId + " " + 
+              discoveredEndpoint.Name);
 }
 ```
+
 And when an endpoint stops advertising:
 
-
-```
+```c#
 public void OnEndpointLost(string lostEndpointId)
 {
-Debug.Log("Endpoint lost: " + lostEndpointId);
+    Debug.Log("Endpoint lost: " + lostEndpointId);
 }
-
-
-
 ```
+
 ## Sending Connection Request
 
 After your app discovers another app that is advertising the requested service
 ID, you can initiate a connection between the devices.
 
-
-```
+```c#
  PlayGamesPlatform.Nearby.SendConnectionRequest(
                 "Local Game player",  // the user-friendly name
                 remote.EndpointId,	// the discovered endpoint	
                 playerData,	// byte[] of data
                 (response) => {
-				Debug.Log("response: " +
-response.ResponseStatus);
-},
+				        Debug.Log("response: " +
+                                    response.ResponseStatus);
+                },
                 (IMessageListener)messageListener);
 ```
+
 IMessageListener is an interface that is called when messages are received:
 
-
-```
+```c#
         void OnMessageReceived(string remoteEndpointId, byte[] data,
                        bool isReliableMessage);
 
         void OnRemoteEndpointDisconnected(string remoteEndpointId);
 ```
- 
 
 ## Responding to Connection Request
 
@@ -174,21 +165,18 @@ accepted or rejected.
 
 To accept a request:
 
-
-```
+```c#
 PlayGamesPlatform.Nearby.AcceptConnectionRequest(
                 request.RemoteEndpoint.EndpointId,
                 (byte[])responseData,
                 (IMessageListener)messageListener);
 ```
+
 To reject a request:
 
-
-```
+```c#
 PlayGamesPlatform.Nearby.RejectConnectionRequest(
                 request.RemoteEndpoint.EndpointId);
-
-
 ```
 ## Sending and Receiving Messages
 
@@ -198,8 +186,9 @@ send messages to any number of clients, and clients can send messages to the
 host. If a client needs to communicate with other clients, you can send a
 message to the host to relay the information to the recipient client.
 
-To send a message, call <em><strong>SendReliable()</strong></em> and pass in the appropriate endpoint IDs. The payload parameter is a byte
-array of up to <em><strong>MaxReliableMessagePayloadLength</strong></em> bytes long that holds your message data. Reliable messages are guaranteed to
+To send a message, call <em><strong>SendReliable()</strong></em> and pass in the appropriate endpoint IDs.
+The payload parameter is a byte array of up to <em><strong>MaxReliableMessagePayloadLength</strong></em> 
+bytes long that holds your message data. Reliable messages are guaranteed to
 be received in the order they were sent, and the system retries sending the
 message until the connection ends.
 
@@ -208,16 +197,16 @@ as the host (meaning StartAdvertising() was called).  Messages can only be sent
 to the remote host if the local device called StartDiscovery()).
 
 
-```
-List&lt;string> endpointIds;
+```c#
+List<string> endpointIds;
 byte[] payload;
 PlayGamesPlatform.Nearby.SendReliable(endpointIds, payload);
 ```
-Smaller messages can be sent using <em><strong>SendUnreliable()</strong></em> the maximum message size is limited to <em><strong>MaxUnreliableMessagePayloadLength</strong></em>.
+Smaller messages can be sent using <em><strong>SendUnreliable()</strong></em> the maximum message size
+is limited to <em><strong>MaxUnreliableMessagePayloadLength</strong></em>.
 
-
-```
-List&lt;string> endpointIds;
+```c#
+List<string> endpointIds;
 byte[] payload;
 PlayGamesPlatform.Nearby.SendUnreliable(endpointIds, payload);
 ```
@@ -225,25 +214,28 @@ PlayGamesPlatform.Nearby.SendUnreliable(endpointIds, payload);
 
 Once  the connections have been made, advertising is stopped by calling:
 
-	<code>PlayGamesPlatform.Nearby.StopAdvertising();</code>
+```c#
+	PlayGamesPlatform.Nearby.StopAdvertising();
+```
 
 Likewise, discovery is stopped by calling:
 
-
-```
+```c#
 PlayGamesPlatform.Nearby.StopDiscovery(serviceId);
 ```
+
 Once the communication is done, the connection can be closed by calling:
 
-	<code>PlayGamesPlatform.Nearby.DisconnectFromEndpoint(endpointId);</code>
+```c#
+	PlayGamesPlatform.Nearby.DisconnectFromEndpoint(endpointId);
+```
 
 To stop all Nearby connections activity, call:
 
-
+```c#
+    PlayGamesPlatform.Nearby.StopAllConnections();
 ```
-PlayGamesPlatform.Nearby.StopAllConnections();
 
-```
 # Sample: Nearby Droids
 
 The Nearby connections sample is found in samples/NearbyDroids.  This is a
@@ -273,7 +265,7 @@ your bundle Id.  It should be unique to your game, and be something like
 com.<yourcompany>.game
   7. Close the Player settings
   8. Set the service id for Nearby Connections. Click Window > Google Play Games >
-Setup > Nearby Connections Setup…
+Setup > Nearby Connections Setup...
   9. Enter the serviceId.  It should be similar (or the same) as the bundle Id.
   10. Press Setup and then close the dialog.
 
@@ -417,5 +409,3 @@ interoperability)
   3. Custom tiles/avatars - allow players to create their own avatar vs. using
 predefined.
   4. More creative animations and sounds.
-
-
