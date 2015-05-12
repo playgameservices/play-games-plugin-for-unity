@@ -56,17 +56,26 @@ namespace GooglePlayGames
 
         public void DoSetup()
         {
-            PerformSetup(mAppId);
+            PerformSetup(mAppId, null);
         }
 
-        // Provide static access to setup for facilitating automated builds.
-        public static void PerformSetup(string appId)
+        /// <summary>
+        /// Provide static access to setup for facilitating automated builds.
+        /// </summary>
+        /// <param name="appId">App identifier.</param>
+        /// <param name="nearbySvcId">Optional nearby connection serviceId</param>
+        public static void PerformSetup(string appId, string nearbySvcId)
         {
             // check for valid app id
             if (!GPGSUtil.LooksLikeValidAppId(appId))
             {
                 GPGSUtil.Alert(GPGSStrings.Setup.AppIdError);
                 return;
+            }
+
+            if (nearbySvcId != null)
+            {
+                NearbyConnectionUI.PerformSetup(nearbySvcId, true);
             }
 
             GPGSProjectSettings.Instance.Set("proj.AppId", appId);

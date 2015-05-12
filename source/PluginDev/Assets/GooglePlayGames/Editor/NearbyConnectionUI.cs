@@ -57,11 +57,13 @@ namespace GooglePlayGames
 
         private void DoSetup()
         {
-            PerformSetup(mNearbyServiceId);
+            PerformSetup(mNearbyServiceId, true);
         }
 
         /// Provide static access to setup for facilitating automated builds.
-        public static void PerformSetup(string nearbyServiceId)
+        /// <param name="nearbyServiceId">The nearby connections service Id</param>
+        /// <param name="androidBuild">true if building android</param>
+        public static void PerformSetup(string nearbyServiceId, bool androidBuild)
         {
             // check for valid app id
             if (!GPGSUtil.LooksLikeValidServiceId(nearbyServiceId))
@@ -73,21 +75,23 @@ namespace GooglePlayGames
             GPGSProjectSettings.Instance.Set(GPGSUtil.SERVICEIDKEY, nearbyServiceId);
             GPGSProjectSettings.Instance.Save();
 
-            // create needed directories
-            GPGSUtil.EnsureDirExists("Assets/Plugins");
-            GPGSUtil.EnsureDirExists("Assets/Plugins/Android");
- 
-            GPGSUtil.CopySupportLibs();
+            if (androidBuild)
+            {
+                // create needed directories
+                GPGSUtil.EnsureDirExists("Assets/Plugins");
+                GPGSUtil.EnsureDirExists("Assets/Plugins/Android");
+                GPGSUtil.CopySupportLibs();
 
-            // Generate AndroidManifest.xml
-            GPGSUtil.GenerateAndroidManifest();
+                // Generate AndroidManifest.xml
+                GPGSUtil.GenerateAndroidManifest();
 
-            // refresh assets, and we're done
-            AssetDatabase.Refresh();
-            GPGSProjectSettings.Instance.Set("android.NearbySetupDone", true);
-            GPGSProjectSettings.Instance.Save();
-            EditorUtility.DisplayDialog(GPGSStrings.Success,
-                GPGSStrings.NearbyConnections.SetupComplete, GPGSStrings.Ok);
+                // refresh assets, and we're done
+                AssetDatabase.Refresh();
+                GPGSProjectSettings.Instance.Set("android.NearbySetupDone", true);
+                GPGSProjectSettings.Instance.Save();
+                EditorUtility.DisplayDialog(GPGSStrings.Success,
+                    GPGSStrings.NearbyConnections.SetupComplete, GPGSStrings.Ok);
+            }
         }
     }
 }
