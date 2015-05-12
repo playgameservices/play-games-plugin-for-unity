@@ -30,10 +30,11 @@ RealTimeMultiplayerListener
 {
     public GUISkin GuiSkin;
 
-    private const int Margin = 20, Spacing = 10;
+    private const int Spacing = 4;
+    private const int Margin = 8;
     private const float FontSizeFactor = 35;
     private const int GridCols = 2;
-    private const int GridRows = 9;
+    private const int GridRows = 10;
 
     private static readonly PlayGamesClientConfiguration ClientConfiguration =
         new PlayGamesClientConfiguration.Builder()
@@ -45,7 +46,7 @@ RealTimeMultiplayerListener
 
     private bool mStandby = false;
     private string mStandbyMessage = string.Empty;
-    private string mStatus = "Ready.";
+    private string _mStatus = "Ready";
     private string mLastInvitationId = null;
 
     private string mSavedGameFilename = "default_name";
@@ -86,6 +87,8 @@ RealTimeMultiplayerListener
 
     public void Start()
     {
+        Screen.orientation = ScreenOrientation.Portrait;
+
         PlayGamesPlatform.DebugLogEnabled = true;
         this.mNearbyGui = new NearbyGUI(this);
     }
@@ -123,13 +126,13 @@ RealTimeMultiplayerListener
 
     public void OnStateSaved(bool success, int slot)
     {
-        mStatus = "Cloud save " + (success ? "successful" : "failed") + " word: " + mLastLocalSave;
+        Status = "Cloud save " + (success ? "successful" : "failed") + " word: " + mLastLocalSave;
         ShowEffect(success);
     }
 
     public void OnRealTimeMessageReceived(bool reliable, string senderId, byte[] data)
     {
-        mStatus = string.Format(
+        Status = string.Format(
             "Got message. Reliable:{0} From:{1} Data: {2}",
             reliable,
             senderId,
@@ -144,45 +147,45 @@ RealTimeMultiplayerListener
     public void OnRoomConnected(bool success)
     {
         ShowEffect(success);
-        mStatus = success ? "Room connected!" : "Room setup failed!";
+        Status = success ? "Room connected!" : "Room setup failed!";
         EndStandBy();
     }
 
     public void OnLeftRoom()
     {
-        mStatus = "Left room.";
+        Status = "Left room.";
     }
 
     public void OnPeersConnected(string[] participantIds)
     {
-        mStatus = "Peers connected: ";
+        Status = "Peers connected: ";
         foreach (string pid in participantIds)
         {
             Participant p = PlayGamesPlatform.Instance.RealTime.GetParticipant(pid);
             if (p != null)
             {
-                mStatus += pid + "(" + p.DisplayName + ") ";
+                Status += pid + "(" + p.DisplayName + ") ";
             }
             else
             {
-                mStatus += pid + "(NULL) ";
+                Status += pid + "(NULL) ";
             }
         }
     }
 
     public void OnPeersDisconnected(string[] participantIds)
     {
-        mStatus = "Peers disconnected: ";
+        Status = "Peers disconnected: ";
         foreach (string pid in participantIds)
         {
             Participant p = PlayGamesPlatform.Instance.RealTime.GetParticipant(pid);
             if (p != null)
             {
-                mStatus += pid + "(" + p.DisplayName + ") ";
+                Status += pid + "(" + p.DisplayName + ") ";
             }
             else
             {
-                mStatus += pid + "(NULL) ";
+                Status += pid + "(NULL) ";
             }
         }
     }
@@ -192,18 +195,18 @@ RealTimeMultiplayerListener
         EndStandBy();
         if (success)
         {
-            mStatus = "Loaded from cloud: " + System.Text.ASCIIEncoding.Default.GetString(data);
+            Status = "Loaded from cloud: " + System.Text.ASCIIEncoding.Default.GetString(data);
         }
         else
         {
-            mStatus = "*** Failed to load from cloud.";
+            Status = "*** Failed to load from cloud.";
         }
 
-        mStatus += ". conflict=" + (mHadCloudConflict ? "yes" : "no");
+        Status += ". conflict=" + (mHadCloudConflict ? "yes" : "no");
 
         if (mHadCloudConflict)
         {
-            mStatus += string.Format(" local={0}, server={1}", mConflictLocalVersion, mConflictServerVersion);
+            Status += string.Format(" local={0}, server={1}", mConflictLocalVersion, mConflictServerVersion);
         }
 
         ShowEffect(success);
@@ -333,7 +336,7 @@ RealTimeMultiplayerListener
 
         if (this.mConflictResolver == null)
         {
-            mStatus = "No pending conflict";
+            Status = "No pending conflict";
             mUi = Ui.SavedGame;
             return;
         }
@@ -374,7 +377,7 @@ RealTimeMultiplayerListener
 
         if (mCurrentSavedGame == null || !mCurrentSavedGame.IsOpen)
         {
-            mStatus = "No opened saved game selected.";
+            Status = "No opened saved game selected.";
             mUi = Ui.SavedGame;
             return;
         }
@@ -393,7 +396,7 @@ RealTimeMultiplayerListener
                 System.Text.ASCIIEncoding.Default.GetBytes(mSavedGameFileContent),
                 (status, updated) =>
                 {
-                    mStatus = "Write status was: " + status;
+                    Status = "Write status was: " + status;
                     mUi = Ui.SavedGame;
                     EndStandBy();
                 });
@@ -414,10 +417,10 @@ RealTimeMultiplayerListener
             strategy,
             (status, openedFile) =>
             {
-                mStatus = "Open status for file " + mSavedGameFilename + ": " + status + "\n";
+                Status = "Open status for file " + mSavedGameFilename + ": " + status + "\n";
                 if (openedFile != null)
                 {
-                    mStatus += "Successfully opened file: " + openedFile.ToString();
+                    Status += "Successfully opened file: " + openedFile.ToString();
                     Logger.d("Opened file: " + openedFile.ToString());
                     mCurrentSavedGame = openedFile;
                 }
@@ -431,14 +434,14 @@ RealTimeMultiplayerListener
         if (mCurrentSavedGame == null)
         {
             ShowEffect(false);
-            mStatus = "No save game selected";
+            Status = "No save game selected";
             return;
         }
 
         if (!mCurrentSavedGame.IsOpen)
         {
             ShowEffect(false);
-            mStatus = "Current saved game is not open. Open it first.";
+            Status = "Current saved game is not open. Open it first.";
             return;
         }
 
@@ -448,12 +451,12 @@ RealTimeMultiplayerListener
             mCurrentSavedGame,
             (status, binaryData) =>
             {
-                mStatus = "Reading file " + openedFile + ", status: " + status + "\n";
+                Status = "Reading file " + openedFile + ", status: " + status + "\n";
 
                 if (binaryData != null)
                 {
                     var stringContent = System.Text.ASCIIEncoding.Default.GetString(binaryData);
-                    mStatus += "File content: " + stringContent;
+                    Status += "File content: " + stringContent;
                     mSavedGameFileContent = stringContent;
                 }
                 else
@@ -475,10 +478,10 @@ RealTimeMultiplayerListener
             false,
             (status, savedGame) =>
             {
-                mStatus = "UI Status: " + status;
+                Status = "UI Status: " + status;
                 if (savedGame != null)
                 {
-                    mStatus +=
+                    Status +=
                         "Retrieved saved game with description: " + savedGame.Description;
                     mCurrentSavedGame = savedGame;
                 }
@@ -508,10 +511,10 @@ RealTimeMultiplayerListener
             },
             (status, openedFile) =>
             {
-                mStatus = "Open status for file " + mSavedGameFilename + ": " + status + "\n";
+                Status = "Open status for file " + mSavedGameFilename + ": " + status + "\n";
                 if (openedFile != null)
                 {
-                    mStatus += "Successfully opened file: " + openedFile.ToString();
+                    Status += "Successfully opened file: " + openedFile.ToString();
                     Logger.d("Opened file: " + openedFile.ToString());
                     mCurrentSavedGame = openedFile;
                 }
@@ -527,8 +530,8 @@ RealTimeMultiplayerListener
             DataSource.ReadNetworkOnly,
             (status, savedGames) =>
             {
-                mStatus = "Fetch All Status: " + status + "\n";
-                mStatus += "Saved Games: [" +
+                Status = "Fetch All Status: " + status + "\n";
+                Status += "Saved Games: [" +
                 string.Join(",", savedGames.Select(g => g.Filename).ToArray()) + "]";
                 savedGames.ForEach(g => Logger.d("Retrieved save game: " + g.ToString()));
                 EndStandBy();
@@ -654,7 +657,7 @@ RealTimeMultiplayerListener
         {
             if (mMatch == null)
             {
-                mStatus = "No match active.";
+                Status = "No match active.";
             }
             else
             {
@@ -690,7 +693,7 @@ RealTimeMultiplayerListener
         }
         else if (GUI.Button(CalcGrid(0, 5), "Max Data Size"))
         {
-            mStatus = PlayGamesPlatform.Instance.TurnBased.GetMaxMatchDataSize() + " bytes";
+            Status = PlayGamesPlatform.Instance.TurnBased.GetMaxMatchDataSize() + " bytes";
         }
         else if (GUI.Button(CalcGrid(1, 1), "Leave"))
         {
@@ -718,12 +721,12 @@ RealTimeMultiplayerListener
     {
         if (mQuest != null)
         {
-            mStatus = "Selected Quest: " + mQuest.Id + "\n";
+            Status = "Selected Quest: " + mQuest.Id + "\n";
         }
 
         if (mQuestMilestone != null)
         {
-            mStatus += "Selected Milestone: " + mQuestMilestone.Id;
+            Status += "Selected Milestone: " + mQuestMilestone.Id;
         }
 
         DrawStatus();
@@ -736,8 +739,8 @@ RealTimeMultiplayerListener
                 DataSource.ReadNetworkOnly,
                 (status, events) =>
                 {
-                    mStatus = "Fetch All Status: " + status + "\n";
-                    mStatus += "Events: [" +
+                    Status = "Fetch All Status: " + status + "\n";
+                    Status += "Events: [" +
                     string.Join(",", events.Select(g => g.Id).ToArray()) + "]";
                     events.ForEach(e => Logger.d("Retrieved event: " + e.ToString()));
                     EndStandBy();
@@ -751,10 +754,10 @@ RealTimeMultiplayerListener
                 Settings.Event,
                 (status, fetchedEvent) =>
                 {
-                    mStatus = "Fetch Status: " + status + "\n";
+                    Status = "Fetch Status: " + status + "\n";
                     if (fetchedEvent != null)
                     {
-                        mStatus += "Event: [" + fetchedEvent.Id + ", " + fetchedEvent.Description + "]";
+                        Status += "Event: [" + fetchedEvent.Id + ", " + fetchedEvent.Description + "]";
                         Logger.d("Fetched event: " + fetchedEvent.ToString());
                     }
               
@@ -789,7 +792,7 @@ RealTimeMultiplayerListener
         {
             if (mQuest == null)
             {
-                mStatus = "Could not show Quest UI - no quest selected";
+                Status = "Could not show Quest UI - no quest selected";
             }
             else
             {
@@ -800,7 +803,7 @@ RealTimeMultiplayerListener
         {
             if (mQuest == null)
             {
-                mStatus = "Could not fetch Quest - no quest selected";
+                Status = "Could not fetch Quest - no quest selected";
             }
             else
             {
@@ -810,7 +813,7 @@ RealTimeMultiplayerListener
                     mQuest.Id,
                     (status, quest) =>
                     {
-                        mStatus = "Fetch Quest Status: " + status + "\n";
+                        Status = "Fetch Quest Status: " + status + "\n";
                         mQuest = quest;
                         Logger.d("Fetched quest " + quest);
                         EndStandBy();
@@ -821,7 +824,7 @@ RealTimeMultiplayerListener
         {
             if (mQuest == null)
             {
-                mStatus = "Could not accept Quest - no quest selected";
+                Status = "Could not accept Quest - no quest selected";
             }
             else
             {
@@ -830,7 +833,7 @@ RealTimeMultiplayerListener
                     mQuest,
                     (status, quest) =>
                     {
-                        mStatus = "Accept Quest Status: " + status + "\n";
+                        Status = "Accept Quest Status: " + status + "\n";
                         mQuest = quest;
                         Logger.d("Accepted quest " + quest);
                         EndStandBy();
@@ -841,7 +844,7 @@ RealTimeMultiplayerListener
         {
             if (mQuestMilestone == null)
             {
-                mStatus = "Could not claim milestone - no milestone selected";
+                Status = "Could not claim milestone - no milestone selected";
             }
             else
             {
@@ -850,7 +853,7 @@ RealTimeMultiplayerListener
                     mQuestMilestone,
                     (status, quest, milestone) =>
                     {
-                        mStatus = "Claim milestone Status: " + status + "\n";
+                        Status = "Claim milestone Status: " + status + "\n";
                         mQuest = quest;
                         mQuestMilestone = milestone;
                         Logger.d("Claim quest: " + quest);
@@ -873,14 +876,21 @@ RealTimeMultiplayerListener
             title == null ? "Play Games Unity Plugin - Smoke Test" : title);
     }
 
-    internal void SetStatus(string status)
+    internal string Status
     {
-        this.mStatus = status;
+        get
+        {
+            return _mStatus;
+        }
+        set
+        {
+            _mStatus = value;
+        }
     }
 
     internal void DrawStatus()
     {
-        GUI.Label(this.CalcGrid(0, 7, 2, 2), this.mStatus);
+        GUI.Label(this.CalcGrid(0, 8, 2, 2), this.Status);
     }
 
     internal void FetchQuestList(QuestFetchFlags flags)
@@ -891,9 +901,12 @@ RealTimeMultiplayerListener
             flags,
             (status, quests) =>
             {
-                mStatus = "Fetch Status: " + status + "\n";
-                mStatus += "Quests: [" +
+                string statusText;
+                statusText = "Fetch Status: " + status + "\n";
+                statusText += "Quests: [" +
                 string.Join(",", quests.Select(g => g.Id).ToArray()) + "]";
+
+                Status = statusText;
 
                 if (quests.Count != 0)
                 {
@@ -907,18 +920,18 @@ RealTimeMultiplayerListener
 
     internal void HandleQuestUI(QuestUiResult result, IQuest quest, IQuestMilestone milestone)
     {
-        mStatus = "Show UI Status: " + mStatus + "\n";
+        Status = "Show UI Status: " + Status + "\n";
         Logger.d("UI Status: " + result);
         if (quest != null)
         {
             mQuest = quest;
-            mStatus += "User wanted to accept quest " + quest.Id;
+            Status += "User wanted to accept quest " + quest.Id;
             Logger.d("User Accepted quest " + quest.ToString());
         }
         else if (milestone != null)
         {
             mQuestMilestone = milestone;
-            mStatus += "User wanted to claim milestone " + milestone.Id;
+            Status += "User wanted to claim milestone " + milestone.Id;
             Logger.d("Claimed milestone " + milestone.ToString());
             Logger.d("Completion data: " +
                 System.Text.ASCIIEncoding.Default.GetString(milestone.CompletionRewardData));
@@ -990,9 +1003,16 @@ RealTimeMultiplayerListener
                     mNearbyGui.OnGUI();
                     break;
                 default:
-                    mStatus = "Authenticated. Hello, " + Social.localUser.userName + " (" +
-                    Social.localUser.id + ")";
-                    ShowRegularUi();
+                    // check for a status of interest, and if there
+                    // is one, then don't touch it.  Otherwise
+                    // show the logged in user.
+                    if (string.IsNullOrEmpty(Status) || Status == "Ready")
+                    {
+                        Status = "Authenticated. Hello, " +
+                            Social.localUser.userName + " (" +
+                            Social.localUser.id + ")";
+                    }
+                        ShowRegularUi();
                     break;
             }
         }
@@ -1024,7 +1044,7 @@ RealTimeMultiplayerListener
                 EndStandBy();
                 if (success)
                 {
-                    mStatus = "Authenticated. Hello, " + Social.localUser.userName + " (" +
+                    Status = "Authenticated. Hello, " + Social.localUser.userName + " (" +
                     Social.localUser.id + ")";
 
                     // register delegates
@@ -1037,7 +1057,7 @@ RealTimeMultiplayerListener
                 }
                 else
                 {
-                    mStatus = "*** Failed to authenticate.";
+                    Status = "*** Failed to authenticate.";
                 }
           
                 ShowEffect(success);
@@ -1047,7 +1067,7 @@ RealTimeMultiplayerListener
     internal void DoSignOut()
     {
         ((PlayGamesPlatform)Social.Active).SignOut();
-        mStatus = "Signing out.";
+        Status = "Signing out.";
     }
 
     internal void DoAchievementReveal()
@@ -1059,7 +1079,8 @@ RealTimeMultiplayerListener
             (bool success) =>
             {
                 EndStandBy();
-                mStatus = success ? "Revealed successfully." : "*** Failed to reveal ach.";
+                Status = success ? "Revealed successfully." : "*** Failed to reveal ach.";
+                Debug.Log("AchievementToReveal completed: " + Status);
                 ShowEffect(success);
             });
     }
@@ -1073,7 +1094,7 @@ RealTimeMultiplayerListener
             (bool success) =>
             {
                 EndStandBy();
-                mStatus = success ? "Unlocked successfully." : "*** Failed to unlock ach.";
+                Status = success ? "Unlocked successfully." : "*** Failed to unlock ach.";
                 ShowEffect(success);
             });
     }
@@ -1089,7 +1110,7 @@ RealTimeMultiplayerListener
             (bool success) =>
             {
                 EndStandBy();
-                mStatus = success ? "Incremented successfully." : "*** Failed to increment ach.";
+                Status = success ? "Incremented successfully." : "*** Failed to increment ach.";
                 ShowEffect(success);
             });
     }
@@ -1109,7 +1130,7 @@ RealTimeMultiplayerListener
             (bool success) =>
             {
                 EndStandBy();
-                mStatus = success ? "Successfully reported score " + score :
+                Status = success ? "Successfully reported score " + score :
                 "*** Failed to report score " + score;
                 ShowEffect(success);
             });
@@ -1159,7 +1180,7 @@ RealTimeMultiplayerListener
         PlayGamesPlatform p = (PlayGamesPlatform)Social.Active;
         p.UpdateState(0, System.Text.ASCIIEncoding.Default.GetBytes(word), this);
         EndStandBy();
-        mStatus = "Saved string to cloud: " + word;
+        Status = "Saved string to cloud: " + word;
         mLastLocalSave = word;
         Logger.d("Saved string: " + word);
         ShowEffect(true);
@@ -1195,7 +1216,7 @@ RealTimeMultiplayerListener
     {
         if (mLastInvitationId == null)
         {
-            mStatus = "No incoming invitation!";
+            Status = "No incoming invitation!";
             return;
         }
       
@@ -1207,12 +1228,12 @@ RealTimeMultiplayerListener
     {
         if (mLastInvitationId == null)
         {
-            mStatus = "No incoming invitation!";
+            Status = "No incoming invitation!";
             return;
         }
       
         PlayGamesPlatform.Instance.RealTime.DeclineInvitation(mLastInvitationId);
-        mStatus = "Declined incoming invitation.";
+        Status = "Declined incoming invitation.";
     }
 
     private void DoBroadcastMessage()
@@ -1222,7 +1243,7 @@ RealTimeMultiplayerListener
         bool reliable = UnityEngine.Random.Range(0, 2) == 0;
 
         PlayGamesPlatform.Instance.RealTime.SendMessageToAll(reliable, System.Text.ASCIIEncoding.Default.GetBytes(word));
-        mStatus = "Sent message: " + word;
+        Status = "Sent message: " + word;
     }
 
     private void DoSendMessage()
@@ -1240,12 +1261,12 @@ RealTimeMultiplayerListener
             reliable,
             recipient.ParticipantId, 
             System.Text.ASCIIEncoding.Default.GetBytes(word));
-        mStatus = string.Format("Sent message: {0}, reliable: {1}, recipient: {2}", word, reliable, recipient.ParticipantId);
+        Status = string.Format("Sent message: {0}, reliable: {1}, recipient: {2}", word, reliable, recipient.ParticipantId);
     }
 
     private void DoLeaveRoom()
     {
-        mStatus = "Requested to leave room.";
+        Status = "Requested to leave room.";
         PlayGamesPlatform.Instance.RealTime.LeaveRoom();
     }
 
@@ -1254,20 +1275,20 @@ RealTimeMultiplayerListener
         List<Participant> participants = PlayGamesPlatform.Instance.RealTime.GetConnectedParticipants();
         if (participants == null)
         {
-            mStatus = "Participants: (null list)";
+            Status = "Participants: (null list)";
             return;
         }
       
-        mStatus = string.Format("{0} participants.", participants.Count);
+        Status = string.Format("{0} participants.", participants.Count);
         Participant self = PlayGamesPlatform.Instance.RealTime.GetSelf();
         foreach (Participant p in participants)
         {
             if (self.ParticipantId.Equals(p.ParticipantId))
             {
-                mStatus += "*";
+                Status += "*";
             }
           
-            mStatus += p.DisplayName + "(" + p.ParticipantId + ") ";
+            Status += p.DisplayName + "(" + p.ParticipantId + ") ";
             Debug.Log(">>> participant: " + p.ToString());
         }
     }
@@ -1275,7 +1296,7 @@ RealTimeMultiplayerListener
     private void OnInvitationReceived(Invitation invitation, bool fromNotification)
     {
         string inviterName = invitation.Inviter != null ? invitation.Inviter.DisplayName : "(null)";
-        mStatus = "!!! Got invitation " + (fromNotification ? " (from notification):" : ":") +
+        Status = "!!! Got invitation " + (fromNotification ? " (from notification):" : ":") +
         " from " + inviterName + ", id " + invitation.InvitationId;
         mLastInvitationId = invitation.InvitationId;
     }
@@ -1286,11 +1307,11 @@ RealTimeMultiplayerListener
         {
             mUi = Ui.TbmpMatch;
             mMatch = match;
-            mStatus = "Got match from notification! " + match;
+            Status = "Got match from notification! " + match;
         }
         else
         {
-            mStatus = "Got match a update not from notification.";
+            Status = "Got match a update not from notification.";
         }
     }
 
@@ -1306,7 +1327,7 @@ RealTimeMultiplayerListener
                 ShowEffect(success);
                 EndStandBy();
                 mMatch = match;
-                mStatus = success ? "Match created" : "Match creation failed";
+                Status = success ? "Match created" : "Match creation failed";
                 if (success)
                 {
                     mUi = Ui.TbmpMatch;
@@ -1326,7 +1347,7 @@ RealTimeMultiplayerListener
                 ShowEffect(success);
                 EndStandBy();
                 mMatch = match;
-                mStatus = success ? "Match created" : "Match creation failed";
+                Status = success ? "Match created" : "Match creation failed";
                 if (success)
                 {
                     mUi = Ui.TbmpMatch;
@@ -1342,7 +1363,7 @@ RealTimeMultiplayerListener
                 ShowEffect(success);
                 EndStandBy();
                 mMatch = match;
-                mStatus = success ? "Successfully accepted from inbox!" : "Failed to accept from inbox";
+                Status = success ? "Successfully accepted from inbox!" : "Failed to accept from inbox";
                 if (success)
                 {
                     mUi = Ui.TbmpMatch;
@@ -1354,7 +1375,7 @@ RealTimeMultiplayerListener
     {
         if (mLastInvitationId == null)
         {
-            mStatus = "No incoming invitation received from listener.";
+            Status = "No incoming invitation received from listener.";
             return;
         }
       
@@ -1366,7 +1387,7 @@ RealTimeMultiplayerListener
                 ShowEffect(success);
                 EndStandBy();
                 mMatch = match;
-                mStatus = success ? "Successfully accepted invitation!" :
+                Status = success ? "Successfully accepted invitation!" :
                 "Failed to accept invitation";
                 if (success)
                 {
@@ -1379,13 +1400,13 @@ RealTimeMultiplayerListener
     {
         if (mLastInvitationId == null)
         {
-            mStatus = "No incoming invitation received from listener.";
+            Status = "No incoming invitation received from listener.";
             return;
         }
       
         PlayGamesPlatform.Instance.TurnBased.DeclineInvitation(mLastInvitationId);
         mLastInvitationId = null;
-        mStatus = "Declined invitation.";
+        Status = "Declined invitation.";
     }
 
     private string GetMatchSummary()
@@ -1418,11 +1439,11 @@ RealTimeMultiplayerListener
     {
         if (mMatch == null)
         {
-            mStatus = "No match is active!";
+            Status = "No match is active!";
             return;
         }
 
-        mStatus = mMatch.ToString();
+        Status = mMatch.ToString();
     }
 
     // figure out who is next to play
@@ -1482,13 +1503,13 @@ RealTimeMultiplayerListener
     {
         if (mMatch == null)
         {
-            mStatus = "No match is active.";
+            Status = "No match is active.";
             return;
         }
       
         if (mMatch.TurnStatus != TurnBasedMatch.MatchTurnStatus.MyTurn)
         {
-            mStatus = "Not my turn.";
+            Status = "Not my turn.";
             return;
         }
 
@@ -1501,7 +1522,7 @@ RealTimeMultiplayerListener
             {
                 EndStandBy();
                 ShowEffect(success);
-                mStatus = success ? "Successfully took turn." : "Failed to take turn.";
+                Status = success ? "Successfully took turn." : "Failed to take turn.";
                 if (success)
                 {
                     mMatch = null;
@@ -1514,13 +1535,13 @@ RealTimeMultiplayerListener
     {
         if (mMatch == null)
         {
-            mStatus = "No match is active.";
+            Status = "No match is active.";
             return;
         }
       
         if (mMatch.TurnStatus != TurnBasedMatch.MatchTurnStatus.MyTurn)
         {
-            mStatus = "Not my turn.";
+            Status = "Not my turn.";
             return;
         }
 
@@ -1547,7 +1568,7 @@ RealTimeMultiplayerListener
             {
                 EndStandBy();
                 ShowEffect(success);
-                mStatus = success ? "Successfully finished match." : "Failed to finish match.";
+                Status = success ? "Successfully finished match." : "Failed to finish match.";
                 if (success)
                 {
                     mMatch = null;
@@ -1560,13 +1581,13 @@ RealTimeMultiplayerListener
     {
         if (mMatch == null)
         {
-            mStatus = "No match is active.";
+            Status = "No match is active.";
             return;
         }
       
         if (mMatch.Status != TurnBasedMatch.MatchStatus.Complete)
         {
-            mStatus = "Match is not complete";
+            Status = "Match is not complete";
             return;
         }
 
@@ -1577,7 +1598,7 @@ RealTimeMultiplayerListener
             {
                 EndStandBy();
                 ShowEffect(success);
-                mStatus = success ? "Successfully ack'ed finish." : "Failed to ack finish.";
+                Status = success ? "Successfully ack'ed finish." : "Failed to ack finish.";
                 if (success)
                 {
                     mMatch = null;
@@ -1590,13 +1611,13 @@ RealTimeMultiplayerListener
     {
         if (mMatch == null)
         {
-            mStatus = "No match is active.";
+            Status = "No match is active.";
             return;
         }
       
         if (mMatch.TurnStatus == TurnBasedMatch.MatchTurnStatus.MyTurn)
         {
-            mStatus = "It's my turn; use 'Leave During Turn'.";
+            Status = "It's my turn; use 'Leave During Turn'.";
             return;
         }
 
@@ -1607,7 +1628,7 @@ RealTimeMultiplayerListener
             {
                 EndStandBy();
                 ShowEffect(success);
-                mStatus = success ? "Successfully left match." : "Failed to leave match.";
+                Status = success ? "Successfully left match." : "Failed to leave match.";
                 if (success)
                 {
                     mMatch = null;
@@ -1620,13 +1641,13 @@ RealTimeMultiplayerListener
     {
         if (mMatch == null)
         {
-            mStatus = "No match is active.";
+            Status = "No match is active.";
             return;
         }
       
         if (mMatch.TurnStatus != TurnBasedMatch.MatchTurnStatus.MyTurn)
         {
-            mStatus = "It's not my turn.";
+            Status = "It's not my turn.";
             return;
         }
 
@@ -1638,7 +1659,7 @@ RealTimeMultiplayerListener
             {
                 EndStandBy();
                 ShowEffect(success);
-                mStatus = success ? "Successfully left match during turn." :
+                Status = success ? "Successfully left match during turn." :
                 "Failed to leave match during turn.";
                 if (success)
                 {
@@ -1652,13 +1673,13 @@ RealTimeMultiplayerListener
     {
         if (mMatch == null)
         {
-            mStatus = "No match is active.";
+            Status = "No match is active.";
             return;
         }
       
         if (mMatch.Status != TurnBasedMatch.MatchStatus.Active)
         {
-            mStatus = "Match is not active.";
+            Status = "Match is not active.";
             return;
         }
 
@@ -1669,7 +1690,7 @@ RealTimeMultiplayerListener
             {
                 EndStandBy();
                 ShowEffect(success);
-                mStatus = success ? "Successfully cancelled match." : "Failed to cancel match.";
+                Status = success ? "Successfully cancelled match." : "Failed to cancel match.";
                 if (success)
                 {
                     mMatch = null;
@@ -1682,13 +1703,13 @@ RealTimeMultiplayerListener
     {
         if (mMatch == null)
         {
-            mStatus = "No match is active.";
+            Status = "No match is active.";
             return;
         }
       
         if (!mMatch.CanRematch)
         {
-            mStatus = "Match can't be rematched.";
+            Status = "Match can't be rematched.";
             return;
         }
 
@@ -1700,7 +1721,7 @@ RealTimeMultiplayerListener
                 EndStandBy();
                 ShowEffect(success);
                 mMatch = match;
-                mStatus = success ? "Successfully rematched." : "Failed to rematch.";
+                Status = success ? "Successfully rematched." : "Failed to rematch.";
                 if (success)
                 {
                     // if we succeed, it will be our turn, so go to the appropriate UI
