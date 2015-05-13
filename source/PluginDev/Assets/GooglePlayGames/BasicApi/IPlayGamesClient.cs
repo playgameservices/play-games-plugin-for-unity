@@ -19,6 +19,8 @@ namespace GooglePlayGames.BasicApi
   using System;
   using GooglePlayGames.BasicApi.Multiplayer;
 
+  using UnityEngine.SocialPlatforms;
+
   /// <summary>
   /// Defines an abstract interface for a Play Games Client. Concrete implementations
   /// might be, for example, the client for Android or for iOS. One fundamental concept
@@ -159,6 +161,18 @@ namespace GooglePlayGames.BasicApi
     /// <param name="successOrFailureCalllback">Callback used to indicate whether the operation
     /// succeeded or failed.</param>
     void SubmitScore(string leaderboardId, long score, Action<bool> successOrFailureCalllback);
+
+    // Receive a score from a given leaderboard
+    // according to its span and collection - check out LeaderboardConsts
+    void ReceiveScore(string lbId, int span, int collection, Action<IScore> callback);
+
+    // Receive the top scores from a given leaderboard
+    // according to its span and collection - check out LeaderboardConsts
+    void ReceiveTopScores(string lbId, int span, int collection, int maxScores, Action<IScore[]> callback);
+
+    // Receive the scores centered a player
+    // according to its span and collection - check out LeaderboardConsts
+    void ReceivePlayerCenteredScores(string lbId, int span, int collection, int maxScores, Action<IScore[]> callback);
 
     /// <summary>
     /// Loads state from the cloud for the passed slot.

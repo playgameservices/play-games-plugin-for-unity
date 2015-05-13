@@ -626,6 +626,55 @@ namespace GooglePlayGames
             mClient.SubmitScore(lbId, score, callback);
         }
 
+        public void LoadCurrentScore(string board, int span, int collection, Action<IScore> callback)
+        {
+            if (!IsAuthenticated())
+            {
+                Logger.e("LoadCurrentScore can only be called after authentication.");
+                if (callback != null)
+                { callback.Invoke(null); }
+                return;
+            }
+
+            Logger.d("LoadCurrentScore: span=" + span + ", collection=" + collection + ", board=" + board);
+            string lbId = MapId(board);
+            mClient.ReceiveScore(lbId, span, collection, callback);
+        }
+
+        public void LoadTopScores(string board, int span, int collection, int maxScores, Action<IScore[]> callback)
+        {
+            if (!IsAuthenticated())
+            {
+                Logger.e("LoadTopScores can only be called after authentication.");
+                if (callback != null)
+                { callback.Invoke(null); }
+                return;
+            }
+
+            maxScores = Mathf.Clamp(maxScores, 1, 25);
+
+            Logger.d("LoadTopScores: span=" + span + ", collection=" + collection + ", board=" + board);
+            string lbId = MapId(board);
+            mClient.ReceiveTopScores(lbId, span, collection, maxScores, callback);
+        }
+
+        public void LoadPlayerCenteredScores(string board, int span, int collection, int maxScores, Action<IScore[]> callback)
+        {
+            if (!IsAuthenticated())
+            {
+                Logger.e("LoadPlayerCenteredScores can only be called after authentication.");
+                if (callback != null)
+                { callback.Invoke(null); }
+                return;
+            }
+
+            maxScores = Mathf.Clamp(maxScores, 1, 25);
+
+            Logger.d("LoadPlayerCenteredScores: span=" + span + ", collection=" + collection + ", board=" + board);
+            string lbId = MapId(board);
+            mClient.ReceivePlayerCenteredScores(lbId, span, collection, maxScores, callback);
+        }
+
         /// <summary>
         /// Not implemented yet. Calls the callback with an empty list.
         /// </summary>

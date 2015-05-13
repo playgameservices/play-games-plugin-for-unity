@@ -24,8 +24,24 @@ namespace GooglePlayGames
     /// </summary>
     public class PlayGamesScore : IScore
     {
+        private string playerId = "";
         private string mLbId = null;
         private long mValue = 0;
+        private long mTimestamp = 0;
+        private int mRank = 0;
+        string playerName = "";
+
+        internal PlayGamesScore() { }
+
+        public PlayGamesScore(string playerId, string mLbId, long timestamp, int rankValue, long value, string playerName = "")
+        {
+            this.playerId = playerId;
+            this.mLbId = mLbId;
+            this.mTimestamp = timestamp;
+            this.mRank = rankValue;
+            this.mValue = value;
+            this.playerName = playerName;
+        }
 
         /// <summary>
         /// Reports the score. Equivalent to <see cref="PlayGamesPlatform.ReportScore" />.
@@ -74,13 +90,13 @@ namespace GooglePlayGames
         }
 
         /// <summary>
-        /// Not implemented. Returns Jan 01, 1970, 00:00:00
+        /// Returns the date of the last score update.
         /// </summary>
         public DateTime date
         {
             get
             {
-                return new DateTime(1970, 1, 1, 0, 0, 0);
+                return new DateTime(mTimestamp).AddYears(1970);
             }
         }
 
@@ -102,19 +118,43 @@ namespace GooglePlayGames
         {
             get
             {
-                return string.Empty;
+                return this.playerId;
             }
         }
 
         /// <summary>
-        /// Not implemented. Returns 1.
+        /// Returns player rank in the leaderboard.
         /// </summary>
         public int rank
         {
             get
             {
-                return 1;
+                return mRank;
             }
+            set
+            {
+                mRank = value;
+            }
+        }
+
+        /// <summary>
+        /// Returns players name
+        /// </summary>
+        public string PlayerName
+        {
+            get
+            {
+                return playerName;
+            }
+            set
+            {
+                playerName = value;
+            }
+        }
+
+        public override string ToString()
+        {
+            return string.Format("[PlayGamesScore: leaderboardID={0}, value={1}, date={2}, Timestamp={3}, rank={4}, playerName={5}]", leaderboardID, value, date, mTimestamp, rank, playerName);
         }
     }
 }

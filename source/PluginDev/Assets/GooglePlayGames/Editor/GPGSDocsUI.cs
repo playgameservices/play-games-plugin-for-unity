@@ -70,7 +70,7 @@ namespace GooglePlayGames
                 string exeName =
                     sdkPath + GPGSUtil.SlashesToPlatformSeparator("/tools/android");
                 string altExeName =
-                    sdkPath + GPGSUtil.SlashesToPlatformSeparator("/tools/android.bat");
+                    sdkPath + GPGSUtil.SlashesToPlatformSeparator("/tools/android.exe");
 
                 EditorUtility.DisplayDialog(
                     GPGSStrings.ExternalLinks.GooglePlayGamesAndroidSdkTitle,

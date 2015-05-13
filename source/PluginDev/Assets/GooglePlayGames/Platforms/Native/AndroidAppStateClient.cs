@@ -36,7 +36,7 @@ internal class AndroidAppStateClient : AppStateClient {
     private const int STATUS_NO_DATA = 4;
     private const int STATUS_KEY_NOT_FOUND = 2002;
     private const int STATUS_CONFLICT = 2000;
-
+    
     private static AndroidJavaClass AppStateManager =
         new AndroidJavaClass("com.google.android.gms.appstate.AppStateManager");
 
@@ -49,7 +49,7 @@ internal class AndroidAppStateClient : AppStateClient {
         mServices = Misc.CheckNotNull(services);
     }
 
-    private static AndroidJavaObject GetApiClient(GameServices services) {
+    public static AndroidJavaObject GetApiClient(GameServices services) {
         return JavaUtils.JavaObjectFromPointer(C.InternalHooks_GetApiClient(services.AsHandle()));
     }
 
@@ -95,7 +95,7 @@ internal class AndroidAppStateClient : AppStateClient {
         }
     }
 
-    private static int GetStatusCode(AndroidJavaObject result) {
+    public static int GetStatusCode(AndroidJavaObject result) {
         if (result == null) {
             return -1;
         }

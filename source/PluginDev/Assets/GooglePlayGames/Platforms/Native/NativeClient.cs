@@ -19,6 +19,8 @@
 
 namespace GooglePlayGames.Native
 {
+    using UnityEngine.SocialPlatforms;
+
     using GooglePlayGames.BasicApi;
     using GooglePlayGames.BasicApi.Multiplayer;
     using GooglePlayGames.BasicApi.SavedGame;
@@ -448,6 +450,263 @@ namespace GooglePlayGames.Native
             Logger.d("Found User: " + mUser);
             Logger.d("Maybe finish for User");
             MaybeFinishAuthentication();
+        }
+
+        private const string resultCallbackClass = "com.google.android.gms.common.api.ResultCallback";
+
+        private object[] makeGmsCallArgs(object[] args)
+        {
+            object[] fullArgs = new object[args.Length + 1];
+            int i;
+            fullArgs[0] = AndroidAppStateClient.GetApiClient(mServices);
+            for (i = 1; i < fullArgs.Length; i++)
+            { fullArgs[i] = args[i - 1]; }
+            return fullArgs;
+        }
+
+        public static AndroidJavaClass GetClass(string className)
+        {
+            try
+            {
+                AndroidJavaClass cls = new AndroidJavaClass(className);
+                return cls;
+            }
+            catch (Exception ex)
+            {
+                Logger.e("JavaUtil failed to load Java class: " + className);
+                throw ex;
+            }
+        }
+
+        public static AndroidJavaClass GetGmsClass(string className)
+        { return GetClass("com.google.android.gms." + className); }
+
+        public static AndroidJavaObject GetGmsField(string className, string fieldName)
+        {
+            string key = className + "/" + fieldName;
+            AndroidJavaClass cls = GetGmsClass(className);
+            AndroidJavaObject obj = cls.GetStatic<AndroidJavaObject>(fieldName);
+            return obj;
+        }
+
+        public static AndroidJavaObject CallNullSafeObjectMethod(AndroidJavaObject target, string methodName, params object[] args)
+        {
+            try
+            {
+                return target.Call<AndroidJavaObject>(methodName, args);
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message.Contains("null"))
+                {
+                    // expected -- means method returned null
+                    return null;
+                }
+                else
+                {
+                    Logger.w("CallObjectMethod exception: " + ex);
+                    return null;
+                }
+            }
+        }
+
+        public ReturnType CallGmsApi<ReturnType>(string className, string fieldName, string methodName, params object[] args)
+        {
+            object[] fullArgs = makeGmsCallArgs(args);
+
+            if (fieldName != null)
+            { return GetGmsField(className, fieldName).Call<ReturnType>(methodName, fullArgs); }
+            return default(ReturnType);
+        }
+
+        public void CallGmsApiWithResult(string className, string fieldName, string methodName, AndroidJavaProxy callbackProxy, params object[] args)
+        {
+            using (AndroidJavaObject pendingResult = CallGmsApi<AndroidJavaObject>(className, fieldName, methodName, args))
+            { pendingResult.Call("setResultCallback", callbackProxy); }
+        }
+
+        public void ReceiveScore(string lbId, int span, int collection, Action<IScore> callback)
+        {
+            Logger.d("AndroidClient.ReceiveScore, lb=" + lbId + ", span=" + span + "collection=" + collection);
+            if (callback == null)
+            {
+                Logger.d("Null callback passed, nowhere to send the result. Aborting.");
+                return;
+            }
+            CallGmsApiWithResult("games.Games", "Leaderboards",
+                                  "loadCurrentPlayerLeaderboardScore",
+                                  new OnLeaderboardScoreReceivedProxy(this, lbId, callback),
+                                  lbId, span, collection);
+        }
+
+        public void ReceiveTopScores(string lbId, int span, int collection, int maxScores, Action<IScore[]> callback)
+        {
+            Logger.d("AndroidClient.ReceiveTopScores, lb=" + lbId + ", span=" + span + "collection=" + collection);
+            if (callback == null)
+            {
+                Logger.d("Null callback passed, nowhere to send the result. Aborting.");
+                return;
+            }
+            CallGmsApiWithResult("games.Games", "Leaderboards",
+                                  "loadTopScores",
+                                  new OnLeaderboardScoresReceivedProxy(this, lbId, callback),
+                                  lbId, span, collection, maxScores);
+        }
+
+        public void ReceivePlayerCenteredScores(string lbId, int span, int collection, int maxScores, Action<IScore[]> callback)
+        {
+            Logger.d("AndroidClient.ReceiveTopScores, lb=" + lbId + ", span=" + span + "collection=" + collection);
+            if (callback == null)
+            {
+                Logger.d("Null callback passed, nowhere to send the result. Aborting.");
+                return;
+            }
+            CallGmsApiWithResult("games.Games", "Leaderboards",
+                                  "loadPlayerCenteredScores",
+                                  new OnLeaderboardScoresReceivedProxy(this, lbId, callback),
+                                  lbId, span, collection, maxScores);
+        }
+
+        private class OnLeaderboardScoresReceivedProxy : AndroidJavaProxy
+        {
+            NativeClient mOwner;
+            Action<IScore[]> receiver;
+            string mLbId;
+
+            internal OnLeaderboardScoresReceivedProxy(NativeClient c, string lbId, Action<IScore[]> callback)
+                : base(resultCallbackClass)
+            {
+                mOwner = c;
+                mLbId = lbId;
+                receiver = callback;
+            }
+
+            public void onResult(AndroidJavaObject result)
+            {
+                Logger.d("OnLeaderboardScoresReceivedProxy invoked");
+                Logger.d("    result=" + result);
+                int statusCode = AndroidAppStateClient.GetStatusCode(result);
+
+                AndroidJavaObject scoresObj = CallNullSafeObjectMethod(result, "getScores");
+
+                if (scoresObj == null)
+                {
+                    if (statusCode == 0 ||
+                        statusCode == 3 ||
+                        statusCode == 4)
+                    {
+                        // successful load (either from network or local cache)
+                        // but player has no score in this table
+                        // return an empty score
+                        receiver.Invoke(new PlayGamesScore[0]);
+                    }
+                    else
+                    {
+                        // network error
+                        receiver.Invoke(null);
+                    }
+                }
+                else
+                {
+                    int scoreCount = scoresObj.Call<int>("getCount");
+
+                    IScore[] scoreArray = new IScore[scoreCount];
+                    for (int i = 0; i < scoreArray.Length; i++)
+                    {
+                        AndroidJavaObject scoreObj = CallNullSafeObjectMethod(scoresObj, "get", i);
+                        if (scoreObj == null)
+                        {
+                            Logger.d("ScoreObj == null at I: " + i);
+                            continue;
+                        }
+
+                        AndroidJavaObject playerObj = CallNullSafeObjectMethod(scoreObj, "getScoreHolder");
+                        if (playerObj == null)
+                        {
+                            Logger.d("PlayerObj == null at I: " + i);
+                            continue;
+                        }
+
+                        string playerId = playerObj.Call<string>("getPlayerId");
+                        int rank = (int)scoreObj.Call<long>("getRank");
+                        long value = scoreObj.Call<long>("getRawScore");
+                        long timestamp = scoreObj.Call<long>("getTimestampMillis");
+                        string playerName = scoreObj.Call<string>("getScoreHolderDisplayName");
+                        scoreArray[i] = new PlayGamesScore(playerId, mLbId, timestamp, rank, value, playerName);
+
+                        scoreObj.Dispose();
+                    }
+
+                    for (int i = 0; i < scoreArray.Length; i++)
+                    { Logger.d(scoreArray[i].ToString()); }
+
+                    receiver.Invoke(scoreArray);
+                    scoresObj.Dispose();
+                }
+            }
+        }
+
+        private class OnLeaderboardScoreReceivedProxy : AndroidJavaProxy
+        {
+            NativeClient mOwner;
+            Action<IScore> receiver;
+            string mLbId;
+
+            internal OnLeaderboardScoreReceivedProxy(NativeClient c, string lbId, Action<IScore> callback)
+                : base(resultCallbackClass)
+            {
+                mOwner = c;
+                mLbId = lbId;
+                receiver = callback;
+            }
+
+            public void onResult(AndroidJavaObject result)
+            {
+                Logger.d("OnLeaderboardScoreReceivedProxy invoked");
+                Logger.d("    result=" + result);
+                int statusCode = AndroidAppStateClient.GetStatusCode(result);
+
+                AndroidJavaObject scoreObj = CallNullSafeObjectMethod(result, "getScore");
+
+                if (scoreObj == null)
+                {
+                    if (statusCode == 0 ||
+                        statusCode == 3 ||
+                        statusCode == 4)
+                    {
+                        // successful load (either from network or local cache)
+                        // but player has no score in this table
+                        // return an empty score
+                        receiver.Invoke(new PlayGamesScore());
+                    }
+                    else
+                    {
+                        // network error
+                        receiver.Invoke(null);
+                    }
+                }
+                else
+                {
+                    AndroidJavaObject playerObj = CallNullSafeObjectMethod(scoreObj, "getScoreHolder");
+                    if (playerObj == null)
+                    {
+                        Logger.d("PlayerObj == null");
+                        return;
+                    }
+
+                    string playerId = playerObj.Call<string>("getPlayerId");
+                    int rank = (int)scoreObj.Call<long>("getRank");
+                    long value = scoreObj.Call<long>("getRawScore");
+                    long timestamp = scoreObj.Call<long>("getTimestampMillis");
+
+                    IScore score = new PlayGamesScore(playerId, mLbId, timestamp, rank, value);
+
+                    Logger.d(score.ToString());
+
+                    receiver.Invoke(score);
+                    scoreObj.Dispose();
+                }
+            }
         }
 
         private void HandleAuthTransition(Types.AuthOperation operation, Status.AuthStatus status)
