@@ -1,33 +1,113 @@
-task 'buildprops' << {
-	ext.ndk_root = System.getenv("ANDROID_NDK_ROOT")
-	ext.sdk_root = System.getenv("ANDROID_HOME")
-	ext.unity_exe ='/Applications/Unity/Unity.app/Contents/MacOS/Unity'
-	ext.pluginProj = file('PluginDev').absolutePath
-	ext.exportPath = file('build/plugin.unitypackage').absolutePath
+/*
+*   Gradle file to build the Unity plugin for Google Play Game Services.
+*/
 
+
+/* 
+    Project level variables
+*/
+ext {
+	ndk_root = System.getenv("ANDROID_NDK_ROOT")
+	sdk_root = System.getenv("ANDROID_HOME")
+	unity_exe ='/Applications/Unity/Unity.app/Contents/MacOS/Unity'
+	pluginProj = file('PluginDev').absolutePath
+	buildPath = file('build').absolutePath
+	samplesPath = file('../samples').absolutePath
+	exportPath = file('build/plugin.unitypackage').absolutePath
+
+    sampleList = ['CubicPilot', 'Minimal',
+         'QuizRacer',  'TicTacToe', 'CubicPilot_4.6',
+         'NearbyDroids', 'QuizRacer_4.6', 'SmokeTest', 'TrivialQuest']
 }
 
 task unity_package(dependsOn:'export_package') << {
 	println "Packaging Complete!"
 }
 
-task cleanup_package(type: Delete) << {
-	ext.path = file('PluginDev').absolutePath + "/Assets/GooglePlayGames/Editor/projsettings.txt"
-	delete '${ext.path}'
+unity_package.dependsOn {
+    tasks.findAll { task -> task.name.startsWith('PackageSample') }
 }
 
+sampleList.each { sampleName ->
+    def createTask   = project.tasks.create('CreateSample' + sampleName)
+    def copySrcTask   = project.tasks.create('CopySrcSample' + sampleName)
+    
+    def sampleSrcDir = samplesPath + '/' + sampleName + '/Source/Assets/' + sampleName
+    def sampleDestSrcDir = buildPath + '/Samples/' + sampleName + '/Assets/' + sampleName
+    
+    /*
+        Create the sample in the build directory
+    */
 
-task export_package << {
-	exec {
-		executable "${buildprops.unity_exe}"
-			args "-g.building", "-batchmode", "-projectPath", "${buildprops.pluginProj}", "-logFile", "build/unity.log",  "-exportPackage", "Assets/GooglePlayGames", "Assets/Plugins", "${buildprops.exportPath}", "-quit"
+    createTask.dependsOn 'export_package'
+    createTask.doFirst {
+	        exec {
+		        executable "${unity_exe}"
+			    args "-batchmode", "-createProject", "${buildPath}/Samples/${sampleName}", "-logFile", "${buildPath}/CreateSample${sampleName}.log",  "-importPackage", "${exportPath}", "-quit"
+	        }
+        }
 
-	}
+    /*
+        Copy the source of the sample into build target.  Don't import the
+        sample package, since we want the latest source code.
+    */
+    copySrcTask.dependsOn createTask
 
+    copySrcTask.doFirst {
+            copy {
+                from sampleSrcDir
+                into sampleDestSrcDir
+            }
+    }
+    copySrcTask.doLast {
+            println 'copied ' + sampleSrcDir + ' to' + sampleDestSrcDir
+    }
+
+    /*
+        Create the exported package
+    */
+     task "PackageSample${sampleName}" {
+
+        dependsOn copySrcTask
+        /*
+                Next, export the project
+        */
+        doLast {
+	        exec {
+		        executable "${unity_exe}"
+			    args "-batchmode", "-projectPath", "${buildPath}/Samples/${sampleName}", "-logFile", "${buildPath}/ExportSample${sampleName}.log",  "-exportPackage", "Assets/${sampleName}",  "${buildPath}/Samples/${sampleName}.unitypackage",  "-quit"
+	        }
+
+        }
+
+        /*
+            Finally, copy the package to the source sample dir.
+        */
+        doLast {
+            copy {
+                from file("${buildPath}/Samples/${sampleName}.unitypackage")
+                into file("../samples/${sampleName}")
+            }
+        }
+    }
+
+}
+
+task export_package {
+    doFirst {
+	    ext.path = file('PluginDev').absolutePath + "/Assets/GooglePlayGames/Editor/projsettings.txt"
+	    delete '${ext.path}'
+    }
+
+    doLast {
+	    exec {
+		    executable "${unity_exe}"
+			    args "-g.building", "-batchmode", "-projectPath", "${pluginProj}", "-logFile", "build/unity.log",  "-exportPackage", "Assets/GooglePlayGames", "Assets/Plugins", "${exportPath}", "-quit"
+	    }
+    }
 }
 
 export_package.dependsOn 'copy_libs'
-export_package.dependsOn 'cleanup_package'
 export_package.dependsOn 'support_jar'
 
 
@@ -36,9 +116,9 @@ task get_gpg_cpp_sdk << {
 	println "got it!"
 }
 
-task check_ndk(dependsOn:'buildprops') << {
+task check_ndk() << {
 
-	if (buildprops.ndk_root == "") {
+	if (ndk_root == "") {
 		throw new GradleException('ANDROID_NDK_ROOT not set')
 	}
 	else {
@@ -56,7 +136,7 @@ task check_ndk(dependsOn:'buildprops') << {
 task compile_gpg << {
 	exec {
 		workingDir "build/jni"
-			executable "${buildprops.ndk_root}/ndk-build"
+			executable "${ndk_root}/ndk-build"
 	}
 }
 compile_gpg.dependsOn 'check_ndk'
