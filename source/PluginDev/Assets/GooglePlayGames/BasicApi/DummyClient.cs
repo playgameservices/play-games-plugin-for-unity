@@ -95,6 +95,7 @@ public class DummyClient : IPlayGamesClient
 
     public void ReceiveScore(string lbId, int span, int collection, Action<IScore> callback)
     {
+        LogUsage();
         if (callback != null)
         {
             callback.Invoke(null);
@@ -103,14 +104,20 @@ public class DummyClient : IPlayGamesClient
 
     public void ReceiveTopScores(string lbId, int span, int collection, int maxScores, Action<IScore[]> callback)
     {
+        LogUsage();
         if (callback != null)
-        { callback.Invoke(null); }
+        { 
+            callback.Invoke(null); 
+        }
     }
 
     public void ReceivePlayerCenteredScores(string lbId, int span, int collection, int maxScores, Action<IScore[]> callback)
     {
+        LogUsage();
         if (callback != null)
-        { callback.Invoke(null); }
+        { 
+            callback.Invoke(null); 
+        }
     }
 
     public void IncrementAchievement(string achId, int steps, Action<bool> callback)

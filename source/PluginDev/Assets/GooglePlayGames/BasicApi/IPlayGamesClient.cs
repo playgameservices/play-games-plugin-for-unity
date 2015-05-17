@@ -162,17 +162,37 @@ namespace GooglePlayGames.BasicApi
     /// succeeded or failed.</param>
     void SubmitScore(string leaderboardId, long score, Action<bool> successOrFailureCalllback);
 
+    /// <summary>
     // Receive a score from a given leaderboard
     // according to its span and collection - check out LeaderboardConsts
-    void ReceiveScore(string lbId, int span, int collection, Action<IScore> callback);
+    /// </summary>
+    /// <param name="leaderboardId">Leaderboard identifier.</param>
+    /// <param name="span">Span of highscores</param>
+    /// <param name="collection">Which leaderboard collection should be used</param>
+    /// <param name="callback">Callback used to retrieve the score from the leaderboard</param>
+    void ReceiveScore(string leaderboardId, int span, int collection, Action<IScore> callback);
 
+    /// <summary>
     // Receive the top scores from a given leaderboard
     // according to its span and collection - check out LeaderboardConsts
-    void ReceiveTopScores(string lbId, int span, int collection, int maxScores, Action<IScore[]> callback);
+    /// </summary>
+    /// <param name="leaderboardId">Leaderboard identifier.</param>
+    /// <param name="span">Span of highscores</param>
+    /// <param name="collection">Which leaderboard collection should be used</param>
+    /// <param name="maxScores">How many scores should be returned</param>
+    /// <param name="callback">Callback used to retrieve the scores from the leaderboard</param>
+    void ReceiveTopScores(string leaderboardId, int span, int collection, int maxScores, Action<IScore[]> callback);
 
-    // Receive the scores centered a player
+    /// <summary>
+    // Receive the scores centered the logged in player
     // according to its span and collection - check out LeaderboardConsts
-    void ReceivePlayerCenteredScores(string lbId, int span, int collection, int maxScores, Action<IScore[]> callback);
+    /// </summary>
+    /// <param name="leaderboardId">Leaderboard identifier.</param>
+    /// <param name="span">Span of highscores</param>
+    /// <param name="collection">Which leaderboard collection should be used</param>
+    /// <param name="maxScores">How many scores should be returned</param>
+    /// <param name="callback">Callback used to retrieve the scores from the leaderboard</param>
+    void ReceivePlayerCenteredScores(string leaderboardId, int span, int collection, int maxScores, Action<IScore[]> callback);
 
     /// <summary>
     /// Loads state from the cloud for the passed slot.
