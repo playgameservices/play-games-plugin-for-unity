@@ -41,6 +41,7 @@ namespace GooglePlayGames.Native
         private const string LaunchBridgeMethod = "launchBridgeIntent";
         private const string LaunchBridgeSignature =
             "(Landroid/app/Activity;Landroid/content/Intent;)V";
+        private const string resultCallbackClass = "com.google.android.gms.common.api.ResultCallback";
 
         private enum AuthState
         {
@@ -146,10 +147,10 @@ namespace GooglePlayGames.Native
             }
 
             PlayGamesHelperObject.RunOnGameThread(() =>
-                {
-                    Logger.d("Invoking user callback on game thread");
-                    callback(success);
-                });
+            {
+                Logger.d("Invoking user callback on game thread");
+                callback(success);
+            });
         }
 
         private void InitializeGameServices()
@@ -210,7 +211,7 @@ namespace GooglePlayGames.Native
 
         private AppStateClient CreateAppStateClient()
         {
-            #if UNITY_ANDROID
+#if UNITY_ANDROID
             if (mConfiguration.EnableDeprecatedCloudSave)
             {
                 return new AndroidAppStateClient(mServices);
@@ -221,9 +222,9 @@ namespace GooglePlayGames.Native
                     "You must explicitly enable cloud save - see " +
                     "PlayGamesClientConfiguration.Builder.EnableDeprecatedCloudSave.");
             }
-            #else
+#else
             return new UnsupportedAppStateClient("App State is not supported on this platform.");
-            #endif
+#endif
         }
 
         internal void HandleInvitation(Types.MultiplayerEvent eventType, string invitationId,
@@ -251,7 +252,7 @@ namespace GooglePlayGames.Native
             currentHandler(invitation.AsInvitation(), shouldAutolaunch);
         }
 
-        #if UNITY_ANDROID
+#if UNITY_ANDROID
         internal static AndroidJavaObject GetActivity()
         {
             using (var jc = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
@@ -288,44 +289,44 @@ namespace GooglePlayGames.Native
                 AndroidJNIHelper.DeleteJNIArgArray(objectArray, jArgs);
             }
         }
-        #endif
+#endif
 
         internal static PlatformConfiguration CreatePlatformConfiguration()
         {
-            #if UNITY_ANDROID
+#if UNITY_ANDROID
             var config = AndroidPlatformConfiguration.Create();
             config.EnableAppState();
             using (var activity = GetActivity())
             {
                 config.SetActivity(activity.GetRawObject());
                 config.SetOptionalIntentHandlerForUI((intent) =>
-                    {
-                        // Capture a global reference to the intent we are to show. This is required
-                        // since we are launching the intent from the game thread, and this callback
-                        // will return before this happens. If we do not hold onto a durable reference,
-                        // the code calling us will clean up the intent before we have a chance to display
-                        // it.
-                        IntPtr intentRef = AndroidJNI.NewGlobalRef(intent);
+                {
+                    // Capture a global reference to the intent we are to show. This is required
+                    // since we are launching the intent from the game thread, and this callback
+                    // will return before this happens. If we do not hold onto a durable reference,
+                    // the code calling us will clean up the intent before we have a chance to display
+                    // it.
+                    IntPtr intentRef = AndroidJNI.NewGlobalRef(intent);
 
-                        PlayGamesHelperObject.RunOnGameThread(() =>
-                            {
-                                try
-                                {
-                                    LaunchBridgeIntent(intentRef);
-                                }
-                                finally
-                                {
-                                    // Now that we've launched the intent, release the global reference.
-                                    AndroidJNI.DeleteGlobalRef(intentRef);
-                                }
-                            });
+                    PlayGamesHelperObject.RunOnGameThread(() =>
+                    {
+                        try
+                        {
+                            LaunchBridgeIntent(intentRef);
+                        }
+                        finally
+                        {
+                            // Now that we've launched the intent, release the global reference.
+                            AndroidJNI.DeleteGlobalRef(intentRef);
+                        }
                     });
+                });
             }
 
             return config;
-            #endif
+#endif
 
-            #if UNITY_IPHONE
+#if UNITY_IPHONE
             if (!GameInfo.IosClientIdInitialized())
             {
                 throw new System.InvalidOperationException("Could not locate the OAuth Client ID, " +
@@ -335,7 +336,7 @@ namespace GooglePlayGames.Native
             var config = IosPlatformConfiguration.Create();
             config.SetClientId(GameInfo.IosClientId);
             return config;
-            #endif
+#endif
         }
 
         public bool IsAuthenticated()
@@ -452,125 +453,125 @@ namespace GooglePlayGames.Native
             MaybeFinishAuthentication();
         }
 
-        private const string resultCallbackClass = "com.google.android.gms.common.api.ResultCallback";
-
-        private object[] makeGmsCallArgs(object[] args)
-        {
-            object[] fullArgs = new object[args.Length + 1];
-            int i;
-            fullArgs[0] = AndroidAppStateClient.GetApiClient(mServices);
-            for (i = 1; i < fullArgs.Length; i++)
-            { fullArgs[i] = args[i - 1]; }
-            return fullArgs;
-        }
-
-        public static AndroidJavaClass GetClass(string className)
-        {
-            try
-            {
-                AndroidJavaClass cls = new AndroidJavaClass(className);
-                return cls;
-            }
-            catch (Exception ex)
-            {
-                Logger.e("JavaUtil failed to load Java class: " + className);
-                throw ex;
-            }
-        }
-
-        public static AndroidJavaClass GetGmsClass(string className)
-        { return GetClass("com.google.android.gms." + className); }
-
-        public static AndroidJavaObject GetGmsField(string className, string fieldName)
-        {
-            string key = className + "/" + fieldName;
-            AndroidJavaClass cls = GetGmsClass(className);
-            AndroidJavaObject obj = cls.GetStatic<AndroidJavaObject>(fieldName);
-            return obj;
-        }
-
-        public static AndroidJavaObject CallNullSafeObjectMethod(AndroidJavaObject target, string methodName, params object[] args)
-        {
-            try
-            {
-                return target.Call<AndroidJavaObject>(methodName, args);
-            }
-            catch (Exception ex)
-            {
-                if (ex.Message.Contains("null"))
-                {
-                    // expected -- means method returned null
-                    return null;
-                }
-                else
-                {
-                    Logger.w("CallObjectMethod exception: " + ex);
-                    return null;
-                }
-            }
-        }
-
-        public ReturnType CallGmsApi<ReturnType>(string className, string fieldName, string methodName, params object[] args)
-        {
-            object[] fullArgs = makeGmsCallArgs(args);
-
-            if (fieldName != null)
-            { return GetGmsField(className, fieldName).Call<ReturnType>(methodName, fullArgs); }
-            return default(ReturnType);
-        }
-
-        public void CallGmsApiWithResult(string className, string fieldName, string methodName, AndroidJavaProxy callbackProxy, params object[] args)
-        {
-            using (AndroidJavaObject pendingResult = CallGmsApi<AndroidJavaObject>(className, fieldName, methodName, args))
-            { pendingResult.Call("setResultCallback", callbackProxy); }
-        }
-
         public void ReceiveScore(string lbId, int span, int collection, Action<IScore> callback)
         {
-            Logger.d("AndroidClient.ReceiveScore, lb=" + lbId + ", span=" + span + "collection=" + collection);
+            Logger.d("NativeClient.ReceiveScore, lb=" + lbId + ", span=" + span + "collection=" + collection);
             if (callback == null)
             {
                 Logger.d("Null callback passed, nowhere to send the result. Aborting.");
                 return;
             }
-            CallGmsApiWithResult("games.Games", "Leaderboards",
-                                  "loadCurrentPlayerLeaderboardScore",
-                                  new OnLeaderboardScoreReceivedProxy(this, lbId, callback),
-                                  lbId, span, collection);
+
+#if UNITY_ANDROID
+
+            try
+            {
+                using (var gamesClass = new AndroidJavaClass("com.google.android.gms.games.Games"))
+                {
+                    AndroidJavaObject leaderboard = gamesClass.GetStatic<AndroidJavaObject>("Leaderboards");
+                    AndroidJavaObject apiClient = AndroidAppStateClient.GetApiClient(mServices);
+
+                    if (apiClient == null)
+                    {
+                        Logger.d("ApiClient is null, could be issues with the connection. Aborting.");
+                        return;
+                    }
+
+                    AndroidJavaObject returnObj = leaderboard.Call<AndroidJavaObject>("loadCurrentPlayerLeaderboardScore", apiClient, new AndroidJavaObject("java.lang.String", lbId), span, collection);
+
+                    returnObj.Call("setResultCallback", new OnLeaderboardScoreReceivedProxy(this, lbId, callback));
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.d("Error: " + e.ToString());
+            }
+#else
+            Logger.d("ReceiveScore() is currently only supported on the android platform.");
+#endif
         }
 
         public void ReceiveTopScores(string lbId, int span, int collection, int maxScores, Action<IScore[]> callback)
         {
-            Logger.d("AndroidClient.ReceiveTopScores, lb=" + lbId + ", span=" + span + "collection=" + collection);
+            Logger.d("NativeClient.ReceiveTopScores, lb=" + lbId + ", span=" + span + "collection=" + collection);
             if (callback == null)
             {
                 Logger.d("Null callback passed, nowhere to send the result. Aborting.");
                 return;
             }
-            CallGmsApiWithResult("games.Games", "Leaderboards",
-                                  "loadTopScores",
-                                  new OnLeaderboardScoresReceivedProxy(this, lbId, callback),
-                                  lbId, span, collection, maxScores);
+
+#if UNITY_ANDROID
+
+            try
+            {
+                using (var gamesClass = new AndroidJavaClass("com.google.android.gms.games.Games"))
+                {
+                    AndroidJavaObject leaderboard = gamesClass.GetStatic<AndroidJavaObject>("Leaderboards");
+                    AndroidJavaObject apiClient = AndroidAppStateClient.GetApiClient(mServices);
+
+                    if (apiClient == null)
+                    {
+                        Logger.d("ApiClient is null, could be issues with the connection. Aborting.");
+                        return;
+                    }
+
+                    AndroidJavaObject returnObj = leaderboard.Call<AndroidJavaObject>("loadTopScores", apiClient, new AndroidJavaObject("java.lang.String", lbId), span, collection, maxScores);
+
+                    returnObj.Call("setResultCallback", new OnLeaderboardScoresReceivedProxy(this, lbId, callback));
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.d("Error: " + e.ToString());
+            }
+
+#else
+            Logger.d("ReceiveTopScores() is currently only supported on the android platform.");
+#endif
         }
 
         public void ReceivePlayerCenteredScores(string lbId, int span, int collection, int maxScores, Action<IScore[]> callback)
         {
-            Logger.d("AndroidClient.ReceiveTopScores, lb=" + lbId + ", span=" + span + "collection=" + collection);
+            Logger.d("NativeClient.ReceivePlayerCenteredScores, lb=" + lbId + ", span=" + span + "collection=" + collection);
             if (callback == null)
             {
                 Logger.d("Null callback passed, nowhere to send the result. Aborting.");
                 return;
             }
-            CallGmsApiWithResult("games.Games", "Leaderboards",
-                                  "loadPlayerCenteredScores",
-                                  new OnLeaderboardScoresReceivedProxy(this, lbId, callback),
-                                  lbId, span, collection, maxScores);
+
+#if UNITY_ANDROID
+
+            try
+            {
+                using (var gamesClass = new AndroidJavaClass("com.google.android.gms.games.Games"))
+                {
+                    AndroidJavaObject leaderboard = gamesClass.GetStatic<AndroidJavaObject>("Leaderboards");
+                    AndroidJavaObject apiClient = AndroidAppStateClient.GetApiClient(mServices);
+
+                    if (apiClient == null)
+                    {
+                        Logger.d("ApiClient is null, could be issues with the connection. Aborting.");
+                        return;
+                    }
+
+                    AndroidJavaObject returnObj = leaderboard.Call<AndroidJavaObject>("loadPlayerCenteredScores", apiClient, new AndroidJavaObject("java.lang.String", lbId), span, collection, maxScores);
+
+                    returnObj.Call("setResultCallback", new OnLeaderboardScoresReceivedProxy(this, lbId, callback));
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.d("Error: " + e.ToString());
+            }
+#else
+            Logger.d("ReceivePlayerCenteredScores() is currently only supported on the android platform.");
+#endif
         }
 
         private class OnLeaderboardScoresReceivedProxy : AndroidJavaProxy
         {
             NativeClient mOwner;
-            Action<IScore[]> receiver;
+            Action<IScore[]> mReceiver;
             string mLbId;
 
             internal OnLeaderboardScoresReceivedProxy(NativeClient c, string lbId, Action<IScore[]> callback)
@@ -578,7 +579,7 @@ namespace GooglePlayGames.Native
             {
                 mOwner = c;
                 mLbId = lbId;
-                receiver = callback;
+                mReceiver = callback;
             }
 
             public void onResult(AndroidJavaObject result)
@@ -587,7 +588,7 @@ namespace GooglePlayGames.Native
                 Logger.d("    result=" + result);
                 int statusCode = AndroidAppStateClient.GetStatusCode(result);
 
-                AndroidJavaObject scoresObj = CallNullSafeObjectMethod(result, "getScores");
+                AndroidJavaObject scoresObj = result.Call<AndroidJavaObject>("getScores");
 
                 if (scoresObj == null)
                 {
@@ -598,12 +599,12 @@ namespace GooglePlayGames.Native
                         // successful load (either from network or local cache)
                         // but player has no score in this table
                         // return an empty score
-                        receiver.Invoke(new PlayGamesScore[0]);
+                        mReceiver.Invoke(new PlayGamesScore[0]);
                     }
                     else
                     {
                         // network error
-                        receiver.Invoke(null);
+                        mReceiver.Invoke(null);
                     }
                 }
                 else
@@ -613,14 +614,14 @@ namespace GooglePlayGames.Native
                     IScore[] scoreArray = new IScore[scoreCount];
                     for (int i = 0; i < scoreArray.Length; i++)
                     {
-                        AndroidJavaObject scoreObj = CallNullSafeObjectMethod(scoresObj, "get", i);
+                        AndroidJavaObject scoreObj = scoresObj.Call<AndroidJavaObject>("get", i);
                         if (scoreObj == null)
                         {
                             Logger.d("ScoreObj == null at I: " + i);
                             continue;
                         }
 
-                        AndroidJavaObject playerObj = CallNullSafeObjectMethod(scoreObj, "getScoreHolder");
+                        AndroidJavaObject playerObj = scoreObj.Call<AndroidJavaObject>("getScoreHolder");
                         if (playerObj == null)
                         {
                             Logger.d("PlayerObj == null at I: " + i);
@@ -640,7 +641,7 @@ namespace GooglePlayGames.Native
                     for (int i = 0; i < scoreArray.Length; i++)
                     { Logger.d(scoreArray[i].ToString()); }
 
-                    receiver.Invoke(scoreArray);
+                    mReceiver.Invoke(scoreArray);
                     scoresObj.Dispose();
                 }
             }
@@ -649,7 +650,7 @@ namespace GooglePlayGames.Native
         private class OnLeaderboardScoreReceivedProxy : AndroidJavaProxy
         {
             NativeClient mOwner;
-            Action<IScore> receiver;
+            Action<IScore> mReceiver;
             string mLbId;
 
             internal OnLeaderboardScoreReceivedProxy(NativeClient c, string lbId, Action<IScore> callback)
@@ -657,7 +658,7 @@ namespace GooglePlayGames.Native
             {
                 mOwner = c;
                 mLbId = lbId;
-                receiver = callback;
+                mReceiver = callback;
             }
 
             public void onResult(AndroidJavaObject result)
@@ -666,7 +667,7 @@ namespace GooglePlayGames.Native
                 Logger.d("    result=" + result);
                 int statusCode = AndroidAppStateClient.GetStatusCode(result);
 
-                AndroidJavaObject scoreObj = CallNullSafeObjectMethod(result, "getScore");
+                AndroidJavaObject scoreObj = result.Call<AndroidJavaObject>("getScore");//CallNullSafeObjectMethod(result, "getScore");
 
                 if (scoreObj == null)
                 {
@@ -677,17 +678,17 @@ namespace GooglePlayGames.Native
                         // successful load (either from network or local cache)
                         // but player has no score in this table
                         // return an empty score
-                        receiver.Invoke(new PlayGamesScore());
+                        mReceiver.Invoke(new PlayGamesScore());
                     }
                     else
                     {
                         // network error
-                        receiver.Invoke(null);
+                        mReceiver.Invoke(null);
                     }
                 }
                 else
                 {
-                    AndroidJavaObject playerObj = CallNullSafeObjectMethod(scoreObj, "getScoreHolder");
+                    AndroidJavaObject playerObj = scoreObj.Call<AndroidJavaObject>("getScoreHolder");
                     if (playerObj == null)
                     {
                         Logger.d("PlayerObj == null");
@@ -703,7 +704,7 @@ namespace GooglePlayGames.Native
 
                     Logger.d(score.ToString());
 
-                    receiver.Invoke(score);
+                    mReceiver.Invoke(score);
                     scoreObj.Dispose();
                 }
             }

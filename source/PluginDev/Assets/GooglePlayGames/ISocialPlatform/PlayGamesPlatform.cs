@@ -626,7 +626,15 @@ namespace GooglePlayGames
             mClient.SubmitScore(lbId, score, callback);
         }
 
-        public void LoadCurrentScore(string board, int span, int collection, Action<IScore> callback)
+        /// <summary>
+        // Request the current players highscore from a given leaderboard
+        // according to its span and collection - check out LeaderboardConsts
+        /// </summary>
+        /// <param name="leaderboardId">Leaderboard identifier.</param>
+        /// <param name="span">Span of highscores</param>
+        /// <param name="collection">Which leaderboard collection should be used</param>
+        /// <param name="callback">Callback used to retrieve the score from the leaderboard</param>
+        public void LoadCurrentScore(string leaderboardId, int span, int collection, Action<IScore> callback)
         {
             if (!IsAuthenticated())
             {
@@ -636,12 +644,21 @@ namespace GooglePlayGames
                 return;
             }
 
-            Logger.d("LoadCurrentScore: span=" + span + ", collection=" + collection + ", board=" + board);
-            string lbId = MapId(board);
+            Logger.d("LoadCurrentScore: span=" + span + ", collection=" + collection + ", board=" + leaderboardId);
+            string lbId = MapId(leaderboardId);
             mClient.ReceiveScore(lbId, span, collection, callback);
         }
 
-        public void LoadTopScores(string board, int span, int collection, int maxScores, Action<IScore[]> callback)
+        /// <summary>
+        // Request the top scores from a given leaderboard
+        // according to its span and collection - check out LeaderboardConsts
+        /// </summary>
+        /// <param name="leaderboardId">Leaderboard identifier.</param>
+        /// <param name="span">Span of highscores</param>
+        /// <param name="collection">Which leaderboard collection should be used</param>
+        /// <param name="maxScores">How many scores should be returned, must be between 1 to 25</param>
+        /// <param name="callback">Callback used to retrieve the scores from the leaderboard</param>
+        public void LoadTopScores(string leaderboardId, int span, int collection, int maxScores, Action<IScore[]> callback)
         {
             if (!IsAuthenticated())
             {
@@ -653,12 +670,21 @@ namespace GooglePlayGames
 
             maxScores = Mathf.Clamp(maxScores, 1, 25);
 
-            Logger.d("LoadTopScores: span=" + span + ", collection=" + collection + ", board=" + board);
-            string lbId = MapId(board);
+            Logger.d("LoadTopScores: span=" + span + ", collection=" + collection + ", board=" + leaderboardId);
+            string lbId = MapId(leaderboardId);
             mClient.ReceiveTopScores(lbId, span, collection, maxScores, callback);
         }
 
-        public void LoadPlayerCenteredScores(string board, int span, int collection, int maxScores, Action<IScore[]> callback)
+        /// <summary>
+        // Request the scores centered the logged in player
+        // according to its span and collection - check out LeaderboardConsts
+        /// </summary>
+        /// <param name="leaderboardId">Leaderboard identifier.</param>
+        /// <param name="span">Span of highscores</param>
+        /// <param name="collection">Which leaderboard collection should be used</param>
+        /// <param name="maxScores">How many scores should be returned, must be between 1 to 25</param>
+        /// <param name="callback">Callback used to retrieve the scores from the leaderboard</param>
+        public void LoadPlayerCenteredScores(string leaderboardId, int span, int collection, int maxScores, Action<IScore[]> callback)
         {
             if (!IsAuthenticated())
             {
@@ -670,8 +696,8 @@ namespace GooglePlayGames
 
             maxScores = Mathf.Clamp(maxScores, 1, 25);
 
-            Logger.d("LoadPlayerCenteredScores: span=" + span + ", collection=" + collection + ", board=" + board);
-            string lbId = MapId(board);
+            Logger.d("LoadPlayerCenteredScores: span=" + span + ", collection=" + collection + ", board=" + leaderboardId);
+            string lbId = MapId(leaderboardId);
             mClient.ReceivePlayerCenteredScores(lbId, span, collection, maxScores, callback);
         }
 

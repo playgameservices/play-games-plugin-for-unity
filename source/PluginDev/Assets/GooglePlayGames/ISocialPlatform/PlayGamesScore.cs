@@ -24,23 +24,23 @@ namespace GooglePlayGames
     /// </summary>
     public class PlayGamesScore : IScore
     {
-        private string playerId = "";
+        private string mPlayerId = "";
         private string mLbId = null;
         private long mValue = 0;
         private long mTimestamp = 0;
         private int mRank = 0;
-        string playerName = "";
+        private string mPlayerName = "";
 
         internal PlayGamesScore() { }
 
-        public PlayGamesScore(string playerId, string mLbId, long timestamp, int rankValue, long value, string playerName = "")
+        public PlayGamesScore(string playerId, string lbId, long timestamp, int rankValue, long value, string playerName = "")
         {
-            this.playerId = playerId;
-            this.mLbId = mLbId;
-            this.mTimestamp = timestamp;
-            this.mRank = rankValue;
-            this.mValue = value;
-            this.playerName = playerName;
+            mPlayerId = playerId;
+            mLbId = lbId;
+            mTimestamp = timestamp;
+            mRank = rankValue;
+            mValue = value;
+            mPlayerName = playerName;
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace GooglePlayGames
         {
             get
             {
-                return this.playerId;
+                return mPlayerId;
             }
         }
 
@@ -140,18 +140,21 @@ namespace GooglePlayGames
         /// <summary>
         /// Returns players name
         /// </summary>
-        public string PlayerName
+        public string playerName
         {
             get
             {
-                return playerName;
+                return mPlayerName;
             }
             set
             {
-                playerName = value;
+                mPlayerName = value;
             }
         }
 
+        /// <summary>
+        /// Score summary in string form
+        /// </summary>
         public override string ToString()
         {
             return string.Format("[PlayGamesScore: leaderboardID={0}, value={1}, date={2}, Timestamp={3}, rank={4}, playerName={5}]", leaderboardID, value, date, mTimestamp, rank, playerName);
