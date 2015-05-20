@@ -440,7 +440,7 @@ public class NearbyGUI : MonoBehaviour, IDiscoveryListener, IMessageListener
                 break;
             default:
                 Debug.LogError("Unknown or unsupported status: " + response.ResponseStatus);
-                if (mEndpoints.ContainsKey(response.RemoteEndpointId) {
+                if (mEndpoints.ContainsKey(response.RemoteEndpointId)) {
                     mEndpoints[response.RemoteEndpointId].State = EndpointState.ERROR;
                 }
                 break;
