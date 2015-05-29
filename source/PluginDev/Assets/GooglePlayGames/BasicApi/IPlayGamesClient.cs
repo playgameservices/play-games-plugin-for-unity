@@ -1,49 +1,50 @@
-// <copyright file="IPlayGamesClient.cs" company="Google Inc.">
-// Copyright (C) 2014 Google Inc.
-//
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//  http://www.apache.org/licenses/LICENSE-2.0
-//
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//    limitations under the License.
-// </copyright>
+/*
+ * Copyright (C) 2014 Google Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-namespace GooglePlayGames.BasicApi
-{
-  using System;
-  using GooglePlayGames.BasicApi.Multiplayer;
+using System;
+using System.Collections.Generic;
+using System.Collections;
+using GooglePlayGames.BasicApi.Multiplayer;
+//using GooglePlayGames.Native.PInvoke;
 
-  /// <summary>
-  /// Defines an abstract interface for a Play Games Client. Concrete implementations
-  /// might be, for example, the client for Android or for iOS. One fundamental concept
-  /// that implementors of this class must adhere to is stable authentication state.
-  /// This means that once Authenticate() returns true through its callback, the user is
-  /// considered to be forever after authenticated while the app is running. The implementation
-  /// must make sure that this is the case -- for example, it must try to silently
-  /// re-authenticate the user if authentication is lost or wait for the authentication
-  /// process to get fixed if it is temporarily in a bad state (such as when the
-  /// Activity in Android has just been brought to the foreground and the connection to
-  /// the Games services hasn't yet been established). To the user of this
-  /// interface, once the user is authenticated, they're forever authenticated.
-  /// Unless, of course, there is an unusual permanent failure such as the underlying
-  /// service dying, in which it's acceptable that API method calls will fail.
-  ///
-  /// <para>All methods can be called from the game thread. The user of this interface
-  /// DOES NOT NEED to call them from the UI thread of the game. Transferring to the UI
-  /// thread when necessary is a responsibility of the implementors of this interface.</para>
-  ///
-  /// <para>CALLBACKS: all callbacks must be invoked in Unity's main thread.
-  /// Implementors of this interface must guarantee that (suggestion: use
-  /// <see cref="GooglePlayGames.OurUtils.RunOnGameThread(System.Action action)"/>).</para>
-  /// </summary>
-  public interface IPlayGamesClient
-  {
+namespace GooglePlayGames.BasicApi {
+/// <summary>
+/// Defines an abstract interface for a Play Games Client. Concrete implementations
+/// might be, for example, the client for Android or for iOS. One fundamental concept
+/// that implementors of this class must adhere to is stable authentication state.
+/// This means that once Authenticate() returns true through its callback, the user is
+/// considered to be forever after authenticated while the app is running. The implementation
+/// must make sure that this is the case -- for example, it must try to silently
+/// re-authenticate the user if authentication is lost or wait for the authentication
+/// process to get fixed if it is temporarily in a bad state (such as when the
+/// Activity in Android has just been brought to the foreground and the connection to
+/// the Games services hasn't yet been established). To the user of this
+/// interface, once the user is authenticated, they're forever authenticated.
+/// Unless, of course, there is an unusual permanent failure such as the underlying
+/// service dying, in which it's acceptable that API method calls will fail.
+///
+/// <para>All methods can be called from the game thread. The user of this interface
+/// DOES NOT NEED to call them from the UI thread of the game. Transferring to the UI
+/// thread when necessary is a responsibility of the implementors of this interface.</para>
+///
+/// <para>CALLBACKS: all callbacks must be invoked in Unity's main thread.
+/// Implementors of this interface must guarantee that (suggestion: use
+/// <see cref="GooglePlayGames.OurUtils.RunOnGameThread(System.Action action)"/>).</para>
+/// </summary>
+public interface IPlayGamesClient {
     /// <summary>
     /// Starts the authentication process. If silent == true, no UIs will be shown
     /// (if UIs are needed, it will fail rather than show them). If silent == false,
@@ -134,12 +135,18 @@ namespace GooglePlayGames.BasicApi
     /// <param name="successOrFailureCalllback">Callback used to indicate whether the operation
     /// succeeded or failed.</param>
     void IncrementAchievement(string achievementId, int steps,
-                                  Action<bool> successOrFailureCalllback);
+                              Action<bool> successOrFailureCalllback);
 
     /// <summary>
     /// Shows the appropriate platform-specific achievements UI.
     /// </summary>
     void ShowAchievementsUI();
+
+	/// <summary>
+	/// Shows the appropriate platform-specific leaderboards UI.
+	/// </summary>
+	void ShowLeaderboardsUI();
+
 
     /// <summary>
     /// Shows the leaderboard UI for a specific leaderboard (if the passed ID is not
@@ -160,7 +167,18 @@ namespace GooglePlayGames.BasicApi
     /// succeeded or failed.</param>
     void SubmitScore(string leaderboardId, long score, Action<bool> successOrFailureCalllback);
 
-    /// <summary>
+	
+	/// <summary>
+	/// Gets the score to the passed leaderboard. This operation will immediately fail
+	/// if the user is not authenticated (i.e. the callback will immediately be invoked with
+	/// <code>null</code>).
+	/// </summary>
+	/// <param name="leaderboardId">Leaderboard identifier.</param>
+	/// <param name="calllback">Callback used to retrieve the Score. 
+	/// If the operation failed is returned System.UInt64.MaxValue.</param>
+	void CurrentScoreValue (string leaderboardId, Action<ulong> callback);
+		    
+	/// <summary>
     /// Loads state from the cloud for the passed slot.
     /// </summary>
     /// <param name="slot">The slot to read from.</param>
@@ -172,7 +190,6 @@ namespace GooglePlayGames.BasicApi
     /// Updates state in the passed slot to the passed data.
     /// </summary>
     /// <param name="slot">The slot to read from.</param>
-    /// <param name="data">The data to save.</param>
     /// <param name="listener">The listener to use to report results and resolve possible
     /// state conflicts.</param>
     void UpdateState(int slot, byte[] data, OnStateLoadedListener listener);
@@ -197,37 +214,25 @@ namespace GooglePlayGames.BasicApi
     SavedGame.ISavedGameClient GetSavedGameClient();
 
     /// <summary>
-    /// Gets the events client.
-    /// </summary>
-    /// <returns>The events client.</returns>
-    Events.IEventsClient GetEventsClient();
-
-    /// <summary>
-    /// Gets the quests client.
-    /// </summary>
-    /// <returns>The quests client.</returns>
-    Quests.IQuestsClient GetQuestsClient();
-
-    /// <summary>
     /// Registers the invitation delegate.
     /// </summary>
     /// <param name="invitationDelegate">Invitation delegate.</param>
     void RegisterInvitationDelegate(InvitationReceivedDelegate invitationDelegate);
-  }
-    
-  /// <summary>
-  /// Delegate that handles an incoming invitation (for both RTMP and TBMP).
-  /// </summary>
-  /// <param name="invitation">The invitation received.</param>
-  /// <param name="shouldAutoAccept">If this is true, then the game should immediately
-  /// accept the invitation and go to the game screen without prompting the user. If
-  /// false, you should prompt the user before accepting the invitation. As an example,
-  /// when a user taps on the "Accept" button on a notification in Android, it is
-  /// clear that they want to accept that invitation right away, so the plugin calls this
-  /// delegate with shouldAutoAccept = true. However, if we receive an incoming invitation
-  /// that the player hasn't specifically indicated they wish to accept (for example,
-  /// we received one in the background from the server), this delegate will be called
-  /// with shouldAutoAccept=false to indicate that you should confirm with the user
-  /// to see if they wish to accept or decline the invitation.</param>
+}
+
+    /// <summary>
+    /// Delegate that handles an incoming invitation (for both RTMP and TBMP).
+    /// </summary>
+    /// <param name="shouldAutoAccept">If this is true, then the game should immediately
+    /// accept the invitation and go to the game screen without prompting the user. If
+    /// false, you should prompt the user before accepting the invitation. As an example,
+    /// when a user taps on the "Accept" button on a notification in Android, it is
+    /// clear that they want to accept that invitation right away, so the plugin calls this
+    /// delegate with shouldAutoAccept = true. However, if we receive an incoming invitation
+    /// that the player hasn't specifically indicated they wish to accept (for example,
+    /// we received one in the background from the server), this delegate will be called
+    /// with shouldAutoAccept=false to indicate that you should confirm with the user
+    /// to see if they wish to accept or decline the invitation.</param>
     public delegate void InvitationReceivedDelegate(Invitation invitation, bool shouldAutoAccept);
 }
+
