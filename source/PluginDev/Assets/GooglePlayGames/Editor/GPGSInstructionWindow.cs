@@ -1,31 +1,16 @@
-﻿// <copyright file="GPGSInstructionWindow.cs" company="Google Inc.">
-// Copyright (C) 2014 Google Inc.
-//
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//  http://www.apache.org/licenses/LICENSE-2.0
-//
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//    limitations under the License.
-// </copyright>
+﻿using System;
+using UnityEditor.Callbacks;
+using UnityEditor;
+using UnityEngine;
+using GooglePlayGames.Editor;
 
-namespace GooglePlayGames
-{
-    using System;
-    using UnityEditor;
-    using UnityEngine;
+namespace GooglePlayGames {
 
-    public class GPGSInstructionWindow : EditorWindow
-    {
+    public class GPGSInstructionWindow : EditorWindow {
+
         private Vector2 mScrollPosition = Vector2.zero;
 
-        public void OnGUI()
-        {
+        void OnGUI() {
             var iosInstructions = GPGSUtil.ReadFile("Assets/GooglePlayGames/Editor/ios_instructions");
             mScrollPosition = EditorGUILayout.BeginScrollView(mScrollPosition);
             GUILayout.TextArea(iosInstructions);
@@ -33,3 +18,4 @@ namespace GooglePlayGames
         }
     }
 }
+

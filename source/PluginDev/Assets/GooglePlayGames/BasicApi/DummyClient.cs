@@ -1,188 +1,157 @@
-// <copyright file="DummyClient.cs" company="Google Inc.">
-// Copyright (C) 2014 Google Inc.
-//
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//  http://www.apache.org/licenses/LICENSE-2.0
-//
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//    limitations under the License.
-// </copyright>
+/*
+ * Copyright (C) 2014 Google Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-namespace GooglePlayGames.BasicApi
-{
-  using System;
-  using System.Collections.Generic;
-  using GooglePlayGames.BasicApi.Multiplayer;
-  using GooglePlayGames.OurUtils;
+using System;
+using System.Collections.Generic;
+using System.Collections;
+using GooglePlayGames.BasicApi.Multiplayer;
+using GooglePlayGames.OurUtils;
 
-public class DummyClient : IPlayGamesClient
-  {
-    public void Authenticate(System.Action<bool> callback, bool silent)
-    {
-      LogUsage();
-      if (callback != null)
-        {
-          callback.Invoke(false);
+namespace GooglePlayGames.BasicApi {
+public class DummyClient : IPlayGamesClient {
+    public void Authenticate(System.Action<bool> callback, bool silent) {
+        LogUsage();
+        if (callback != null) {
+            callback.Invoke(false);
         }
     }
 
-    public bool IsAuthenticated()
-    {
-      LogUsage();
-      return false;
+    public bool IsAuthenticated() {
+        LogUsage();
+        return false;
     }
 
-    public void SignOut()
-    {
-      LogUsage();
+    public void SignOut() {
+        LogUsage();
     }
 
-    public string GetUserId()
-    {
-      LogUsage();
-      return "DummyID";
+    public string GetUserId() {
+        LogUsage();
+        return "DummyID";
     }
 
-    public string GetUserDisplayName()
-    {
-      LogUsage();
-      return "Player";
+    public string GetUserDisplayName() {
+        LogUsage();
+        return "Player";
     }
 
-    public string GetUserImageUrl()
-    {
-      LogUsage();
-      return null;
+    public string GetUserImageUrl() {
+        LogUsage();
+        return null;
     }
 
-    public List<Achievement> GetAchievements()
-    {
-      LogUsage();
-      return new List<Achievement>();
+    public List<Achievement> GetAchievements() {
+        LogUsage();
+        return new List<Achievement>();
     }
 
-    public Achievement GetAchievement(string achId)
-    {
-      LogUsage();
-      return null;
+    public Achievement GetAchievement(string achId) {
+        LogUsage();
+        return null;
     }
 
-    public void UnlockAchievement(string achId, Action<bool> callback)
-    {
-      LogUsage();
-      if (callback != null)
-        {
-          callback.Invoke(false);
+    public void UnlockAchievement(string achId, Action<bool> callback) {
+        LogUsage();
+        if (callback != null) {
+            callback.Invoke(false);
         }
     }
 
-    public void RevealAchievement(string achId, Action<bool> callback)
-    {
-      LogUsage();
-      if (callback != null)
-        {
-          callback.Invoke(false);
+    public void RevealAchievement(string achId, Action<bool> callback) {
+        LogUsage();
+        if (callback != null) {
+            callback.Invoke(false);
         }
     }
 
-    public void IncrementAchievement(string achId, int steps, Action<bool> callback)
-    {
-      LogUsage();
-      if (callback != null)
-        {
-          callback.Invoke(false);
+    public void IncrementAchievement(string achId, int steps, Action<bool> callback) {
+        LogUsage();
+        if (callback != null) {
+            callback.Invoke(false);
         }
     }
 
-    public void ShowAchievementsUI()
-    {
-      LogUsage();
+    public void ShowAchievementsUI() {
+        LogUsage();
+    }
+	
+	public 	void ShowLeaderboardsUI() {
+		LogUsage();
+	}
+
+
+    public void ShowLeaderboardUI(string lbId) {
+        LogUsage();
     }
 
-    public void ShowLeaderboardUI(string lbId)
-    {
-      LogUsage();
-    }
-
-    public void SubmitScore(string lbId, long score, Action<bool> callback)
-    {
-      LogUsage();
-      if (callback != null)
-        {
-          callback.Invoke(false);
+    public void SubmitScore(string lbId, long score, Action<bool> callback) {
+        LogUsage();
+        if (callback != null) {
+            callback.Invoke(false);
         }
     }
 
-    public void LoadState(int slot, OnStateLoadedListener listener)
-    {
-      LogUsage();
-      if (listener != null)
-        {
-          listener.OnStateLoaded(false, slot, null);
+    public void LoadState(int slot, OnStateLoadedListener listener) {
+        LogUsage();
+        if (listener != null) {
+            listener.OnStateLoaded(false, slot, null);
         }
     }
 
-    public void UpdateState(int slot, byte[] data, OnStateLoadedListener listener)
-    {
-      LogUsage();
+    public void UpdateState(int slot, byte[] data, OnStateLoadedListener listener) {
+        LogUsage();
     }
 
-    public Multiplayer.IRealTimeMultiplayerClient GetRtmpClient()
-    {
-      LogUsage();
-      return null;
+    public Multiplayer.IRealTimeMultiplayerClient GetRtmpClient() {
+        LogUsage();
+        return null;
     }
 
-    public Multiplayer.ITurnBasedMultiplayerClient GetTbmpClient()
-    {
-      LogUsage();
-      return null;
+    public Multiplayer.ITurnBasedMultiplayerClient GetTbmpClient() {
+        LogUsage();
+        return null;
     }
 
-    public SavedGame.ISavedGameClient GetSavedGameClient()
-    {
-      LogUsage();
-      return null;
+    public SavedGame.ISavedGameClient GetSavedGameClient() {
+        LogUsage();
+        return null;
     }
 
-    public GooglePlayGames.BasicApi.Events.IEventsClient GetEventsClient()
-    {
-      LogUsage();
-      return null;
+    public void RegisterInvitationDelegate(InvitationReceivedDelegate deleg) {
+        LogUsage();
     }
 
-    public GooglePlayGames.BasicApi.Quests.IQuestsClient GetQuestsClient()
-    {
-      LogUsage();
-      return null;
+    public Invitation GetInvitationFromNotification() {
+        LogUsage();
+        return null;
     }
 
-    public void RegisterInvitationDelegate(InvitationReceivedDelegate deleg)
-    {
-      LogUsage();
+    public bool HasInvitationFromNotification() {
+        LogUsage();
+        return false;
     }
 
-    public Invitation GetInvitationFromNotification()
-    {
-      LogUsage();
-      return null;
+	public void CurrentScoreValue (string leaderboardId, Action<ulong> callback){
+		LogUsage();
+	}
+
+    private static void LogUsage() {
+        Logger.d("Received method call on DummyClient - using stub implementation.");
     }
 
-    public bool HasInvitationFromNotification()
-    {
-      LogUsage();
-      return false;
-    }
-
-    private static void LogUsage()
-    {
-      Logger.d("Received method call on DummyClient - using stub implementation.");
-    }
-  }
 }
+}
+
