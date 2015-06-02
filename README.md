@@ -129,7 +129,7 @@ To configure your Unity game to run with Google Play Games on Android, first
 open the Android SDK manager and verify that you have downloaded the **Google
 Play Services** package. The Android SDK manager is usually available in your
 SDK installation directory, under the "tools" subdirectory, and is called
-**android** (or **android.exe** on Windows). The **Google Play Services**
+**android** (or **android.bat** on Windows). The **Google Play Services**
 package is available under the **Extras** folder. If it is not installed
 or is out of date, install or update it before proceeding.
 
