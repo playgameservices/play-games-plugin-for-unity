@@ -586,7 +586,7 @@ namespace GooglePlayGames.Native
             {
                 Logger.d("OnLeaderboardScoresReceivedProxy invoked");
                 Logger.d("    result=" + result);
-                int statusCode = AndroidAppStateClient.GetStatusCode(result);
+                int statusCode = PlayGamesHelperObject.GetStatusCode(result);
 
                 AndroidJavaObject scoresObj = result.Call<AndroidJavaObject>("getScores");
 
@@ -665,7 +665,7 @@ namespace GooglePlayGames.Native
             {
                 Logger.d("OnLeaderboardScoreReceivedProxy invoked");
                 Logger.d("    result=" + result);
-                int statusCode = AndroidAppStateClient.GetStatusCode(result);
+                int statusCode = PlayGamesHelperObject.GetStatusCode(result);
 
                 AndroidJavaObject scoreObj = result.Call<AndroidJavaObject>("getScore");//CallNullSafeObjectMethod(result, "getScore");
 

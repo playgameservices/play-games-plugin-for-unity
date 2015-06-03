@@ -72,16 +72,6 @@ internal class AndroidAppStateClient : AppStateClient {
         }
     }
 
-    public static int GetStatusCode(AndroidJavaObject result)
-    {
-        if (result == null)
-        {
-            return -1;
-        }
-        AndroidJavaObject status = result.Call<AndroidJavaObject>("getStatus");
-        return status.Call<int>("getStatusCode");
-    }
-
     private static object[] PrependApiClient(AndroidJavaObject apiClient, params object[] args) {
         List<object> argsList = new List<object>();
         argsList.Add(apiClient);
@@ -203,7 +193,7 @@ internal class AndroidAppStateClient : AppStateClient {
         public void onResult(AndroidJavaObject result) {
             Logger.d("OnStateResultProxy.onResult, result=" + result);
 
-            int statusCode = GetStatusCode(result);
+            int statusCode = PlayGamesHelperObject.GetStatusCode(result);
             Logger.d("OnStateResultProxy: status code is " + statusCode);
 
             if (result == null) {
