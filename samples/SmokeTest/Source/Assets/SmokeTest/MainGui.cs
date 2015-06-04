@@ -75,6 +75,7 @@ RealTimeMultiplayerListener
         Main,
         Multiplayer,
         Rtmp,
+        RtmpWaiting,
         SavedGame,
         EditSavedGameName,
         WriteSavedGame,
@@ -141,7 +142,9 @@ RealTimeMultiplayerListener
 
     public void OnRoomSetupProgress(float progress)
     {
-        SetStandBy("Setting up room (" + ((int)progress) + "%)");
+        mUi = Ui.RtmpWaiting;
+        EndStandBy();
+        Status = "Setting up room (" + ((int)progress) + "%)";
     }
 
     public void OnRoomConnected(bool success)
@@ -313,6 +316,7 @@ RealTimeMultiplayerListener
         else if (GUI.Button(this.CalcGrid(1, 5), "Back"))
         {
             this.mUi = Ui.Main;
+            ShowEffect(true);
         }
     }
 
@@ -326,6 +330,7 @@ RealTimeMultiplayerListener
         if (GUI.Button(this.CalcGrid(1, 7), "Back"))
         {
             this.mUi = Ui.SavedGame;
+            ShowEffect(true);
         }
     }
 
@@ -365,6 +370,7 @@ RealTimeMultiplayerListener
         if (GUI.Button(CalcGrid(1, 7), "Back"))
         {
             mUi = Ui.SavedGame;
+            ShowEffect(true);
         }
     }
 
@@ -578,6 +584,18 @@ RealTimeMultiplayerListener
         else if (GUI.Button(CalcGrid(1, 6), "Back"))
         {
             mUi = Ui.Main;
+            ShowEffect(true);
+        }
+    }
+
+    internal void ShowRtmpWaiting()
+    {
+        DrawTitle("REAL-TIME MULTIPLAYER");
+        GUI.Label(this.CalcGrid(0, 2, 2, 2), Status);
+        if (GUI.Button(CalcGrid(0, 4), "Leave Room"))
+        {
+            DoLeaveRoom();
+            mUi = Ui.Rtmp;
         }
     }
 
@@ -588,13 +606,21 @@ RealTimeMultiplayerListener
 
         if (GUI.Button(CalcGrid(0, 1), "Quick Game 2p"))
         {
-            DoQuickGame(2);
+            DoQuickGame(2, 0);
         }
-        else if (GUI.Button(CalcGrid(0, 2), "Create Game"))
+        else if (GUI.Button(CalcGrid(0, 2), "Q.Game bit 1"))
+        {
+            DoQuickGame(2, 0x01);
+        }
+        else if (GUI.Button(CalcGrid(1, 2), "Q.Game bit 2"))
+        {
+            DoQuickGame(2, 0x02);
+        }
+        else if (GUI.Button(CalcGrid(0, 3), "Create Game"))
         {
             DoCreateGame();
         }
-        else if (GUI.Button(CalcGrid(0, 3), "From Inbox"))
+        else if (GUI.Button(CalcGrid(0, 4), "From Inbox"))
         {
             DoAcceptFromInbox();
         }
@@ -602,29 +628,30 @@ RealTimeMultiplayerListener
         {
             DoBroadcastMessage();
         }
-        else if (GUI.Button(CalcGrid(0, 4), "Send msg"))
+        else if (GUI.Button(CalcGrid(0, 5), "Send msg"))
         {
             DoSendMessage();
         }
-        else if (GUI.Button(CalcGrid(1, 2), "Who Is Here"))
+        else if (GUI.Button(CalcGrid(1, 3), "Who Is Here"))
         {
             DoListParticipants();
         }
-        else if (GUI.Button(CalcGrid(1, 3), "Accept incoming"))
+        else if (GUI.Button(CalcGrid(1, 4), "Accept incoming"))
         {
             DoAcceptIncoming();
         }
-        else if (GUI.Button(CalcGrid(1, 4), "Decline incoming"))
+        else if (GUI.Button(CalcGrid(1, 5), "Decline incoming"))
         {
             DoDeclineIncoming();
         }
-        else if (GUI.Button(CalcGrid(0, 5), "Leave Room"))
+        else if (GUI.Button(CalcGrid(0, 6), "Leave Room"))
         {
             DoLeaveRoom();
         }
-        else if (GUI.Button(CalcGrid(1, 5), "Back"))
+        else if (GUI.Button(CalcGrid(1, 6), "Back"))
         {
             mUi = Ui.Multiplayer;
+            ShowEffect(true);
         }
     }
 
@@ -975,6 +1002,9 @@ RealTimeMultiplayerListener
                 case Ui.Rtmp:
                     ShowRtmpUi();
                     break;
+                case Ui.RtmpWaiting:
+                    ShowRtmpWaiting ();
+                    break;
                 case Ui.Multiplayer:
                     ShowMultiplayerUi();
                     break;
@@ -1193,11 +1223,12 @@ RealTimeMultiplayerListener
         ((PlayGamesPlatform)Social.Active).LoadState(0, this);
     }
 
-    private void DoQuickGame(uint players)
+    private void DoQuickGame(uint players, ulong bitmask)
     {
         uint opponents = players - 1;
         SetStandBy("Starting quick game " + players + " players...");
-        PlayGamesPlatform.Instance.RealTime.CreateQuickGame(opponents, opponents, 0, this);
+        PlayGamesPlatform.Instance.RealTime.CreateQuickGame(opponents, opponents, 0, bitmask, this);
+
     }
 
     private void DoCreateGame()

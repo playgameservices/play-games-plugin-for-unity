@@ -49,6 +49,29 @@ namespace GooglePlayGames.BasicApi.Multiplayer
                          Multiplayer.RealTimeMultiplayerListener listener);
 
     /// <summary>
+    /// Creates a game with random automatch opponents using exclusiveBitMask No UI will be shown.
+    /// The participants will be automatically selected among users who are currently
+    /// looking for opponents.
+    /// After calling this method, your listener's
+    /// <see cref="RealTimeMultiplayerListener.OnRoomSetupProgress" />
+    /// method will be called to indicate room setup progress. Eventually,
+    /// <see cref="RealTimeMultiplayerListener.OnRoomConnected" />
+    /// will be called to indicate that the room setup is either complete or has failed
+    /// (check the <b>success</b> parameter of the callback). If you wish to
+    /// cancel room setup, call <see cref="LeaveRoom"/>.
+    /// </summary>
+    /// <param name="minOpponents">Minimum number of opponents (not counting the
+    /// current player -- so for a 2-player game, pass 1).</param>
+    /// <param name="maxOpponents">Max number of opponents (not counting the current
+    /// player -- so for a 2-player game, pass 1).</param>
+    /// <param name="variant">Variant. Use 0 for default.</param>
+    /// <param name="exclusiveBitMask">Exclusive bit mask. Players are matched if the masks logically AND'ed = 0</param>
+    /// <param name="listener">Listener. The listener to notify of relevant events.</param>
+    void CreateQuickGame(uint minOpponents, uint maxOpponents, uint variant,
+        ulong exclusiveBitMask,
+        RealTimeMultiplayerListener listener);
+
+    /// <summary>
     /// Creates a game with an invitation screen. An invitation screen will be shown
     /// where the user can select who to invite to a multiplayer game. The invitation
     /// screen also allows the user to add random automatch opponents. After the invitation

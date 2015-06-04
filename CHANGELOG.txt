@@ -1,3 +1,6 @@
+Version 0.9.21
+  New Features:
+       * #498 Bitmask filter in CreateQuickGame
 2015-05-01 Version 0.9.20 (codename: ewokian)
    New Features:
        * Support for Events and Quests

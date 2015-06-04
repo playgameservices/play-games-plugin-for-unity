@@ -49,7 +49,13 @@ namespace GooglePlayGames.Native
         }
 
         public void CreateQuickGame(uint minOpponents, uint maxOpponents, uint variant,
-                                RealTimeMultiplayerListener listener)
+            RealTimeMultiplayerListener listener)
+        {
+            CreateQuickGame (minOpponents, maxOpponents, variant, 0, listener);
+        }
+
+        public void CreateQuickGame(uint minOpponents, uint maxOpponents, uint variant,
+                                ulong exclusiveBitMask, RealTimeMultiplayerListener listener)
         {
             lock (mSessionLock)
             {
@@ -71,6 +77,7 @@ namespace GooglePlayGames.Native
                     var config = configBuilder.SetMinimumAutomatchingPlayers(minOpponents)
                     .SetMaximumAutomatchingPlayers(maxOpponents)
                     .SetVariant(variant)
+                    .SetExclusiveBitMask(exclusiveBitMask)
                     .Build();
 
                     using (config)
