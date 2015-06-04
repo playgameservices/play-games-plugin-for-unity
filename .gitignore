@@ -22,6 +22,13 @@ samples/**/Assets/Plugins.meta
 samples/**/Assets/Plugins/
 samples/**/Library/
 samples/**/Library.meta
+samples/**/Source/*.csproj
+samples/**/Source/**/*.meta
+samples/**/*.apk
+samples/**/Settings.StyleCop
+samples/**/Source/*.sln
+samples/**/Source/Source.userprefs
+samples/**/Source/ProjectSettings
 
 source/PluginDev/ProjectSettings/GraphicsSettings.asset
 source/PluginDev/ProjectSettings/NavMeshAreas.asset
