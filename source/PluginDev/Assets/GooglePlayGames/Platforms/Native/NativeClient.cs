@@ -16,7 +16,6 @@
 
 #if (UNITY_ANDROID || (UNITY_IPHONE && !NO_GPGS))
 
-
 namespace GooglePlayGames.Native
 {
     using GooglePlayGames.BasicApi;
@@ -123,8 +122,8 @@ namespace GooglePlayGames.Native
                 GameServices().StartAuthorizationUI();
             }
         }
-
-        private static Action<bool> AsOnGameThreadCallback(Action<bool> callback)
+            
+        private static Action<T> AsOnGameThreadCallback<T>(Action<T> callback)
         {
             if (callback == null)
             {
@@ -136,7 +135,7 @@ namespace GooglePlayGames.Native
             return result => InvokeCallbackOnGameThread(callback, result);
         }
 
-        private static void InvokeCallbackOnGameThread(Action<bool> callback, bool success)
+        private static void InvokeCallbackOnGameThread<T>(Action<T> callback, T data)
         {
             if (callback == null)
             {
@@ -146,7 +145,7 @@ namespace GooglePlayGames.Native
             PlayGamesHelperObject.RunOnGameThread(() =>
                 {
                     Logger.d("Invoking user callback on game thread");
-                    callback(success);
+                    callback(data);
                 });
         }
 
@@ -659,30 +658,47 @@ namespace GooglePlayGames.Native
             callback(true);
         }
 
-        public void ShowAchievementsUI()
+        public void ShowAchievementsUI(Action<UIStatus> cb)
         {
             if (!IsAuthenticated())
             {
                 return;
             }
 
-            GameServices().AchievementManager().ShowAllUI(Callbacks.NoopUICallback);
+            var callback = Callbacks.NoopUICallback;
+            if (cb != null)
+            {
+                callback = (result) => {
+                    cb.Invoke((UIStatus)result);
+                };
+            }     
+            callback = AsOnGameThreadCallback(callback);
+
+            GameServices().AchievementManager().ShowAllUI(callback);
         }
 
-        public void ShowLeaderboardUI(string leaderboardId)
+        public void ShowLeaderboardUI(string leaderboardId, Action<UIStatus> cb)
         {
             if (!IsAuthenticated())
             {
                 return;
             }
 
+            Action<Status.UIStatus> callback = Callbacks.NoopUICallback;
+            if (cb != null)
+            {
+                callback = (result) => {
+                    cb.Invoke((UIStatus)result);
+                };
+            }
+            callback = AsOnGameThreadCallback(callback);
             if (leaderboardId == null)
             {
-                GameServices().LeaderboardManager().ShowAllUI(Callbacks.NoopUICallback);
+                GameServices().LeaderboardManager().ShowAllUI(callback);
             }
             else
             {
-                GameServices().LeaderboardManager().ShowUI(leaderboardId, Callbacks.NoopUICallback);
+                GameServices().LeaderboardManager().ShowUI(leaderboardId, callback);
             }
         }
 
