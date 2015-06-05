@@ -32,3 +32,6 @@ samples/**/Source/ProjectSettings
 
 source/PluginDev/ProjectSettings/GraphicsSettings.asset
 source/PluginDev/ProjectSettings/NavMeshAreas.asset
+
+.gradle/
+.idea/
