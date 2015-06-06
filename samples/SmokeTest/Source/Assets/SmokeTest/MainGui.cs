@@ -228,7 +228,7 @@ RealTimeMultiplayerListener
         {
             this.DoAuthenticate();
         }
-      
+
         if (GUI.Button(this.CalcGrid(1, 1), "Nearby Connections"))
         {
             this.mUi = Ui.NearbyConnections;
@@ -430,7 +430,7 @@ RealTimeMultiplayerListener
                     Logger.d("Opened file: " + openedFile.ToString());
                     mCurrentSavedGame = openedFile;
                 }
-          
+
                 EndStandBy();
             });
     }
@@ -469,7 +469,7 @@ RealTimeMultiplayerListener
                 {
                     mSavedGameFileContent = string.Empty;
                 }
-          
+
                 EndStandBy();
             });
     }
@@ -491,7 +491,7 @@ RealTimeMultiplayerListener
                         "Retrieved saved game with description: " + savedGame.Description;
                     mCurrentSavedGame = savedGame;
                 }
-          
+
                 EndStandBy();
             });
     }
@@ -524,7 +524,7 @@ RealTimeMultiplayerListener
                     Logger.d("Opened file: " + openedFile.ToString());
                     mCurrentSavedGame = openedFile;
                 }
-          
+
                 EndStandBy();
             });
     }
@@ -784,10 +784,11 @@ RealTimeMultiplayerListener
                     Status = "Fetch Status: " + status + "\n";
                     if (fetchedEvent != null)
                     {
-                        Status += "Event: [" + fetchedEvent.Id + ", " + fetchedEvent.Description + "]";
-                        Logger.d("Fetched event: " + fetchedEvent.ToString());
+                        Status += "Event: [" + fetchedEvent.Id + ", " + fetchedEvent.Description + "]: " +
+                            fetchedEvent.CurrentCount;
+                        Logger.d("Fetched event: " + fetchedEvent);
                     }
-              
+
                     EndStandBy();
                 });
         }
@@ -899,7 +900,7 @@ RealTimeMultiplayerListener
     internal void DrawTitle(string title)
     {
         GUI.Label(
-            this.CalcGrid(0, 0, 2, 1), 
+            this.CalcGrid(0, 0, 2, 1),
             title == null ? "Play Games Unity Plugin - Smoke Test" : title);
     }
 
@@ -1089,7 +1090,7 @@ RealTimeMultiplayerListener
                 {
                     Status = "*** Failed to authenticate.";
                 }
-          
+
                 ShowEffect(success);
             });
     }
@@ -1198,7 +1199,7 @@ RealTimeMultiplayerListener
                 x += RandCharFrom("nsr");
             }
         }
-      
+
         return x;
     }
 
@@ -1250,7 +1251,7 @@ RealTimeMultiplayerListener
             Status = "No incoming invitation!";
             return;
         }
-      
+
         SetStandBy("Accepting invitation...");
         PlayGamesPlatform.Instance.RealTime.AcceptInvitation(mLastInvitationId, this);
     }
@@ -1262,7 +1263,7 @@ RealTimeMultiplayerListener
             Status = "No incoming invitation!";
             return;
         }
-      
+
         PlayGamesPlatform.Instance.RealTime.DeclineInvitation(mLastInvitationId);
         Status = "Declined incoming invitation.";
     }
@@ -1290,7 +1291,7 @@ RealTimeMultiplayerListener
 
         PlayGamesPlatform.Instance.RealTime.SendMessage(
             reliable,
-            recipient.ParticipantId, 
+            recipient.ParticipantId,
             System.Text.ASCIIEncoding.Default.GetBytes(word));
         Status = string.Format("Sent message: {0}, reliable: {1}, recipient: {2}", word, reliable, recipient.ParticipantId);
     }
@@ -1309,7 +1310,7 @@ RealTimeMultiplayerListener
             Status = "Participants: (null list)";
             return;
         }
-      
+
         Status = string.Format("{0} participants.", participants.Count);
         Participant self = PlayGamesPlatform.Instance.RealTime.GetSelf();
         foreach (Participant p in participants)
@@ -1318,7 +1319,7 @@ RealTimeMultiplayerListener
             {
                 Status += "*";
             }
-          
+
             Status += p.DisplayName + "(" + p.ParticipantId + ") ";
             Debug.Log(">>> participant: " + p.ToString());
         }
@@ -1409,7 +1410,7 @@ RealTimeMultiplayerListener
             Status = "No incoming invitation received from listener.";
             return;
         }
-      
+
         SetStandBy("Accepting TBMP invitation...");
         PlayGamesPlatform.Instance.TurnBased.AcceptInvitation(
             mLastInvitationId,
@@ -1434,7 +1435,7 @@ RealTimeMultiplayerListener
             Status = "No incoming invitation received from listener.";
             return;
         }
-      
+
         PlayGamesPlatform.Instance.TurnBased.DeclineInvitation(mLastInvitationId);
         mLastInvitationId = null;
         Status = "Declined invitation.";
@@ -1461,7 +1462,7 @@ RealTimeMultiplayerListener
         {
             summary += " " + p.DisplayName;
         }
-      
+
         summary += " and " + mMatch.AvailableAutomatchSlots + " pending automatch";
         return summary;
     }
@@ -1537,7 +1538,7 @@ RealTimeMultiplayerListener
             Status = "No match is active.";
             return;
         }
-      
+
         if (mMatch.TurnStatus != TurnBasedMatch.MatchTurnStatus.MyTurn)
         {
             Status = "Not my turn.";
@@ -1569,7 +1570,7 @@ RealTimeMultiplayerListener
             Status = "No match is active.";
             return;
         }
-      
+
         if (mMatch.TurnStatus != TurnBasedMatch.MatchTurnStatus.MyTurn)
         {
             Status = "Not my turn.";
@@ -1615,7 +1616,7 @@ RealTimeMultiplayerListener
             Status = "No match is active.";
             return;
         }
-      
+
         if (mMatch.Status != TurnBasedMatch.MatchStatus.Complete)
         {
             Status = "Match is not complete";
@@ -1645,7 +1646,7 @@ RealTimeMultiplayerListener
             Status = "No match is active.";
             return;
         }
-      
+
         if (mMatch.TurnStatus == TurnBasedMatch.MatchTurnStatus.MyTurn)
         {
             Status = "It's my turn; use 'Leave During Turn'.";
@@ -1675,7 +1676,7 @@ RealTimeMultiplayerListener
             Status = "No match is active.";
             return;
         }
-      
+
         if (mMatch.TurnStatus != TurnBasedMatch.MatchTurnStatus.MyTurn)
         {
             Status = "It's not my turn.";
@@ -1707,7 +1708,7 @@ RealTimeMultiplayerListener
             Status = "No match is active.";
             return;
         }
-      
+
         if (mMatch.Status != TurnBasedMatch.MatchStatus.Active)
         {
             Status = "Match is not active.";
@@ -1737,7 +1738,7 @@ RealTimeMultiplayerListener
             Status = "No match is active.";
             return;
         }
-      
+
         if (!mMatch.CanRematch)
         {
             Status = "Match can't be rematched.";
