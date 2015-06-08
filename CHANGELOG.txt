@@ -2,6 +2,7 @@ Version 0.9.21
   New Features:
        * #136 Callback for ShowLeaderboardUI()
        * #498 Bitmask filter in CreateQuickGame
+       * #537 Exposing Saved Games Delete API
        * iOS builds will use Cocoapods if installed to build xcode project.
 2015-05-01 Version 0.9.20 (codename: ewokian)
    New Features:

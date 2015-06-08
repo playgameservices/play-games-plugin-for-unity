@@ -435,6 +435,19 @@ RealTimeMultiplayerListener
             });
     }
 
+    internal void DoDeleteSavedGame()
+    {
+        if (mCurrentSavedGame == null)
+        {
+            ShowEffect(false);
+            Status = "No save game selected";
+            return;
+        }
+        PlayGamesPlatform.Instance.SavedGame.Delete(mCurrentSavedGame);
+        Status = mCurrentSavedGame.Filename + " deleted.";
+        mCurrentSavedGame = null;
+    }
+
     internal void DoReadSavedGame()
     {
         if (mCurrentSavedGame == null)
@@ -580,6 +593,10 @@ RealTimeMultiplayerListener
         else if (GUI.Button(CalcGrid(1, 4), "Edit Filename"))
         {
             mUi = Ui.EditSavedGameName;
+        }
+        else if (GUI.Button(CalcGrid(0, 5), "Delete"))
+        {
+            DoDeleteSavedGame();
         }
         else if (GUI.Button(CalcGrid(1, 6), "Back"))
         {

@@ -14,7 +14,7 @@
 //    limitations under the License.
 // </copyright>
 
-#if (UNITY_ANDROID || UNITY_IPHONE)
+#if (UNITY_ANDROID || (UNITY_IPHONE && !NO_GPGS))
 
 namespace GooglePlayGames.Native
 {
@@ -68,6 +68,11 @@ namespace GooglePlayGames.Native
 
         public void FetchAllSavedGames(DataSource source, Action<SavedGameRequestStatus,
         List<ISavedGameMetadata>> callback)
+        {
+            throw new NotImplementedException(mMessage);
+        }
+
+        public void Delete(ISavedGameMetadata metadata)
         {
             throw new NotImplementedException(mMessage);
         }
