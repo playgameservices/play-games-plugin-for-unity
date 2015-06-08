@@ -621,8 +621,19 @@ namespace GooglePlayGames.Native
 
             Logger.d("Performing " + updateType + " on " + achId);
             updateAchievment(achievement);
-            // The native SDK never fails.
-            callback(true);
+
+            GameServices().AchievementManager().Fetch(achId, rsp => {
+                if (rsp.Status() == Status.ResponseStatus.VALID) {
+                    callback(true);
+                    mAchievements.Remove(achId);
+                    mAchievements.Add(achId, rsp.Achievement().AsAchievement());
+                }
+                else {
+                    Logger.e("Cannot refresh achievement " + achId + ": " +
+                        rsp.Status());
+                    callback(false);
+                }
+            });
         }
 
         public void IncrementAchievement(string achId, int steps, Action<bool> callback)
@@ -655,7 +666,18 @@ namespace GooglePlayGames.Native
             }
 
             GameServices().AchievementManager().Increment(achId, Convert.ToUInt32(steps));
-            callback(true);
+            GameServices().AchievementManager().Fetch(achId, rsp => {
+                if (rsp.Status() == Status.ResponseStatus.VALID) {
+                    callback(true);
+                    mAchievements.Remove(achId);
+                    mAchievements.Add(achId, rsp.Achievement().AsAchievement());
+                }
+                else {
+                    Logger.e("Cannot refresh achievement " + achId + ": " +
+                        rsp.Status());
+                    callback(false);
+                }
+            });
         }
 
         public void ShowAchievementsUI(Action<UIStatus> cb)
