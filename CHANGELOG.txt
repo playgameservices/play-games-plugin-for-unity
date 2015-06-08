@@ -1,6 +1,7 @@
 Version 0.9.21
   New Features:
        * #136 Callback for ShowLeaderboardUI()
+       * #483 IncrementAchievement does not update Achievement data cache
        * #498 Bitmask filter in CreateQuickGame
        * #537 Exposing Saved Games Delete API
        * iOS builds will use Cocoapods if installed to build xcode project.
