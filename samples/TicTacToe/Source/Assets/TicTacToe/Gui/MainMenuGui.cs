@@ -41,7 +41,7 @@ public class MainMenuGui : BaseGui {
     private const int Opponents = 1;
 
     // default matching - matches everything as 0xffffffff
-    private const int Variant = -1;
+    private const uint Variant = 0xffffffff;
 
     // the match the player is being offered to play right now
     TurnBasedMatch mIncomingMatch = null;
