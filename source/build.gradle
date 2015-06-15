@@ -2,146 +2,245 @@
 *   Gradle file to build the Unity plugin for Google Play Game Services.
 */
 
-
+buildscript {
+    repositories {
+        jcenter()
+        mavenLocal()
+    }
+}
 /* 
     Project level variables
 */
-ext {
-	ndk_root = System.getenv("ANDROID_NDK_ROOT")
-	sdk_root = System.getenv("ANDROID_HOME")
-	unity_exe ='/Applications/Unity/Unity.app/Contents/MacOS/Unity'
-	pluginProj = file('PluginDev').absolutePath
-	buildPath = file('build').absolutePath
-	samplesPath = file('../samples').absolutePath
-	exportPath = file('build/plugin.unitypackage').absolutePath
+project.ext {
+    ndk_root = System.getenv("ANDROID_NDK_ROOT")
+    sdk_root = System.getenv("ANDROID_HOME")
+    unity_exe = System.getenv("UNITY_EXE")
+    if (unity_exe == null || unity.exe.isEmpty()) {
+        unity_exe ='/Applications/Unity/Unity.app/Contents/MacOS/Unity'
+    }
+    pluginSrc = file('PluginDev').absolutePath
+    pluginProj = file('build/PluginSrc').absolutePath
+    buildPath = file('build').absolutePath
+    samplesPath = file('../samples').absolutePath
+    samplesBuildSrc = file('build/sampleSrc').absolutePath
+    exportPath = file('build/plugin.unitypackage').absolutePath
 
     sampleList = ['CubicPilot', 'Minimal',
          'QuizRacer',  'TicTacToe', 'CubicPilot_4.6',
          'NearbyDroids', 'QuizRacer_4.6', 'SmokeTest', 'TrivialQuest']
+
+    gpg_sdk_link = 'https://developers.google.com/games/services/downloads/gpg-cpp-sdk.v1.4.1.zip'
 }
 
-task unity_package(dependsOn:'export_package') << {
-	println "Packaging Complete!"
+
+if (!tasks.findByName('prebuild')) {
+    task prebuild() {
+        println('Local prebuild')
+    }
+    prebuild.dependsOn {
+        project.tasks.findAll { task -> task.ext.has('remoteTaskPhase') && task.ext.remoteTaskPhase == 'prebuild' }
+    }
+}
+if (!tasks.findByName('build')) {
+    task build() {
+        println('Local build')
+    }
+    build.dependsOn {
+        project.tasks.findAll { task -> task.ext.has('remoteTaskPhase') && task.ext.remoteTaskPhase == 'build' }
+    }
+}
+if (!tasks.findByName('postbuild')) {
+    task postbuild() {
+        println('Local postbuild')
+    }
+    postbuild.dependsOn {
+        project.tasks.findAll { task -> task.ext.has('remoteTaskPhase') && task.ext.remoteTaskPhase == 'postbuild' }
+    }
 }
 
-unity_package.dependsOn {
-    tasks.findAll { task -> task.name.startsWith('PackageSample') }
+project.defaultTasks = ['prebuild', 'build', 'postbuild']
+
+
+/**
+    Final task of building all the unity packages.
+**/
+task unity_package(dependsOn:'export_package') {
+
+    description = "Top level task for building the unity packages"
+
+    doLast {
+        println "Packaging Complete!"
+    }
+    
+    // Mark this a build phase task for remoteTask support.
+    ext.remoteTaskPhase = 'build'
+
+    // Depends on packaging all the samples
+    dependsOn {
+        tasks.findAll { task -> task.name.startsWith('PackageSample') }
+    }
 }
 
+/**
+    Generate tasks for the samples.  There are several tasks for each sample.
+**/
 sampleList.each { sampleName ->
     def createTask   = project.tasks.create('CreateSample' + sampleName)
     def copySrcTask   = project.tasks.create('CopySrcSample' + sampleName)
+    def copyBuildSrcTask   = project.tasks.create('CopyBuildSrcSample' + sampleName)
     
+    // this is the path to the source code
     def sampleSrcDir = samplesPath + '/' + sampleName + '/Source/Assets/' + sampleName
+
+    // this is the path to the source code in the build dir
+    def sampleBuildSrcDir = samplesBuildSrc + '/' + sampleName + '/Source/Assets/' + sampleName
+
+    // this is the path to build the sample package
     def sampleDestSrcDir = buildPath + '/Samples/' + sampleName + '/Assets/' + sampleName
     
     /*
         Create the sample in the build directory
     */
-
+    createTask.description = "Create the ${sampleName} package"
     createTask.dependsOn 'export_package'
     createTask.doFirst {
-	        exec {
-		        executable "${unity_exe}"
-			    args "-batchmode", "-createProject", "${buildPath}/Samples/${sampleName}", "-logFile", "${buildPath}/CreateSample${sampleName}.log",  "-importPackage", "${exportPath}", "-quit"
-	        }
+        exec {
+            executable "${unity_exe}"
+                args "-batchmode", "-createProject", "${buildPath}/Samples/${sampleName}", "-logFile", "${buildPath}/CreateSample${sampleName}.log",  "-importPackage", "${exportPath}", "-quit"
         }
+    }
+    // This is a build task
+    createTask.ext.remoteTaskPhase = 'build'
 
+    /*
+        Copy the source of the sample into build dir.  
+        This is done so it can be remoted and assembled as a part of a RemoteTask.
+    */
+    copyBuildSrcTask.description = "Copies sample ${sampleName} source code to build area"
+    copyBuildSrcTask.doFirst {
+            copy {
+                from sampleSrcDir
+                into sampleBuildSrcDir
+            }
+    }
+    copySrcTask.doLast {
+            println 'copied ' + sampleSrcDir + ' to' + sampleBuildSrcDir
+    }
+
+    copyBuildSrcTask.ext.remoteTaskPhase = 'prebuild'
     /*
         Copy the source of the sample into build target.  Don't import the
         sample package, since we want the latest source code.
     */
+    copySrcTask.description = "Copies sample ${sampleName} source code to sample project build area"
     copySrcTask.dependsOn createTask
-
     copySrcTask.doFirst {
             copy {
-                from sampleSrcDir
+                from sampleBuildSrcDir
                 into sampleDestSrcDir
             }
     }
     copySrcTask.doLast {
-            println 'copied ' + sampleSrcDir + ' to' + sampleDestSrcDir
+            println 'copied ' + sampleBuildSrcDir + ' to' + sampleDestSrcDir
     }
+
+    copySrcTask.ext.remoteTaskPhase = 'build'
 
     /*
         Create the exported package
     */
-     task "PackageSample${sampleName}" {
+    def packageTask   = project.tasks.create('PackageSample' + sampleName)
 
-        dependsOn copySrcTask
+        packageTask.description = "Package ${sampleName} sample"
+
+        packageTask.dependsOn createTask
         /*
                 Next, export the project
         */
-        doLast {
-	        exec {
-		        executable "${unity_exe}"
-			    args "-batchmode", "-projectPath", "${buildPath}/Samples/${sampleName}", "-logFile", "${buildPath}/ExportSample${sampleName}.log",  "-exportPackage", "Assets/${sampleName}",  "${buildPath}/Samples/${sampleName}.unitypackage",  "-quit"
-	        }
-
+        packageTask.doLast {
+            exec {
+                executable "${unity_exe}"
+                args "-batchmode", "-projectPath", "${buildPath}/Samples/${sampleName}", "-logFile", "${buildPath}/ExportSample${sampleName}.log",  "-exportPackage", "Assets/${sampleName}",  "${buildPath}/Samples/${sampleName}.unitypackage",  "-quit"
+            }
         }
+        packageTask.ext.remoteTaskPhase = 'build'
 
         /*
             Finally, copy the package to the source sample dir.
         */
-        doLast {
+        def copySamplePackageTask = project.tasks.create('CopySamplePackage' + sampleName)
+        copySamplePackageTask.description = "Copy unity package for " + sampleName + " back to src dir"
+        copySamplePackageTask.doLast {
             copy {
                 from file("${buildPath}/Samples/${sampleName}.unitypackage")
                 into file("../samples/${sampleName}")
             }
         }
-    }
 
+        copySamplePackageTask.ext.remoteTaskPhase = 'build'
 }
 
-task export_package {
+task export_package () {
+    description = "Creates and exports the Plugin unity package"
     doFirst {
-	    ext.path = file('PluginDev').absolutePath + "/Assets/GooglePlayGames/Editor/projsettings.txt"
-	    delete '${ext.path}'
+        ext.path = "${pluginProj}/Assets/GooglePlayGames/Editor/projsettings.txt"
+        delete '${ext.path}'
     }
 
     doLast {
-	    exec {
-		    executable "${unity_exe}"
-			    args "-g.building", "-batchmode", "-projectPath", "${pluginProj}", "-logFile", "build/unity.log",  "-exportPackage", "Assets/GooglePlayGames", "Assets/Plugins", "${exportPath}", "-quit"
-	    }
+        exec {
+            executable "${unity_exe}"
+                args "-g.building", "-batchmode", "-projectPath", "${pluginProj}", "-logFile", "build/unity.log",  "-exportPackage", "Assets/GooglePlayGames", "Assets/Plugins", "${exportPath}", "-quit"
+        }
     }
 }
 
-export_package.dependsOn 'copy_libs'
-export_package.dependsOn 'support_jar'
+export_package.ext.remoteTaskPhase = 'build'
 
 
-task get_gpg_cpp_sdk << {
-	//TODO: pull from url
-	println "got it!"
+task get_gpg_cpp_sdk () {
+
+    doFirst {
+        ant.get(src: gpg_sdk_link, dest: 'gpg_cpp_sdk.zip', skipexisting: 'true')
+    }
+    doLast {
+        println "Got ${gpg_sdk_link} as gpg_cpp_sdk.zip"
+    }
 }
+get_gpg_cpp_sdk.description = "Download the gpg sdk from the specified location"
+
+get_gpg_cpp_sdk.ext.remoteTaskPhase = 'prebuild'
 
 task check_ndk() << {
-
-	if (ndk_root == "") {
-		throw new GradleException('ANDROID_NDK_ROOT not set')
-	}
-	else {
-		if (System.getenv("ANDROID_HOME") == null) {
-			throw new GradleException('ANDROID_HOME not set')
-		}
-		println("OK");
-	}
+    if (ndk_root == "") {
+        throw new GradleException('ANDROID_NDK_ROOT not set')
+    }
+    else {
+        if (System.getenv("ANDROID_HOME") == null) {
+            throw new GradleException('ANDROID_HOME not set')
+        }
+        println("OK");
+    }
 }
+check_ndk.description = "Checks that the NDK is setup correctly"
+check_ndk.ext.remoteTaskPhase = 'prebuild'
 
 
 // The ndk work needs to happen in the jni directory - it is baked into the
 // ndk environment.
 //
 task compile_gpg << {
-	exec {
-		workingDir "build/jni"
-			executable "${ndk_root}/ndk-build"
-	}
+    exec {
+        workingDir "build/jni"
+        executable "${ndk_root}/ndk-build"
+    }
 }
+compile_gpg.description = "Compiles the GPG SDK libs into .so files"
 compile_gpg.dependsOn 'check_ndk'
 compile_gpg.dependsOn 'copy_gpg_sdk'
 compile_gpg.dependsOn 'copy_native'
+
+compile_gpg.ext.remoteTaskPhase = 'prebuild'
 
 task copy_native << {
 	copy {
@@ -149,6 +248,19 @@ task copy_native << {
 	into {'build/jni'}
 	}
 }
+copy_native.description = "Copies the native code of the plugin into the build/jni dir for compiling"
+copy_native.ext.remoteTaskPhase = 'prebuild'
+
+
+task copy_plugin_source << {
+    copy {
+        from {"${pluginSrc}"}
+        into {"${pluginProj}"}
+    }
+}
+copy_plugin_source.description = "Copies plugin source into build directory"
+copy_plugin_source.ext.remoteTaskPhase = 'prebuild'
+
 
 task copy_gpg_sdk << {
  copy {
@@ -157,25 +269,38 @@ task copy_gpg_sdk << {
     	into {'build/jni' }
 }
 }
+copy_gpg_sdk.description = "Unzips the GPG SDK into the correct dir for NDK"
+copy_gpg_sdk.dependsOn get_gpg_cpp_sdk
+copy_gpg_sdk.ext.remoteTaskPhase = 'prebuild'
 
 task copy_libs (dependsOn: 'compile_gpg') << {
-	copy {
-	  from {'build/libs'}
-	into {'PluginDev/Assets/Plugins/Android/libs' }
-	}
+    copy {
+        from {'build/libs'}
+        into {'build/PluginSrc/Assets/Plugins/Android/libs' }
+    }
 }
+copy_libs.description = "Copies the compiled native libs to the plugin directory"
+copy_libs.dependsOn 'copy_plugin_source'
+copy_libs.ext.remoteTaskPhase = 'prebuild'
 
 task build_java_support_lib(type: GradleBuild) {
+    description = "Builds the client libraries for Android"
     buildFile = 'SupportLib/build.gradle'
     tasks = ['build']
 }
+build_java_support_lib.ext.remoteTaskPhase = 'prebuild'
 
 task support_jar(dependsOn:'build_java_support_lib') << {
-	copy {
-	 from zipTree('SupportLib/PlayGamesPluginSupport/build/outputs/aar/PlayGamesPluginSupport-debug.aar')
-	 into {'PluginDev/Assets/Plugins/Android/MainLibProj/libs'}
-	 include {'**/classes.jar'}
-	exclude { details -> !details.file.name.endsWith('.jar')}
-	rename ('classes.jar','play-games-plugin-support.jar')
-	}
+    copy {
+        from zipTree('SupportLib/PlayGamesPluginSupport/build/outputs/aar/PlayGamesPluginSupport-debug.aar')
+        into {'build/PluginSrc/Assets/Plugins/Android/MainLibProj/libs'}
+        include {'**/classes.jar'}
+        exclude { details -> !details.file.name.endsWith('.jar')}
+        rename ('classes.jar','play-games-plugin-support.jar')
+    }
 }
+support_jar.description = "Copies the android support libs to the Plugin directory"
+support_jar.dependsOn 'copy_plugin_source'
+
+support_jar.ext.remoteTaskPhase = 'prebuild'
+
