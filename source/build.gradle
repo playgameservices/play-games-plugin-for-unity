@@ -212,7 +212,7 @@ get_gpg_cpp_sdk.description = "Download the gpg sdk from the specified location"
 get_gpg_cpp_sdk.ext.remoteTaskPhase = 'prebuild'
 
 task check_ndk() << {
-    if (ndk_root == "") {
+    if (ndk_root == null || ndk_root == "") {
         throw new GradleException('ANDROID_NDK_ROOT not set')
     }
     else {
