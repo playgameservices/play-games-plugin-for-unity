@@ -24,6 +24,8 @@ project.ext {
     samplesPath = file('../samples').absolutePath
     samplesBuildSrc = file('build/sampleSrc').absolutePath
     exportPath = file('build/plugin.unitypackage').absolutePath
+    currentPluginPath = file('../current-build').absolutePath
+    currentPluginName = 'GooglePlayGamesPlugin-0.9.21.unitypackage'
 
     sampleList = ['CubicPilot', 'Minimal',
          'QuizRacer',  'TicTacToe', 'CubicPilot_4.6',
@@ -177,7 +179,7 @@ sampleList.each { sampleName ->
             }
         }
 
-        copySamplePackageTask.ext.remoteTaskPhase = 'build'
+        copySamplePackageTask.ext.remoteTaskPhase = 'postbuild'
 }
 
 task export_package () {
@@ -197,6 +199,26 @@ task export_package () {
 
 export_package.ext.remoteTaskPhase = 'build'
 
+/*
+    Copy the plugin to the current-build directory
+*/
+task copy_plugin() {
+    description = 'Copy plugin to the current-build directory'
+    doFirst {
+            copy {
+                from file(exportPath)
+                into file(currentPluginPath)
+                rename ('plugin.unitypackage', currentPluginName)
+            }
+        }
+
+    doLast {
+        println "Copied  ${exportPath}  to   ${currentPluginPath}"
+    }
+
+        ext.remoteTaskPhase = 'postbuild'
+
+}
 
 task get_gpg_cpp_sdk () {
 
