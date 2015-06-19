@@ -36,7 +36,7 @@ internal class AndroidAppStateClient : AppStateClient {
     private const int STATUS_NO_DATA = 4;
     private const int STATUS_KEY_NOT_FOUND = 2002;
     private const int STATUS_CONFLICT = 2000;
-
+    
     private static AndroidJavaClass AppStateManager =
         new AndroidJavaClass("com.google.android.gms.appstate.AppStateManager");
 
@@ -49,7 +49,7 @@ internal class AndroidAppStateClient : AppStateClient {
         mServices = Misc.CheckNotNull(services);
     }
 
-    private static AndroidJavaObject GetApiClient(GameServices services) {
+    public static AndroidJavaObject GetApiClient(GameServices services) {
         return JavaUtils.JavaObjectFromPointer(C.InternalHooks_GetApiClient(services.AsHandle()));
     }
 
@@ -93,14 +93,6 @@ internal class AndroidAppStateClient : AppStateClient {
         using (pendingResult) {
             pendingResult.Call("setResultCallback", callbackProxy);
         }
-    }
-
-    private static int GetStatusCode(AndroidJavaObject result) {
-        if (result == null) {
-            return -1;
-        }
-        AndroidJavaObject status = result.Call<AndroidJavaObject>("getStatus");
-        return status.Call<int>("getStatusCode");
     }
 
     internal static byte[] ToByteArray(AndroidJavaObject javaByteArray) {
@@ -201,7 +193,7 @@ internal class AndroidAppStateClient : AppStateClient {
         public void onResult(AndroidJavaObject result) {
             Logger.d("OnStateResultProxy.onResult, result=" + result);
 
-            int statusCode = GetStatusCode(result);
+            int statusCode = PlayGamesHelperObject.GetStatusCode(result);
             Logger.d("OnStateResultProxy: status code is " + statusCode);
 
             if (result == null) {

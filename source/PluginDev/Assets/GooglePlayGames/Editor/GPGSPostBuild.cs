@@ -33,13 +33,12 @@ namespace GooglePlayGames
         [PostProcessBuild]
         public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
         {
-#if UNITY_4_6
+#if UNITY_4_5 || UNITY_4_6
             if (target != BuildTarget.iPhone) {
                 return;
             }
 #else
-            if (target != BuildTarget.iOS)
-            {
+            if (target != BuildTarget.iOS) {
                 return;
             }
 #endif

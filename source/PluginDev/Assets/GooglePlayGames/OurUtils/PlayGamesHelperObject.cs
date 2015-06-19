@@ -139,5 +139,17 @@ namespace GooglePlayGames.OurUtils
         {
             sPauseCallback = callback;
         }
+
+        #if UNITY_ANDROID
+        public static int GetStatusCode(AndroidJavaObject result)
+        {
+            if (result == null)
+            {
+                return -1;
+            }
+            AndroidJavaObject status = result.Call<AndroidJavaObject>("getStatus");
+            return status.Call<int>("getStatusCode");
+        }
+        #endif 
     }
 }

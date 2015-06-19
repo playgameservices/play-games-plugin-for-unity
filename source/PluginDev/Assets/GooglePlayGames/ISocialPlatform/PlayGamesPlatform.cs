@@ -627,6 +627,81 @@ namespace GooglePlayGames
         }
 
         /// <summary>
+        // Request the current players highscore from a given leaderboard
+        // according to its span and collection - check out LeaderboardConsts
+        /// </summary>
+        /// <param name="leaderboardId">Leaderboard identifier.</param>
+        /// <param name="span">Span of highscores</param>
+        /// <param name="collection">Which leaderboard collection should be used</param>
+        /// <param name="callback">Callback used to retrieve the score from the leaderboard</param>
+        public void LoadCurrentScore(string leaderboardId, int span, int collection, Action<IScore> callback)
+        {
+            if (!IsAuthenticated())
+            {
+                Logger.e("LoadCurrentScore can only be called after authentication.");
+                if (callback != null)
+                { callback.Invoke(null); }
+                return;
+            }
+
+            Logger.d("LoadCurrentScore: span=" + span + ", collection=" + collection + ", board=" + leaderboardId);
+            string lbId = MapId(leaderboardId);
+            mClient.ReceiveScore(lbId, span, collection, callback);
+        }
+
+        /// <summary>
+        // Request the top scores from a given leaderboard
+        // according to its span and collection - check out LeaderboardConsts
+        /// </summary>
+        /// <param name="leaderboardId">Leaderboard identifier.</param>
+        /// <param name="span">Span of highscores</param>
+        /// <param name="collection">Which leaderboard collection should be used</param>
+        /// <param name="maxScores">How many scores should be returned, must be between 1 to 25</param>
+        /// <param name="callback">Callback used to retrieve the scores from the leaderboard</param>
+        public void LoadTopScores(string leaderboardId, int span, int collection, int maxScores, Action<IScore[]> callback)
+        {
+            if (!IsAuthenticated())
+            {
+                Logger.e("LoadTopScores can only be called after authentication.");
+                if (callback != null)
+                { callback.Invoke(null); }
+                return;
+            }
+
+            maxScores = Mathf.Clamp(maxScores, 1, 25);
+
+            Logger.d("LoadTopScores: span=" + span + ", collection=" + collection + ", board=" + leaderboardId);
+            string lbId = MapId(leaderboardId);
+            mClient.ReceiveTopScores(lbId, span, collection, maxScores, callback);
+        }
+
+        /// <summary>
+        // Request the scores centered the logged in player
+        // according to its span and collection - check out LeaderboardConsts
+        /// </summary>
+        /// <param name="leaderboardId">Leaderboard identifier.</param>
+        /// <param name="span">Span of highscores</param>
+        /// <param name="collection">Which leaderboard collection should be used</param>
+        /// <param name="maxScores">How many scores should be returned, must be between 1 to 25</param>
+        /// <param name="callback">Callback used to retrieve the scores from the leaderboard</param>
+        public void LoadPlayerCenteredScores(string leaderboardId, int span, int collection, int maxScores, Action<IScore[]> callback)
+        {
+            if (!IsAuthenticated())
+            {
+                Logger.e("LoadPlayerCenteredScores can only be called after authentication.");
+                if (callback != null)
+                { callback.Invoke(null); }
+                return;
+            }
+
+            maxScores = Mathf.Clamp(maxScores, 1, 25);
+
+            Logger.d("LoadPlayerCenteredScores: span=" + span + ", collection=" + collection + ", board=" + leaderboardId);
+            string lbId = MapId(leaderboardId);
+            mClient.ReceivePlayerCenteredScores(lbId, span, collection, maxScores, callback);
+        }
+
+        /// <summary>
         /// Not implemented yet. Calls the callback with an empty list.
         /// </summary>
         public void LoadScores(string leaderboardID, Action<IScore[]> callback)

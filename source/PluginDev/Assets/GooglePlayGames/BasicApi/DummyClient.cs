@@ -16,6 +16,8 @@
 
 namespace GooglePlayGames.BasicApi
 {
+  using UnityEngine.SocialPlatforms;
+
   using System;
   using System.Collections.Generic;
   using GooglePlayGames.BasicApi.Multiplayer;
@@ -88,6 +90,33 @@ public class DummyClient : IPlayGamesClient
       if (callback != null)
         {
           callback.Invoke(false);
+        }
+    }
+
+    public void ReceiveScore(string lbId, int span, int collection, Action<IScore> callback)
+    {
+        LogUsage();
+        if (callback != null)
+        {
+            callback.Invoke(null);
+        }
+    }
+
+    public void ReceiveTopScores(string lbId, int span, int collection, int maxScores, Action<IScore[]> callback)
+    {
+        LogUsage();
+        if (callback != null)
+        { 
+            callback.Invoke(null); 
+        }
+    }
+
+    public void ReceivePlayerCenteredScores(string lbId, int span, int collection, int maxScores, Action<IScore[]> callback)
+    {
+        LogUsage();
+        if (callback != null)
+        { 
+            callback.Invoke(null); 
         }
     }
 

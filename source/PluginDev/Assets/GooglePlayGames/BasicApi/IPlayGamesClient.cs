@@ -19,6 +19,8 @@ namespace GooglePlayGames.BasicApi
   using System;
   using GooglePlayGames.BasicApi.Multiplayer;
 
+  using UnityEngine.SocialPlatforms;
+
   /// <summary>
   /// Defines an abstract interface for a Play Games Client. Concrete implementations
   /// might be, for example, the client for Android or for iOS. One fundamental concept
@@ -159,6 +161,38 @@ namespace GooglePlayGames.BasicApi
     /// <param name="successOrFailureCalllback">Callback used to indicate whether the operation
     /// succeeded or failed.</param>
     void SubmitScore(string leaderboardId, long score, Action<bool> successOrFailureCalllback);
+
+    /// <summary>
+    // Receive a score from a given leaderboard
+    // according to its span and collection - check out LeaderboardConsts
+    /// </summary>
+    /// <param name="leaderboardId">Leaderboard identifier.</param>
+    /// <param name="span">Span of highscores</param>
+    /// <param name="collection">Which leaderboard collection should be used</param>
+    /// <param name="callback">Callback used to retrieve the score from the leaderboard</param>
+    void ReceiveScore(string leaderboardId, int span, int collection, Action<IScore> callback);
+
+    /// <summary>
+    // Receive the top scores from a given leaderboard
+    // according to its span and collection - check out LeaderboardConsts
+    /// </summary>
+    /// <param name="leaderboardId">Leaderboard identifier.</param>
+    /// <param name="span">Span of highscores</param>
+    /// <param name="collection">Which leaderboard collection should be used</param>
+    /// <param name="maxScores">How many scores should be returned</param>
+    /// <param name="callback">Callback used to retrieve the scores from the leaderboard</param>
+    void ReceiveTopScores(string leaderboardId, int span, int collection, int maxScores, Action<IScore[]> callback);
+
+    /// <summary>
+    // Receive the scores centered the logged in player
+    // according to its span and collection - check out LeaderboardConsts
+    /// </summary>
+    /// <param name="leaderboardId">Leaderboard identifier.</param>
+    /// <param name="span">Span of highscores</param>
+    /// <param name="collection">Which leaderboard collection should be used</param>
+    /// <param name="maxScores">How many scores should be returned</param>
+    /// <param name="callback">Callback used to retrieve the scores from the leaderboard</param>
+    void ReceivePlayerCenteredScores(string leaderboardId, int span, int collection, int maxScores, Action<IScore[]> callback);
 
     /// <summary>
     /// Loads state from the cloud for the passed slot.
