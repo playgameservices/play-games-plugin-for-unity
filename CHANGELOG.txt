@@ -1,11 +1,13 @@
 Version 0.9.21
   New Features:
        * #136 Callback for ShowLeaderboardUI()
-       * #483 IncrementAchievement does not update Achievement data cache
        * #498 Bitmask filter in CreateQuickGame
        * #537 Exposing Saved Games Delete API
-       * #568 Exception with null or empty image URL
        * iOS builds will use Cocoapods if installed to build xcode project.
+  Bug Fixes
+       * #483 IncrementAchievement does not update Achievement data cache
+       * #568 Exception with null or empty image URL
+       * Fixed Setup dialogs not laidout correctly.
 2015-05-01 Version 0.9.20 (codename: ewokian)
    New Features:
        * Support for Events and Quests

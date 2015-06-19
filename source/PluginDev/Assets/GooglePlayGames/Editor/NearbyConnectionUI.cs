@@ -1,5 +1,5 @@
 ﻿// <copyright file="NearbyConnectionUI.cs" company="Google Inc.">
-// Copyright (C) 2014 Google Inc.
+// Copyright (C) 2014 Google Inc. All Rights Reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -26,7 +26,9 @@ namespace GooglePlayGames
         [MenuItem("Window/Google Play Games/Setup/Nearby Connections setup...", false, 3)]
         public static void MenuItemFileGPGSAndroidSetup()
         {
-            EditorWindow.GetWindow(typeof(NearbyConnectionUI));
+            EditorWindow window = EditorWindow.GetWindow(
+                typeof(NearbyConnectionUI), true, GPGSStrings.NearbyConnections.Title);
+            window.minSize = new Vector2(400, 200);
         }
 
         public void OnEnable()
@@ -36,40 +38,57 @@ namespace GooglePlayGames
 
         public void OnGUI()
         {
-            GUILayout.BeginArea(new Rect(20, 20, position.width - 40, position.height - 40));
-            GUILayout.Label(GPGSStrings.NearbyConnections.Title, EditorStyles.boldLabel);
+            GUI.skin.label.wordWrap = true;
+            GUILayout.BeginVertical();
+            GUILayout.Space(10);
             GUILayout.Label(GPGSStrings.NearbyConnections.Blurb);
             GUILayout.Space(10);
-            
+
             GUILayout.Label(GPGSStrings.Setup.NearbyServiceId, EditorStyles.boldLabel);
+            GUILayout.Space(10);
             GUILayout.Label(GPGSStrings.Setup.NearbyServiceBlurb);
             mNearbyServiceId = EditorGUILayout.TextField(GPGSStrings.Setup.NearbyServiceId,
-                mNearbyServiceId);
-            
-            GUILayout.Space(10);
-            if (GUILayout.Button(GPGSStrings.Setup.SetupButton))
+                mNearbyServiceId,GUILayout.Width(350));
+
+            GUILayout.FlexibleSpace();
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+            if (GUILayout.Button(GPGSStrings.Setup.SetupButton,
+                GUILayout.Width(100)))
             {
                 DoSetup();
             }
+            if (GUILayout.Button("Cancel", GUILayout.Width(100)))
+            {
+                this.Close();
+            }
 
-            GUILayout.EndArea();
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+            GUILayout.Space(20);
+            GUILayout.EndVertical();
         }
 
         private void DoSetup()
         {
-            PerformSetup(mNearbyServiceId, true);
+            if (PerformSetup(mNearbyServiceId, true))
+            {
+                EditorUtility.DisplayDialog(GPGSStrings.Success,
+                    GPGSStrings.NearbyConnections.SetupComplete, GPGSStrings.Ok);
+                this.Close();
+            }
         }
 
         /// Provide static access to setup for facilitating automated builds.
         /// <param name="nearbyServiceId">The nearby connections service Id</param>
         /// <param name="androidBuild">true if building android</param>
-        public static void PerformSetup(string nearbyServiceId, bool androidBuild)
+        public static bool PerformSetup(string nearbyServiceId, bool androidBuild)
         {
             // check for valid app id
             if (!GPGSUtil.LooksLikeValidServiceId(nearbyServiceId))
             {
                 GPGSUtil.Alert(GPGSStrings.Setup.ServiceIdError);
-                return;
+                return false;
             }
 
             GPGSProjectSettings.Instance.Set(GPGSUtil.SERVICEIDKEY, nearbyServiceId);
@@ -89,9 +108,8 @@ namespace GooglePlayGames
                 AssetDatabase.Refresh();
                 GPGSProjectSettings.Instance.Set("android.NearbySetupDone", true);
                 GPGSProjectSettings.Instance.Save();
-                EditorUtility.DisplayDialog(GPGSStrings.Success,
-                    GPGSStrings.NearbyConnections.SetupComplete, GPGSStrings.Ok);
             }
+            return true;
         }
     }
 }
