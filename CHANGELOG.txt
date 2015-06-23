@@ -1,11 +1,16 @@
 Version 0.9.21
   New Features:
        * #136 Callback for ShowLeaderboardUI()
+       * #382 Callback for declined invitation when creating RTMP room
+       * #392 Support for Default waiting room for RTMP
        * #498 Bitmask filter in CreateQuickGame
        * #537 Exposing Saved Games Delete API
        * iOS builds will use Cocoapods if installed to build xcode project.
   Bug Fixes
+       * #440 No callback from ReportProgress
+       * #444 Can Rematch always returns false
        * #483 IncrementAchievement does not update Achievement data cache
+       * #488 Peers disconnected right after OnRoomConnected
        * #568 Exception with null or empty image URL
        * Fixed Setup dialogs not laidout correctly.
 2015-05-01 Version 0.9.20 (codename: ewokian)

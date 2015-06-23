@@ -1,5 +1,5 @@
 // <copyright file="IRealTimeMultiplayerClient.cs" company="Google Inc.">
-// Copyright (C) 2014 Google Inc.
+// Copyright (C) 2014 Google Inc.  All Rights Reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -91,6 +91,11 @@ namespace GooglePlayGames.BasicApi.Multiplayer
     /// events.</param>
     void CreateWithInvitationScreen(uint minOpponents, uint maxOppponents, uint variant,
                                     Multiplayer.RealTimeMultiplayerListener listener);
+
+    /// <summary>
+    /// Shows the waiting room UI and waits for all participants to join.
+    /// </summary>
+    void ShowWaitingRoomUI();
 
     /// <summary>
     /// Creates a real-time game starting with the inbox screen. On the inbox screen,

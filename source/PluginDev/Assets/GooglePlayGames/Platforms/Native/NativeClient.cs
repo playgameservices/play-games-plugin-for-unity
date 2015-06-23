@@ -1,5 +1,5 @@
 ﻿// <copyright file="NativeClient.cs" company="Google Inc.">
-// Copyright (C) 2014 Google Inc.
+// Copyright (C) 2014 Google Inc.  All Rights Reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -353,7 +353,7 @@ namespace GooglePlayGames.Native
                 return;
             }
 
-            Logger.d("Populating Achievements");
+            Logger.d("Populating Achievements, status = " + response.Status());
             lock (AuthStateLock)
             {
                 if (response.Status() != Status.ResponseStatus.VALID &&
@@ -380,6 +380,7 @@ namespace GooglePlayGames.Native
                         achievements[achievement.Id()] = achievement.AsAchievement();
                     }
                 }
+                Logger.d("Found " + response.Count() + " Achievements");
                 mAchievements = achievements;
             }
 

@@ -1,5 +1,5 @@
 ﻿// <copyright file="MainGui.cs" company="Google Inc.">
-// Copyright (C) 2014 Google Inc.
+// Copyright (C) 2014 Google Inc.  All Rights Reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ using GooglePlayGames.OurUtils;
 using UnityEngine;
 
 public class MainGui : MonoBehaviour, OnStateLoadedListener,
-RealTimeMultiplayerListener
+        RealTimeMultiplayerListener
 {
     public GUISkin GuiSkin;
 
@@ -150,8 +150,26 @@ RealTimeMultiplayerListener
     public void OnRoomConnected(bool success)
     {
         ShowEffect(success);
-        Status = success ? "Room connected!" : "Room setup failed!";
+        if (success)
+        {
+            Status = "Room connected!";
+        }
+        else
+        {
+            Status += " Room setup failed!";
+        }
         EndStandBy();
+        mUi = Ui.Rtmp;
+    }
+
+    public void OnParticipantLeft(Participant participant)
+    {
+        Debug.Log("Player " + participant.DisplayName + "(" +
+            participant.ParticipantId + ") has " + participant.Status);
+        Status = participant.DisplayName + " " +
+            (string)(
+                (participant.Status == Participant.ParticipantStatus.Declined) ?
+                "Declined" : "Left");
     }
 
     public void OnLeftRoom()
@@ -178,7 +196,8 @@ RealTimeMultiplayerListener
 
     public void OnPeersDisconnected(string[] participantIds)
     {
-        Status = "Peers disconnected: ";
+        Status = "Peers disconnected(" + participantIds.Count() + "): ";
+       
         foreach (string pid in participantIds)
         {
             Participant p = PlayGamesPlatform.Instance.RealTime.GetParticipant(pid);
@@ -191,6 +210,7 @@ RealTimeMultiplayerListener
                 Status += pid + "(NULL) ";
             }
         }
+        Debug.Log(Status);
     }
 
     public void OnStateLoaded(bool success, int slot, byte[] data)
@@ -612,6 +632,11 @@ RealTimeMultiplayerListener
         if (GUI.Button(CalcGrid(0, 4), "Leave Room"))
         {
             DoLeaveRoom();
+            mUi = Ui.Rtmp;
+        }
+        if (GUI.Button(CalcGrid(1, 4), "Show Waiting UI"))
+        {
+            DoWaitingRoom();
             mUi = Ui.Rtmp;
         }
     }
@@ -1319,6 +1344,11 @@ RealTimeMultiplayerListener
         PlayGamesPlatform.Instance.RealTime.LeaveRoom();
     }
 
+    private void DoWaitingRoom()
+    {
+        PlayGamesPlatform.Instance.RealTime.ShowWaitingRoomUI();
+    }
+
     private void DoListParticipants()
     {
         List<Participant> participants = PlayGamesPlatform.Instance.RealTime.GetConnectedParticipants();
@@ -1360,7 +1390,20 @@ RealTimeMultiplayerListener
         }
         else
         {
-            Status = "Got match a update not from notification.";
+            Debug.Log("OnMatchFrom Notification = " + match.MatchId + " "
+                + match.Status + " " + match.TurnStatus);
+            mMatch = match;
+            if (mMatch.Status == TurnBasedMatch.MatchStatus.Complete ||
+                mMatch.Status == TurnBasedMatch.MatchStatus.Cancelled)
+            {
+                mUi = Ui.Tbmp;
+            }
+            else
+                {
+                mUi = Ui.TbmpMatch;
+                }
+
+            Status = "Got match a update not from notification: " + mMatch;
         }
     }
 

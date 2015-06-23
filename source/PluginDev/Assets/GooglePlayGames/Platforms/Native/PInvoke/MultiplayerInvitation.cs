@@ -1,5 +1,5 @@
 // <copyright file="MultiplayerInvitation.cs" company="Google Inc.">
-// Copyright (C) 2014 Google Inc.
+// Copyright (C) 2014 Google Inc.  All Rights Reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -69,6 +69,16 @@ namespace GooglePlayGames.Native.PInvoke
         protected override void CallDispose(HandleRef selfPointer)
         {
             C.MultiplayerInvitation_Dispose(selfPointer);
+        }
+
+        internal uint AutomatchingSlots()
+        {
+            return C.MultiplayerInvitation_AutomatchingSlotsAvailable(SelfPtr());
+        }
+
+        internal uint ParticipantCount()
+        {
+            return C.MultiplayerInvitation_Participants_Length(SelfPtr()).ToUInt32();
         }
 
         private static Invitation.InvType ToInvType(Types.MultiplayerInvitationType invitationType)

@@ -80,9 +80,12 @@ We will cover this in more detail later.
 
 ## Wait for Connection
 
-After calling any of the room creation/joining methods described above, you should show a waiting screen in your game and wait until you get a call to the `OnRoomConnected` method of your listener.
+After calling any of the room creation/joining methods described above,
+you should show a waiting screen in your game and wait until you get a call
+to the `OnRoomConnected` method of your listener.
 
-If you want to show a progress bar while waiting, you can implement the `OnRoomSetupProgress` method of the listener:
+If you want to show a progress bar while waiting, you can implement the
+`OnRoomSetupProgress` method of the listener:
 
 ```csharp
     public void OnRoomSetupProgress(float progress) {
@@ -91,7 +94,28 @@ If you want to show a progress bar while waiting, you can implement the `OnRoomS
     }
 ```
 
-When the room setup is complete (or has failed), you will receive a call to your listener's `OnRoomConnected` method.
+Alternatively, you can display the standard waiting room UI by calling
+ShowWaitingRoomUI() from the OnRoomSetupProgress().  When the waiting is
+over, OnRoomConnected() is called as normal.
+
+```csharp
+    private bool showingWaitingRoom = false;
+
+    public void OnRoomSetupProgress(float progress) {
+        // show the default waiting room.
+        if (!showingWaitingRoom) {
+            showingWaitingRoom = true;
+            PlayGamesPlatform.Instance.RealTime.ShowWaitingRoomUI();
+        }
+    }
+```
+
+If a participant declines an invitation, the callback `OnParticipantLeft` is
+called.  Since this happens before the game has begun, this can cause unbalanced
+calls relative to OnPeersConnected().
+
+When the room setup is complete (or has failed), you will receive a call to
+your listener's `OnRoomConnected` method.
 
 ```csharp
     public void OnRoomConnected(bool success) {
