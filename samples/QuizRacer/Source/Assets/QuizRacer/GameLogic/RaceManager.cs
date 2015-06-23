@@ -208,6 +208,10 @@ public class RaceManager : RealTimeMultiplayerListener
         }
     }
 
+    public void OnParticipantLeft(Participant participant)
+    {
+    }
+
     public void OnPeersConnected(string[] peers)
     {
     }

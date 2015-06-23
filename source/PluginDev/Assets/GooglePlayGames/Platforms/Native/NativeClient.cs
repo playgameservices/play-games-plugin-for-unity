@@ -380,7 +380,7 @@ namespace GooglePlayGames.Native
                         achievements[achievement.Id()] = achievement.AsAchievement();
                     }
                 }
-                Logger.d("Found " + response.Count() + " Achievements");
+                Logger.d("Found " + achievements.Count + " Achievements");
                 mAchievements = achievements;
             }
 

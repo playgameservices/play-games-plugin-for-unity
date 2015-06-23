@@ -1,7 +1,11 @@
 Version 0.9.21
+  **BREAKING CHANGES**
+       * #382 Callback for declined invitation when creating RTMP room
+    This change adds the method `OnParticipantLeft` to the
+ `RealTimeMultiplayerListener` interface.  Existing games that use this interface
+need to add an implementation of this method.
   New Features:
        * #136 Callback for ShowLeaderboardUI()
-       * #382 Callback for declined invitation when creating RTMP room
        * #392 Support for Default waiting room for RTMP
        * #498 Bitmask filter in CreateQuickGame
        * #537 Exposing Saved Games Delete API
