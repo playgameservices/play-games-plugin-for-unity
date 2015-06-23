@@ -1,5 +1,5 @@
 ﻿// <copyright file="GPGSPostBuild.cs" company="Google Inc.">
-// Copyright (C) 2014 Google Inc.
+// Copyright (C) 2014 Google Inc.  All Rights Reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -35,12 +35,12 @@ namespace GooglePlayGames
         [PostProcessBuild]
         public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
         {
-#if UNITY_4_6
-            if (target != BuildTarget.iPhone) {
+#if UNITY_5_0
+            if (target != BuildTarget.iOS) {
                 return;
             }
 #else
-            if (target != BuildTarget.iOS)
+            if (target != BuildTarget.iPhone)
             {
                 return;
             }
