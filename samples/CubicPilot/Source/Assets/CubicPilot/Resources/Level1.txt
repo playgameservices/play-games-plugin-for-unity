@@ -1,0 +1,43 @@
+# Level 0 (aka "Sector A")
+
+# -- Settings --
+dur        40
+
+# -- Intro --
+
+msg Sector B
+wait 2
+
+# -- Enemy waves --
+
+:10
+spawn Soldier 0
+wait 4
+end
+
+:10
+spawn Tank -7
+spawn Soldier 3
+wait 4
+end
+
+:10
+spawn InvTank 7
+spawn Soldier -3
+wait 4
+end
+
+:10
+spawn Soldier 3
+wait 4
+end
+
+:10
+spawn Soldier -3
+wait 4
+end
+
+:10
+spawn ZigzagSoldier 0
+wait 4
+end

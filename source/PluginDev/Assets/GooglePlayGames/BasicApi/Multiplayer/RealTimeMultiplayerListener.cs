@@ -1,5 +1,5 @@
 // <copyright file="RealTimeMultiplayerListener.cs" company="Google Inc.">
-// Copyright (C) 2014 Google Inc.
+// Copyright (C) 2014 Google Inc. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,9 +16,6 @@
 
 namespace GooglePlayGames.BasicApi.Multiplayer
 {
-  using System;
-  using System.Collections.Generic;
-
   /// <summary>
   /// Real time multiplayer listener. This listener will be called to notify you
   /// of real-time room events.
@@ -46,6 +43,15 @@ namespace GooglePlayGames.BasicApi.Multiplayer
     /// request, naturally).
     /// </summary>
     void OnLeftRoom();
+
+    /// <summary>
+    /// Raises the participant left event.
+    /// This is called during room setup if a player declines an invitation
+    /// or leaves.  The status of the participant can be inspected to determine
+    /// the reason.  If all players have left, the room is closed automatically.
+    /// </summary>
+    /// <param name="participant">Participant that left</param>
+    void OnParticipantLeft(Participant participant);
 
     /// <summary>
     /// Called when peers connect to the room.

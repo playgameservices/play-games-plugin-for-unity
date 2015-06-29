@@ -1,5 +1,5 @@
 ﻿// <copyright file="NativeClient.cs" company="Google Inc.">
-// Copyright (C) 2014 Google Inc.
+// Copyright (C) 2014 Google Inc.  All Rights Reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
 // </copyright>
 
 #if (UNITY_ANDROID || (UNITY_IPHONE && !NO_GPGS))
-
 
 namespace GooglePlayGames.Native
 {
@@ -123,8 +122,8 @@ namespace GooglePlayGames.Native
                 GameServices().StartAuthorizationUI();
             }
         }
-
-        private static Action<bool> AsOnGameThreadCallback(Action<bool> callback)
+            
+        private static Action<T> AsOnGameThreadCallback<T>(Action<T> callback)
         {
             if (callback == null)
             {
@@ -136,7 +135,7 @@ namespace GooglePlayGames.Native
             return result => InvokeCallbackOnGameThread(callback, result);
         }
 
-        private static void InvokeCallbackOnGameThread(Action<bool> callback, bool success)
+        private static void InvokeCallbackOnGameThread<T>(Action<T> callback, T data)
         {
             if (callback == null)
             {
@@ -146,7 +145,7 @@ namespace GooglePlayGames.Native
             PlayGamesHelperObject.RunOnGameThread(() =>
                 {
                     Logger.d("Invoking user callback on game thread");
-                    callback(success);
+                    callback(data);
                 });
         }
 
@@ -354,7 +353,7 @@ namespace GooglePlayGames.Native
                 return;
             }
 
-            Logger.d("Populating Achievements");
+            Logger.d("Populating Achievements, status = " + response.Status());
             lock (AuthStateLock)
             {
                 if (response.Status() != Status.ResponseStatus.VALID &&
@@ -381,6 +380,7 @@ namespace GooglePlayGames.Native
                         achievements[achievement.Id()] = achievement.AsAchievement();
                     }
                 }
+                Logger.d("Found " + achievements.Count + " Achievements");
                 mAchievements = achievements;
             }
 
@@ -622,8 +622,19 @@ namespace GooglePlayGames.Native
 
             Logger.d("Performing " + updateType + " on " + achId);
             updateAchievment(achievement);
-            // The native SDK never fails.
-            callback(true);
+
+            GameServices().AchievementManager().Fetch(achId, rsp => {
+                if (rsp.Status() == Status.ResponseStatus.VALID) {
+                    callback(true);
+                    mAchievements.Remove(achId);
+                    mAchievements.Add(achId, rsp.Achievement().AsAchievement());
+                }
+                else {
+                    Logger.e("Cannot refresh achievement " + achId + ": " +
+                        rsp.Status());
+                    callback(false);
+                }
+            });
         }
 
         public void IncrementAchievement(string achId, int steps, Action<bool> callback)
@@ -656,33 +667,61 @@ namespace GooglePlayGames.Native
             }
 
             GameServices().AchievementManager().Increment(achId, Convert.ToUInt32(steps));
-            callback(true);
+            GameServices().AchievementManager().Fetch(achId, rsp => {
+                if (rsp.Status() == Status.ResponseStatus.VALID) {
+                    callback(true);
+                    mAchievements.Remove(achId);
+                    mAchievements.Add(achId, rsp.Achievement().AsAchievement());
+                }
+                else {
+                    Logger.e("Cannot refresh achievement " + achId + ": " +
+                        rsp.Status());
+                    callback(false);
+                }
+            });
         }
 
-        public void ShowAchievementsUI()
+        public void ShowAchievementsUI(Action<UIStatus> cb)
         {
             if (!IsAuthenticated())
             {
                 return;
             }
 
-            GameServices().AchievementManager().ShowAllUI(Callbacks.NoopUICallback);
+            var callback = Callbacks.NoopUICallback;
+            if (cb != null)
+            {
+                callback = (result) => {
+                    cb.Invoke((UIStatus)result);
+                };
+            }     
+            callback = AsOnGameThreadCallback(callback);
+
+            GameServices().AchievementManager().ShowAllUI(callback);
         }
 
-        public void ShowLeaderboardUI(string leaderboardId)
+        public void ShowLeaderboardUI(string leaderboardId, Action<UIStatus> cb)
         {
             if (!IsAuthenticated())
             {
                 return;
             }
 
+            Action<Status.UIStatus> callback = Callbacks.NoopUICallback;
+            if (cb != null)
+            {
+                callback = (result) => {
+                    cb.Invoke((UIStatus)result);
+                };
+            }
+            callback = AsOnGameThreadCallback(callback);
             if (leaderboardId == null)
             {
-                GameServices().LeaderboardManager().ShowAllUI(Callbacks.NoopUICallback);
+                GameServices().LeaderboardManager().ShowAllUI(callback);
             }
             else
             {
-                GameServices().LeaderboardManager().ShowUI(leaderboardId, Callbacks.NoopUICallback);
+                GameServices().LeaderboardManager().ShowUI(leaderboardId, callback);
             }
         }
 

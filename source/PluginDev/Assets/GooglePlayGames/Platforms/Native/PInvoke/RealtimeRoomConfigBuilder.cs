@@ -42,8 +42,12 @@ namespace GooglePlayGames.Native.PInvoke
             return this;
         }
 
-        internal RealtimeRoomConfigBuilder SetVariant(uint variant)
+        internal RealtimeRoomConfigBuilder SetVariant(uint variantValue)
         {
+            uint variant;
+            unchecked {
+                variant = variantValue == 0 ? (uint)-1 : variantValue;
+            }
             C.RealTimeRoomConfig_Builder_SetVariant(SelfPtr(), variant);
             return this;
         }

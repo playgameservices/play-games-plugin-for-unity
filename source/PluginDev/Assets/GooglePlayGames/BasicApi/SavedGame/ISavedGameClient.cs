@@ -316,6 +316,14 @@ public delegate void ConflictCallback(IConflictResolver resolver, ISavedGameMeta
         /// "Open".</param>
         void FetchAllSavedGames(DataSource source,
                             Action<SavedGameRequestStatus, List<ISavedGameMetadata>> callback);
+
+        /// <summary>
+        /// Delete the specified snapshot.
+        /// This will delete the data of the snapshot locally and on the server.
+        /// </summary>
+        /// <param name="metadata">the saved game metadata identifying the data to
+        /// delete.</param>
+        void Delete(ISavedGameMetadata metadata);
     }
 
     /// <summary>

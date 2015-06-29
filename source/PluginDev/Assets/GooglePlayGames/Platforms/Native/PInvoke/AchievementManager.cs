@@ -59,6 +59,22 @@ namespace GooglePlayGames.Native.PInvoke
                 Callbacks.Type.Temporary, response, data);
         }
 
+        internal void Fetch(string achId, Action<FetchResponse> callback)
+        {
+            Misc.CheckNotNull(achId);
+            Misc.CheckNotNull(callback);
+            C.AchievementManager_Fetch(mServices.AsHandle(), Types.DataSource.CACHE_OR_NETWORK,
+                achId, InternalFetchCallback,
+                Callbacks.ToIntPtr<FetchResponse>(callback, FetchResponse.FromPointer));
+        }
+
+        [AOT.MonoPInvokeCallback(typeof(C.FetchCallback))]
+        private static void InternalFetchCallback(IntPtr response, IntPtr data)
+        {
+            Callbacks.PerformInternalCallback("AchievementManager#InternalFetchCallback",
+                Callbacks.Type.Temporary, response, data);
+        }
+
         internal void Increment(string achievementId, uint numSteps)
         {
             Misc.CheckNotNull(achievementId);
@@ -78,6 +94,39 @@ namespace GooglePlayGames.Native.PInvoke
             Misc.CheckNotNull(achievementId);
 
             C.AchievementManager_Unlock(mServices.AsHandle(), achievementId);
+        }
+
+        internal class FetchResponse : BaseReferenceHolder
+        {
+            internal FetchResponse(IntPtr selfPointer) : base(selfPointer)
+            {
+            }
+
+            internal CommonErrorStatus.ResponseStatus Status()
+            {
+                return C.AchievementManager_FetchResponse_GetStatus(SelfPtr());
+            }
+
+            internal NativeAchievement Achievement()
+            {
+                IntPtr p =  C.AchievementManager_FetchResponse_GetData(SelfPtr());
+                return new NativeAchievement(p);
+            }
+
+            protected override void CallDispose(HandleRef selfPointer)
+            {
+                C.AchievementManager_FetchResponse_Dispose(selfPointer);
+            }
+
+            internal static FetchResponse FromPointer(IntPtr pointer)
+            {
+                if (pointer.Equals(IntPtr.Zero))
+                {
+                    return null;
+                }
+
+                return new FetchResponse(pointer);
+            }
         }
 
         internal class FetchAllResponse : BaseReferenceHolder, IEnumerable<NativeAchievement>

@@ -26,12 +26,10 @@
             openURL:(NSURL *)url
   sourceApplication:(NSString *)sourceApplication
          annotation:(id)annotation {
-
     [super application:application
                openURL:url
      sourceApplication:sourceApplication
             annotation:annotation];
-
     return [GPPURLHandler handleURL:url
                   sourceApplication:sourceApplication
                          annotation:annotation];
@@ -41,7 +39,6 @@
         didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [super application:application didFinishLaunchingWithOptions:launchOptions];
 
-    //-- Set Notification
     // iOS 8 Notifications
     if ([application
          respondsToSelector:@selector(isRegisteredForRemoteNotifications)]) {
@@ -51,7 +48,6 @@
                             UIUserNotificationTypeAlert |
                             UIUserNotificationTypeBadge)
           categories:nil]];
-
         [application registerForRemoteNotifications];
     } else {
         // iOS < 8 Notifications
@@ -78,7 +74,6 @@
     gpg::RegisterDeviceToken(deviceToken, false);
 }
 
-
 - (void)application:(UIApplication *)application
         didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
     NSLog(@"Error registering for remote notifications! %@", error);
@@ -92,6 +87,5 @@
     NSLog(@"Received notification: %@", userInfo);
     gpg::TryHandleRemoteNotification(userInfo);
 }
-
 
 @end

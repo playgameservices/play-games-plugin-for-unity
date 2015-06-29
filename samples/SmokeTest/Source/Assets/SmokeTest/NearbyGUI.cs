@@ -168,7 +168,7 @@ public class NearbyGUI : MonoBehaviour, IDiscoveryListener, IMessageListener
             
         if (client == null)
         {
-            mOwner.SetStatus("Nearby client is null!");
+            mOwner.Status = "Nearby client is null!";
             mOwner.DrawStatus();
             if (GUI.Button(CalcGrid(1, 4), "Back"))
             {
@@ -303,7 +303,7 @@ public class NearbyGUI : MonoBehaviour, IDiscoveryListener, IMessageListener
         }
         else
         {
-            mOwner.SetStatus("Found " + mEndpoints.Count + " endpoints");
+            mOwner.Status = "Found " + mEndpoints.Count + " endpoints";
         }
             
         int index = 0;
@@ -425,9 +425,24 @@ public class NearbyGUI : MonoBehaviour, IDiscoveryListener, IMessageListener
             case ConnectionResponse.Status.Rejected:
                 mEndpoints[response.RemoteEndpointId].State = EndpointState.REJECTED;
                 break;
-            case ConnectionResponse.Status.NetworkError:
+            case ConnectionResponse.Status.ErrorAlreadyConnected:
+                // it is an error, but we can treat it like connected.
+                mEndpoints[response.RemoteEndpointId].State = EndpointState.CONNECTED;
+                break;
+            case ConnectionResponse.Status.ErrorEndpointNotConnected:
                 mEndpoints[response.RemoteEndpointId].State = EndpointState.ERROR;
-
+                break;
+            case ConnectionResponse.Status.ErrorInternal:
+                mEndpoints[response.RemoteEndpointId].State = EndpointState.ERROR;
+                break;
+            case ConnectionResponse.Status.ErrorNetworkNotConnected:
+                mEndpoints[response.RemoteEndpointId].State = EndpointState.ERROR;
+                break;
+            default:
+                Debug.LogError("Unknown or unsupported status: " + response.ResponseStatus);
+                if (mEndpoints.ContainsKey(response.RemoteEndpointId)) {
+                    mEndpoints[response.RemoteEndpointId].State = EndpointState.ERROR;
+                }
                 break;
         }
     }
