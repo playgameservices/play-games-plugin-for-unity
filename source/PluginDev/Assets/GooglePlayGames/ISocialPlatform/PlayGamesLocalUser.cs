@@ -163,7 +163,7 @@ namespace GooglePlayGames
 
             // the url can be null if the user does not have an
             // avatar configured.
-            if (url != null)
+            if (!string.IsNullOrEmpty(url))
             {
                 if (mAvatarUrl == null || mAvatarUrl.url != url)
                 {

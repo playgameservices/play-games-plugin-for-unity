@@ -36,7 +36,7 @@ Features:
 * cross-platform support (Android and iOS) with no need for platform glue code.
 * (Android) no need to override/customize the player Activity
 * (Android) no need to override/customize AndroidManifest.xml
-* (iOS) integrates into XCode build
+* (iOS) integrates into XCode build using Cocoapods to manage the framework dependencies.
 
 System requirements:
 
@@ -47,8 +47,7 @@ System requirements:
     * Google Play Services library, version 7.0 or above
 * To deploy on iOS:
     * XCode 5.1 or above
-    * Google Plus SDK for iOS
-    * Google Play Games C++ SDK version 1.4 or above
+    * [Cocoapods](https://cocoapods.org/)
 
 
 ## Upgrading
@@ -180,17 +179,14 @@ For more information, consult the documentation for your version of Windows.
 
 ## iOS Setup
 
-To configure your Unity game to run with Google Play Games on iOS, download the
-Games C++ SDK and the Google+ iOS SDK, which are available from
-[our downloads page](https://developers.google.com/games/services/downloads/). Unpack the
-downloads into a directory of your choice. The necessary bundles and frameworks
-are:
+Install Cocoapods
 
-* GoogleOpenSource.framework
-* GooglePlus.bundle
-* GooglePlus.framework
-* gpg.bundle
-* gpg.framework
+Once Cocoapods is installed, the plugin will add a Podfile to the xcode project to manage
+the framework dependencies.
+
+Since Cocoapods uses workspaces to manage the project and the dependent pods, you need to
+open Unity-iPhone.xcworkspace to build the project.
+
 
 Next, open the iOS build settings dialog. To do so, click **File | Build Settings**,
 select the **iOS** platform, and click **Player Settings**. Find the **Bundle Identifier**
@@ -419,7 +415,7 @@ Incrementing an event is very simple, just call the following method:
     using GooglePlayGames;
     ...
     // Increments the event with Id "YOUR_EVENT_ID" by 1
-    PlayGamesPlatform.Instance.Events.IncrementEvent(YOUR_EVENT_ID, 1);
+    PlayGamesPlatform.Instance.Events.IncrementEvent("YOUR_EVENT_ID", 1);
 ```
 This call is "fire and forget", it will handle batching and execution for you in the background.
 
@@ -740,40 +736,14 @@ configure the Info.plist settings on your project. You will see a log of the
 operation, which if successful, will give you additional instructions to finish
 configuring your XCode project.
 
-The additional steps are:
+The final step that is run is adding the Podfile to the project and running
+`pod install`.  This creates a pod project containing the dependencies, and also
+a workspace configuration called Unity-iPhone.xcworkspace.
 
-1. Add these frameworks. To do this, click the top-level project (the item on the
-list labeled **Unity-iPhone, 1 target, iOS SDK**), then click the **Build Phases**
-tab and expand the **Link Binary with Libraries** item. Then, add the following
-frameworks to that list:
-<br/><br/>
+To open and build the project open a terminal window in the project directory, and type
+`open Unity-iPhone.xcworkspace`. Alternatively, you can double click the file in Finder.
 
-**AddressBook.framework**<br/>
-**AssetsLibrary.framework**<br/>
-**CoreData.framework**<br/>
-**CoreTelephony.framework**<br/>
-**CoreText.framework**<br/>
-**Security.framework**<br/>
-**libc++.dylib**<br/>
-**libz.dylib**<br/><br/>
 
-2. Add the following bundles and frameworks from the Google Plus and Google Play
-   Games C++ SDK that you have previously downloaded. If you have not downloaded
-   these files yet, they can be found [in the downloads section](https://developers.google.com/games/services/downloads) of the Google Play Games developer site. To add these frameworks you can simply drag
-and drop those 5 files on the top-level project item (labeled **Unity-iPhone**).<br/><br/>
-     **GoogleOpenSource.framework**<br/>
-     **GooglePlus.bundle**<br/>
-     **GooglePlus.framework**<br/>
-     **gpg.bundle**<br/>
-     **gpg.framework**<br/><br/>
-3. Add the **"-ObjC"** linker flag. To do this, select the top-level project
-   object, then go to the **Build Settings**
-   tab. Search for **"Other Linker Flags"** using the search tool, double click
-   the **Other Linker Flags** item and add **"-ObjC"** to that list (attention to case!).
-
-**Note:** If you export the project a second time to the same XCode project
-directory, you can use Unity's **Append** option to avoid overwriting these
-settings. If you use **Replace**, however, you might have to reapply some settings.
 
 ## Excluding all Google Play Game Services when building for iOS
 
@@ -892,6 +862,43 @@ That way, you can even submit scores and achievements simultaneously to two or m
 
 In the `GPGSAppController.m` file, you will notice within the `application:didRegisterForRemoteNotificationsWithDeviceToken` method that there is a comment discussing using the sandbox push server. Follow instructions there to switch between the production and sandbox environment and push notification.
 
+
+## Building iOS projects without Cocoapods
+
+These are the manual steps needed to build iOS projects without using Cocoapods:
+
+1. Add these frameworks. To do this, click the top-level project (the item on the
+list labeled **Unity-iPhone, 1 target, iOS SDK**), then click the **Build Phases**
+tab and expand the **Link Binary with Libraries** item. Then, add the following
+frameworks to that list:
+<br/><br/>
+
+**AddressBook.framework**<br/>
+**AssetsLibrary.framework**<br/>
+**CoreData.framework**<br/>
+**CoreTelephony.framework**<br/>
+**CoreText.framework**<br/>
+**Security.framework**<br/>
+**libc++.dylib**<br/>
+**libz.dylib**<br/><br/>
+
+2. Add the following bundles and frameworks from the Google Plus and Google Play
+   Games C++ SDK that you have previously downloaded. If you have not downloaded
+   these files yet, they can be found [in the downloads section](https://developers.google.com/games/services/downloads) of the Google Play Games developer site. To add these frameworks you can simply drag
+and drop those 5 files on the top-level project item (labeled **Unity-iPhone**).<br/><br/>
+     **GoogleOpenSource.framework**<br/>
+     **GooglePlus.bundle**<br/>
+     **GooglePlus.framework**<br/>
+     **gpg.bundle**<br/>
+     **gpg.framework**<br/><br/>
+3. Add the **"-ObjC"** linker flag. To do this, select the top-level project
+   object, then go to the **Build Settings**
+   tab. Search for **"Other Linker Flags"** using the search tool, double click
+   the **Other Linker Flags** item and add **"-ObjC"** to that list (attention to case!).
+
+**Note:** If you export the project a second time to the same XCode project
+directory, you can use Unity's **Append** option to avoid overwriting these
+settings. If you use **Replace**, however, you might have to reapply some settings.
 ## Special Thanks
 
 This section lists people who have contributed to this project by writing code, improving documentation or fixing bugs.

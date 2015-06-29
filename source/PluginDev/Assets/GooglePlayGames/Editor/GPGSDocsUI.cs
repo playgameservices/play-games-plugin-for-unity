@@ -70,7 +70,7 @@ namespace GooglePlayGames
                 string exeName =
                     sdkPath + GPGSUtil.SlashesToPlatformSeparator("/tools/android");
                 string altExeName =
-                    sdkPath + GPGSUtil.SlashesToPlatformSeparator("/tools/android.exe");
+                    sdkPath + GPGSUtil.SlashesToPlatformSeparator("/tools/android.bat");
 
                 EditorUtility.DisplayDialog(
                     GPGSStrings.ExternalLinks.GooglePlayGamesAndroidSdkTitle,
@@ -99,7 +99,7 @@ namespace GooglePlayGames
         public static void MenuItemAbout()
         {
             string msg = GPGSStrings.AboutText +
-                         PluginVersion.VersionString + " (" +
+                PluginVersion.VersionString + " (" +
                          string.Format("0x{0:X8}", GooglePlayGames.PluginVersion.VersionInt) + ")";
             EditorUtility.DisplayDialog(GPGSStrings.AboutTitle, msg,
                 GPGSStrings.Ok);

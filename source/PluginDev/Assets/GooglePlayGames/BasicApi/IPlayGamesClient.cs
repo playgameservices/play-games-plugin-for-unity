@@ -138,8 +138,10 @@ namespace GooglePlayGames.BasicApi
 
     /// <summary>
     /// Shows the appropriate platform-specific achievements UI.
+    /// <param name="callback">The callback to invoke when complete.  If null,
+    /// no callback is called. </param>
     /// </summary>
-    void ShowAchievementsUI();
+    void ShowAchievementsUI(Action<UIStatus> callback);
 
     /// <summary>
     /// Shows the leaderboard UI for a specific leaderboard (if the passed ID is not
@@ -147,7 +149,10 @@ namespace GooglePlayGames.BasicApi
     /// </summary>
     /// <param name="leaderboardId">The leaderboard to display. <code>null</code> to display
     /// all.</param>
-    void ShowLeaderboardUI(string leaderboardId);
+    /// <param name="callback">If non-null, the callback to invoke when the
+    /// leaderboard is dismissed.
+    /// </param>
+    void ShowLeaderboardUI(string leaderboardId, Action<UIStatus> callback);
 
     /// <summary>
     /// Submits the passed score to the passed leaderboard. This operation will immediately fail

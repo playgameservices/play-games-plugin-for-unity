@@ -1,5 +1,5 @@
 ﻿// <copyright file="GPGSPostBuild.cs" company="Google Inc.">
-// Copyright (C) 2014 Google Inc.
+// Copyright (C) 2014 Google Inc.  All Rights Reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -17,9 +17,11 @@
 namespace GooglePlayGames
 {
     using System;
+    using System.Collections.Generic;
+    using System.IO;
     using UnityEditor.Callbacks;
     using UnityEditor;
-    using UnityEngine;
+    using UnityEditor.iOS.Xcode;
     using GooglePlayGames;
     using GooglePlayGames.Editor.Util;
     using System.Text.RegularExpressions;
@@ -33,12 +35,12 @@ namespace GooglePlayGames
         [PostProcessBuild]
         public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
         {
-#if UNITY_4_6
-            if (target != BuildTarget.iPhone) {
+#if UNITY_5_0
+            if (target != BuildTarget.iOS) {
                 return;
             }
 #else
-            if (target != BuildTarget.iOS)
+            if (target != BuildTarget.iPhone)
             {
                 return;
             }
@@ -63,16 +65,25 @@ namespace GooglePlayGames
                 return;
             }
 
+            //Copy the podfile into the project.
+            string podfile = "Assets/GooglePlayGames/Editor/Podfile.txt";
+            string destpodfile = pathToBuiltProject + "/Podfile";
+            if (!System.IO.File.Exists(destpodfile)) {
+                FileUtil.CopyFileOrDirectory(podfile, destpodfile);
+            }
+
+            GPGSInstructionWindow w = EditorWindow.GetWindow<GPGSInstructionWindow>(
+                true,
+                "Building for IOS",
+                true);
+            w.UsingCocoaPod = CocoaPodHelper.Update(pathToBuiltProject);
+
             UnityEngine.Debug.Log("Adding URL Types for authentication using PlistBuddy.");
 
             UpdateGeneratedInfoPlistFile(pathToBuiltProject + "/Info.plist");
             UpdateGeneratedPbxproj(pathToBuiltProject + "/Unity-iPhone.xcodeproj/project.pbxproj");
 
-            EditorWindow.GetWindow<GPGSInstructionWindow>(
-                utility: true,
-                title: "Building for IOS",
-                focus: true);
-            #endif
+        #endif
         }
 
         /// <summary>
@@ -152,30 +163,36 @@ namespace GooglePlayGames
 
         /// <summary>
         /// Updates the generated pbxproj to reduce manual work required by developers. Currently
-        /// this just adds the '-fobjc-arc' flag for the Play Games ObjC source files.
+        /// this adds the '-fobjc-arc' flag for the Play Games ObjC source file.
         /// </summary>
         /// <param name="pbxprojPath">Pbxproj path.</param>
         private static void UpdateGeneratedPbxproj(string pbxprojPath)
         {
-            // We're looking for lines in the form:
-            // ... = {isa = PBXBuildFile; fileRef = DEADBEEF /* GPGSFileName.mm */; };
-            // And we want to append "settings = {COMPILER_FLAGS = "-fobjc-arc"};" to the content in
-            // between the braces. This is done with a regex replace.
-            // The expression is structured as follows:
-            // - Begin a capturing group.
-            // - Find any line that begins with "<anything>{isa = PBXBuildFile" followed by a
-            //   reference to a file beginning with "GPGS" and ending with ".m" (e.g. "GPGSFile.m")
-            // - Close the capture group - leaving a trailing "};"
-            // - Replace that line with the captured group with
-            //   "settings = {COMPILER_FLAGS = "-fobjc-arc";};};" appended. The trailing "};" is needed
-            //   because we omitted the "};" from the group.
-            var withFlagAdded = Regex.Replace(
-                                    GPGSUtil.ReadFully(pbxprojPath),
-                                    @"(.*\{isa\s*=\s*PBXBuildFile.*GPGS\w*\.m.*)\}\;",
-                                    @"$1settings = {COMPILER_FLAGS = ""-fobjc-arc""; }; };");
+            PBXProject proj = new PBXProject();
+            proj.ReadFromString(File.ReadAllText(pbxprojPath));
 
-            // Overwrite the pbxproj with the updated value.
-            GPGSUtil.WriteFile(pbxprojPath, withFlagAdded);
+            string target =
+                proj.TargetGuidByName(PBXProject.GetUnityTargetName());
+            string testTarget =
+                proj.TargetGuidByName(PBXProject.GetUnityTestTargetName());
+
+            proj.AddBuildProperty(target, "OTHER_LDFLAGS", "$(inherited)");
+            proj.AddBuildProperty(testTarget, "OTHER_LDFLAGS", "$(inherited)");
+            proj.AddBuildProperty(target, "HEADER_SEARCH_PATHS", "$(inherited)");
+            proj.AddBuildProperty(testTarget, "HEADER_SEARCH_PATHS", "$(inherited)");
+            proj.AddBuildProperty(target, "OTHER_CFLAGS", "$(inherited)");
+            proj.AddBuildProperty(testTarget, "OTHER_CFLAGS", "$(inherited)");
+
+            string fileGuid =
+                 proj.FindFileGuidByProjectPath("Libraries/Plugins/iOS/GPGSAppController.mm");
+
+            List<string> list = new List<string>();
+            list.Add("-fobjc-arc");
+
+            proj.SetCompileFlagsForFile(target, fileGuid, list);
+
+            File.WriteAllText(pbxprojPath, proj.WriteToString());
         }
     }
 }
+

@@ -376,6 +376,13 @@ namespace GooglePlayGames.Native
                 });
         }
 
+        public void Delete(ISavedGameMetadata metadata)
+        {
+            Misc.CheckNotNull(metadata);
+
+            mSnapshotManager.Delete((NativeSnapshotMetadata)metadata);
+        }
+
         /// <summary>
         /// A helper class that is responsible for managing the pre-fetching callbacks for binary data.
         /// This class functions by tracking when the read operations for both original and unmerged

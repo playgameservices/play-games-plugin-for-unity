@@ -1,5 +1,5 @@
 // <copyright file="IRealTimeMultiplayerClient.cs" company="Google Inc.">
-// Copyright (C) 2014 Google Inc.
+// Copyright (C) 2014 Google Inc.  All Rights Reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -49,6 +49,29 @@ namespace GooglePlayGames.BasicApi.Multiplayer
                          Multiplayer.RealTimeMultiplayerListener listener);
 
     /// <summary>
+    /// Creates a game with random automatch opponents using exclusiveBitMask No UI will be shown.
+    /// The participants will be automatically selected among users who are currently
+    /// looking for opponents.
+    /// After calling this method, your listener's
+    /// <see cref="RealTimeMultiplayerListener.OnRoomSetupProgress" />
+    /// method will be called to indicate room setup progress. Eventually,
+    /// <see cref="RealTimeMultiplayerListener.OnRoomConnected" />
+    /// will be called to indicate that the room setup is either complete or has failed
+    /// (check the <b>success</b> parameter of the callback). If you wish to
+    /// cancel room setup, call <see cref="LeaveRoom"/>.
+    /// </summary>
+    /// <param name="minOpponents">Minimum number of opponents (not counting the
+    /// current player -- so for a 2-player game, pass 1).</param>
+    /// <param name="maxOpponents">Max number of opponents (not counting the current
+    /// player -- so for a 2-player game, pass 1).</param>
+    /// <param name="variant">Variant. Use 0 for default.</param>
+    /// <param name="exclusiveBitMask">Exclusive bit mask. Players are matched if the masks logically AND'ed = 0</param>
+    /// <param name="listener">Listener. The listener to notify of relevant events.</param>
+    void CreateQuickGame(uint minOpponents, uint maxOpponents, uint variant,
+        ulong exclusiveBitMask,
+        RealTimeMultiplayerListener listener);
+
+    /// <summary>
     /// Creates a game with an invitation screen. An invitation screen will be shown
     /// where the user can select who to invite to a multiplayer game. The invitation
     /// screen also allows the user to add random automatch opponents. After the invitation
@@ -68,6 +91,11 @@ namespace GooglePlayGames.BasicApi.Multiplayer
     /// events.</param>
     void CreateWithInvitationScreen(uint minOpponents, uint maxOppponents, uint variant,
                                     Multiplayer.RealTimeMultiplayerListener listener);
+
+    /// <summary>
+    /// Shows the waiting room UI and waits for all participants to join.
+    /// </summary>
+    void ShowWaitingRoomUI();
 
     /// <summary>
     /// Creates a real-time game starting with the inbox screen. On the inbox screen,

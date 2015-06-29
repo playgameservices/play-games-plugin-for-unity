@@ -1,5 +1,5 @@
 // <copyright file="GPGSAndroidSetupUI.cs" company="Google Inc.">
-// Copyright (C) 2014 Google Inc.
+// Copyright (C) Google Inc. All Rights Reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -26,7 +26,9 @@ namespace GooglePlayGames
         [MenuItem("Window/Google Play Games/Setup/Android setup...", false, 1)]
         public static void MenuItemFileGPGSAndroidSetup()
         {
-            EditorWindow.GetWindow(typeof(GPGSAndroidSetupUI));
+            EditorWindow window = EditorWindow.GetWindow(
+                typeof(GPGSAndroidSetupUI), true, GPGSStrings.AndroidSetup.Title);
+            window.minSize = new Vector2(400, 200);
         }
 
         public void OnEnable()
@@ -36,37 +38,69 @@ namespace GooglePlayGames
 
         public void OnGUI()
         {
-            GUILayout.BeginArea(new Rect(20, 20, position.width - 40, position.height - 40));
-            GUILayout.Label(GPGSStrings.AndroidSetup.Title, EditorStyles.boldLabel);
-            GUILayout.Label(GPGSStrings.AndroidSetup.Blurb);
+            GUI.skin.label.wordWrap = true;
+            GUILayout.BeginVertical();
+
             GUILayout.Space(10);
+            GUILayout.Label(GPGSStrings.AndroidSetup.Blurb);
 
             GUILayout.Label(GPGSStrings.Setup.AppId, EditorStyles.boldLabel);
             GUILayout.Label(GPGSStrings.Setup.AppIdBlurb);
-            mAppId = EditorGUILayout.TextField(GPGSStrings.Setup.AppId, mAppId);
-
             GUILayout.Space(10);
-            if (GUILayout.Button(GPGSStrings.Setup.SetupButton))
+
+            mAppId = EditorGUILayout.TextField(GPGSStrings.Setup.AppId,
+                mAppId,GUILayout.Width(300));
+
+            GUILayout.FlexibleSpace();
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+            if (GUILayout.Button(GPGSStrings.Setup.SetupButton,
+                GUILayout.Width(100)))
             {
                 DoSetup();
             }
 
-            GUILayout.EndArea();
+            if (GUILayout.Button("Cancel",GUILayout.Width(100)))
+            {
+                this.Close();
+            }
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+            GUILayout.Space(20);
+            GUILayout.EndVertical();
         }
 
         public void DoSetup()
         {
-            PerformSetup(mAppId);
+            if (PerformSetup(mAppId, null))
+            {
+                EditorUtility.DisplayDialog(GPGSStrings.Success,
+                    GPGSStrings.AndroidSetup.SetupComplete, GPGSStrings.Ok);
+                this.Close();
+            }
+           
         }
 
-        // Provide static access to setup for facilitating automated builds.
-        public static void PerformSetup(string appId)
+        /// <summary>
+        /// Provide static access to setup for facilitating automated builds.
+        /// </summary>
+        /// <param name="appId">App identifier.</param>
+        /// <param name="nearbySvcId">Optional nearby connection serviceId</param>
+        public static bool PerformSetup(string appId, string nearbySvcId)
         {
             // check for valid app id
             if (!GPGSUtil.LooksLikeValidAppId(appId))
             {
                 GPGSUtil.Alert(GPGSStrings.Setup.AppIdError);
-                return;
+                return false;
+            }
+
+            if (nearbySvcId != null)
+            {
+                if (!NearbyConnectionUI.PerformSetup(nearbySvcId, true))
+                {
+                    return false;
+                }
             }
 
             GPGSProjectSettings.Instance.Set("proj.AppId", appId);
@@ -78,20 +112,20 @@ namespace GooglePlayGames
                 Debug.LogError("Android SDK not found.");
                 EditorUtility.DisplayDialog(GPGSStrings.AndroidSetup.SdkNotFound,
                     GPGSStrings.AndroidSetup.SdkNotFoundBlurb, GPGSStrings.Ok);
-                return;
+                return false;
             }
-          
+
             GPGSUtil.CopySupportLibs();
 
             // Generate AndroidManifest.xml
             GPGSUtil.GenerateAndroidManifest();
- 
+
             // refresh assets, and we're done
             AssetDatabase.Refresh();
             GPGSProjectSettings.Instance.Set("android.SetupDone", true);
             GPGSProjectSettings.Instance.Save();
-            EditorUtility.DisplayDialog(GPGSStrings.Success,
-                GPGSStrings.AndroidSetup.SetupComplete, GPGSStrings.Ok);
+
+            return true;
         }
     }
 }

@@ -1,3 +1,22 @@
+Version 0.9.21
+  **BREAKING CHANGES**
+       * #382 Callback for declined invitation when creating RTMP room
+    This change adds the method `OnParticipantLeft` to the
+ `RealTimeMultiplayerListener` interface.  Existing games that use this interface
+need to add an implementation of this method.
+  New Features:
+       * #136 Callback for ShowLeaderboardUI()
+       * #392 Support for Default waiting room for RTMP
+       * #498 Bitmask filter in CreateQuickGame
+       * #537 Exposing Saved Games Delete API
+       * iOS builds will use Cocoapods if installed to build xcode project.
+  Bug Fixes
+       * #440 No callback from ReportProgress
+       * #444 Can Rematch always returns false
+       * #483 IncrementAchievement does not update Achievement data cache
+       * #488 Peers disconnected right after OnRoomConnected
+       * #568 Exception with null or empty image URL
+       * Fixed Setup dialogs not laidout correctly.
 2015-05-01 Version 0.9.20 (codename: ewokian)
    New Features:
        * Support for Events and Quests
@@ -11,7 +30,6 @@
        * #443 ERROR_NOT_AUTHORIZED on re-login
        * #453 NO_GPGS causes unreachable code warnings
        * #454 Error building Player: IOException: android-support-v4.jar already exists
-
 Version 0.9.15 (codename: auto-dogey5)
     New Features:
         * #276 Added support for excluding Google Play Game Services for iOS build (NO_GPGS)
