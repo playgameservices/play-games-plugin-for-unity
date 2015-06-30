@@ -1,5 +1,4 @@
-# Uncomment this line to define a global platform for your project
-# platform :ios, '8.0'
+platform :ios
 
 target 'Unity-iPhone' do
 pod 'GooglePlayGames', '~> 4.4'
