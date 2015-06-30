@@ -24,7 +24,7 @@ namespace GooglePlayGames
     using UnityEditor.iOS.Xcode;
     using GooglePlayGames;
     using GooglePlayGames.Editor.Util;
-    using System.Text.RegularExpressions;
+	using UnityEngine;
 
     public static class GPGSPostBuild
     {
