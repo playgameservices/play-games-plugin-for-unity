@@ -53,9 +53,9 @@ namespace NearbyDroids
         /// </summary>
         private static string[] sortingLayers =
         {
-            "Floor",
+            "Units",
             "Items",
-            "Units"
+            "Floor",
         };
 
         /// <summary>
@@ -63,9 +63,9 @@ namespace NearbyDroids
         /// </summary>
         private static long[] sortingLayerIds =
         {
-            812571243,
+            2591762383,
             1718506405,
-            2591762383
+            812571243
         };
 
         /// <summary>

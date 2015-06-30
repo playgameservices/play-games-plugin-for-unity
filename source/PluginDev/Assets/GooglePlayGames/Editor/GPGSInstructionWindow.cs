@@ -24,12 +24,36 @@ namespace GooglePlayGames
     {
         private Vector2 mScrollPosition = Vector2.zero;
 
+        private bool usingCocoaPod = false;
+        private string instructions;
+
         public void OnGUI()
         {
-            var iosInstructions = GPGSUtil.ReadFile("Assets/GooglePlayGames/Editor/ios_instructions");
+
+                if (!UsingCocoaPod)
+                {
+                    instructions = GPGSUtil.ReadFile("Assets/GooglePlayGames/Editor/ios_instructions");
+                }
+                else
+                {
+                    instructions = GPGSUtil.ReadFile("Assets/GooglePlayGames/Editor/cocoapod_instructions");
+                }
+
             mScrollPosition = EditorGUILayout.BeginScrollView(mScrollPosition);
-            GUILayout.TextArea(iosInstructions);
+            GUILayout.TextArea(instructions);
             EditorGUILayout.EndScrollView();
+        }
+
+        public bool UsingCocoaPod
+        {
+            get
+            {
+                return usingCocoaPod;
+            }
+            set
+            {
+                usingCocoaPod = value;
+            }
         }
     }
 }

@@ -100,14 +100,22 @@ public class DummyClient : IPlayGamesClient
         }
     }
 
-    public void ShowAchievementsUI()
+    public void ShowAchievementsUI(Action<UIStatus> callback)
     {
       LogUsage();
+      if (callback != null)
+      {
+          callback.Invoke(UIStatus.VersionUpdateRequired);
+      }
     }
 
-    public void ShowLeaderboardUI(string lbId)
+    public void ShowLeaderboardUI(string lbId, Action<UIStatus> callback)
     {
-      LogUsage();
+        LogUsage();
+        if (callback != null)
+        {
+            callback.Invoke(UIStatus.VersionUpdateRequired);
+        }
     }
 
     public void SubmitScore(string lbId, long score, Action<bool> callback)

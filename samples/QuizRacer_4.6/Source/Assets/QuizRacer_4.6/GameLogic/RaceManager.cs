@@ -172,6 +172,9 @@ public class RaceManager : RealTimeMultiplayerListener {
     public void OnPeersConnected(string[] peers) {
     }
 
+    public void OnParticipantLeft(Participant participant) {
+    }
+
     public void OnPeersDisconnected(string[] peers) {
         foreach (string peer in peers) {
             // if this peer has left and hasn't finished the race,

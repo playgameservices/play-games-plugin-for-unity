@@ -1,5 +1,5 @@
 // <copyright file="PluginVersion.cs" company="Google Inc.">
-// Copyright (C) 2014 Google Inc.
+// Copyright (C) 2014 Google Inc. All Rights Reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -21,10 +21,9 @@ namespace GooglePlayGames
     // older versions, used when upgrading to other versions
     public const string VersionKeyCPP = "00911";
     public const string VersionKeyU5 = "00915";
-        
-    public const int VersionInt = 0x0920;
-    public const string VersionString = "0.9.20";
-    public const string VersionKey = "00920";
+    public const int VersionInt = 0x0921;
+    public const string VersionString = "0.9.21";
+    public const string VersionKey = "00921";
 
     // only needed to upgrade to 00915
     public const int MinGmsCoreVersionCode = 0;

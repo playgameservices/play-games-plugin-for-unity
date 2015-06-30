@@ -20,7 +20,7 @@ namespace GooglePlayGames
     using UnityEditor;
     using System.Collections.Generic;
     using System.IO;
-
+     
     public class GPGSExportPackageUI
     {
         [MenuItem("Window/Google Play Games/Export Plugin Package...", false, 999)]

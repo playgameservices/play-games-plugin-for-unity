@@ -653,16 +653,26 @@ namespace GooglePlayGames
         /// </summary>
         public void ShowAchievementsUI()
         {
+            ShowAchievementsUI(null);
+        }
+
+        /// <summary>
+        /// Shows the standard Google Play Games achievements user interface,
+        /// which allows the player to browse their achievements.
+        /// </summary>
+        /// <param name="callback">If non-null, the callback is invoked when
+        /// the achievement UI is dismissed</param> 
+        public void ShowAchievementsUI(Action<UIStatus> callback)
+        {
             if (!IsAuthenticated())
             {
                 Logger.e("ShowAchievementsUI can only be called after authentication.");
                 return;
             }
 
-            Logger.d("ShowAchievementsUI");
-            mClient.ShowAchievementsUI();
+            Logger.d("ShowAchievementsUI callback is "  + callback);
+            mClient.ShowAchievementsUI(callback);
         }
-
         /// <summary>
         /// Shows the standard Google Play Games leaderboards user interface,
         /// which allows the player to browse their leaderboards. If you have
@@ -673,14 +683,8 @@ namespace GooglePlayGames
         /// </summary>
         public void ShowLeaderboardUI()
         {
-            if (!IsAuthenticated())
-            {
-                Logger.e("ShowLeaderboardUI can only be called after authentication.");
-                return;
-            }
-
-            Logger.d("ShowLeaderboardUI");
-            mClient.ShowLeaderboardUI(MapId(mDefaultLbUi));
+            Logger.d("ShowLeaderboardUI with default ID");
+            ShowLeaderboardUI(MapId(mDefaultLbUi), null);
         }
 
         /// <summary>
@@ -694,19 +698,30 @@ namespace GooglePlayGames
         /// </param>
         public void ShowLeaderboardUI(string lbId)
         {
+           if (lbId != null)
+            {
+                lbId = MapId(lbId);
+            }
+
+            mClient.ShowLeaderboardUI(lbId, null);
+        }
+
+        /// <summary>
+        /// Shows the leaderboard UI and calls the specified callback upon 
+        /// completion.
+        /// </summary>
+        /// <param name="lbId">leaderboard ID, can be null meaning all leaderboards.</param>
+        /// <param name="callback">Callback to call.  If null, nothing is called.</param>
+        public void ShowLeaderboardUI(string lbId, Action<UIStatus> callback)
+        {
             if (!IsAuthenticated())
             {
                 Logger.e("ShowLeaderboardUI can only be called after authentication.");
                 return;
             }
 
-            Logger.d("ShowLeaderboardUI, lbId=" + lbId);
-            if (lbId != null)
-            {
-                lbId = MapId(lbId);
-            }
-
-            mClient.ShowLeaderboardUI(lbId);
+            Logger.d("ShowLeaderboardUI, lbId=" + lbId + " callback is " + callback);
+            mClient.ShowLeaderboardUI(lbId, callback);
         }
 
         /// <summary>
