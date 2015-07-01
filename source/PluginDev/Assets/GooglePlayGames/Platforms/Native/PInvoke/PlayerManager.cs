@@ -1,5 +1,5 @@
 // <copyright file="PlayerManager.cs" company="Google Inc.">
-// Copyright (C) 2014 Google Inc.
+// Copyright (C) 2014 Google Inc. All Rights Reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,10 +16,9 @@
 
 #if (UNITY_ANDROID || (UNITY_IPHONE && !NO_GPGS))
 
-namespace GooglePlayGames.Native
+namespace GooglePlayGames.Native.PInvoke
 {
     using System;
-    using GooglePlayGames.Native.PInvoke;
     using System.Runtime.InteropServices;
     using GooglePlayGames.OurUtils;
     using C = GooglePlayGames.Native.Cwrapper.PlayerManager;

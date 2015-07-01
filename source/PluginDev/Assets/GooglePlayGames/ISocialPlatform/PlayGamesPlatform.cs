@@ -1,5 +1,5 @@
 // <copyright file="PlayGamesPlatform.cs" company="Google Inc.">
-// Copyright (C) 2014 Google Inc.
+// Copyright (C) 2014 Google Inc. All Rights Reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -14,21 +14,21 @@
 //    limitations under the License.
 // </copyright>
 
-using System;
-using UnityEngine.SocialPlatforms;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using GooglePlayGames.BasicApi;
-using GooglePlayGames.OurUtils;
-using GooglePlayGames.BasicApi.Multiplayer;
-using GooglePlayGames.BasicApi.SavedGame;
-using GooglePlayGames.BasicApi.Quests;
-using GooglePlayGames.BasicApi.Events;
-using GooglePlayGames.BasicApi.Nearby;
-
 namespace GooglePlayGames
 {
+    using System;
+    using UnityEngine.SocialPlatforms;
+    using System.Collections;
+    using System.Collections.Generic;
+    using UnityEngine;
+    using GooglePlayGames.BasicApi;
+    using GooglePlayGames.OurUtils;
+    using GooglePlayGames.BasicApi.Multiplayer;
+    using GooglePlayGames.BasicApi.SavedGame;
+    using GooglePlayGames.BasicApi.Quests;
+    using GooglePlayGames.BasicApi.Events;
+    using GooglePlayGames.BasicApi.Nearby;
+
     /// <summary>
     /// Provides access to the Google Play Games platform. This is an implementation of
     /// UnityEngine.SocialPlatforms.ISocialPlatform. Activate this platform by calling
@@ -558,15 +558,59 @@ namespace GooglePlayGames
         }
 
         /// <summary>
+        /// Set an achievement to have at least the given number of steps completed.
+        /// Calling this method while the achievement already has more steps than
+        /// the provided value is a no-op. Once the achievement reaches the
+        /// maximum number of steps, the achievement is automatically unlocked,
+        /// and any further mutation operations are ignored.
+        /// </summary>
+        /// <param name='achievementID'>
+        /// The ID of the achievement to increment. This can be a raw Google Play
+        /// Games achievement ID (alphanumeric string), or an alias that was previously configured
+        /// by a call to <see cref="AddIdMapping" />.
+        /// </param>
+        /// <param name='steps'>
+        /// The number of steps to increment the achievement by.
+        /// </param>
+        /// <param name='callback'>
+        /// The callback to call to report the success or failure of the operation. The callback
+        /// will be called with <c>true</c> to indicate success or <c>false</c> for failure.
+        /// </param>
+        public void SetStepsAtLeast(string achievementID, int steps, Action<bool> callback)
+        {
+            if (!IsAuthenticated())
+            {
+                Logger.e("SetStepsAtLeast can only be called after authentication.");
+                if (callback != null)
+                {
+                    callback.Invoke(false);
+                }
+
+                return;
+            }
+
+            // map ID, if it's in the dictionary
+            Logger.d("SetStepsAtLeast: " + achievementID + ", steps " + steps);
+            achievementID = MapId(achievementID);
+            mClient.SetStepsAtLeast(achievementID, steps, callback);
+        }
+
+        /// <summary>
         /// Not implemented yet. Calls the callback with an empty list.
         /// </summary>
         public void LoadAchievementDescriptions(Action<IAchievementDescription[]> callback)
         {
-            Logger.w("PlayGamesPlatform.LoadAchievementDescriptions is not implemented.");
-            if (callback != null)
-            {
-                callback.Invoke(new IAchievementDescription[0]);
+            if (!IsAuthenticated ()) {
+                Logger.e ("LoadAchievementDescriptions can only be called after authentication.");
+                callback.Invoke (null);
             }
+            mClient.LoadAchievements (ach => {
+                IAchievementDescription[] data = new IAchievementDescription[ach.Length];
+                for(int i=0;i<data.Length;i++) {
+                    data[i] = new PlayGamesAchievement(ach[i]);
+                }
+                callback.Invoke(data);
+            });
         }
 
         /// <summary>
@@ -574,11 +618,18 @@ namespace GooglePlayGames
         /// </summary>
         public void LoadAchievements(Action<IAchievement[]> callback)
         {
-            Logger.w("PlayGamesPlatform.LoadAchievements is not implemented.");
-            if (callback != null)
-            {
-                callback.Invoke(new IAchievement[0]);
+            if (!IsAuthenticated ()) {
+                Logger.e ("LoadAchievements can only be called after authentication.");
+                callback.Invoke (null);
             }
+            mClient.LoadAchievements (ach => {
+                IAchievement[] data = new IAchievement[ach.Length];
+                for(int i=0;i<data.Length;i++) {
+                    data[i] = new PlayGamesAchievement(ach[i]);
+                }
+                callback.Invoke(data);
+            });
+
         }
 
         /// <summary>
@@ -627,6 +678,34 @@ namespace GooglePlayGames
         }
 
         /// <summary>
+        /// Submits the score for the currently signed-in player
+        /// to the leaderboard associated with a specific id
+        /// and metadata (such as something the player did to earn the score).
+        /// </summary>
+        /// <param name="score">Score.</param>
+        /// <param name="board">leaderboard id.</param>
+        /// <param name="metadata">metadata about the score.</param>
+        /// <param name="callback">Callback upon completion.</param>
+        public void ReportScore(long score, string board, string metadata, Action<bool> callback)
+        {
+            if (!IsAuthenticated())
+            {
+                Logger.e("ReportScore can only be called after authentication.");
+                if (callback != null)
+                {
+                    callback.Invoke(false);
+                }
+
+                return;
+            }
+
+            Logger.d("ReportScore: score=" + score + ", board=" + board +
+                " metadata=" + metadata);
+            string lbId = MapId(board);
+            mClient.SubmitScore(lbId, score, metadata, callback);
+        }
+
+        /// <summary>
         /// Not implemented yet. Calls the callback with an empty list.
         /// </summary>
         public void LoadScores(string leaderboardID, Action<IScore[]> callback)
@@ -661,7 +740,7 @@ namespace GooglePlayGames
         /// which allows the player to browse their achievements.
         /// </summary>
         /// <param name="callback">If non-null, the callback is invoked when
-        /// the achievement UI is dismissed</param> 
+        /// the achievement UI is dismissed</param>
         public void ShowAchievementsUI(Action<UIStatus> callback)
         {
             if (!IsAuthenticated())
@@ -707,7 +786,7 @@ namespace GooglePlayGames
         }
 
         /// <summary>
-        /// Shows the leaderboard UI and calls the specified callback upon 
+        /// Shows the leaderboard UI and calls the specified callback upon
         /// completion.
         /// </summary>
         /// <param name="lbId">leaderboard ID, can be null meaning all leaderboards.</param>

@@ -1,5 +1,5 @@
 // <copyright file="Callbacks.cs" company="Google Inc.">
-// Copyright (C) 2014 Google Inc.
+// Copyright (C) 2014 Google Inc. All Rights Reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -20,12 +20,11 @@ namespace GooglePlayGames.Native.PInvoke
 {
     using System;
     using System.Runtime.InteropServices;
-    using GooglePlayGames.OurUtils;
     using GooglePlayGames.Native.Cwrapper;
+    using GooglePlayGames.OurUtils;
 
     static class Callbacks
     {
-        
         internal static readonly Action<CommonErrorStatus.UIStatus> NoopUICallback = status =>
         {
             Logger.d("Received UI callback: " + status);
@@ -46,7 +45,7 @@ namespace GooglePlayGames.Native.PInvoke
                     }
                 }
             };
-            
+
             return ToIntPtr(pointerReceiver);
         }
 
@@ -63,7 +62,7 @@ namespace GooglePlayGames.Native.PInvoke
                     }
                 }
             };
-            
+
             return ToIntPtr(pointerReceiver);
         }
 
@@ -73,7 +72,7 @@ namespace GooglePlayGames.Native.PInvoke
             {
                 return IntPtr.Zero;
             }
-            
+
             // Once the callback is passed off to native, we don't retain a reference to it - which
             // means it's eligible for garbage collecting or being moved around by the runtime. If
             // the garbage collector runs before the native code invokes the callback, chaos will
@@ -85,7 +84,6 @@ namespace GooglePlayGames.Native.PInvoke
             return GCHandle.ToIntPtr(handle);
         }
 
-        
         internal static T IntPtrToTempCallback<T>(IntPtr handle) where T : class
         {
             return IntPtrToCallback<T>(handle, true);
@@ -97,7 +95,7 @@ namespace GooglePlayGames.Native.PInvoke
             {
                 return null;
             }
-            
+
             var gcHandle = GCHandle.FromIntPtr(handle);
             try
             {
@@ -117,7 +115,7 @@ namespace GooglePlayGames.Native.PInvoke
                 }
             }
         }
-        
+
         // TODO(hsakai): Better way of handling this.
         internal static T IntPtrToPermanentCallback<T>(IntPtr handle) where T : class
         {
@@ -129,7 +127,7 @@ namespace GooglePlayGames.Native.PInvoke
         {
             Logger.d("Showing UI Internal callback: " + status);
             var callback = IntPtrToTempCallback<Action<CommonErrorStatus.UIStatus>>(data);
-            
+
             try
             {
                 callback(status);
@@ -152,16 +150,15 @@ namespace GooglePlayGames.Native.PInvoke
                                                      IntPtr response, IntPtr userData)
         {
             Logger.d("Entering internal callback for " + callbackName);
-            
             Action<IntPtr> callback = callbackType == Type.Permanent
                 ? IntPtrToPermanentCallback<Action<IntPtr>>(userData)
                     : IntPtrToTempCallback<Action<IntPtr>>(userData);
-            
+
             if (callback == null)
             {
                 return;
             }
-            
+
             try
             {
                 callback(response);
@@ -196,7 +193,7 @@ namespace GooglePlayGames.Native.PInvoke
             {
                 return;
             }
-            
+
             try
             {
                 callback(param1, param2);
@@ -229,7 +226,7 @@ namespace GooglePlayGames.Native.PInvoke
                 {
                     return;
                 }
-                
+
                 PlayGamesHelperObject.RunOnGameThread(() => toInvokeOnGameThread(result1, result2));
             };
         }
@@ -240,13 +237,12 @@ namespace GooglePlayGames.Native.PInvoke
             {
                 return null;
             }
-            
+
             byte[] convertedData = new byte[dataLength.ToUInt32()];
             Marshal.Copy(data, convertedData, 0, (int)dataLength.ToUInt32());
-            
+
             return convertedData;
         }
-        
     }
 }
 

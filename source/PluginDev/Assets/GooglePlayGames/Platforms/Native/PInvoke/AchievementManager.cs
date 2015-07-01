@@ -1,5 +1,5 @@
 // <copyright file="AchievementManager.cs" company="Google Inc.">
-// Copyright (C) 2014 Google Inc.
+// Copyright (C) 2014 Google Inc. All Rights Reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -19,10 +19,9 @@
 namespace GooglePlayGames.Native.PInvoke
 {
     using System;
-    using GooglePlayGames.Native.PInvoke;
     using System.Runtime.InteropServices;
-    using GooglePlayGames.OurUtils;
     using System.Collections.Generic;
+    using GooglePlayGames.OurUtils;
     using GooglePlayGames.Native.Cwrapper;
     using C = GooglePlayGames.Native.Cwrapper.AchievementManager;
 
@@ -79,7 +78,16 @@ namespace GooglePlayGames.Native.PInvoke
         {
             Misc.CheckNotNull(achievementId);
 
-            C.AchievementManager_Increment(mServices.AsHandle(), achievementId, numSteps);
+            C.AchievementManager_Increment(mServices.AsHandle(),
+                achievementId, numSteps);
+        }
+
+        internal void SetStepsAtLeast(string achivementId, uint numSteps)
+        {
+            Misc.CheckNotNull(achivementId);
+
+            C.AchievementManager_SetStepsAtLeast(mServices.AsHandle(),
+                achivementId, numSteps);
         }
 
         internal void Reveal(string achievementId)

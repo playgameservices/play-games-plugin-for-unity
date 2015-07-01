@@ -1,5 +1,5 @@
 // <copyright file="DummyClient.cs" company="Google Inc.">
-// Copyright (C) 2014 Google Inc.
+// Copyright (C) 2014 Google Inc. All Rights Reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -61,10 +61,13 @@ public class DummyClient : IPlayGamesClient
       return null;
     }
 
-    public List<Achievement> GetAchievements()
+    public void LoadAchievements(Action<Achievement[]> callback)
     {
-      LogUsage();
-      return new List<Achievement>();
+        LogUsage ();
+        if (callback != null)
+        {
+            callback.Invoke(null);
+        }
     }
 
     public Achievement GetAchievement(string achId)
@@ -100,6 +103,15 @@ public class DummyClient : IPlayGamesClient
         }
     }
 
+    public void SetStepsAtLeast(string achId, int steps, Action<bool> callback)
+    {
+        LogUsage();
+        if (callback != null)
+        {
+            callback.Invoke(false);
+        }
+    }
+
     public void ShowAchievementsUI(Action<UIStatus> callback)
     {
       LogUsage();
@@ -124,6 +136,16 @@ public class DummyClient : IPlayGamesClient
       if (callback != null)
         {
           callback.Invoke(false);
+        }
+    }
+
+    public void SubmitScore(string lbId, long score, string metadata,
+        Action<bool> callback)
+    {
+        LogUsage();
+        if (callback != null)
+        {
+            callback.Invoke(false);
         }
     }
 

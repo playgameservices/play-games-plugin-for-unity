@@ -122,7 +122,7 @@ namespace GooglePlayGames.Native
                 GameServices().StartAuthorizationUI();
             }
         }
-            
+
         private static Action<T> AsOnGameThreadCallback<T>(Action<T> callback)
         {
             if (callback == null)
@@ -272,8 +272,8 @@ namespace GooglePlayGames.Native
                         // Unity no longer supports constructing an AndroidJavaObject using an IntPtr,
                         // so I have to manually munge with JNI here.
                         IntPtr methodId = AndroidJNI.GetStaticMethodID(bridgeClass.GetRawClass(),
-                                          LaunchBridgeMethod,
-                                          LaunchBridgeSignature);
+                                              LaunchBridgeMethod,
+                                              LaunchBridgeSignature);
                         jArgs[0].l = currentActivity.GetRawObject();
                         jArgs[1].l = bridgedIntent;
                         AndroidJNI.CallStaticVoidMethod(bridgeClass.GetRawClass(), methodId, jArgs);
@@ -575,6 +575,13 @@ namespace GooglePlayGames.Native
             return mAchievements[achId];
         }
 
+        public void LoadAchievements(Action<Achievement[]> callback)
+        {
+            Achievement[] data = new Achievement[mAchievements.Count];
+            mAchievements.Values.CopyTo (data, 0);
+            callback.Invoke (data);
+        }
+
         public void UnlockAchievement(string achId, Action<bool> callback)
         {
             UpdateAchievement("Unlock", achId, callback, a => a.IsUnlocked,
@@ -623,18 +630,21 @@ namespace GooglePlayGames.Native
             Logger.d("Performing " + updateType + " on " + achId);
             updateAchievment(achievement);
 
-            GameServices().AchievementManager().Fetch(achId, rsp => {
-                if (rsp.Status() == Status.ResponseStatus.VALID) {
-                    callback(true);
-                    mAchievements.Remove(achId);
-                    mAchievements.Add(achId, rsp.Achievement().AsAchievement());
-                }
-                else {
-                    Logger.e("Cannot refresh achievement " + achId + ": " +
-                        rsp.Status());
-                    callback(false);
-                }
-            });
+            GameServices().AchievementManager().Fetch(achId, rsp =>
+                {
+                    if (rsp.Status() == Status.ResponseStatus.VALID)
+                    {
+                        mAchievements.Remove(achId);
+                        mAchievements.Add(achId, rsp.Achievement().AsAchievement());
+                        callback(true);
+                    }
+                    else
+                    {
+                        Logger.e("Cannot refresh achievement " + achId + ": " +
+                            rsp.Status());
+                        callback(false);
+                    }
+                });
         }
 
         public void IncrementAchievement(string achId, int steps, Action<bool> callback)
@@ -667,18 +677,69 @@ namespace GooglePlayGames.Native
             }
 
             GameServices().AchievementManager().Increment(achId, Convert.ToUInt32(steps));
-            GameServices().AchievementManager().Fetch(achId, rsp => {
-                if (rsp.Status() == Status.ResponseStatus.VALID) {
-                    callback(true);
-                    mAchievements.Remove(achId);
-                    mAchievements.Add(achId, rsp.Achievement().AsAchievement());
-                }
-                else {
-                    Logger.e("Cannot refresh achievement " + achId + ": " +
-                        rsp.Status());
-                    callback(false);
-                }
-            });
+            GameServices().AchievementManager().Fetch(achId, rsp =>
+                {
+                    if (rsp.Status() == Status.ResponseStatus.VALID)
+                    {
+                        mAchievements.Remove(achId);
+                        mAchievements.Add(achId, rsp.Achievement().AsAchievement());
+                        callback(true);
+                    }
+                    else
+                    {
+                        Logger.e("Cannot refresh achievement " + achId + ": " +
+                            rsp.Status());
+                        callback(false);
+                    }
+                });
+        }
+
+        public void SetStepsAtLeast(string achId, int steps, Action<bool> callback)
+        {
+            Misc.CheckNotNull(achId);
+            callback = AsOnGameThreadCallback(callback);
+
+            InitializeGameServices();
+
+            var achievement = GetAchievement(achId);
+            if (achievement == null)
+            {
+                Logger.e("Could not increment, no achievement with ID " + achId);
+                callback(false);
+                return;
+            }
+
+            if (!achievement.IsIncremental)
+            {
+                Logger.e("Could not increment, achievement with ID " +
+                    achId + " is not incremental");
+                callback(false);
+                return;
+            }
+
+            if (steps < 0)
+            {
+                Logger.e("Attempted to increment by negative steps");
+                callback(false);
+                return;
+            }
+
+            GameServices().AchievementManager().SetStepsAtLeast(achId, Convert.ToUInt32(steps));
+            GameServices().AchievementManager().Fetch(achId, rsp =>
+                {
+                    if (rsp.Status() == Status.ResponseStatus.VALID)
+                    {
+                        mAchievements.Remove(achId);
+                        mAchievements.Add(achId, rsp.Achievement().AsAchievement());
+                        callback(true);
+                    }
+                    else
+                    {
+                        Logger.e("Cannot refresh achievement " + achId + ": " +
+                            rsp.Status());
+                        callback(false);
+                    }
+                });
         }
 
         public void ShowAchievementsUI(Action<UIStatus> cb)
@@ -691,10 +752,11 @@ namespace GooglePlayGames.Native
             var callback = Callbacks.NoopUICallback;
             if (cb != null)
             {
-                callback = (result) => {
+                callback = (result) =>
+                {
                     cb.Invoke((UIStatus)result);
                 };
-            }     
+            }
             callback = AsOnGameThreadCallback(callback);
 
             GameServices().AchievementManager().ShowAllUI(callback);
@@ -710,7 +772,8 @@ namespace GooglePlayGames.Native
             Action<Status.UIStatus> callback = Callbacks.NoopUICallback;
             if (cb != null)
             {
-                callback = (result) => {
+                callback = (result) =>
+                {
                     cb.Invoke((UIStatus)result);
                 };
             }
@@ -737,10 +800,33 @@ namespace GooglePlayGames.Native
 
             if (leaderboardId == null)
             {
-                throw new ArgumentNullException("Leaderboard ID was null");
+                throw new ArgumentNullException("leaderboardId");
             }
 
-            GameServices().LeaderboardManager().SubmitScore(leaderboardId, score);
+            GameServices().LeaderboardManager().SubmitScore(leaderboardId,
+                score, null);
+            // Score submissions cannot fail.
+            callback(true);
+        }
+
+        public void SubmitScore(string leaderboardId, long score, string metadata,
+                                Action<bool> callback)
+        {
+            callback = AsOnGameThreadCallback(callback);
+            if (!IsAuthenticated())
+            {
+                callback(false);
+            }
+
+            InitializeGameServices();
+
+            if (leaderboardId == null)
+            {
+                throw new ArgumentNullException("leaderboardId");
+            }
+
+            GameServices().LeaderboardManager().SubmitScore(leaderboardId,
+                score, metadata);
             // Score submissions cannot fail.
             callback(true);
         }

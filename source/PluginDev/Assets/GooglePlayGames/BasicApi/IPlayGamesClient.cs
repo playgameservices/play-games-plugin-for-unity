@@ -1,5 +1,5 @@
 // <copyright file="IPlayGamesClient.cs" company="Google Inc.">
-// Copyright (C) 2014 Google Inc.
+// Copyright (C) 2014 Google Inc. All Rights Reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -97,6 +97,12 @@ namespace GooglePlayGames.BasicApi
     Achievement GetAchievement(string achievementId);
 
     /// <summary>
+    /// Loads the achievements for the current signed in user and invokes
+    /// the callback.
+    /// </summary>
+    void LoadAchievements(Action<Achievement[]> callback);
+
+    /// <summary>
     /// Unlocks the achievement with the passed identifier. If the operation succeeds, the callback
     /// will be invoked on the game thread with <code>true</code>. If the operation fails, the
     /// callback will be invoked with <code>false</code>. This operation will immediately fail if
@@ -137,6 +143,18 @@ namespace GooglePlayGames.BasicApi
                                   Action<bool> successOrFailureCalllback);
 
     /// <summary>
+    /// Set an achievement to have at least the given number of steps completed.
+    /// Calling this method while the achievement already has more steps than
+    /// the provided value is a no-op. Once the achievement reaches the
+    /// maximum number of steps, the achievement is automatically unlocked,
+    /// and any further mutation operations are ignored.
+    /// </summary>
+    /// <param name="achId">Ach identifier.</param>
+    /// <param name="steps">Steps.</param>
+    /// <param name="callback">Callback.</param>
+    void SetStepsAtLeast(string achId, int steps, Action<bool> callback);
+
+    /// <summary>
     /// Shows the appropriate platform-specific achievements UI.
     /// <param name="callback">The callback to invoke when complete.  If null,
     /// no callback is called. </param>
@@ -163,7 +181,21 @@ namespace GooglePlayGames.BasicApi
     /// <param name="score">Score.</param>
     /// <param name="successOrFailureCalllback">Callback used to indicate whether the operation
     /// succeeded or failed.</param>
-    void SubmitScore(string leaderboardId, long score, Action<bool> successOrFailureCalllback);
+    void SubmitScore(string leaderboardId, long score,
+            Action<bool> successOrFailureCalllback);
+
+    /// <summary>
+    /// Submits the score for the currently signed-in player
+    /// to the leaderboard associated with a specific id 
+    /// and metadata (such as something the player did to earn the score).
+    /// </summary>
+    /// <param name="score">Score.</param>
+    /// <param name="board">leaderboard id.</param>
+    /// <param name="metadata">metadata about the score.</param>
+    /// <param name="callback">Callback upon completion.</param>
+    void SubmitScore(string leaderboardId, long score, string metadata,
+            Action<bool> successOrFailureCalllback);
+    
 
     /// <summary>
     /// Loads state from the cloud for the passed slot.
