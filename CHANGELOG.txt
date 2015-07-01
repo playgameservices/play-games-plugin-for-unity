@@ -1,3 +1,7 @@
+Version 0.9.22
+    New Features:
+       * #120 implement setStepsAtLeast for achievements
+       * #259 implement LoadAchievements
 Version 0.9.21
   **BREAKING CHANGES**
        * #382 Callback for declined invitation when creating RTMP room

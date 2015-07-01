@@ -19,10 +19,8 @@
 namespace GooglePlayGames.Native.PInvoke
 {
     using System;
-    using GooglePlayGames.Native.PInvoke;
     using System.Runtime.InteropServices;
     using GooglePlayGames.OurUtils;
-    using GooglePlayGames.Native.Cwrapper;
     using C = GooglePlayGames.Native.Cwrapper.MultiplayerInvitation;
     using Types = GooglePlayGames.Native.Cwrapper.Types;
     using Status = GooglePlayGames.Native.Cwrapper.CommonErrorStatus;

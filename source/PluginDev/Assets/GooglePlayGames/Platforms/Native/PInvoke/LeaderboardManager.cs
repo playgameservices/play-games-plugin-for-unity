@@ -1,5 +1,5 @@
 // <copyright file="LeaderboardManager.cs" company="Google Inc.">
-// Copyright (C) 2014 Google Inc.
+// Copyright (C) 2014 Google Inc. All Rights Reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,11 +16,9 @@
 
 #if (UNITY_ANDROID || (UNITY_IPHONE && !NO_GPGS))
 
-namespace GooglePlayGames.Native
+namespace GooglePlayGames.Native.PInvoke
 {
     using System;
-    using GooglePlayGames.Native.PInvoke;
-    using System.Runtime.InteropServices;
     using GooglePlayGames.OurUtils;
     using C = GooglePlayGames.Native.Cwrapper.LeaderboardManager;
     using Types = GooglePlayGames.Native.Cwrapper.Types;
@@ -36,12 +34,13 @@ namespace GooglePlayGames.Native
             mServices = Misc.CheckNotNull(services);
         }
 
-        internal void SubmitScore(string leaderboardId, long score)
+        internal void SubmitScore(string leaderboardId, long score, string metadata)
         {
-            Misc.CheckNotNull(leaderboardId);
-            Logger.d("Native Submitting score: " + score + " for lb " + leaderboardId);
-            // Note, we pass empty-string as the metadata - this is ignored by the native SDK.
-            C.LeaderboardManager_SubmitScore(mServices.AsHandle(), leaderboardId, (ulong)score, "");
+            Misc.CheckNotNull(leaderboardId, "leaderboardId");
+            Logger.d("Native Submitting score: " + score +
+                " for lb " + leaderboardId + " with metadata: " + metadata);
+            C.LeaderboardManager_SubmitScore(mServices.AsHandle(), leaderboardId,
+                (ulong)score, metadata ?? "");
         }
 
         internal void ShowAllUI(Action<Status.UIStatus> callback)
