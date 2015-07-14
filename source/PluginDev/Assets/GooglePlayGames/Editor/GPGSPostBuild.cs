@@ -35,7 +35,7 @@ namespace GooglePlayGames
         [PostProcessBuild]
         public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
         {
-#if UNITY_5_0
+#if UNITY_5
             if (target != BuildTarget.iOS) {
                 return;
             }
