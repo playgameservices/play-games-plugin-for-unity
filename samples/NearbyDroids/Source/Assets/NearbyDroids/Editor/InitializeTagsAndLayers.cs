@@ -84,7 +84,7 @@ namespace NearbyDroids
 
             CheckTags(tagManager);
 
-            #if UNITY_5_0
+            #if UNITY_5
             CheckLayers(tagManager);
             #else
             Debug.LogError("WARNING!! You are using an older version of Unity, " +
