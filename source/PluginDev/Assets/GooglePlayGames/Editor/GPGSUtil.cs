@@ -17,6 +17,7 @@
 namespace GooglePlayGames
 {
     using System;
+    using System.Collections;
     using System.IO;
     using UnityEditor;
     using UnityEngine;
@@ -26,6 +27,10 @@ namespace GooglePlayGames
         public const string SERVICEIDPLACEHOLDER = "__NEARBY_SERVICE_ID__";
         public const string SERVICEIDKEY = "App.NearbdServiceId";
         public const string APPIDPLACEHOLDER = "___APP_ID___";
+        public const string NAMESPACESTARTPLACEHOLDER = "__NameSpaceStart__";
+        public const string NAMESPACEENDPLACEHOLDER = "__NameSpaceEnd__";
+        public const string CLASSNAMEPLACEHOLDER = "__Class__";
+        public const string CONSTANTSPLACEHOLDER = "__Constant_Properties__";
         public const string APPIDKEY = "proj.AppId";
         public const string IOSCLIENTIDPLACEHOLDER = "__CLIENTID__";
         public const string IOSCLIENTIDKEY = "ios.ClientId";
@@ -223,6 +228,53 @@ namespace GooglePlayGames
             manifestBody = manifestBody.Replace(SERVICEIDPLACEHOLDER, nearbyServiceId);
             GPGSUtil.WriteFile(destFilename, manifestBody);
             GPGSUtil.UpdateGameInfo();
+        }
+
+        public static void WriteResourceIds(string className, Hashtable resourceKeys)
+        {
+
+            string constantsValues = string.Empty;
+            string[] parts = className.Split('.');
+            string dirName = "Assets";
+            string nameSpace = string.Empty;
+            for (int i = 0; i < parts.Length - 1; i++)
+            {
+                dirName += "/" + parts[i];
+                if (nameSpace != string.Empty)
+                {
+                    nameSpace += ".";
+                }
+                nameSpace += parts[i];
+            }
+            EnsureDirExists(dirName);
+            foreach (DictionaryEntry ent in resourceKeys)
+            {
+                constantsValues += "        public const string " +
+                    ent.Key + " = \"" + ent.Value + "\";\n";
+            }
+
+            string fileBody = GPGSUtil.ReadEditorTemplate("template-Constants");
+            if (nameSpace != string.Empty)
+            {
+                fileBody = fileBody.Replace(NAMESPACESTARTPLACEHOLDER,
+                    "namespace " + nameSpace + "\n{");
+            }
+            else
+            {
+                fileBody = fileBody.Replace(NAMESPACESTARTPLACEHOLDER, "");
+            }
+            fileBody = fileBody.Replace(CLASSNAMEPLACEHOLDER, parts[parts.Length - 1]);
+            fileBody = fileBody.Replace(CONSTANTSPLACEHOLDER, constantsValues);
+            if (nameSpace != string.Empty)
+            {
+                fileBody = fileBody.Replace(NAMESPACEENDPLACEHOLDER,
+                    "}");
+            }
+            else
+            {
+                fileBody = fileBody.Replace(NAMESPACEENDPLACEHOLDER, "");
+            }
+            WriteFile(dirName + "/" + parts[parts.Length-1] + ".cs", fileBody);
         }
 
         public static void UpdateGameInfo()

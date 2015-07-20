@@ -1,5 +1,6 @@
 Version 0.9.22
     New Features:
+       * Updated Configuration setup using Resource data from Play Console.
        * #120 implement setStepsAtLeast for achievements
        * #259 implement LoadAchievements
 Version 0.9.21

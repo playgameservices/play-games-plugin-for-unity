@@ -15,7 +15,11 @@ and open the project using the xcWorkspace file to build.
 Your project is now ready to build and deploy!
 
 
--- APPENDIX: Running on the simulator. --
+
+-- APPENDIX: Running on the simulator using Unity versions < 5.0. --
+
+** NOTE **  If you are using Unity 5.0 or greater, no changes are needed to run in the simulator.
+
 You only need to read this section if you intend to run your project
 in the simulator, as opposed to an actual device.
 

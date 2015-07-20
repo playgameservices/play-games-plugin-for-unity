@@ -16,6 +16,8 @@
 
 namespace GooglePlayGames
 {
+    using System.IO;
+    using System.Collections;
     using UnityEngine;
     using UnityEditor;
 
@@ -23,21 +25,28 @@ namespace GooglePlayGames
     {
         private const string GameInfoPath = "Assets/GooglePlayGames/GameInfo.cs";
 
-        private string mClientId = string.Empty;
         private string mBundleId = string.Empty;
+        private Vector2 scroll;
+        private string mConfigData = string.Empty;
+        private string mClassName = "GooglePlayGames.GPGSIds";
 
         [MenuItem("Window/Google Play Games/Setup/iOS setup...", false, 2)]
         public static void MenuItemGPGSIOSSetup()
         {
             EditorWindow window = EditorWindow.GetWindow(
                     typeof(GPGSIOSSetupUI), true, GPGSStrings.IOSSetup.Title);
-            window.minSize = new Vector2(500, 300);
+            window.minSize = new Vector2(500, 500);
         }
 
         public void OnEnable()
         {
-            mClientId = GPGSProjectSettings.Instance.Get("ios.ClientId");
             mBundleId = GPGSProjectSettings.Instance.Get("ios.BundleId");
+            if (string.IsNullOrEmpty(mBundleId))
+            {
+                mBundleId = PlayerSettings.bundleIdentifier;
+            }
+            mClassName = GPGSProjectSettings.Instance.Get("proj.ConstantsClassName");
+            mConfigData = GPGSProjectSettings.Instance.Get("proj.ios.ResourceData");
 
             if (mBundleId.Trim().Length == 0)
             {
@@ -66,15 +75,6 @@ namespace GooglePlayGames
             GUILayout.Label(GPGSStrings.IOSSetup.Blurb);
             GUILayout.Space(10);
 
-            // Client ID field
-            GUILayout.Label(GPGSStrings.IOSSetup.ClientIdTitle, EditorStyles.boldLabel);
-            GUILayout.Label(GPGSStrings.IOSSetup.ClientIdBlurb);
-      
-            mClientId = EditorGUILayout.TextField(GPGSStrings.IOSSetup.ClientId,
-                mClientId, GUILayout.Width(450));
-
-            GUILayout.Space(10);
-
             // Bundle ID field
             GUILayout.Label(GPGSStrings.IOSSetup.BundleIdTitle, EditorStyles.boldLabel);
             GUILayout.Label(GPGSStrings.IOSSetup.BundleIdBlurb);
@@ -83,7 +83,23 @@ namespace GooglePlayGames
             GUILayout.Space(10);
 
             GUILayout.FlexibleSpace();
-      
+
+            GUILayout.Label("Constants class name", EditorStyles.boldLabel);
+            GUILayout.Label("Enter the fully qualified name of the class to create containing the constants");
+            GUILayout.Space(10);
+
+            mClassName = EditorGUILayout.TextField("Constants class name",
+                mClassName,GUILayout.Width(480));
+
+            GUILayout.Label("Resources Definition", EditorStyles.boldLabel);
+            GUILayout.Label("Paste in the Objective-C Resources from the Play Console");
+            GUILayout.Space(10);
+            scroll = GUILayout.BeginScrollView(scroll);
+            mConfigData = EditorGUILayout.TextArea(mConfigData,
+                GUILayout.Width(475), GUILayout.Height(Screen.height));
+            GUILayout.EndScrollView();
+            GUILayout.Space(10);
+
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
             // Setup button
@@ -124,12 +140,112 @@ namespace GooglePlayGames
         /// </summary>
         void DoSetup()
         {
-            if (PerformSetup(mClientId, mBundleId, null))
+            if (PerformSetup(mBundleId, mClassName, mConfigData, null))
             {
                 GPGSUtil.Alert(GPGSStrings.Success, GPGSStrings.IOSSetup.SetupComplete);
                 Close();
             }
+            else
+            {
+                GPGSUtil.Alert(GPGSStrings.Error,
+                    "Missing or invalid resource data.  Check that CLIENT_ID is defined.");
+            }
         }
+
+        /// <summary>
+        /// Performs setup using the Android resources downloaded XML file
+        /// from the play console.
+        /// </summary>
+        /// <returns><c>true</c>, if setup was performed, <c>false</c> otherwise.</returns>
+        /// <param name="className">Fully qualified class name for the resource Ids.</param>
+        /// <param name="resourceXmlData">Resource xml data.</param>
+        /// <param name="clientId">Client identifier.</param>
+        /// <param name="bundleId">Bundle identifier.</param>
+        /// <param name="nearbySvcId">Nearby svc identifier.</param>
+        public static bool PerformSetup(string bundleId, 
+            string className, string resourceXmlData, string nearbySvcId)
+        {
+            if (ParseResources(className, resourceXmlData))
+            {
+                GPGSProjectSettings.Instance.Set("proj.ConstantsClassName", className);
+                GPGSProjectSettings.Instance.Set("proj.ios.ResourceData", resourceXmlData);
+                return PerformSetup(GPGSProjectSettings.Instance.Get("ios.ClientId"),
+                    bundleId, nearbySvcId);
+            }
+            return false;
+        }
+
+        private static bool ParseResources(string className, string res)
+        {
+           // parse the resources, they keys are in the form of
+            // #define <KEY> @"<VALUE>"
+
+            //transform the string to make it easier to parse
+            string input = res.Replace("#define ","");
+            input = input.Replace("@\"", "");
+            input = input.Replace("\"", "");
+
+            // now input is name value, one per line
+            StringReader reader = new StringReader(input);
+            string line = reader.ReadLine();
+            string key;
+            string value;
+            string clientId = null;
+            Hashtable resourceKeys = new Hashtable();
+            while (line != null)
+            {
+                string[] parts = line.Split(' ');
+                key = parts[0];
+                if (parts.Length > 1)
+                {
+                    value = parts[1];
+                }
+                else
+                {
+                    value = null;
+                }
+                if (!string.IsNullOrEmpty(value))
+                {
+                    if (key == "CLIENT_ID")
+                    {
+                        clientId = value;
+                        GPGSProjectSettings.Instance.Set("ios.ClientId", clientId);
+                    }
+                    else if (key.StartsWith("ACH_"))
+                    {
+                        string prop = "achievement_" + key.Substring(4).ToLower();
+                        resourceKeys[prop] = value;
+                    }
+                    else if (key.StartsWith("LEAD_"))
+                    {
+                        string prop = "leaderboard_" + key.Substring(5).ToLower();
+                        resourceKeys[prop] = value;
+                    }
+                    else if (key.StartsWith("EVENT_"))
+                    {
+                        string prop = "event_" + key.Substring(6).ToLower();
+                        resourceKeys[prop] = value;
+                    }
+                    else if (key.StartsWith("QUEST_"))
+                    {
+                        string prop = "quest_" + key.Substring(6).ToLower();
+                        resourceKeys[prop] = value;
+                    }
+                    else
+                    {
+                        resourceKeys[key] = value;
+                    }
+                }
+                line = reader.ReadLine();
+            }
+            reader.Close();
+            if (resourceKeys.Count > 0)
+            {
+                GPGSUtil.WriteResourceIds(className, resourceKeys);
+            }
+            return !string.IsNullOrEmpty(clientId);
+        }
+
 
         /// <summary>
         /// Performs the setup.  This is called externally to facilitate
@@ -138,7 +254,8 @@ namespace GooglePlayGames
         /// <param name="clientId">Client identifier.</param>
         /// <param name="bundleId">Bundle identifier.</param>
         /// <param name="nearbySvcId">Nearby connections service Id.</param>
-        public static bool PerformSetup(string clientId, string bundleId, string nearbySvcId)
+        public static bool PerformSetup(string clientId, string bundleId,
+            string nearbySvcId)
         {
 
             if (!GPGSUtil.LooksLikeValidClientId(clientId))

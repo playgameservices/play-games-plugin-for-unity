@@ -154,12 +154,20 @@ Player Settings window. In that window, look for the **Bundle Identifier** setti
 under **Other Settings**. Enter your package name there (for example
 _com.example.my.awesome.game_).
 
-Next, click the **Window |Google Play Games|Setup - Android setup** menu item. This will display the Android setup screen, where you must input your Application ID (e.g. 12345678012).
+Next, click the **Window |Google Play Games|Setup - Android setup** menu item.
+This will display the Android setup screen.
 
-After filling in the application ID, click the **Setup** button.
+Enter the Constants class name.  This is the name of the fully qualified class
+that will be updated (or created) which contains the IDs of the game resources.
+The format of the name is <namespace>.<classname>.
 
-**Important:** The application ID and package name settings must match exactly
-the values you used when setting up your project on the Developer Console.
+Enter the resource definition data.  This is the XML data from the play console
+which contains the resource IDs as well as the Application ID for Android.
+
+This data is found in the play console by clicking "Get resources" on any of the 
+resource pages (e.g. Achievements or Leaderboards), then clicking Android.
+
+After pasting the data into the text area, click the **Setup** button.
 
 ### Additional instructions on building for Android on Windows
 
@@ -192,7 +200,19 @@ Next, open the iOS build settings dialog. To do so, click **File | Build Setting
 select the **iOS** platform, and click **Player Settings**. Find the **Bundle Identifier**
 setting and enter your bundle identifier there.
 
-Next, click the **Window | Google Play Games | Setup  - iOS **setup menu item. This will display the iOS setup screen, where you must input:
+Next, click the **Window | Google Play Games | Setup  - iOS setup menu item.
+
+Enter the Constants class name.  This is the name of the fully qualified class
+that will be updated (or created) which contains the IDs of the game resources.
+The format of the name is <namespace>.<classname>.
+
+Enter the resource definition data.  This is the Objective-C  data from the play console
+which contains the resource IDs as well as the Client ID.
+
+This data is found in the play console by clicking "Get resources" on any of the 
+resource pages (e.g. Achievements or Leaderboards), then clicking Objective-C.
+
+After pasting the data into the text area, click the **Setup** button.
 
 * Your client ID (e.g. "46798138751-afwa4iejsfjskj.apps.googleusercontent.com")
 * Your bundle identifier (e.g. "com.example.AwesomeGame")
@@ -763,7 +783,10 @@ Build Options | Debug Information Format | Debug. Select **DWARF** instead of **
 
 **URL errors while signing in.** This is often a sign that either the client ID or the Bundle Identifier is not correctly set up, or that your **Info.plist** file got corrupted. Check that your client ID and Bundle ID are correctly configured in the project and that they correspond to the data in the Developer Console.
 
-## Building for iOS to run on the simulator
+## Building for iOS to run on the simulator (pre-Unity 5.0)
+
+**Note:** If you are using Unity 5.0 or greater, no changes to the generated project
+is needed.
 
 To run your game in the simulator as opposed to a real device, you must export
 it from Unity with the "Simulator SDK" instead of the "Device SDK". To do this,

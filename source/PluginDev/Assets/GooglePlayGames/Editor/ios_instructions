@@ -36,11 +36,11 @@ TO FINISH CONFIGURING THE EXPORTED XCODE PROJECT
 Your project is now ready to build and deploy!
 
 
+-- APPENDIX: Running on the simulator. (Pre Unity 5.0 only) --
 
+**NOTE**: If you are using Unity 5.0 or greater, the application will run in the 
+simulator with no modification.
 
-
-
--- APPENDIX: Running on the simulator. --
 You only need to read this section if you intend to run your project
 in the simulator, as opposed to an actual device.
 

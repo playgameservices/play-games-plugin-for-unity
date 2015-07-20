@@ -16,24 +16,30 @@
 
 namespace GooglePlayGames
 {
+    using System.IO;
+    using System.Collections;
+    using System.Xml;
     using UnityEngine;
     using UnityEditor;
 
     public class GPGSAndroidSetupUI : EditorWindow
     {
-        private string mAppId = string.Empty;
+        private string mConfigData = string.Empty;
+        private string mClassName = "GooglePlayGames.GPGSIds";
+        private Vector2 scroll;
 
         [MenuItem("Window/Google Play Games/Setup/Android setup...", false, 1)]
         public static void MenuItemFileGPGSAndroidSetup()
         {
             EditorWindow window = EditorWindow.GetWindow(
                 typeof(GPGSAndroidSetupUI), true, GPGSStrings.AndroidSetup.Title);
-            window.minSize = new Vector2(400, 200);
+            window.minSize = new Vector2(500, 400);
         }
 
         public void OnEnable()
         {
-            mAppId = GPGSProjectSettings.Instance.Get("proj.AppId");
+            mClassName = GPGSProjectSettings.Instance.Get("proj.ConstantsClassName");
+            mConfigData = GPGSProjectSettings.Instance.Get("proj.ResourceData");
         }
 
         public void OnGUI()
@@ -43,14 +49,22 @@ namespace GooglePlayGames
 
             GUILayout.Space(10);
             GUILayout.Label(GPGSStrings.AndroidSetup.Blurb);
-
-            GUILayout.Label(GPGSStrings.Setup.AppId, EditorStyles.boldLabel);
-            GUILayout.Label(GPGSStrings.Setup.AppIdBlurb);
+           
+            GUILayout.Label("Constants class name", EditorStyles.boldLabel);
+            GUILayout.Label("Enter the fully qualified name of the class to create containing the constants");
             GUILayout.Space(10);
 
-            mAppId = EditorGUILayout.TextField(GPGSStrings.Setup.AppId,
-                mAppId,GUILayout.Width(300));
-
+            mClassName = EditorGUILayout.TextField("Constants class name",
+                mClassName,GUILayout.Width(480));
+            
+            GUILayout.Label("Resources Definition", EditorStyles.boldLabel);
+            GUILayout.Label("Paste in the Android Resources from the Play Console");
+            GUILayout.Space(10);
+            scroll = GUILayout.BeginScrollView(scroll);
+            mConfigData = EditorGUILayout.TextArea(mConfigData,
+                GUILayout.Width(475), GUILayout.Height(Screen.height));
+            GUILayout.EndScrollView();
+            GUILayout.Space(10);
             GUILayout.FlexibleSpace();
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
@@ -72,13 +86,81 @@ namespace GooglePlayGames
 
         public void DoSetup()
         {
-            if (PerformSetup(mAppId, null))
+            if (PerformSetup(mClassName, mConfigData, null))
             {
                 EditorUtility.DisplayDialog(GPGSStrings.Success,
                     GPGSStrings.AndroidSetup.SetupComplete, GPGSStrings.Ok);
                 this.Close();
             }
+            else
+            {
+                GPGSUtil.Alert(GPGSStrings.Error,
+                    "Invalid or missing XML resource data.  Make sure the data is" +
+                    " valid and contains the app_id element");
+            }
            
+        }
+
+        private static bool ParseResources(string className, string res)
+        {
+            XmlTextReader reader = new XmlTextReader(new StringReader(res));
+            bool inResource = false;
+            string lastProp = null;
+            Hashtable resourceKeys = new Hashtable();
+            string appId = null;
+            while (reader.Read())
+            {
+                if (reader.Name == "resources")
+                {
+                    inResource = true;
+                }
+                if (inResource && reader.Name == "string")
+                {
+                    lastProp = reader.GetAttribute("name");
+                }
+                else if (inResource && !string.IsNullOrEmpty(lastProp))
+                {
+                    if (reader.HasValue)
+                    {
+                        if (lastProp == "app_id")
+                        {
+                            appId = reader.Value;
+                            GPGSProjectSettings.Instance.Set("proj.AppId", appId);
+                        }
+                        else
+                        {
+                            resourceKeys[lastProp] = reader.Value;
+                        }
+                        lastProp = null;
+                    }
+                }
+            }
+            reader.Close();
+            if (resourceKeys.Count > 0)
+            {
+                GPGSUtil.WriteResourceIds(className, resourceKeys);
+            }
+            return appId != null;
+        }
+
+
+        /// <summary>
+        /// Performs setup using the Android resources downloaded XML file
+        /// from the play console.
+        /// </summary>
+        /// <returns><c>true</c>, if setup was performed, <c>false</c> otherwise.</returns>
+        /// <param name="className">Fully qualified class name for the resource Ids.</param>
+        /// <param name="resourceXmlData">Resource xml data.</param>
+        /// <param name="nearbySvcId">Nearby svc identifier.</param>
+        public static bool PerformSetup(string className, string resourceXmlData, string nearbySvcId)
+        {
+            if (ParseResources(className, resourceXmlData))
+            {
+                GPGSProjectSettings.Instance.Set("proj.ConstantsClassName", className);
+                GPGSProjectSettings.Instance.Set("proj.ResourceData", resourceXmlData);
+                return PerformSetup(GPGSProjectSettings.Instance.Get("proj.AppId"), nearbySvcId);
+            }
+            return false;
         }
 
         /// <summary>

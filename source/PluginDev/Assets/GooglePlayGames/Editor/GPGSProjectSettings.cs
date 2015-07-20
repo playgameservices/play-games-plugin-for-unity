@@ -18,6 +18,7 @@ namespace GooglePlayGames
 {
     using System.Collections.Generic;
     using System.IO;
+    using UnityEngine;
 
     public class GPGSProjectSettings
     {
@@ -91,7 +92,8 @@ namespace GooglePlayGames
         {
             if (mDict.ContainsKey(key))
             {
-                return mDict[key];
+                string val = WWW.UnEscapeURL(mDict[key]);
+                return val;
             }
             else
             {
@@ -116,7 +118,8 @@ namespace GooglePlayGames
 
         public void Set(string key, string val)
         {
-            mDict[key] = val;
+            string escaped = WWW.EscapeURL(val);
+            mDict[key] = escaped;
             mDirty = true;
         }
 
