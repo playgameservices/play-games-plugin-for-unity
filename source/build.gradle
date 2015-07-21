@@ -12,9 +12,18 @@ buildscript {
     Project level variables
 */
 project.ext {
-    ndk_root = System.getenv("ANDROID_NDK_ROOT")
-    sdk_root = System.getenv("ANDROID_HOME")
-    unity_exe = System.getenv("UNITY_EXE")
+    ndk_root = System.getProperty("ANDROID_NDK_ROOT")
+    if (ndk_root == null || ndk_root.isEmpty()) {
+        ndk_root = System.getenv("ANDROID_NDK_ROOT")
+    }
+    sdk_root = System.getProperty("ANDROID_HOME")
+    if (sdk_root == null || sdk_root.isEmpty()) {
+        sdk_root = System.getenv("ANDROID_HOME")
+    }
+    unity_exe = System.getProperty("UNITY_EXE")
+    if (unity_exe == null || unity_exe.isEmpty()) {
+        unity_exe = System.getenv("UNITY_EXE")
+    }
     if (unity_exe == null || unity_exe.isEmpty()) {
         unity_exe ='/Applications/Unity/Unity.app/Contents/MacOS/Unity'
     }
