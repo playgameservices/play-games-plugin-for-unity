@@ -132,6 +132,20 @@ namespace GooglePlayGames
         }
 
         /// <summary>
+        /// Gets an access token for the user.
+        /// </summary>
+        /// <returns>
+        /// An access token for the user.
+        /// </returns>
+        public new string token
+        {
+            get
+            {
+                return authenticated ? mPlatform.GetToken() : string.Empty;
+            }
+        }
+
+        /// <summary>
         /// Returns true (since this is the local user).
         /// </summary>
         public new bool isFriend

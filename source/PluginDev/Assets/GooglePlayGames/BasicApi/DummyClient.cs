@@ -43,6 +43,12 @@ public class DummyClient : IPlayGamesClient
       LogUsage();
     }
 
+    public string GetToken()
+    {
+      LogUsage();
+      return "DummyToken";
+    }
+
     public string GetUserId()
     {
       LogUsage();

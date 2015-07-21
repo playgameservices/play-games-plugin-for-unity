@@ -285,6 +285,71 @@ namespace GooglePlayGames.Native
                 AndroidJNIHelper.DeleteJNIArgArray(objectArray, jArgs);
             }
         }
+        
+        private AndroidJavaObject GetApiClient(GameServices services) {
+            //return JavaUtils.JavaObjectFromPointer(GooglePlayGames.Native.Cwrapper.InternalHooks.InternalHooks_GetApiClient(services.AsHandle()));
+            using (var currentActivity = GetActivity()) {
+                using (AndroidJavaClass jc_plus = new AndroidJavaClass("com.google.android.gms.plus.Plus")) {
+                    using (AndroidJavaObject jc_builder = new AndroidJavaObject("com.google.android.gms.common.api.GoogleApiClient$Builder",currentActivity)) {
+                        jc_builder.Call<AndroidJavaObject> ("addApi", jc_plus.GetStatic<AndroidJavaObject>("API"));
+                        jc_builder.Call<AndroidJavaObject> ("addScope", jc_plus.GetStatic<AndroidJavaObject>("SCOPE_PLUS_LOGIN"));
+                        AndroidJavaObject client = jc_builder.Call<AndroidJavaObject> ("build");
+                        client.Call ("connect");
+                        while(!client.Call<bool>("isConnected"))
+                        {
+                            System.Threading.Thread.Sleep(100);
+                        }
+                        return client;
+                    }
+                }
+            }
+        }
+        
+        private string RetrieveUserEmail() {
+            string email;
+            using (AndroidJavaClass jc_plus = new AndroidJavaClass("com.google.android.gms.plus.Plus")) {
+                using (AndroidJavaObject jo_plusAccountApi = jc_plus.GetStatic<AndroidJavaObject>("AccountApi")) {
+                    Debug.Log("jo_plusAccountApi: " + (jo_plusAccountApi == null ? "NULL" : jo_plusAccountApi.ToString()));
+                    using (var apiClient = GetApiClient(mServices)) {
+                        Debug.Log("apiClient: " + (apiClient == null ? "NULL" : apiClient.ToString()));
+                        email  = jo_plusAccountApi.Call<string>("getAccountName", apiClient);
+                        Logger.d("Player email: " + email);
+                    }
+                }
+            }
+            return email;
+        }
+        
+        public string GetToken() {
+			if( String.IsNullOrEmpty(GameInfo.AndroidClientId) || ("__ANDROID_CLIENTID__" == GameInfo.AndroidClientId) )
+			{
+				throw new Exception("Client ID has not been set, cannot request access token.");
+			}
+            string token = null;
+            Debug.Log("Before RetrieveUserEmail");
+            string email = RetrieveUserEmail() ?? "NULL";
+            Debug.Log("After RetrieveUserEmail email: " + email);
+            string scope = "audience:server:client_id:" + "101626759741-kc5sdafasdfsdf9j1aek9bfgfou3oom.apps.googleusercontent.com";//CLIENT_ID;
+            using (AndroidJavaClass jc_unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"),
+                   jc_gau = new AndroidJavaClass("com.google.android.gms.auth.GoogleAuthUtil")) {
+                using(AndroidJavaObject jo_Activity = jc_unityPlayer.GetStatic<AndroidJavaObject>("currentActivity")) {
+                    token = jc_gau.CallStatic<string>("getToken", jo_Activity, email, scope);
+                }
+            }
+            Debug.Log("Token " + token);
+            return token;
+        }
+
+        #elif UNITY_IOS
+        
+        [System.Runtime.InteropServices.DllImport("__Internal")]
+        private static extern string _GooglePlayGetAccessToken();
+        
+        public string GetToken()
+        {
+            return _GooglePlayGetAccessToken();
+        }
+        
         #endif
 
         internal static PlatformConfiguration CreatePlatformConfiguration()

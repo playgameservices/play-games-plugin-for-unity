@@ -362,6 +362,21 @@ namespace GooglePlayGames
         }
 
         /// <summary>
+        /// Returns an access token for the user.
+        /// </summary>
+        /// <returns>
+        /// An access token for the user.
+        /// </returns>
+        public string GetToken()
+        {
+            if (mClient != null)
+            {
+                return mClient.GetToken();
+            }
+            return null;
+        }
+
+        /// <summary>
         /// Returns the achievement corresponding to the passed achievement identifier.
         /// </summary>
         /// <returns>
