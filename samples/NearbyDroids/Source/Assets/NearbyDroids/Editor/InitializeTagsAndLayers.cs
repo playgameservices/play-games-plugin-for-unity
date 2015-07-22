@@ -78,7 +78,7 @@ namespace NearbyDroids
             Debug.Log("Checking for custom tags and layers");
 
             // Open tag manager
-            SerializedObject tagManager = 
+            SerializedObject tagManager =
                 new SerializedObject(AssetDatabase.LoadAllAssetsAtPath(
                     "ProjectSettings/TagManager.asset")[0]);
 
@@ -143,14 +143,13 @@ namespace NearbyDroids
                     SerializedProperty t = layersProp.GetArrayElementAtIndex(0);
                     t.FindPropertyRelative("name").stringValue = name;
                     t.FindPropertyRelative("uniqueID").longValue = sortingLayerIds[index];
-                   
                     Debug.Log("Adding sorting layer: " + name);
                 }
             }
         }
 
         /// <summary>
-        /// Checks the layers in the pre-unity 5.0 layout 
+        /// Checks the layers in the pre-unity 5.0 layout
         /// NOTE:  This is untested!!!
         /// </summary>
         /// <param name="tagManager">Tag manager.</param>
