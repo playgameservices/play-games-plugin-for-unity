@@ -250,7 +250,7 @@ namespace GooglePlayGames
             foreach (DictionaryEntry ent in resourceKeys)
             {
                 constantsValues += "        public const string " +
-                    ent.Key + " = \"" + ent.Value + "\";\n";
+                    ent.Key + " = \"" + ent.Value + "\"; // <GPGSID>\n";
             }
 
             string fileBody = GPGSUtil.ReadEditorTemplate("template-Constants");
