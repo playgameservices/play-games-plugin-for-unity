@@ -85,6 +85,12 @@ namespace GooglePlayGames.BasicApi.Multiplayer
         void GetAllInvitations(Action<Invitation[]> callback);
 
         /// <summary>
+        /// Gets all matches.
+        /// </summary>
+        /// <param name="callback">Callback.</param>
+        void GetAllMatches(Action<TurnBasedMatch[]> callback);
+
+        /// <summary>
         /// Starts a game by showing the match inbox. The player's match inbox will be
         /// shown, allowing the player to pick an ongoing match or accept an outstanding
         /// invite. Once they choose a match or invitation, your callback will be called.

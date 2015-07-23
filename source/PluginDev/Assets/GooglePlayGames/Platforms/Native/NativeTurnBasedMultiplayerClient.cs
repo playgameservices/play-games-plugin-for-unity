@@ -21,7 +21,6 @@ namespace GooglePlayGames.Native
     using System;
     using GooglePlayGames.BasicApi;
     using GooglePlayGames.BasicApi.Multiplayer;
-    using GooglePlayGames.Native.Cwrapper;
     using GooglePlayGames.Native.PInvoke;
     using GooglePlayGames.OurUtils;
     using Types = GooglePlayGames.Native.Cwrapper.Types;
@@ -78,7 +77,7 @@ namespace GooglePlayGames.Native
                     .SetMinimumAutomatchingPlayers(minOpponents)
                     .SetMaximumAutomatchingPlayers(maxOpponents)
                     .SetExclusiveBitMask(exclusiveBitmask);
-                
+
                 using (var config = configBuilder.Build())
                 {
                     mTurnBasedManager.CreateMatch(config, BridgeMatchToUserCallback(
@@ -100,7 +99,7 @@ namespace GooglePlayGames.Native
             callback = Callbacks.AsOnGameThreadCallback(callback);
             mTurnBasedManager.ShowPlayerSelectUI(minOpponents, maxOpponents, true, result =>
                 {
-                    if (result.Status() != CommonErrorStatus.UIStatus.VALID)
+                    if (result.Status() != Cwrapper.CommonErrorStatus.UIStatus.VALID)
                     {
                         callback((UIStatus)result.Status(), null);
                     }
@@ -121,13 +120,39 @@ namespace GooglePlayGames.Native
         {
             mTurnBasedManager.GetAllTurnbasedMatches(allMatches =>
                 {
-                    Invitation[] invites = new Invitation[allMatches.Count()];
+                    Invitation[] invites = new Invitation[allMatches.InvitationCount()];
                     int i=0;
                     foreach (var invitation in allMatches.Invitations())
                     {
                         invites[i++] = invitation.AsInvitation();
                     }
                     callback(invites);
+                });
+        }
+
+        public void GetAllMatches(Action<TurnBasedMatch[]> callback)
+        {
+            mTurnBasedManager.GetAllTurnbasedMatches(allMatches =>
+                {
+                    int count = allMatches.MyTurnMatchesCount() +
+                        allMatches.TheirTurnMatchesCount() +
+                        allMatches.CompletedMatchesCount();
+
+                    TurnBasedMatch[] matches = new TurnBasedMatch[count];
+                    int i=0;
+                    foreach (var match in allMatches.MyTurnMatches())
+                    {
+                        matches[i++] = match.AsTurnBasedMatch(mNativeClient.GetUserId());
+                    }
+                    foreach (var match in allMatches.TheirTurnMatches())
+                    {
+                        matches[i++] = match.AsTurnBasedMatch(mNativeClient.GetUserId());
+                    }
+                    foreach (var match in allMatches.CompletedMatches())
+                    {
+                        matches[i++] = match.AsTurnBasedMatch(mNativeClient.GetUserId());
+                    }
+                    callback(matches);
                 });
         }
 
@@ -143,24 +168,24 @@ namespace GooglePlayGames.Native
                         UIStatus status = UIStatus.InternalError;
                         switch(callbackResult.ResponseStatus())
                         {
-                            case CommonErrorStatus.MultiplayerStatus.VALID:
+                            case Cwrapper.CommonErrorStatus.MultiplayerStatus.VALID:
                                 status = UIStatus.Valid;
-                                break;   
-                            case CommonErrorStatus.MultiplayerStatus.VALID_BUT_STALE:
+                                break;
+                            case Cwrapper.CommonErrorStatus.MultiplayerStatus.VALID_BUT_STALE:
                                 status = UIStatus.Valid;
-                                break;   
-                            case CommonErrorStatus.MultiplayerStatus.ERROR_INTERNAL:
+                                break;
+                            case Cwrapper.CommonErrorStatus.MultiplayerStatus.ERROR_INTERNAL:
                                 status = UIStatus.InternalError;
-                                break;   
-                            case CommonErrorStatus.MultiplayerStatus.ERROR_NOT_AUTHORIZED:
+                                break;
+                            case Cwrapper.CommonErrorStatus.MultiplayerStatus.ERROR_NOT_AUTHORIZED:
                                 status = UIStatus.NotAuthorized;
-                                break;   
-                            case CommonErrorStatus.MultiplayerStatus.ERROR_VERSION_UPDATE_REQUIRED:
+                                break;
+                            case Cwrapper.CommonErrorStatus.MultiplayerStatus.ERROR_VERSION_UPDATE_REQUIRED:
                                 status = UIStatus.VersionUpdateRequired;
-                                break;   
-                            case CommonErrorStatus.MultiplayerStatus.ERROR_TIMEOUT:
+                                break;
+                            case Cwrapper.CommonErrorStatus.MultiplayerStatus.ERROR_TIMEOUT:
                                 status = UIStatus.Timeout;
-                                break;   
+                                break;
                         }
                         userCallback(status, null);
                     }
