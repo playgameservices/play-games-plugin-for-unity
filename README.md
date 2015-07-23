@@ -195,6 +195,13 @@ the framework dependencies.
 Since Cocoapods uses workspaces to manage the project and the dependent pods, you need to
 open Unity-iPhone.xcworkspace to build the project.
 
+**Note:** If you are using a version of Unity less than 5.0, you may encounter
+a linker error when building the Xcode application.  If you see the error:
+`ld: library not found for -lPods-Unity-iPhone`
+Then open the project tree, expand Frameworks, and delete libPods-Unity-iPhone.a
+and rebuild.
+
+
 
 Next, open the iOS build settings dialog. To do so, click **File | Build Settings**,
 select the **iOS** platform, and click **Player Settings**. Find the **Bundle Identifier**
