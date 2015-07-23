@@ -19,7 +19,9 @@
 namespace GooglePlayGames.Native
 {
     using System;
+    using GooglePlayGames.BasicApi;
     using GooglePlayGames.BasicApi.Multiplayer;
+    using GooglePlayGames.Native.Cwrapper;
     using GooglePlayGames.Native.PInvoke;
     using GooglePlayGames.OurUtils;
     using Types = GooglePlayGames.Native.Cwrapper.Types;
@@ -37,36 +39,76 @@ namespace GooglePlayGames.Native
             this.mNativeClient = nativeClient;
         }
 
+        /// <summary>
+        /// Starts a game with randomly selected opponent(s). No exclusivebitmask.
+        /// </summary>
+        /// <param name="minOpponents">Minimum number opponents, not counting the current
+        /// player -- so for a 2-player game, use 1).</param>
+        /// <param name="maxOpponents">Max opponents, not counting the current player.</param>
+        /// <param name="variant">Variant. Use 0 for default.</param>
+        /// <param name="callback">Callback. Called when match setup is complete or fails.
+        /// If it succeeds, will be called with (true, match); if it fails, will be
+        /// called with (false, null).</param>
         public void CreateQuickMatch(uint minOpponents, uint maxOpponents, uint variant,
-                                 Action<bool, TurnBasedMatch> callback)
+           Action<bool, TurnBasedMatch> callback)
+        {
+            CreateQuickMatch(minOpponents, maxOpponents, variant, 0L, callback);
+        }
+
+        /// <summary>
+        /// Starts a game with randomly selected opponent(s) using exclusiveBitMask.
+        ///  No UI will be shown.
+        /// </summary>
+        /// <param name="minOpponents">Minimum number opponents, not counting the current
+        /// player -- so for a 2-player game, use 1).</param>
+        /// <param name="maxOpponents">Max opponents, not counting the current player.</param>
+        /// <param name="variant">Variant. Use 0 for default.</param>
+        /// <param name="exclusiveBitmask">The bitmask used to match players. The
+        /// xor operation of all the bitmasks must be 0 to match players.</param>
+        /// <param name="callback">Callback. Called when match setup is complete or fails.
+        /// If it succeeds, will be called with (true, match); if it fails, will be
+        /// called with (false, null).</param>
+        public void CreateQuickMatch(uint minOpponents, uint maxOpponents, uint variant,
+            ulong exclusiveBitmask, Action<bool, TurnBasedMatch> callback)
         {
             callback = Callbacks.AsOnGameThreadCallback(callback);
             using (var configBuilder = TurnBasedMatchConfigBuilder.Create())
             {
-                configBuilder.SetVariant(variant);
-                configBuilder.SetMinimumAutomatchingPlayers(minOpponents);
-                configBuilder.SetMaximumAutomatchingPlayers(maxOpponents);
+                configBuilder.SetVariant(variant)
+                    .SetMinimumAutomatchingPlayers(minOpponents)
+                    .SetMaximumAutomatchingPlayers(maxOpponents)
+                    .SetExclusiveBitMask(exclusiveBitmask);
+                
                 using (var config = configBuilder.Build())
                 {
-                    mTurnBasedManager.CreateMatch(config, BridgeMatchToUserCallback(callback));
+                    mTurnBasedManager.CreateMatch(config, BridgeMatchToUserCallback(
+                        (status, match) => callback(status == UIStatus.Valid, match)));
                 }
             }
         }
 
         public void CreateWithInvitationScreen(uint minOpponents, uint maxOpponents, uint variant,
-                                           Action<bool, TurnBasedMatch> callback)
+            Action<bool, TurnBasedMatch> callback)
+        {
+            CreateWithInvitationScreen(minOpponents, maxOpponents, variant,
+                (status, match) => callback(status == UIStatus.Valid, match));
+        }
+
+        public void CreateWithInvitationScreen(uint minOpponents, uint maxOpponents, uint variant,
+            Action<UIStatus, TurnBasedMatch> callback)
         {
             callback = Callbacks.AsOnGameThreadCallback(callback);
             mTurnBasedManager.ShowPlayerSelectUI(minOpponents, maxOpponents, true, result =>
                 {
-                    if (result.Status() != GooglePlayGames.Native.Cwrapper.CommonErrorStatus.UIStatus.VALID)
+                    if (result.Status() != CommonErrorStatus.UIStatus.VALID)
                     {
-                        callback(false, null);
+                        callback((UIStatus)result.Status(), null);
                     }
 
                     using (var configBuilder = TurnBasedMatchConfigBuilder.Create())
                     {
-                        configBuilder.PopulateFromUIResponse(result);
+                        configBuilder.PopulateFromUIResponse(result)
+                            .SetVariant(variant);
                         using (var config = configBuilder.Build())
                         {
                             mTurnBasedManager.CreateMatch(config, BridgeMatchToUserCallback(callback));
@@ -75,8 +117,22 @@ namespace GooglePlayGames.Native
                 });
         }
 
+        public void GetAllInvitations(Action<Invitation[]> callback)
+        {
+            mTurnBasedManager.GetAllTurnbasedMatches(allMatches =>
+                {
+                    Invitation[] invites = new Invitation[allMatches.Count()];
+                    int i=0;
+                    foreach (var invitation in allMatches.Invitations())
+                    {
+                        invites[i++] = invitation.AsInvitation();
+                    }
+                    callback(invites);
+                });
+        }
+
         private Action<TurnBasedManager.TurnBasedMatchResponse> BridgeMatchToUserCallback(
-            Action<bool, TurnBasedMatch> userCallback)
+            Action<UIStatus, TurnBasedMatch> userCallback)
         {
             return callbackResult =>
             {
@@ -84,13 +140,35 @@ namespace GooglePlayGames.Native
                 {
                     if (match == null)
                     {
-                        userCallback(false, null);
+                        UIStatus status = UIStatus.InternalError;
+                        switch(callbackResult.ResponseStatus())
+                        {
+                            case CommonErrorStatus.MultiplayerStatus.VALID:
+                                status = UIStatus.Valid;
+                                break;   
+                            case CommonErrorStatus.MultiplayerStatus.VALID_BUT_STALE:
+                                status = UIStatus.Valid;
+                                break;   
+                            case CommonErrorStatus.MultiplayerStatus.ERROR_INTERNAL:
+                                status = UIStatus.InternalError;
+                                break;   
+                            case CommonErrorStatus.MultiplayerStatus.ERROR_NOT_AUTHORIZED:
+                                status = UIStatus.NotAuthorized;
+                                break;   
+                            case CommonErrorStatus.MultiplayerStatus.ERROR_VERSION_UPDATE_REQUIRED:
+                                status = UIStatus.VersionUpdateRequired;
+                                break;   
+                            case CommonErrorStatus.MultiplayerStatus.ERROR_TIMEOUT:
+                                status = UIStatus.Timeout;
+                                break;   
+                        }
+                        userCallback(status, null);
                     }
                     else
                     {
                         var converted = match.AsTurnBasedMatch(mNativeClient.GetUserId());
                         Logger.d("Passing converted match to user callback:" + converted);
-                        userCallback(true, converted);
+                        userCallback(UIStatus.Valid, converted);
                     }
                 }
             };
@@ -130,7 +208,8 @@ namespace GooglePlayGames.Native
                         return;
                     }
 
-                    mTurnBasedManager.AcceptInvitation(invitation, BridgeMatchToUserCallback(callback));
+                    mTurnBasedManager.AcceptInvitation(invitation, BridgeMatchToUserCallback(
+                        (status, match) => callback(status == UIStatus.Valid, match)));
                 }
             );
         }
@@ -399,7 +478,8 @@ namespace GooglePlayGames.Native
             callback = Callbacks.AsOnGameThreadCallback(callback);
             FindEqualVersionMatch(match, failed => callback(false, null), foundMatch =>
                 {
-                    mTurnBasedManager.Rematch(foundMatch, BridgeMatchToUserCallback(callback));
+                    mTurnBasedManager.Rematch(foundMatch, BridgeMatchToUserCallback(
+                        (status, m) => callback(status == UIStatus.Valid, m)));
                 });
         }
 

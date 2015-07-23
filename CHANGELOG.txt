@@ -1,8 +1,12 @@
 Version 0.9.22
     New Features:
        * Updated Configuration setup using Resource data from Play Console.
+       * Added support for exclusiveBitmask in Turnbased quickmatches.
        * #120 implement setStepsAtLeast for achievements
+       * #256 Get all turn-based invitations
        * #259 implement LoadAchievements
+       * #380 Callback on CreateWithInvitationScreen
+       * #445 Variant error in turn based match
 Version 0.9.21
   **BREAKING CHANGES**
        * #382 Callback for declined invitation when creating RTMP room

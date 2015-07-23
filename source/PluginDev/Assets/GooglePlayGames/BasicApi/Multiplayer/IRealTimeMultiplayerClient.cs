@@ -46,7 +46,7 @@ namespace GooglePlayGames.BasicApi.Multiplayer
     /// <param name="variant">Variant. Use 0 for default.</param>
     /// <param name="listener">Listener. The listener to notify of relevant events.</param>
     void CreateQuickGame(uint minOpponents, uint maxOpponents, uint variant,
-                         Multiplayer.RealTimeMultiplayerListener listener);
+                         RealTimeMultiplayerListener listener);
 
     /// <summary>
     /// Creates a game with random automatch opponents using exclusiveBitMask No UI will be shown.
@@ -90,7 +90,7 @@ namespace GooglePlayGames.BasicApi.Multiplayer
     /// <param name="listener">Listener. This listener will be notified of relevant
     /// events.</param>
     void CreateWithInvitationScreen(uint minOpponents, uint maxOppponents, uint variant,
-                                    Multiplayer.RealTimeMultiplayerListener listener);
+                                    RealTimeMultiplayerListener listener);
 
     /// <summary>
     /// Shows the waiting room UI and waits for all participants to join.

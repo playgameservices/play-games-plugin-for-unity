@@ -335,6 +335,13 @@ namespace GooglePlayGames.Native.PInvoke
                     index => new MultiplayerInvitation(C.TurnBasedMultiplayerManager_TurnBasedMatchesResponse_GetInvitations_GetElement(SelfPtr(), index)));
             }
 
+            internal int Count()
+            {
+                UIntPtr ptr =
+                    C.TurnBasedMultiplayerManager_TurnBasedMatchesResponse_GetInvitations_Length(SelfPtr());
+                return (int)ptr.ToUInt32();
+            }
+
             internal static TurnBasedMatchesResponse FromPointer(IntPtr pointer)
             {
                 if (PInvokeUtilities.IsNull(pointer))

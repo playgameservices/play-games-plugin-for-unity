@@ -57,5 +57,6 @@ namespace GooglePlayGames.BasicApi
     Timeout = -5,
     UserClosedUI = -6,
     UiBusy = -12,
+    LeftRoom = -18,
   }
 }
