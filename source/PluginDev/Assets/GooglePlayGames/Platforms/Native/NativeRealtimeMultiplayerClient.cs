@@ -1070,8 +1070,7 @@ namespace GooglePlayGames.Native
                             Logger.d("Connecting state ShowWaitingRoomUI: room pcount:" + response.Room().ParticipantCount() +
                                 " status: " + response.Room().Status());
                             if (response.Room().Status() == Types.RealTimeRoomStatus.ACTIVE) {
-                            mSession.EnterState(new ActiveState(response.Room(), mSession));
-                            mSession.OnGameThreadListener().RoomConnected(true);
+                                mSession.EnterState(new ActiveState(response.Room(), mSession));
                             }
                         }
                         else if(response.ResponseStatus() == Status.UIStatus.ERROR_LEFT_ROOM){
@@ -1080,7 +1079,6 @@ namespace GooglePlayGames.Native
                         else {
                             mSession.OnGameThreadListener().RoomSetupProgress(this.mPercentComplete);
                         }
-                       
                     });
             }
         }

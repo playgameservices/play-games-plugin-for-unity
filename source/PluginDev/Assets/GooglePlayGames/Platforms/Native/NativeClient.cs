@@ -503,7 +503,7 @@ namespace GooglePlayGames.Native
                         }
                         break;
                     case Types.AuthOperation.SIGN_OUT:
-                        mAuthState = AuthState.Unauthenticated;
+                        ToUnauthenticated();
                         break;
                     default:
                         Logger.e("Unknown AuthOperation " + operation);
