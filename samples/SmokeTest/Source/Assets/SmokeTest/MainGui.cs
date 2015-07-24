@@ -155,6 +155,7 @@ namespace SmokeTest
 
         public void OnRoomConnected(bool success)
         {
+            Debug.Log("----- OnRoomConnected: " + success);
             ShowEffect(success);
             if (success)
             {
@@ -715,7 +716,15 @@ namespace SmokeTest
             {
                 DoTbmpDeclineIncoming();
             }
-            else if (GUI.Button(CalcGrid(1, 3), "Match..."))
+            else if (GUI.Button(CalcGrid(1, 3), "List all Invitations"))
+            {
+                DoGetAllInvitations();
+            }
+            else if (GUI.Button(CalcGrid(0, 4), "List all Matches"))
+            {
+                DoGetAllMatches();
+            }
+            else if (GUI.Button(CalcGrid(1, 4), "Match..."))
             {
                 if (mMatch == null)
                 {
@@ -1167,7 +1176,6 @@ namespace SmokeTest
             Social.ShowLeaderboardUI();
             ShowEffect(true);
         }
-           
 
         internal char RandCharFrom(string s)
         {
@@ -1330,11 +1338,14 @@ namespace SmokeTest
 
         private void OnMatchFromNotification(TurnBasedMatch match, bool fromNotification)
         {
+            Debug.Log("In OnMatchFromNotification: fromNotification: " + fromNotification +
+                " match: " + match);
             if (fromNotification)
             {
                 mUi = Ui.TbmpMatch;
                 mMatch = match;
                 Status = "Got match from notification! " + match;
+                Debug.Log("Got match from notification! " + match);
             }
             else
             {
@@ -1391,6 +1402,36 @@ namespace SmokeTest
                     if (success)
                     {
                         mUi = Ui.TbmpMatch;
+                    }
+                });
+        }
+
+        private void DoGetAllInvitations()
+        {
+            PlayGamesPlatform.Instance.TurnBased.GetAllInvitations(
+                (invites) =>
+                {
+                    _mStatus = "Got " + invites.Length + " invites";
+                    foreach(Invitation invite in invites)
+                    {
+                        _mStatus += " " + invite.InvitationId + " (" +
+                            invite.InvitationType + ") from " +
+                            invite.Inviter + "\n";
+                    }
+                });
+        }
+
+        private void DoGetAllMatches()
+        {
+            PlayGamesPlatform.Instance.TurnBased.GetAllMatches(
+                (matches) =>
+                {
+                    _mStatus = "Got " + matches.Length + " matches";
+                    foreach(TurnBasedMatch match in matches)
+                    {
+                        _mStatus += " " + match.MatchId + " " +
+                            match.Status + " " +
+                            match.TurnStatus + "\n";
                     }
                 });
         }
@@ -1465,6 +1506,7 @@ namespace SmokeTest
             }
 
             summary = "Match: [" + data + "], S:" + mMatch.Status + ", T:" + mMatch.TurnStatus + "\n";
+            summary += "Self: " + mMatch.Self+ " me: " + Social.localUser.userName+"\n";
             summary += "With: ";
             foreach (Participant p in mMatch.Participants)
             {
