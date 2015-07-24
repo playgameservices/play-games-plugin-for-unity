@@ -7,6 +7,7 @@ Version 0.9.22
        * #259 implement LoadAchievements
        * #380 Callback on CreateWithInvitationScreen
        * #445 Variant error in turn based match
+       * #614 OnRoomConnected() getting called twice after implementing ShowWaitingRoomUI
        * #617 Get all turn-based matches
 Version 0.9.21
   **BREAKING CHANGES**
