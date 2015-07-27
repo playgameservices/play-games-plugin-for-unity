@@ -3,6 +3,9 @@ Version 0.9.22
        * Updated Configuration setup using Resource data from Play Console.
        * Added support for exclusiveBitmask in Turnbased quickmatches.
        * #120 implement setStepsAtLeast for achievements
+       * #182 Response to Submit Score or Load Scores
+       * #186 Return Leaderboard Rank?
+       * #274 Added the score reception functionality - method LoadCurrentScore
        * #256 Get all turn-based invitations
        * #259 implement LoadAchievements
        * #380 Callback on CreateWithInvitationScreen

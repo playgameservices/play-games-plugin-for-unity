@@ -17,6 +17,8 @@
 namespace GooglePlayGames.BasicApi.Multiplayer
 {
     using System;
+    using UnityEngine.SocialPlatforms;
+    using UnityEngine;
 
     /// <summary>
     /// Represents a player. A player is different from a participant! The participant is
@@ -24,11 +26,14 @@ namespace GooglePlayGames.BasicApi.Multiplayer
     /// (tied to a Google account). The player exists across matches, the Participant
     /// only exists in the context of a particular match.
     /// </summary>
-    public class Player
+    public class Player : IUserProfile
     {
         private readonly string mDisplayName;
         private readonly string mPlayerId;
         private readonly string mAvatarUrl;
+
+        private WWW wwwImage;
+        private Texture2D mImage;
 
         internal Player(string displayName, string playerId, string avatarUrl)
         {
@@ -94,5 +99,83 @@ namespace GooglePlayGames.BasicApi.Multiplayer
         {
             return mPlayerId != null ? mPlayerId.GetHashCode() : 0;
         }
+
+        #region IUserProfile implementation
+
+        public string userName
+        {
+            get
+            {
+                return DisplayName;
+            }
+        }
+
+        public string id
+        {
+            get
+            {
+                return mPlayerId;
+            }
+        }
+
+        public bool isFriend
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        public UserState state
+        {
+            get
+            {
+                return UserState.Offline;
+            }
+        }
+
+        public UnityEngine.Texture2D image
+        {
+            get
+            {
+                return LoadImage();
+            }
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Loads the local user's image from the url.  Loading urls
+        /// is asynchronous so the return from this call is fast,
+        /// the image is returned once it is loaded.  null is returned
+        /// up to that point.
+        /// </summary>
+        private Texture2D LoadImage()
+        {
+            // the url can be null if the user does not have an
+            // avatar configured.
+            if (!string.IsNullOrEmpty(mAvatarUrl))
+            {
+                if (wwwImage == null || wwwImage.url != mAvatarUrl)
+                {
+                    wwwImage = new WWW(mAvatarUrl);
+                    mImage = null;
+                }
+
+                if (mImage != null) {
+                    return mImage;
+                }
+
+                if (wwwImage.isDone)
+                {
+                    mImage =  wwwImage.texture;
+                    return mImage;
+                }
+            }
+
+            // if there is no url, always return null.
+            return null;
+        }
+
     }
 }

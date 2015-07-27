@@ -18,6 +18,7 @@ namespace GooglePlayGames.BasicApi
 {
   using System;
   using GooglePlayGames.BasicApi.Multiplayer;
+  using UnityEngine.SocialPlatforms;
 
   /// <summary>
   /// Defines an abstract interface for a Play Games Client. Concrete implementations
@@ -87,6 +88,14 @@ namespace GooglePlayGames.BasicApi
     /// <returns>The URL to load the avatar image. <code>null</code> if they are not logged
     /// in</returns>
     string GetUserImageUrl();
+
+    /// <summary>
+    /// Loads the users specified.  This is mainly used by the leaderboard
+    /// APIs to get the information of a high scorer.
+    /// </summary>
+    /// <param name="userIds">User identifiers.</param>
+    /// <param name="callback">Callback.</param>
+    void LoadUsers(string[] userIds, Action<IUserProfile[]> callback);
 
     /// <summary>
     /// Returns the achievement corresponding to the passed achievement identifier.
@@ -173,6 +182,42 @@ namespace GooglePlayGames.BasicApi
     void ShowLeaderboardUI(string leaderboardId, Action<UIStatus> callback);
 
     /// <summary>
+    /// Loads the score data for the given leaderboard.
+    /// </summary>
+    /// <param name="leaderboardId">Leaderboard identifier.</param>
+    /// <param name="start">Start indicating the top scores or player centric</param>
+    /// <param name="rowCount">max number of scores to return. non-positive indicates
+    /// no rows should be returned.  This causes only the summary info to
+    /// be loaded. This can be limited
+    // by the SDK.</param>
+    /// <param name="collection">leaderboard collection: public or social</param>
+    /// <param name="timeSpan">leaderboard timespan</param>
+    /// <param name="callback">callback with the scores, and a page token.
+    /// The token can be used to load next/prev pages.</param>
+    void LoadScores(string leaderboardId, LeaderboardStart start,
+                    int rowCount, LeaderboardCollection collection,
+                    LeaderboardTimeSpan timeSpan,
+            Action<LeaderboardScoreData> callback);
+
+
+    /// <summary>
+    /// Loads the more scores for the leaderboard.  The token is accessed
+    /// by calling LoadScores() with a positive row count.
+    /// </summary>
+    /// <param name="token">Token.</param>
+    /// <param name="rowCount">max number of scores to return.  This can be limited
+    // by the SDK.</param>
+    /// <param name="callback">Callback.</param>
+    void LoadMoreScores(ScorePageToken token, int rowCount,
+            Action<LeaderboardScoreData> callback);
+
+    /// <summary>
+    /// Returns the max number of scores returned per call.
+    /// </summary>
+    /// <returns>The max results.</returns>
+    int LeaderboardMaxResults();
+
+    /// <summary>
     /// Submits the passed score to the passed leaderboard. This operation will immediately fail
     /// if the user is not authenticated (i.e. the callback will immediately be invoked with
     /// <code>false</code>).
@@ -186,7 +231,7 @@ namespace GooglePlayGames.BasicApi
 
     /// <summary>
     /// Submits the score for the currently signed-in player
-    /// to the leaderboard associated with a specific id 
+    /// to the leaderboard associated with a specific id
     /// and metadata (such as something the player did to earn the score).
     /// </summary>
     /// <param name="score">Score.</param>
@@ -195,7 +240,6 @@ namespace GooglePlayGames.BasicApi
     /// <param name="callback">Callback upon completion.</param>
     void SubmitScore(string leaderboardId, long score, string metadata,
             Action<bool> successOrFailureCalllback);
-    
 
     /// <summary>
     /// Loads state from the cloud for the passed slot.
@@ -219,13 +263,13 @@ namespace GooglePlayGames.BasicApi
     /// </summary>
     /// <seealso cref="GooglePlayGames.Multiplayer.IRealTimeMultiplayerClient"/>
     /// <returns>The rtmp client.</returns>
-    Multiplayer.IRealTimeMultiplayerClient GetRtmpClient();
+    IRealTimeMultiplayerClient GetRtmpClient();
 
     /// <summary>
     /// Returns a turn-based multiplayer client.
     /// </summary>
     /// <returns>The tbmp client.</returns>
-    Multiplayer.ITurnBasedMultiplayerClient GetTbmpClient();
+    ITurnBasedMultiplayerClient GetTbmpClient();
 
     /// <summary>
     /// Gets the saved game client.
@@ -251,7 +295,7 @@ namespace GooglePlayGames.BasicApi
     /// <param name="invitationDelegate">Invitation delegate.</param>
     void RegisterInvitationDelegate(InvitationReceivedDelegate invitationDelegate);
   }
-    
+
   /// <summary>
   /// Delegate that handles an incoming invitation (for both RTMP and TBMP).
   /// </summary>

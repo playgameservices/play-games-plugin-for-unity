@@ -333,15 +333,18 @@ namespace GooglePlayGames
         }
 
         /// <summary>
-        /// Not implemented yet. Calls the callback with an empty list.
+        /// Loads the user information if available.
+        /// <param name="userIds">The user ids to look up</param>
+        /// <param name="callback">The callback</param>
         /// </summary>
-        public void LoadUsers(string[] userIDs, Action<IUserProfile[]> callback)
+        public void LoadUsers(string[] userIds, Action<IUserProfile[]> callback)
         {
-            Logger.w("PlayGamesPlatform.LoadUsers is not implemented.");
-            if (callback != null)
+            if (!IsAuthenticated())
             {
-                callback.Invoke(new IUserProfile[0]);
+                Logger.e("GetUserId() can only be called after authentication.");
+                callback(new IUserProfile[0]);
             }
+            mClient.LoadUsers(userIds, callback);
         }
         /// <summary>
         /// Returns the user's Google ID.
@@ -596,7 +599,8 @@ namespace GooglePlayGames
         }
 
         /// <summary>
-        /// Not implemented yet. Calls the callback with an empty list.
+        /// Loads the Achievement descriptions.
+        /// <param name="callback">The callback to receive the descriptions</param>
         /// </summary>
         public void LoadAchievementDescriptions(Action<IAchievementDescription[]> callback)
         {
@@ -614,7 +618,8 @@ namespace GooglePlayGames
         }
 
         /// <summary>
-        /// Not implemented yet. Calls the callback with an empty list.
+        /// Loads the achievement state for the current user.
+        /// <param name="callback">The callback to receive the achievements</param>
         /// </summary>
         public void LoadAchievements(Action<IAchievement[]> callback)
         {
@@ -706,24 +711,69 @@ namespace GooglePlayGames
         }
 
         /// <summary>
-        /// Not implemented yet. Calls the callback with an empty list.
+        /// Loads the scores relative the player.  This returns the 25
+        /// (which is the max results returned by the SDK per call) scores
+        /// that are around the player's score on the Social, all time leaderboard.
+        /// Use the overloaded methods which are specific to GPGS to modify these
+        /// parameters.
         /// </summary>
-        public void LoadScores(string leaderboardID, Action<IScore[]> callback)
+        /// <param name="leaderboardId">Leaderboard Id</param>
+        /// <param name="callback">Callback.</param>
+        public void LoadScores(string leaderboardId, Action<IScore[]> callback)
         {
-            Logger.w("PlayGamesPlatform.LoadScores not implemented.");
-            if (callback != null)
-            {
-                callback.Invoke(new IScore[0]);
-            }
+            LoadScores(leaderboardId, LeaderboardStart.PlayerCentered,
+                mClient.LeaderboardMaxResults(),
+                LeaderboardCollection.Public,
+                LeaderboardTimeSpan.AllTime,
+                (scoreData) => callback(scoreData.Scores)
+                );
         }
 
         /// <summary>
-        /// Not implemented yet. Returns null;
+        /// Loads the scores using the provided parameters.
+        /// </summary>
+        /// <param name="leaderboardId">Leaderboard identifier.</param>
+        /// <param name="start">Start either top scores, or player centered.</param>
+        /// <param name="rowCount">Row count. the number of rows to return.</param>
+        /// <param name="collection">Collection. social or public</param>
+        /// <param name="timeSpan">Time span. daily, weekly, all-time</param>
+        /// <param name="callback">Callback.</param>
+        public void LoadScores(string leaderboardId, LeaderboardStart start,
+            int rowCount, LeaderboardCollection collection,
+            LeaderboardTimeSpan timeSpan,
+            Action<LeaderboardScoreData> callback)
+        {
+            if (!IsAuthenticated())
+            {
+                Logger.e("LoadScores can only be called after authentication.");
+                callback(new LeaderboardScoreData(leaderboardId,
+                    ResponseStatus.NotAuthorized));
+                return;
+            }
+            mClient.LoadScores(leaderboardId, start,
+                rowCount, collection, timeSpan, callback);
+        }
+
+        public void LoadMoreScores(ScorePageToken token, int rowCount,
+            Action<LeaderboardScoreData> callback)
+        {
+            if (!IsAuthenticated())
+            {
+                Logger.e("LoadMoreScores can only be called after authentication.");
+                callback(new LeaderboardScoreData(token.LeaderboardId,
+                    ResponseStatus.NotAuthorized));
+                return;
+            }
+            mClient.LoadMoreScores(token, rowCount, callback);
+        }
+
+        /// <summary>
+        /// Returns a leaderboard object that can be configured to
+        /// load scores.
         /// </summary>
         public ILeaderboard CreateLeaderboard()
         {
-            Logger.w("PlayGamesPlatform.CreateLeaderboard not implemented. Returning null.");
-            return null;
+            return new PlayGamesLeaderboard(mDefaultLbUi);
         }
 
         /// <summary>
@@ -796,6 +846,7 @@ namespace GooglePlayGames
             if (!IsAuthenticated())
             {
                 Logger.e("ShowLeaderboardUI can only be called after authentication.");
+                callback (UIStatus.NotAuthorized);
                 return;
             }
 
@@ -837,23 +888,79 @@ namespace GooglePlayGames
         }
 
         /// <summary>
-        /// Not implemented yet. Calls the callback with <c>false</c>.
+        /// Loads the leaderboard based on the constraints in the leaderboard
+        /// object.
+        /// <param name="board">The leaderboard object.  This is created by
+        /// calling CreateLeaderboard(), and then initialized appropriately.</param>
+        /// <param name="callback">callback, returning boolean for success</param>
         /// </summary>
         public void LoadScores(ILeaderboard board, Action<bool> callback)
         {
-            Logger.w("PlayGamesPlatform.LoadScores not implemented.");
-            if (callback != null)
+            if (!IsAuthenticated())
             {
-                callback.Invoke(false);
+                Logger.e("LoadScores can only be called after authentication.");
+                if (callback != null)
+                {
+                    callback(false);
+                }
+            }
+
+            LeaderboardTimeSpan timeSpan;
+            switch (board.timeScope)
+            {
+                case TimeScope.AllTime:
+                    timeSpan = LeaderboardTimeSpan.AllTime;
+                    break;
+                case TimeScope.Week:
+                    timeSpan = LeaderboardTimeSpan.Weekly;
+                    break;
+                case TimeScope.Today:
+                    timeSpan = LeaderboardTimeSpan.Daily;
+                    break;
+                default:
+                    timeSpan = LeaderboardTimeSpan.AllTime;
+                    break;
+            }
+
+            ((PlayGamesLeaderboard)board).loading = true;
+            Logger.d("LoadScores, board=" + board + " callback is " + callback);
+            mClient.LoadScores(
+                board.id,
+                LeaderboardStart.PlayerCentered,
+                board.range.count > 0 ? board.range.count : mClient.LeaderboardMaxResults(),
+                board.userScope == UserScope.FriendsOnly ? LeaderboardCollection.Social : LeaderboardCollection.Public,
+                timeSpan,
+                (scoreData) => HandleLoadingScores(
+                    (PlayGamesLeaderboard)board, scoreData, callback));
+        }
+
+
+        internal void HandleLoadingScores(PlayGamesLeaderboard board,
+            LeaderboardScoreData scoreData, Action<bool> callback)
+        {
+            bool ok = board.SetFromData(scoreData);
+            if (ok && !board.HasAllScores() && scoreData.NextPageToken != null)
+            {
+                int rowCount = board.range.count - board.ScoreCount;
+                // need to load more scores
+                mClient.LoadMoreScores(scoreData.NextPageToken, rowCount,
+                    (nextScoreData) =>
+                    HandleLoadingScores(board, nextScoreData, callback));
+            }
+            else
+            {
+                callback(ok);
             }
         }
 
         /// <summary>
-        /// Not implemented yet. Returns false.
+        /// Check if the leaderboard is currently loading.
+        /// <param name="board">The leaderboard of interest.</param>
+        /// <returns>true if loading.</returns>
         /// </summary>
         public bool GetLoading(ILeaderboard board)
         {
-            return false;
+            return board != null && board.loading;
         }
 
         /// <summary>

@@ -100,10 +100,10 @@ leaderboard you configure, make sure to note the corresponding **achievement ID*
 Achievement and leaderboard IDs are alphanumeric strings (e.g.
 "Cgkx9eiuwi8_AQ").
 
-## Add Events and Quests 
-Events and Quests are a way to introduce new challenges for players to complete and 
+## Add Events and Quests
+Events and Quests are a way to introduce new challenges for players to complete and
 incentivizing them with some in-game reward or benefit if they succeed.
-Read more about how to configure and use Events and Quests on 
+Read more about how to configure and use Events and Quests on
 [Game Concepts - Events and Quests](https://developers.google.com/games/services/common/concepts/quests)
 
 ## Load Your Game Project
@@ -130,7 +130,7 @@ the **current-build** directory:
 To install the plugin, simply open your game project in Unity and import that file into
 your project's assets, as you would any other Unity package. This is accomplished through
 the **Assets | Import Package | Custom Package** menu item (you can also reach this menu it
-by right-clicking the **Assets** folder). After importing, you should see that 
+by right-clicking the **Assets** folder). After importing, you should see that
 a new menu item was added to the Window menu: **"Google Play Games"**.
 If you don't see the new menu items, refresh the assets by
 clicking **Assets | Refresh** and try again.
@@ -164,7 +164,7 @@ The format of the name is <namespace>.<classname>.
 Enter the resource definition data.  This is the XML data from the play console
 which contains the resource IDs as well as the Application ID for Android.
 
-This data is found in the play console by clicking "Get resources" on any of the 
+This data is found in the play console by clicking "Get resources" on any of the
 resource pages (e.g. Achievements or Leaderboards), then clicking Android.
 
 After pasting the data into the text area, click the **Setup** button.
@@ -216,7 +216,7 @@ The format of the name is <namespace>.<classname>.
 Enter the resource definition data.  This is the Objective-C  data from the play console
 which contains the resource IDs as well as the Client ID.
 
-This data is found in the play console by clicking "Get resources" on any of the 
+This data is found in the play console by clicking "Get resources" on any of the
 resource pages (e.g. Achievements or Leaderboards), then clicking Objective-C.
 
 After pasting the data into the text area, click the **Setup** button.
@@ -435,6 +435,126 @@ object first:
     PlayGamesPlatform.Instance.ShowLeaderboardUI("Cfji293fjsie_QA");
 ```
 
+## Accessing Leaderboard data
+
+There are 2 methods to retrieving the leaderboard score data.
+
+### Using Social.ILeaderboard
+
+This method uses the ILeaderboard interface to define the scope and filters
+for getting the data.  This approach allows you to configure:
+1. The leaderboard Id
+2. The collection (social or public)
+3. The timeframe (daily, weekly, all-time)
+4. The rank position to start retrieving scores.
+5. The number of scores (the default is 25).
+6. Filter by user id.
+
+If the from parameter is non-positive, then the results returned are
+player-centered, meaning the scores around the current player's score are
+returned.
+
+Note: the play game services API only supports paging, so retrieving using a
+high 'from' position will have a performance impact.
+
+```csharp
+    ILeaderboard lb = PlayGamesPlatform.Instance.CreateLeaderboard();
+    lb.id = "MY_LEADERBOARD_ID";
+    lb.LoadScores(ok =>
+        {
+            if (ok) {
+                LoadUsersAndDisplay(lb);
+            }
+            else {
+                Debug.Log("Error retrieving leaderboardi");
+            }
+        });
+```
+
+### Using PlayGamesPlatform.LoadScores()
+
+This method uses the PlayGamesPlatform directly.  This approach provides
+additional flexibility and information when accessing the leaderboard data.
+
+```csharp
+    PlayGamesPlatform.Instance.LoadScores(
+            GPGSIds.leaderboard_leaders_in_smoketesting,
+            LeaderboardStart.PlayerCentered,
+            100,
+            LeaderboardCollection.Public,
+            LeaderboardTimeSpan.AllTime,
+            (data) =>
+            {
+                mStatus = "Leaderboard data valid: " + data.Valid;
+                mStatus += "\n approx:" +data.ApproximateCount + " have " + data.Scores.Length;
+            });
+```
+
+The parameters for LoadScores() are:
+    1. leaderboardId
+    2. start position (top scores or player centered)
+    3. row count
+    4. leaderboard collection (social or public)
+    5. time span (daily, weekly, all-time)
+    6. callback accepting a LeaderboardScoreData object.
+
+The `LeaderboardScoreData` class is used to return information back to the
+caller when loading scores.  The members are:
+    1. Id - the leaderboard id
+    2. Valid - true if the returned data is valid (the call was successful)
+    3. Status - the ResponseStatus of the call
+    4. ApproximateCount - the approximate number of scores in the leaderboard
+    5. Title - the title of the leaderboard
+    6. PlayerScore - the score of the current player
+    7. Scores - the list of scores
+    8. PrevPageToken - a token that can be used to call `LoadMoreScores()` to
+        get the previous page of scores.
+    9. NextPageToken - a token that can be used to call `LoadMoreScores()` to
+        get the next page of scores.
+
+```csharp
+    void GetNextPage(LeaderboardScoreData data)
+    {
+        PlayGamesPlatform.Instance.LoadMoreScores(data.NextPageToken, 10,
+            (results) =>
+            {
+                mStatus = "Leaderboard data valid: " + data.Valid;
+                mStatus += "\n approx:" +data.ApproximateCount + " have " + data.Scores.Length;
+            });
+    }
+```
+
+### Getting player names
+
+Each score has the userId of the player that made the score.  You can use
+`Social.LoadUsers()` to load the player profile.  Remember that the contents
+of the player profile are subject to privacy settings of the players.
+
+```csharp
+    internal void LoadUsersAndDisplay(ILeaderboard lb)
+    {
+        // get the user ids
+        List<string> userIds = new List<string>();
+
+        foreach(IScore score in lb.scores) {
+            userIds.Add(score.userID);
+        }
+        // load the profiles and display (or in this case, log)
+        Social.LoadUsers(userIds.ToArray(), (users) =>
+            {
+                string status = "Leaderboard loading: " + lb.title + " count = " +
+                    lb.scores.Length;
+                foreach(IScore score in lb.scores) {
+                    IUserProfile user = FindUser(users, score.userID);
+                    status += "\n" + score.formattedValue + " by " +
+                        (string)(
+                            (user != null) ? user.userName : "**unk_" + score.userID + "**");
+                }
+                Debug.log(status);
+            });
+    }
+```
+
 ## Recording Events
 Incrementing an event is very simple, just call the following method:
 
@@ -458,7 +578,7 @@ your app must present the quests UI.  To bring up the UI, call the following met
         // ...
     });
 ```
-After the user dismisses the quests UI or takes some action within the UI, your application 
+After the user dismisses the quests UI or takes some action within the UI, your application
 will receive a callback.  If the user has tried to accept a quest or claim a quest milestone
 reward, you should take the appropriate action.  The code below demonstrates one way to handle
 user actions:
