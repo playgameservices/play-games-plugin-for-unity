@@ -19,6 +19,7 @@
 namespace GooglePlayGames.Native.PInvoke
 {
     using System;
+    using System.Collections.Generic;
     using System.Runtime.InteropServices;
     using GooglePlayGames.OurUtils;
     using C = GooglePlayGames.Native.Cwrapper.PlayerManager;
@@ -46,6 +47,88 @@ namespace GooglePlayGames.Native.PInvoke
         {
             Callbacks.PerformInternalCallback("PlayerManager#InternalFetchSelfCallback",
                 Callbacks.Type.Temporary, response, data);
+        }
+
+        internal void FetchList(string[] userIds, Action<NativePlayer[]> callback)
+        {
+            FetchResponseCollector coll = new FetchResponseCollector();
+            coll.pendingCount = userIds.Length;
+            coll.callback = callback;
+            foreach(string id in userIds)
+            {
+                C.PlayerManager_Fetch(mGameServices.AsHandle(),
+                    Types.DataSource.CACHE_OR_NETWORK,
+                    id,
+                    InternalFetchCallback,
+                    Callbacks.ToIntPtr<FetchResponse>(
+                        (rsp) => HandleFetchResponse(coll, rsp),
+                        FetchResponse.FromPointer)
+                    );
+            }
+        }
+
+        [AOT.MonoPInvokeCallback(typeof(C.FetchCallback))]
+        private static void InternalFetchCallback(IntPtr response, IntPtr data)
+        {
+            Callbacks.PerformInternalCallback("PlayerManager#InternalFetchCallback",
+                Callbacks.Type.Temporary, response, data);
+        }
+
+        internal void HandleFetchResponse(FetchResponseCollector collector,
+            FetchResponse resp)
+        {
+            if (resp.Status() == Status.ResponseStatus.VALID ||
+                resp.Status() == Status.ResponseStatus.VALID_BUT_STALE)
+            {
+                NativePlayer player = resp.GetPlayer();
+                collector.results.Add(player);
+            }
+            collector.pendingCount--;
+            if (collector.pendingCount == 0)
+            {
+                collector.callback(collector.results.ToArray());
+            }
+        }
+
+        internal class FetchResponseCollector
+        {
+            internal int pendingCount;
+            internal List<NativePlayer> results = new List<NativePlayer>();
+            internal Action<NativePlayer[]> callback;
+        }
+
+        internal class FetchResponse : BaseReferenceHolder
+        {
+            internal FetchResponse(IntPtr selfPointer) : base(selfPointer)
+            {
+            }
+
+            protected override void CallDispose(HandleRef selfPointer)
+            {
+                C.PlayerManager_FetchResponse_Dispose(SelfPtr());
+            }
+
+            internal NativePlayer GetPlayer()
+            {
+                return new NativePlayer(
+                    C.PlayerManager_FetchResponse_GetData(SelfPtr())
+                );
+            }
+
+            internal Status.ResponseStatus Status()
+            {
+                return C.PlayerManager_FetchResponse_GetStatus(SelfPtr());
+            }
+
+            internal static FetchResponse FromPointer(IntPtr selfPointer)
+            {
+                if (PInvokeUtilities.IsNull(selfPointer))
+                {
+                    return null;
+                }
+
+                return new FetchResponse(selfPointer);
+            }
         }
 
         internal class FetchSelfResponse : BaseReferenceHolder

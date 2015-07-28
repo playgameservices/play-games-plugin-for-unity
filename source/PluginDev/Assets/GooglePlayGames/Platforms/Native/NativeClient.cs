@@ -30,6 +30,7 @@ namespace GooglePlayGames.Native
     using Types = GooglePlayGames.Native.Cwrapper.Types;
     using Status = GooglePlayGames.Native.Cwrapper.CommonErrorStatus;
     using UnityEngine;
+    using UnityEngine.SocialPlatforms;
 
     public class NativeClient : IPlayGamesClient
     {
@@ -79,7 +80,8 @@ namespace GooglePlayGames.Native
                 return mServices;
             }
         }
-
+        ///<summary></summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.Authenticate"/>
         public void Authenticate(Action<bool> callback, bool silent)
         {
             lock (AuthStateLock)
@@ -335,6 +337,8 @@ namespace GooglePlayGames.Native
             #endif
         }
 
+        ///<summary></summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.IsAuthenticated"/>
         public bool IsAuthenticated()
         {
             lock (AuthStateLock)
@@ -523,6 +527,8 @@ namespace GooglePlayGames.Native
             }
         }
 
+        ///<summary></summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.SignOut"/>
         public void SignOut()
         {
             ToUnauthenticated();
@@ -535,6 +541,8 @@ namespace GooglePlayGames.Native
             GameServices().SignOut();
         }
 
+        ///<summary></summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.GetUserId"/>
         public string GetUserId()
         {
             if (mUser == null)
@@ -545,6 +553,8 @@ namespace GooglePlayGames.Native
             return mUser.PlayerId;
         }
 
+        ///<summary></summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.GetUserDisplayName"/>
         public string GetUserDisplayName()
         {
             if (mUser == null)
@@ -555,6 +565,8 @@ namespace GooglePlayGames.Native
             return mUser.DisplayName;
         }
 
+        ///<summary></summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.GetUserImageUrl"/>
         public string GetUserImageUrl()
         {
             if (mUser == null)
@@ -565,6 +577,24 @@ namespace GooglePlayGames.Native
             return mUser.AvatarURL;
         }
 
+        ///<summary></summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.LoadUsers"/>
+        public void LoadUsers(string[] userIds, Action<IUserProfile[]> callback)
+        {
+            mServices.PlayerManager().FetchList(userIds,
+                (nativeUsers) =>
+                {
+                    IUserProfile[] users = new IUserProfile[nativeUsers.Length];
+                    for (int i = 0; i < users.Length; i++)
+                    {
+                        users[i] = nativeUsers[i].AsPlayer();
+                    }
+                    callback(users);
+                });
+        }
+
+        ///<summary></summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.GetAchievement"/>
         public Achievement GetAchievement(string achId)
         {
             if (mAchievements == null || !mAchievements.ContainsKey(achId))
@@ -575,6 +605,8 @@ namespace GooglePlayGames.Native
             return mAchievements[achId];
         }
 
+        ///<summary></summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.LoadAchievements"/>
         public void LoadAchievements(Action<Achievement[]> callback)
         {
             Achievement[] data = new Achievement[mAchievements.Count];
@@ -582,6 +614,8 @@ namespace GooglePlayGames.Native
             callback.Invoke (data);
         }
 
+        ///<summary></summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.UnlockAchievement"/>
         public void UnlockAchievement(string achId, Action<bool> callback)
         {
             UpdateAchievement("Unlock", achId, callback, a => a.IsUnlocked,
@@ -592,6 +626,8 @@ namespace GooglePlayGames.Native
                 });
         }
 
+        ///<summary></summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.RevealAchievement"/>
         public void RevealAchievement(string achId, Action<bool> callback)
         {
             UpdateAchievement("Reveal", achId, callback, a => a.IsRevealed,
@@ -647,6 +683,8 @@ namespace GooglePlayGames.Native
                 });
         }
 
+        ///<summary></summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.IncrementAchievement"/>
         public void IncrementAchievement(string achId, int steps, Action<bool> callback)
         {
             Misc.CheckNotNull(achId);
@@ -694,6 +732,8 @@ namespace GooglePlayGames.Native
                 });
         }
 
+        ///<summary></summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.SetStepsAtLeast"/>
         public void SetStepsAtLeast(string achId, int steps, Action<bool> callback)
         {
             Misc.CheckNotNull(achId);
@@ -742,6 +782,8 @@ namespace GooglePlayGames.Native
                 });
         }
 
+        ///<summary></summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.ShowAchievementsUI"/>
         public void ShowAchievementsUI(Action<UIStatus> cb)
         {
             if (!IsAuthenticated())
@@ -762,6 +804,15 @@ namespace GooglePlayGames.Native
             GameServices().AchievementManager().ShowAllUI(callback);
         }
 
+        ///<summary></summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.LeaderboardMaxResults"/>
+        public int LeaderboardMaxResults()
+        {
+            return GameServices().LeaderboardManager().LeaderboardMaxResults;
+        }
+
+        ///<summary></summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.ShowLeaderboardUI"/>
         public void ShowLeaderboardUI(string leaderboardId, Action<UIStatus> cb)
         {
             if (!IsAuthenticated())
@@ -788,6 +839,30 @@ namespace GooglePlayGames.Native
             }
         }
 
+        ///<summary></summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.LoadScores"/>
+        public void LoadScores(string leaderboardId, LeaderboardStart start,
+            int rowCount, LeaderboardCollection collection,
+            LeaderboardTimeSpan timeSpan,
+            Action<LeaderboardScoreData> callback)
+        {
+            GameServices().LeaderboardManager().LoadLeaderboardData(
+                leaderboardId, start, rowCount, collection, timeSpan,
+                this.mUser.PlayerId, callback
+            );
+        }
+
+        ///<summary></summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.LoadMoreScores"/>
+        public void LoadMoreScores(ScorePageToken token, int rowCount,
+            Action<LeaderboardScoreData> callback)
+        {
+            GameServices().LeaderboardManager().LoadScorePage(null,
+                rowCount, token, callback);
+        }
+
+        ///<summary></summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.SubmitScore"/>
         public void SubmitScore(string leaderboardId, long score, Action<bool> callback)
         {
             callback = AsOnGameThreadCallback(callback);
@@ -809,6 +884,8 @@ namespace GooglePlayGames.Native
             callback(true);
         }
 
+        ///<summary></summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.SubmitScore"/>
         public void SubmitScore(string leaderboardId, long score, string metadata,
                                 Action<bool> callback)
         {
@@ -831,6 +908,8 @@ namespace GooglePlayGames.Native
             callback(true);
         }
 
+        ///<summary></summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.LoadState"/>
         public void LoadState(int slot, OnStateLoadedListener listener)
         {
             Misc.CheckNotNull(listener);
@@ -846,6 +925,8 @@ namespace GooglePlayGames.Native
             }
         }
 
+        ///<summary></summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.UploadState"/>
         public void UpdateState(int slot, byte[] data, OnStateLoadedListener listener)
         {
             Misc.CheckNotNull(listener);
@@ -862,7 +943,9 @@ namespace GooglePlayGames.Native
             }
         }
 
-        public GooglePlayGames.BasicApi.Multiplayer.IRealTimeMultiplayerClient GetRtmpClient()
+        ///<summary></summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.GetRtmpClient"/>
+        public IRealTimeMultiplayerClient GetRtmpClient()
         {
             if (!IsAuthenticated())
             {
@@ -875,7 +958,9 @@ namespace GooglePlayGames.Native
             }
         }
 
-        public GooglePlayGames.BasicApi.Multiplayer.ITurnBasedMultiplayerClient GetTbmpClient()
+        ///<summary></summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.GetTbmpClient"/>
+        public ITurnBasedMultiplayerClient GetTbmpClient()
         {
             lock (GameServicesLock)
             {
@@ -883,7 +968,9 @@ namespace GooglePlayGames.Native
             }
         }
 
-        public GooglePlayGames.BasicApi.SavedGame.ISavedGameClient GetSavedGameClient()
+        ///<summary></summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.GetSavedGameClient"/>
+        public ISavedGameClient GetSavedGameClient()
         {
             lock (GameServicesLock)
             {
@@ -891,7 +978,9 @@ namespace GooglePlayGames.Native
             }
         }
 
-        public GooglePlayGames.BasicApi.Events.IEventsClient GetEventsClient()
+        ///<summary></summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.GetEventsClient"/>
+        public IEventsClient GetEventsClient()
         {
             lock (GameServicesLock)
             {
@@ -899,7 +988,9 @@ namespace GooglePlayGames.Native
             }
         }
 
-        public GooglePlayGames.BasicApi.Quests.IQuestsClient GetQuestsClient()
+        ///<summary></summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.GetQuestsClient"/>
+        public IQuestsClient GetQuestsClient()
         {
             lock (GameServicesLock)
             {
@@ -908,6 +999,8 @@ namespace GooglePlayGames.Native
         }
 
 
+        ///<summary></summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.RegisterInvitationDelegate"/>
         public void RegisterInvitationDelegate(InvitationReceivedDelegate invitationDelegate)
         {
             if (invitationDelegate == null)

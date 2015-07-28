@@ -115,7 +115,6 @@ namespace GooglePlayGames.Native.PInvoke
             {
                 val = 0;
             }
-            Debug.Log ("*_*_* Creating timestamp: " + val);
             achievement.LastModifiedTime  = UnixEpoch.AddMilliseconds(val);
             achievement.Points = getXP ();
             achievement.RevealedImageUrl = getRevealedImageUrl();

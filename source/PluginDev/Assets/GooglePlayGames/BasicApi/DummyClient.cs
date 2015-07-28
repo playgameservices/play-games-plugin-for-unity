@@ -14,12 +14,13 @@
 //    limitations under the License.
 // </copyright>
 
+
 namespace GooglePlayGames.BasicApi
 {
   using System;
-  using System.Collections.Generic;
   using GooglePlayGames.BasicApi.Multiplayer;
   using GooglePlayGames.OurUtils;
+  using UnityEngine.SocialPlatforms;
 
 public class DummyClient : IPlayGamesClient
   {
@@ -59,6 +60,15 @@ public class DummyClient : IPlayGamesClient
     {
       LogUsage();
       return null;
+    }
+
+    public void LoadUsers(string[] userIds, Action<IUserProfile[]> callback)
+    {
+        LogUsage ();
+        if (callback != null)
+        {
+            callback.Invoke(null);
+        }
     }
 
     public void LoadAchievements(Action<Achievement[]> callback)
@@ -127,6 +137,35 @@ public class DummyClient : IPlayGamesClient
         if (callback != null)
         {
             callback.Invoke(UIStatus.VersionUpdateRequired);
+        }
+    }
+
+    public int LeaderboardMaxResults()
+    {
+        return 25;
+    }
+
+    public void LoadScores(string leaderboardId, LeaderboardStart start,
+        int rowCount, LeaderboardCollection collection,
+        LeaderboardTimeSpan timeSpan,
+            Action<LeaderboardScoreData> callback)
+    {
+        LogUsage();
+        if (callback != null)
+        {
+                callback(new LeaderboardScoreData(leaderboardId,
+                    ResponseStatus.LicenseCheckFailed));
+        }
+    }
+
+    public void LoadMoreScores(ScorePageToken token, int rowCount,
+                    Action<LeaderboardScoreData> callback)
+    {
+        LogUsage();
+        if (callback != null)
+        {
+                callback(new LeaderboardScoreData(token.LeaderboardId,
+                    ResponseStatus.LicenseCheckFailed));
         }
     }
 
