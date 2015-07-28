@@ -1,5 +1,5 @@
 ﻿// <copyright file="AchievementGUI.cs" company="Google Inc.">
-// Copyright (C) 2015 Google Inc.
+// Copyright (C) 2015 Google Inc. All Rights Reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -83,7 +83,8 @@ namespace SmokeTest
             {
                 DoAchievementUI();
             }
-            if (GUILayout.Button("Back",GUILayout.ExpandHeight(true)))
+            if (GUILayout.Button("Back",GUILayout.ExpandHeight(true),
+                GUILayout.Height(height),GUILayout.ExpandWidth(true)))
             {
                 mOwner.SetUI(MainGui.Ui.Main);
             }
