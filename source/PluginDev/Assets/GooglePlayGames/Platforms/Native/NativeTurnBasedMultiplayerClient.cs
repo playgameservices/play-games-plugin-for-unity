@@ -19,6 +19,7 @@
 namespace GooglePlayGames.Native
 {
     using System;
+    using System.Collections;
     using GooglePlayGames.BasicApi;
     using GooglePlayGames.BasicApi.Multiplayer;
     using GooglePlayGames.Native.PInvoke;
@@ -297,7 +298,20 @@ namespace GooglePlayGames.Native
 
             bool shouldAutolaunch = eventType == Types.MultiplayerEvent.UPDATED_FROM_APP_LAUNCH;
 
-            currentDelegate(match.AsTurnBasedMatch(mNativeClient.GetUserId()), shouldAutolaunch);
+            match.ReferToMe();
+            Callbacks.AsCoroutine(WaitForLogin(()=>
+                
+                {currentDelegate(match.AsTurnBasedMatch(mNativeClient.GetUserId()), shouldAutolaunch);
+                    match.ForgetMe();}));
+        }
+
+        IEnumerator WaitForLogin(Action method)
+        {
+            if (string.IsNullOrEmpty(mNativeClient.GetUserId()))
+            {
+                yield return null;
+            }
+            method.Invoke();
         }
 
 

@@ -17,6 +17,7 @@
 namespace GooglePlayGames.OurUtils
 {
     using System;
+    using System.Collections;
     using UnityEngine;
     using System.Collections.Generic;
 
@@ -72,6 +73,14 @@ namespace GooglePlayGames.OurUtils
             if (instance == this)
             {
                 instance = null;
+            }
+        }
+
+        public static void RunCoroutine(IEnumerator action)
+        {
+            if (instance != null)
+            {
+                instance.StartCoroutine(action);
             }
         }
 

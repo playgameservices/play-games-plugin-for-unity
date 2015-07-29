@@ -19,6 +19,7 @@
 namespace GooglePlayGames.Native.PInvoke
 {
     using System;
+    using System.Collections;
     using System.Runtime.InteropServices;
     using GooglePlayGames.Native.Cwrapper;
     using GooglePlayGames.OurUtils;
@@ -229,6 +230,11 @@ namespace GooglePlayGames.Native.PInvoke
 
                 PlayGamesHelperObject.RunOnGameThread(() => toInvokeOnGameThread(result1, result2));
             };
+        }
+
+        internal static void AsCoroutine(IEnumerator routine)
+        {
+            PlayGamesHelperObject.RunCoroutine(routine);
         }
 
         internal static byte[] IntPtrAndSizeToByteArray(IntPtr data, UIntPtr dataLength)

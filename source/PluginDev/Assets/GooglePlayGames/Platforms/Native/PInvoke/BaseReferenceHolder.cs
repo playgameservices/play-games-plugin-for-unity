@@ -20,9 +20,14 @@ namespace GooglePlayGames.Native.PInvoke
 {
     using System;
     using System.Runtime.InteropServices;
+    using System.Collections.Generic;
+    using GooglePlayGames.OurUtils;
 
     internal abstract class BaseReferenceHolder : IDisposable
     {
+
+        private static Dictionary<HandleRef, BaseReferenceHolder> _refs =
+            new Dictionary<HandleRef, BaseReferenceHolder>();
 
         private HandleRef mSelfPointer;
 
@@ -67,12 +72,30 @@ namespace GooglePlayGames.Native.PInvoke
 
         private void Dispose(bool fromFinalizer)
         {
-            if (!PInvokeUtilities.IsNull(mSelfPointer))
+            if (fromFinalizer || !_refs.ContainsKey(mSelfPointer))
             {
-                CallDispose(mSelfPointer);
-                mSelfPointer = new HandleRef(this, IntPtr.Zero);
+                if (!PInvokeUtilities.IsNull(mSelfPointer))
+                {
+                    CallDispose(mSelfPointer);
+                    mSelfPointer = new HandleRef(this, IntPtr.Zero);
+                }
             }
         }
+
+        internal void ReferToMe()
+        {
+            _refs[SelfPtr()] =  this;
+        }
+
+        internal void ForgetMe()
+        {
+            if (_refs.ContainsKey(SelfPtr()))
+            {
+                _refs.Remove(SelfPtr());
+                Dispose(false);
+            }
+        }
+
     }
 }
 #endif
