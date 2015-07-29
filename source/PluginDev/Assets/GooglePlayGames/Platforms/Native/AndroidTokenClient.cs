@@ -1,4 +1,4 @@
-﻿// <copyright file="AndroidAppStateClient.cs" company="Google Inc.">
+﻿// <copyright file="AndroidTokenClient.cs" company="Google Inc.">
 // Copyright (C) 2015 Google Inc.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,34 +44,8 @@ internal class AndroidTokenClient: TokenClient
         /// <returns>The API client associated with the current Unity app.</returns>
         /// <param name="services">The Google Play Games Services object.</param>
         /// <param name="serverClientID">The OAuth 2.0 client ID for a backend server.</param>
-        private AndroidJavaObject GetApiClient(GameServices services, string serverClientID)
-        {
-            using (var currentActivity = new AndroidJavaClass("com.unity3d.player.UnityPlayer").GetStatic<AndroidJavaObject>("currentActivity")) {
-                using (AndroidJavaClass plusService = new AndroidJavaClass("com.google.android.gms.plus.Plus")) {
-                    using (AndroidJavaObject apiClientBuilder
-                            = new AndroidJavaObject("com.google.android.gms.common.api.GoogleApiClient$Builder",currentActivity))
-                    {
-                        apiClientBuilder.Call<AndroidJavaObject> ("addApi",
-                               plusService.GetStatic<AndroidJavaObject>("API"));
-                        apiClientBuilder.Call<AndroidJavaObject> ("addScope",
-                               plusService.GetStatic<AndroidJavaObject>("SCOPE_PLUS_LOGIN"));
-
-                        // Request an OAuth 2.0 authorization code.
-                        if (serverClientID != null){
-                            apiClientBuilder.Call<AndroidJavaObject>("requestServerAuthCode",
-                                    apiClientBuilder.GetStatic<AndroidJavaObject>(serverClientID), currentActivity);
-                        }
-
-                        AndroidJavaObject client = apiClientBuilder.Call<AndroidJavaObject>("build");
-                        client.Call ("connect");
-                        while(!client.Call<bool>("isConnected"))
-                        {
-                            System.Threading.Thread.Sleep(100);
-                        }
-                        return client;
-                    }
-                }
-            }
+        private AndroidJavaObject GetApiClient() {
+            return JavaUtils.JavaObjectFromPointer(C.InternalHooks_GetApiClient(mServices.AsHandle()));
         }
 
         /// <summary>
@@ -87,7 +61,7 @@ internal class AndroidTokenClient: TokenClient
             {
                 using (AndroidJavaObject accountService = plusService.GetStatic<AndroidJavaObject>("AccountApi"))
                 {
-                    using (var apiClient = GetApiClient(mServices, null))
+                    using (var apiClient = GetApiClient())
                     {
                         email  = accountService.Call<string>("getAccountName", apiClient);
                     }

@@ -68,6 +68,10 @@ namespace GooglePlayGames.BasicApi
     /// </summary>
     void SignOut();
 
+    /// <summary>Retrieves an OAuth 2.0 bearer token for the client.</summary>
+    /// <returns>A string representing the bearer token.</returns>
+    String GetToken();
+
     /// <summary>
     /// Returns the authenticated user's ID. Note that this value may change if a user signs
     /// on and signs in with a different account.

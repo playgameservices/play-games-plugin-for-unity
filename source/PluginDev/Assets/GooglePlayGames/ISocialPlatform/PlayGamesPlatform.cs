@@ -1053,5 +1053,14 @@ namespace GooglePlayGames
 
             return id;
         }
+
+        /// <summary>
+        /// Retrieves a bearer token associated with the current account.
+        /// </summary>
+        /// <returns>A bearer token for authorized requests.</returns>
+        public string GetToken()
+        {
+            return mClient.GetToken();
+        }
     }
 }

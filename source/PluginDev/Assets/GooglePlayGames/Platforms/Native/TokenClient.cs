@@ -1,4 +1,4 @@
-// <copyright file="AndroidAppStateClient.cs" company="Google Inc.">
+// <copyright file="TokenClient.cs" company="Google Inc.">
 // Copyright (C) 2015 Google Inc.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,9 +14,8 @@
 //  limitations under the License.
 // </copyright>
 
-#if (UNITY_ANDROID || UNITY_IPHONE) && !NO_GPGS
+#if (UNITY_ANDROID || (UNITY_IPHONE && !NO_GPGS))
 namespace GooglePlayGames.Native
-using System;
 {
     internal interface TokenClient
     {
