@@ -31,7 +31,7 @@ namespace GooglePlayGames
 #endif
     using GooglePlayGames;
     using GooglePlayGames.Editor.Util;
-	using UnityEngine;
+    using UnityEngine;
 
     public static class GPGSPostBuild
     {
@@ -43,7 +43,8 @@ namespace GooglePlayGames
         public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
         {
 #if UNITY_5
-            if (target != BuildTarget.iOS) {
+            if (target != BuildTarget.iOS)
+            {
                 return;
             }
 #else
@@ -54,14 +55,52 @@ namespace GooglePlayGames
 #endif
 
             #if NO_GPGS
-            Debug.Log("Removing AppController code since NO_GPGS is defined");
-            // remove plugin code from generated project
-            string pluginDir = pathToBuiltProject + "/Libraries/Plugins/iOS";
-            if (System.IO.Directory.Exists(pluginDir))
+
+            string pbxprojPath = pathToBuiltProject + "/Unity-iPhone.xcodeproj/project.pbxproj";
+            PBXProject proj = new PBXProject();
+            proj.ReadFromString(File.ReadAllText(pbxprojPath));
+
+            string fileGuid =
+                proj.FindFileGuidByProjectPath("Libraries/Plugins/iOS/GPGSAppController.mm");
+
+            if (fileGuid == null)
             {
-                GPGSUtil.WriteFile(pluginDir + "/GPGSAppController.mm", "// Empty since NO_GPGS is defined\n");
-                return;
+                // look in the legacy location
+                fileGuid =
+                    proj.FindFileGuidByProjectPath("Libraries/GPGSAppController.mm");
             }
+            string headerGuid =
+                proj.FindFileGuidByProjectPath("Libraries/Plugins/iOS/GPGSAppController.h");
+
+            if (headerGuid == null)
+            {
+                // look in the legacy location
+                headerGuid =
+                    proj.FindFileGuidByProjectPath("Libraries/GPGSAppController.h");
+            }
+
+            if (fileGuid != null)
+            {
+                Debug.Log ("Removing GPGSAppController.mm from xcode project");
+                proj.RemoveFile(fileGuid);
+            }
+            else
+            {
+                Debug.Log("Could not find GPGSAppController.mm in the xcode project");
+            }
+
+            if (headerGuid != null)
+            {
+                Debug.Log ("Removing GPGSAppController.h from xcode project");
+                proj.RemoveFile(headerGuid);
+            }
+            else
+            {
+                Debug.Log("Could not find GPGSAppController.h in the xcode project");
+            }
+
+            File.WriteAllText(pbxprojPath, proj.WriteToString());
+
             #else
 
             if (GetBundleId() == null)
@@ -75,7 +114,8 @@ namespace GooglePlayGames
             //Copy the podfile into the project.
             string podfile = "Assets/GooglePlayGames/Editor/Podfile.txt";
             string destpodfile = pathToBuiltProject + "/Podfile";
-            if (!System.IO.File.Exists(destpodfile)) {
+            if (!System.IO.File.Exists(destpodfile))
+            {
                 FileUtil.CopyFileOrDirectory(podfile, destpodfile);
             }
 
@@ -193,7 +233,8 @@ namespace GooglePlayGames
             string fileGuid =
                  proj.FindFileGuidByProjectPath("Libraries/Plugins/iOS/GPGSAppController.mm");
 
-            if (fileGuid == null) {
+            if (fileGuid == null)
+            {
                 // look in the legacy location
                 fileGuid =
                     proj.FindFileGuidByProjectPath("Libraries/GPGSAppController.mm");
