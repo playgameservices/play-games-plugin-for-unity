@@ -72,6 +72,7 @@ namespace SmokeTest
 
         private NearbyGUI mNearbyGui;
         private AchievementGUI mAchievementGui;
+        private LeaderboardGUI mLeaderboardGui;
 
         // which UI are we showing?
         public enum Ui
@@ -88,7 +89,8 @@ namespace SmokeTest
             TbmpMatch,
             QuestsAndEvents,
             NearbyConnections,
-            Achievements
+            Achievements,
+            Leaderboards
         }
 
         public void Start()
@@ -98,6 +100,7 @@ namespace SmokeTest
             PlayGamesPlatform.DebugLogEnabled = true;
             this.mNearbyGui = new NearbyGUI(this);
             this.mAchievementGui = new AchievementGUI(this);
+            this.mLeaderboardGui = new LeaderboardGUI(this);
         }
 
         public void SetUI(Ui page)
@@ -275,15 +278,10 @@ namespace SmokeTest
             {
                 this.mUi = Ui.QuestsAndEvents;
             }
-            else if (GUI.Button(this.CalcGrid(0, 2), "LB Show UI"))
+            else if (GUI.Button(CalcGrid(0, 2), "Leaderboards"))
             {
-                this.DoLeaderboardUI();
+                this.mUi = Ui.Leaderboards;
             }
-            if (GUI.Button(this.CalcGrid(1, 2), "Post Score"))
-            {
-                this.DoPostScore();
-            }
-
             else if (GUI.Button(this.CalcGrid(0, 3), "Cloud Save"))
             {
                 this.DoCloudSave();
@@ -1049,6 +1047,9 @@ namespace SmokeTest
                     case Ui.Achievements:
                         mAchievementGui.OnGUI();
                         break;
+                    case Ui.Leaderboards:
+                        mLeaderboardGui.OnGUI();
+                        break;
                     case Ui.Rtmp:
                         ShowRtmpUi();
                         break;
@@ -1150,32 +1151,6 @@ namespace SmokeTest
             Status = "Signing out.";
         }
 
-        internal long GenScore()
-        {
-            return (long)DateTime.Today.Subtract(new DateTime(2013, 1, 1, 0, 0, 0)).TotalSeconds;
-        }
-
-        internal void DoPostScore()
-        {
-            long score = GenScore();
-            SetStandBy("Posting score: " + score);
-            Social.ReportScore(
-                score,
-                GPGSIds.leaderboard_leaders_in_smoketesting,
-                (bool success) =>
-                {
-                    EndStandBy();
-                    Status = success ? "Successfully reported score " + score :
-                    "*** Failed to report score " + score;
-                    ShowEffect(success);
-                });
-        }
-
-        internal void DoLeaderboardUI()
-        {
-            Social.ShowLeaderboardUI();
-            ShowEffect(true);
-        }
 
         internal char RandCharFrom(string s)
         {
