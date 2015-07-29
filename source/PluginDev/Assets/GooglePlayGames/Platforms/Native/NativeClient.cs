@@ -58,6 +58,7 @@ namespace GooglePlayGames.Native
         private volatile IEventsClient mEventsClient;
         private volatile IQuestsClient mQuestsClient;
         private volatile AppStateClient mAppStateClient;
+        private volatile TokenClient mTokenClient;
         private volatile Action<Invitation, bool> mInvitationDelegate;
         private volatile Dictionary<String, Achievement> mAchievements = null;
         private volatile Player mUser = null;
@@ -202,6 +203,7 @@ namespace GooglePlayGames.Native
 
                         mAppStateClient = CreateAppStateClient();
                         mAuthState = AuthState.SilentPending;
+                        mTokenClient = CreateTokenClient();
                     }
                 }
             }
@@ -222,6 +224,16 @@ namespace GooglePlayGames.Native
             }
             #else
             return new UnsupportedAppStateClient("App State is not supported on this platform.");
+            #endif
+        }
+
+        private TokenClient CreateTokenClient()
+        {
+            #if UNITY_ANDROID
+            return new AndroidTokenClient(mServices);
+            #else
+            // TODO: (class) iOS implementation
+            return null;
             #endif
         }
 
@@ -998,7 +1010,6 @@ namespace GooglePlayGames.Native
             }
         }
 
-
         ///<summary></summary>
         /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.RegisterInvitationDelegate"/>
         public void RegisterInvitationDelegate(InvitationReceivedDelegate invitationDelegate)
@@ -1012,6 +1023,18 @@ namespace GooglePlayGames.Native
                 mInvitationDelegate = Callbacks.AsOnGameThreadCallback<Invitation, bool>(
                     (invitation, autoAccept) => invitationDelegate(invitation, autoAccept));
             }
+        }
+
+        /// <summary>Gets the client OAuth 2.0 bearer token.</summary>
+        /// <returns>A string representing the bearer token if the client is valid; otherwise,
+        /// returns null.</returns>
+        public string GetToken()
+        {
+            if (mTokenClient != null)
+            {
+                return mTokenClient.GetToken(null);
+            }
+            return null;
         }
     }
 }
