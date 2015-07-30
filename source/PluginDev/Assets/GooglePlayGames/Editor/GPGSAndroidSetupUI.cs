@@ -21,9 +21,9 @@ namespace GooglePlayGames
 
     public class GPGSAndroidSetupUI : EditorWindow
     {
-		private const string GameInfoPath = "Assets/GooglePlayGames/GameInfo.cs";
-		
-		private string mClientId = string.Empty;
+        private const string GameInfoPath = "Assets/GooglePlayGames/GameInfo.cs";
+        
+        private string mClientId = string.Empty;
         private string mAppId = string.Empty;
 
         [MenuItem("Window/Google Play Games/Setup/Android setup...", false, 1)]
@@ -100,26 +100,26 @@ namespace GooglePlayGames
         /// </summary>
         /// <param name="appId">App identifier.</param>
         /// <param name="nearbySvcId">Optional nearby connection serviceId</param>
-		public static bool PerformSetup(string clientId, string appId, string nearbySvcId)
-		{
-			if(clientId != null)
-			{
-				if (!GPGSUtil.LooksLikeValidClientId(clientId))
-				{
-					GPGSUtil.Alert(GPGSStrings.Setup.ClientIdError);
-					return false;
-				}
-				appId = clientId.Split('-')[0];
-			}
-			else
-			{
-	            // check for valid app id
-	            if (!GPGSUtil.LooksLikeValidAppId(appId))
-	            {
-	                GPGSUtil.Alert(GPGSStrings.Setup.AppIdError);
-	                return false;
-	            }
-			}
+        public static bool PerformSetup(string clientId, string appId, string nearbySvcId)
+        {
+            if(clientId != null)
+            {
+                if (!GPGSUtil.LooksLikeValidClientId(clientId))
+                {
+                    GPGSUtil.Alert(GPGSStrings.Setup.ClientIdError);
+                    return false;
+                }
+                appId = clientId.Split('-')[0];
+            }
+            else
+            {
+                // check for valid app id
+                if (!GPGSUtil.LooksLikeValidAppId(appId))
+                {
+                    GPGSUtil.Alert(GPGSStrings.Setup.AppIdError);
+                    return false;
+                }
+            }
 
             if (nearbySvcId != null)
             {
@@ -130,9 +130,9 @@ namespace GooglePlayGames
             }
 
             GPGSProjectSettings.Instance.Set("proj.AppId", appId);
-			GPGSProjectSettings.Instance.Set(GPGSUtil.ANDROIDCLIENTIDKEY, clientId);
+            GPGSProjectSettings.Instance.Set(GPGSUtil.ANDROIDCLIENTIDKEY, clientId);
             GPGSProjectSettings.Instance.Save();
-			GPGSUtil.UpdateGameInfo();
+            GPGSUtil.UpdateGameInfo();
 
             // check that Android SDK is there
             if (!GPGSUtil.HasAndroidSdk())
@@ -147,8 +147,8 @@ namespace GooglePlayGames
 
             // Generate AndroidManifest.xml
             GPGSUtil.GenerateAndroidManifest();
-			
-			FillInAppData(GameInfoPath, GameInfoPath, clientId);
+            
+            FillInAppData(GameInfoPath, GameInfoPath, clientId);
 
             // refresh assets, and we're done
             AssetDatabase.Refresh();
@@ -157,21 +157,21 @@ namespace GooglePlayGames
 
             return true;
         }
-		
-		/// <summary>
-		/// Helper function to do search and replace of the client and bundle ids.
-		/// </summary>
-		/// <param name="sourcePath">Source path.</param>
-		/// <param name="outputPath">Output path.</param>
-		/// <param name="clientId">Client identifier.</param>
-		/// <param name="bundleId">Bundle identifier.</param>
-		private static void FillInAppData(string sourcePath,
-		                                  string outputPath,
-		                                  string clientId)
-		{
-			string fileBody = GPGSUtil.ReadFully(sourcePath);
-			fileBody = fileBody.Replace(GPGSUtil.ANDROIDCLIENTIDPLACEHOLDER, clientId);
-			GPGSUtil.WriteFile(outputPath, fileBody);
-		}
+        
+        /// <summary>
+        /// Helper function to do search and replace of the client and bundle ids.
+        /// </summary>
+        /// <param name="sourcePath">Source path.</param>
+        /// <param name="outputPath">Output path.</param>
+        /// <param name="clientId">Client identifier.</param>
+        /// <param name="bundleId">Bundle identifier.</param>
+        private static void FillInAppData(string sourcePath,
+                                          string outputPath,
+                                          string clientId)
+        {
+            string fileBody = GPGSUtil.ReadFully(sourcePath);
+            fileBody = fileBody.Replace(GPGSUtil.ANDROIDCLIENTIDPLACEHOLDER, clientId);
+            GPGSUtil.WriteFile(outputPath, fileBody);
+        }
     }
 }

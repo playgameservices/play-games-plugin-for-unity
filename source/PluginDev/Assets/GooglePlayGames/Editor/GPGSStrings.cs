@@ -45,9 +45,9 @@ namespace GooglePlayGames
            
             public const string AppIdError = "The App Id does not appear to be valid. " +
                                              "It must consist solely of digits, usually 10 or more.";
-			
-			public const string ClientIdTitle = "Oauth Client ID";
-			public const string ClientId = "Client ID";
+            
+            public const string ClientIdTitle = "Oauth Client ID";
+            public const string ClientId = "Client ID";
             public const string ClientIdError = "The Client ID does not appear to be valid. " +
                                                 "It should end in .apps.googleusercontent.com.";
 

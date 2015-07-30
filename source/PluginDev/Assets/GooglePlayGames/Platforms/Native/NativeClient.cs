@@ -27,6 +27,7 @@ namespace GooglePlayGames.Native
     using System.Collections.Generic;
     using GooglePlayGames.BasicApi.Events;
     using GooglePlayGames.BasicApi.Quests;
+    using C = GooglePlayGames.Native.Cwrapper.InternalHooks;
     using Types = GooglePlayGames.Native.Cwrapper.Types;
     using Status = GooglePlayGames.Native.Cwrapper.CommonErrorStatus;
     using UnityEngine;
@@ -287,22 +288,7 @@ namespace GooglePlayGames.Native
         }
         
         private AndroidJavaObject GetApiClient(GameServices services) {
-            //return JavaUtils.JavaObjectFromPointer(GooglePlayGames.Native.Cwrapper.InternalHooks.InternalHooks_GetApiClient(services.AsHandle()));
-            using (var currentActivity = GetActivity()) {
-                using (AndroidJavaClass jc_plus = new AndroidJavaClass("com.google.android.gms.plus.Plus")) {
-                    using (AndroidJavaObject jc_builder = new AndroidJavaObject("com.google.android.gms.common.api.GoogleApiClient$Builder",currentActivity)) {
-                        jc_builder.Call<AndroidJavaObject> ("addApi", jc_plus.GetStatic<AndroidJavaObject>("API"));
-                        jc_builder.Call<AndroidJavaObject> ("addScope", jc_plus.GetStatic<AndroidJavaObject>("SCOPE_PLUS_LOGIN"));
-                        AndroidJavaObject client = jc_builder.Call<AndroidJavaObject> ("build");
-                        client.Call ("connect");
-                        while(!client.Call<bool>("isConnected"))
-                        {
-                            System.Threading.Thread.Sleep(100);
-                        }
-                        return client;
-                    }
-                }
-            }
+            return JavaUtils.JavaObjectFromPointer(C.InternalHooks_GetApiClient(services.AsHandle()));
         }
         
         private string RetrieveUserEmail() {
@@ -329,7 +315,7 @@ namespace GooglePlayGames.Native
             Debug.Log("Before RetrieveUserEmail");
             string email = RetrieveUserEmail() ?? "NULL";
             Debug.Log("After RetrieveUserEmail email: " + email);
-            string scope = "audience:server:client_id:" + "101626759741-kc5sdafasdfsdf9j1aek9bfgfou3oom.apps.googleusercontent.com";//CLIENT_ID;
+            string scope = "audience:server:client_id:" + GameInfo.AndroidClientId;
             using (AndroidJavaClass jc_unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"),
                    jc_gau = new AndroidJavaClass("com.google.android.gms.auth.GoogleAuthUtil")) {
                 using(AndroidJavaObject jo_Activity = jc_unityPlayer.GetStatic<AndroidJavaObject>("currentActivity")) {

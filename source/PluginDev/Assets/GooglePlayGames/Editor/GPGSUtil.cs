@@ -28,13 +28,13 @@ namespace GooglePlayGames
         public const string APPIDPLACEHOLDER = "___APP_ID___";
         public const string APPIDKEY = "proj.AppId";
 
-		public const string ANDROIDCLIENTIDPLACEHOLDER = "__ANDROID_CLIENTID__";
-		public const string ANDROIDCLIENTIDKEY = "and.ClientId";
+        public const string ANDROIDCLIENTIDPLACEHOLDER = "__ANDROID_CLIENTID__";
+        public const string ANDROIDCLIENTIDKEY = "and.ClientId";
 
-		public const string IOSCLIENTIDPLACEHOLDER = "__IOS_CLIENTID__";
-		public const string IOSCLIENTIDKEY = "ios.ClientId";
+        public const string IOSCLIENTIDPLACEHOLDER = "__IOS_CLIENTID__";
+        public const string IOSCLIENTIDKEY = "ios.ClientId";
         public const string IOSBUNDLEIDPLACEHOLDER = "__BUNDLEID__";
-		public const string IOSBUNDLEIDKEY = "ios.BundleId";
+        public const string IOSBUNDLEIDKEY = "ios.BundleId";
 
         private const string GameInfoPath = "Assets/GooglePlayGames/GameInfo.cs";
         private const string GameInfoTemplatePath = "Assets/GooglePlayGames/Editor/GameInfo.template";
@@ -250,11 +250,11 @@ namespace GooglePlayGames
                 fileBody = fileBody.Replace(IOSCLIENTIDPLACEHOLDER, iosClientId);
             }
 
-			var andClientId = GPGSProjectSettings.Instance.Get(ANDROIDCLIENTIDKEY, null);
-			if (andClientId != null)
-			{
-				fileBody = fileBody.Replace(ANDROIDCLIENTIDPLACEHOLDER, andClientId);
-			}
+            var andClientId = GPGSProjectSettings.Instance.Get(ANDROIDCLIENTIDKEY, null);
+            if (andClientId != null)
+            {
+                fileBody = fileBody.Replace(ANDROIDCLIENTIDPLACEHOLDER, andClientId);
+            }
 
             var bundleId = GPGSProjectSettings.Instance.Get(IOSBUNDLEIDKEY, null);
             if (bundleId != null)
