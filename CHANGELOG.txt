@@ -9,6 +9,7 @@ Version 0.9.22
        * #256 Get all turn-based invitations
        * #259 implement LoadAchievements
        * #380 Callback on CreateWithInvitationScreen
+       * #387 OnLeftRoom not called when application is paused
        * #445 Variant error in turn based match
        * #480 Get score rank after submitting
        * #503 LoadScores not implemented

@@ -39,6 +39,11 @@ namespace GooglePlayGames.Native
             mNativeClient = Misc.CheckNotNull(nativeClient);
             mRealtimeManager = Misc.CheckNotNull(manager);
             mCurrentSession = GetTerminatedSession();
+
+            // register callback for when the application pauses.  OnPause
+            // will disconnect the client, we need to leave the room manually
+            // the disconnection does not trigger and events.
+            PlayGamesHelperObject.AddPauseCallback(HandleAppPausing);
         }
 
         private RoomSession GetTerminatedSession()
@@ -111,6 +116,16 @@ namespace GooglePlayGames.Native
                     session.OnRoomStatusChanged(room));
         }
 
+        private void HandleAppPausing(bool paused)
+        {
+            if (paused)
+            {
+                Logger.d("Application is pausing, which disconnects the RTMP " +
+                    " client.  Leaving room.");
+                LeaveRoom();
+            }
+        }
+
         public void CreateWithInvitationScreen(uint minOpponents, uint maxOppponents, uint variant,
                                            RealTimeMultiplayerListener listener)
         {
@@ -139,10 +154,12 @@ namespace GooglePlayGames.Native
                             return;
                         }
 
-
-                        mCurrentSession.MinPlayersToStart = 
-                            response.MinimumAutomatchingPlayers() + (uint)response.Count()
-                        // plus self
+                        // the min number to start is the number of automatched
+                        // plus the number of named invitations
+                        // plus the local player.
+                        mCurrentSession.MinPlayersToStart =
+                            response.MinimumAutomatchingPlayers() +
+                            (uint)response.Count()
                             + 1;
 
                         using (var configBuilder = RealtimeRoomConfigBuilder.Create())
@@ -251,9 +268,8 @@ namespace GooglePlayGames.Native
                             {
                                 if (invitation.Id().Equals(invitationId))
                                 {
-                                   
-                                    mCurrentSession.MinPlayersToStart = 
-                                        invitation.AutomatchingSlots() + 
+                                    mCurrentSession.MinPlayersToStart =
+                                        invitation.AutomatchingSlots() +
                                         invitation.ParticipantCount();
                                     Logger.d("Setting MinPlayersToStart with invitation to : " +
                                         mCurrentSession.MinPlayersToStart);
@@ -419,7 +435,7 @@ namespace GooglePlayGames.Native
                 {
                     return mMinPlayersToStart;
                 }
-                set 
+                set
                 {
                     mMinPlayersToStart = value;
                 }
@@ -969,7 +985,7 @@ namespace GooglePlayGames.Native
             {
                 HashSet<string> newConnectedSet = new HashSet<string>();
 
-                // handle when an invitation is received, so number of total 
+                // handle when an invitation is received, so number of total
                 // participants is not known.
                 if (room.Status() == Types.RealTimeRoomStatus.AUTO_MATCHING ||
                     room.Status() == Types.RealTimeRoomStatus.CONNECTING)
@@ -978,7 +994,7 @@ namespace GooglePlayGames.Native
                     {
                         mSession.MinPlayersToStart = mSession.MinPlayersToStart +
                         room.ParticipantCount();
-                        mPercentPerParticipant = 
+                        mPercentPerParticipant =
                             (100.0f - InitialPercentComplete) / (float)mSession.MinPlayersToStart;
                     }
                 }
@@ -1257,7 +1273,7 @@ namespace GooglePlayGames.Native
 
             internal override void OnStateEntered()
             {
-                mSession.Manager().LeaveRoom(mRoomToLeave, (status) => 
+                mSession.Manager().LeaveRoom(mRoomToLeave, (status) =>
                     { mLeavingCompleteCallback();
                         mSession.EnterState(new ShutdownState(mSession));
                     } );
