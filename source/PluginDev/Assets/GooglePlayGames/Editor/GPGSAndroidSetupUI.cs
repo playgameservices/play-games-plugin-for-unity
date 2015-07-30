@@ -183,7 +183,7 @@ namespace GooglePlayGames
         /// <param name="nearbySvcId">Optional nearby connection serviceId</param>
         public static bool PerformSetup(string clientId, string appId, string nearbySvcId)
         {
-            if(clientId != null)
+            if( !string.IsNullOrEmpty(clientId) )
             {
                 if (!GPGSUtil.LooksLikeValidClientId(clientId))
                 {
