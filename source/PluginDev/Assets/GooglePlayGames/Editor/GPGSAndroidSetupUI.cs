@@ -28,6 +28,8 @@ namespace GooglePlayGames
         private string mClassName = "GooglePlayGames.GPGSIds";
         private Vector2 scroll;
 
+        private string mClientId = string.Empty;
+
         [MenuItem("Window/Google Play Games/Setup/Android setup...", false, 1)]
         public static void MenuItemFileGPGSAndroidSetup()
         {
@@ -40,6 +42,7 @@ namespace GooglePlayGames
         {
             mClassName = GPGSProjectSettings.Instance.Get("proj.ConstantsClassName");
             mConfigData = GPGSProjectSettings.Instance.Get("proj.ResourceData");
+            mClientId = GPGSProjectSettings.Instance.Get(GPGSUtil.ANDROIDCLIENTIDKEY);
         }
 
         public void OnGUI()
@@ -65,6 +68,16 @@ namespace GooglePlayGames
                 GUILayout.Width(475), GUILayout.Height(Screen.height));
             GUILayout.EndScrollView();
             GUILayout.Space(10);
+
+            // Client ID field
+            GUILayout.Label(GPGSStrings.Setup.ClientIdTitle, EditorStyles.boldLabel);
+            GUILayout.Label(GPGSStrings.AndroidSetup.ClientIdBlurb);
+      
+            mClientId = EditorGUILayout.TextField(GPGSStrings.Setup.ClientId,
+                mClientId, GUILayout.Width(450));
+
+            GUILayout.Space(10);
+
             GUILayout.FlexibleSpace();
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
@@ -86,7 +99,7 @@ namespace GooglePlayGames
 
         public void DoSetup()
         {
-            if (PerformSetup(mClassName, mConfigData, null))
+            if (PerformSetup(mClientId, mClassName, mConfigData, null))
             {
                 EditorUtility.DisplayDialog(GPGSStrings.Success,
                     GPGSStrings.AndroidSetup.SetupComplete, GPGSStrings.Ok);
@@ -152,13 +165,13 @@ namespace GooglePlayGames
         /// <param name="className">Fully qualified class name for the resource Ids.</param>
         /// <param name="resourceXmlData">Resource xml data.</param>
         /// <param name="nearbySvcId">Nearby svc identifier.</param>
-        public static bool PerformSetup(string className, string resourceXmlData, string nearbySvcId)
+        public static bool PerformSetup(string clientId, string className, string resourceXmlData, string nearbySvcId)
         {
             if (ParseResources(className, resourceXmlData))
             {
                 GPGSProjectSettings.Instance.Set("proj.ConstantsClassName", className);
                 GPGSProjectSettings.Instance.Set("proj.ResourceData", resourceXmlData);
-                return PerformSetup(GPGSProjectSettings.Instance.Get("proj.AppId"), nearbySvcId);
+                return PerformSetup(clientId, GPGSProjectSettings.Instance.Get("proj.AppId"), nearbySvcId);
             }
             return false;
         }
@@ -168,13 +181,25 @@ namespace GooglePlayGames
         /// </summary>
         /// <param name="appId">App identifier.</param>
         /// <param name="nearbySvcId">Optional nearby connection serviceId</param>
-        public static bool PerformSetup(string appId, string nearbySvcId)
+        public static bool PerformSetup(string clientId, string appId, string nearbySvcId)
         {
-            // check for valid app id
-            if (!GPGSUtil.LooksLikeValidAppId(appId))
+            if(clientId != null)
             {
-                GPGSUtil.Alert(GPGSStrings.Setup.AppIdError);
-                return false;
+                if (!GPGSUtil.LooksLikeValidClientId(clientId))
+                {
+                    GPGSUtil.Alert(GPGSStrings.Setup.ClientIdError);
+                    return false;
+                }
+                appId = clientId.Split('-')[0];
+            }
+            else
+            {
+                // check for valid app id
+                if (!GPGSUtil.LooksLikeValidAppId(appId))
+                {
+                    GPGSUtil.Alert(GPGSStrings.Setup.AppIdError);
+                    return false;
+                }
             }
 
             if (nearbySvcId != null)
@@ -186,7 +211,9 @@ namespace GooglePlayGames
             }
 
             GPGSProjectSettings.Instance.Set("proj.AppId", appId);
+            GPGSProjectSettings.Instance.Set(GPGSUtil.ANDROIDCLIENTIDKEY, clientId);
             GPGSProjectSettings.Instance.Save();
+            GPGSUtil.UpdateGameInfo();
 
             // check that Android SDK is there
             if (!GPGSUtil.HasAndroidSdk())
@@ -201,6 +228,8 @@ namespace GooglePlayGames
 
             // Generate AndroidManifest.xml
             GPGSUtil.GenerateAndroidManifest();
+            
+            FillInAppData(GameInfoPath, GameInfoPath, clientId);
 
             // refresh assets, and we're done
             AssetDatabase.Refresh();
@@ -208,6 +237,22 @@ namespace GooglePlayGames
             GPGSProjectSettings.Instance.Save();
 
             return true;
+        }
+        
+        /// <summary>
+        /// Helper function to do search and replace of the client and bundle ids.
+        /// </summary>
+        /// <param name="sourcePath">Source path.</param>
+        /// <param name="outputPath">Output path.</param>
+        /// <param name="clientId">Client identifier.</param>
+        /// <param name="bundleId">Bundle identifier.</param>
+        private static void FillInAppData(string sourcePath,
+                                          string outputPath,
+                                          string clientId)
+        {
+            string fileBody = GPGSUtil.ReadFully(sourcePath);
+            fileBody = fileBody.Replace(GPGSUtil.ANDROIDCLIENTIDPLACEHOLDER, clientId);
+            GPGSUtil.WriteFile(outputPath, fileBody);
         }
     }
 }

@@ -132,6 +132,20 @@ namespace GooglePlayGames
         }
 
         /// <summary>
+        /// Gets an id token for the user.
+        /// </summary>
+        /// <returns>
+        /// An id token for the user.
+        /// </returns>
+        public new string idToken
+        {
+            get
+            {
+                return authenticated ? mPlatform.GetIdToken() : string.Empty;
+            }
+        }
+
+        /// <summary>
         /// Returns true (since this is the local user).
         /// </summary>
         public new bool isFriend

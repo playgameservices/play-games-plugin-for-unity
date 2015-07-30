@@ -32,6 +32,7 @@ namespace GooglePlayGames
 
     // Filled in automatically
     public const string IosClientId = "__CLIENTID__";
+    public const string AndroidClientId = "__ANDROID_CLIENTID__";
 
     private const string UnescapedApplicationId = "APPID";
     private const string UnescapedIosClientId = "CLIENTID";

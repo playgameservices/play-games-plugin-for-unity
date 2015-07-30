@@ -130,8 +130,8 @@ namespace GooglePlayGames
                                       string clientId, string bundleId)
         {
             string fileBody = GPGSUtil.ReadFully(sourcePath);
-            fileBody = fileBody.Replace("__CLIENTID__", clientId);
-            fileBody = fileBody.Replace("__BUNDLEID__", bundleId);
+            fileBody = fileBody.Replace(GPGSUtil.IOSCLIENTIDPLACEHOLDER, clientId);
+            fileBody = fileBody.Replace(GPGSUtil.IOSBUNDLEIDPLACEHOLDER, bundleId);
             GPGSUtil.WriteFile(outputPath, fileBody);
         }
 
@@ -260,7 +260,7 @@ namespace GooglePlayGames
 
             if (!GPGSUtil.LooksLikeValidClientId(clientId))
             {
-                GPGSUtil.Alert(GPGSStrings.IOSSetup.ClientIdError);
+                GPGSUtil.Alert(GPGSStrings.Setup.ClientIdError);
                 return false;
             }
             if (!GPGSUtil.LooksLikeValidBundleId(bundleId))
