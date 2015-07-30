@@ -296,7 +296,9 @@ namespace GooglePlayGames.Native
                         jc_builder.Call<AndroidJavaObject> ("addScope", jc_plus.GetStatic<AndroidJavaObject>("SCOPE_PLUS_LOGIN"));
                         AndroidJavaObject client = jc_builder.Call<AndroidJavaObject> ("build");
                         client.Call ("connect");
-                        while(!client.Call<bool>("isConnected"))
+                        
+                        int ct = 100;
+                        while( ( !client.Call("isConnected") ) && (ct-- != 0) )
                         {
                             System.Threading.Thread.Sleep(100);
                         }
