@@ -288,10 +288,34 @@ namespace GooglePlayGames.Native
         }
         
         private AndroidJavaObject GetApiClient(GameServices services) {
-            return JavaUtils.JavaObjectFromPointer(C.InternalHooks_GetApiClient(services.AsHandle()));
+            //return JavaUtils.JavaObjectFromPointer(GooglePlayGames.Native.Cwrapper.InternalHooks.InternalHooks_GetApiClient(services.AsHandle()));
+            using (var currentActivity = GetActivity()) {
+                using (AndroidJavaClass jc_plus = new AndroidJavaClass("com.google.android.gms.plus.Plus")) {
+                    using (AndroidJavaObject jc_builder = new AndroidJavaObject("com.google.android.gms.common.api.GoogleApiClient$Builder",currentActivity)) {
+                        jc_builder.Call<AndroidJavaObject> ("addApi", jc_plus.GetStatic<AndroidJavaObject>("API"));
+                        jc_builder.Call<AndroidJavaObject> ("addScope", jc_plus.GetStatic<AndroidJavaObject>("SCOPE_PLUS_LOGIN"));
+                        AndroidJavaObject client = jc_builder.Call<AndroidJavaObject> ("build");
+                        client.Call ("connect");
+                        
+                        int ct = 100;
+                        while( ( !client.Call("isConnected") ) && (ct-- != 0) )
+                        {
+                            System.Threading.Thread.Sleep(100);
+                        }
+                        return client;
+                    }
+                }
+            }
+            //return JavaUtils.JavaObjectFromPointer(C.InternalHooks_GetApiClient(services.AsHandle()));
         }
         
-        private string RetrieveUserEmail() {
+        private string GetEmail() {
+            if (!this.IsAuthenticated())
+            {
+                Debug.Log("Cannot get API client - not authenticated");
+                return null;
+            }
+
             string email;
             using (AndroidJavaClass jc_plus = new AndroidJavaClass("com.google.android.gms.plus.Plus")) {
                 using (AndroidJavaObject jo_plusAccountApi = jc_plus.GetStatic<AndroidJavaObject>("AccountApi")) {
@@ -305,16 +329,49 @@ namespace GooglePlayGames.Native
             }
             return email;
         }
+
+        /// <summary>Gets the access token currently associated with the Unity activity.</summary>
+        /// <returns>The OAuth 2.0 access token.</returns>
+        public string GetAccessToken()
+        {
+            if (!this.IsAuthenticated())
+            {
+                Debug.Log("Cannot get API client - not authenticated");
+                return null;
+            }
+
+            string token = null;
+            string email = GetEmail() ?? "NULL";
+            string scope = "oauth2:https://www.googleapis.com/auth/plus.me";
+            
+            using (AndroidJavaClass unityActivity = new AndroidJavaClass("com.unity3d.player.UnityPlayer"),
+                   googleAuthUtil = new AndroidJavaClass("com.google.android.gms.auth.GoogleAuthUtil"))
+            {
+                using(AndroidJavaObject currentActivity =
+                      unityActivity.GetStatic<AndroidJavaObject>("currentActivity"))
+                {
+                    token = googleAuthUtil.CallStatic<string>("getToken", currentActivity, email, scope);
+                }
+            }
+            
+            return token;
+        }
         
         public string GetIdToken() {
+            if (!this.IsAuthenticated())
+            {
+                Debug.Log("Cannot get API client - not authenticated");
+                return null;
+            }
+
 			if( String.IsNullOrEmpty(GameInfo.AndroidClientId) || ("__ANDROID_CLIENTID__" == GameInfo.AndroidClientId) )
 			{
-				throw new Exception("Client ID has not been set, cannot request access token.");
+				throw new Exception("Client ID has not been set, cannot request id token.");
 			}
             string token = null;
-            Debug.Log("Before RetrieveUserEmail");
-            string email = RetrieveUserEmail() ?? "NULL";
-            Debug.Log("After RetrieveUserEmail email: " + email);
+            Debug.Log("Before GetEmail");
+            string email = GetEmail() ?? "NULL";
+            Debug.Log("After GetEmail email: " + email);
             string scope = "audience:server:client_id:" + GameInfo.AndroidClientId;
             using (AndroidJavaClass jc_unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"),
                    jc_gau = new AndroidJavaClass("com.google.android.gms.auth.GoogleAuthUtil")) {
@@ -333,7 +390,27 @@ namespace GooglePlayGames.Native
         
         public string GetIdToken()
         {
+            if (!this.IsAuthenticated())
+            {
+                Debug.Log("Cannot get API client - not authenticated");
+                return null;
+            }
+
             return _GooglePlayGetIdToken();
+        }
+        
+        [System.Runtime.InteropServices.DllImport("__Internal")]
+        private static extern string _GooglePlayGetAccessToken();
+        
+        public string GetAccessToken()
+        {
+            if (!this.IsAuthenticated())
+            {
+                Debug.Log("Cannot get API client - not authenticated");
+                return null;
+            }
+
+            return _GooglePlayGetAccessToken();
         }
         
         #endif
