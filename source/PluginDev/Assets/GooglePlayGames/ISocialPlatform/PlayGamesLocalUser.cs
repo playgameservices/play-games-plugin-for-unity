@@ -132,16 +132,16 @@ namespace GooglePlayGames
         }
 
         /// <summary>
-        /// Gets an access token for the user.
+        /// Gets an id token for the user.
         /// </summary>
         /// <returns>
-        /// An access token for the user.
+        /// An id token for the user.
         /// </returns>
-        public new string token
+        public new string idToken
         {
             get
             {
-                return authenticated ? mPlatform.GetToken() : string.Empty;
+                return authenticated ? mPlatform.GetIdToken() : string.Empty;
             }
         }
 

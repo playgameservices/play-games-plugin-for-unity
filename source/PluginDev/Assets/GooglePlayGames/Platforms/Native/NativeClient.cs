@@ -333,7 +333,7 @@ namespace GooglePlayGames.Native
         
         public string GetIdToken()
         {
-            return _GooglePlayGetAccessToken();
+            return _GooglePlayGetIdToken();
         }
         
         #endif

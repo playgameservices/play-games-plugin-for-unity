@@ -86,7 +86,7 @@ namespace GooglePlayGames.BasicApi
     /// </summary>
     /// <returns>An access token. <code>null</code> if they are not logged
     /// in</returns>
-    string GetToken();
+    string GetIdToken();
 
     /// <summary>
     /// Returns the user's avatar url, if they are logged in and have an avatar.

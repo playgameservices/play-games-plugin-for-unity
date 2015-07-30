@@ -362,16 +362,16 @@ namespace GooglePlayGames
         }
 
         /// <summary>
-        /// Returns an access token for the user.
+        /// Returns an id token for the user.
         /// </summary>
         /// <returns>
-        /// An access token for the user.
+        /// An id token for the user.
         /// </returns>
-        public string GetToken()
+        public string GetIdToken()
         {
             if (mClient != null)
             {
-                return mClient.GetToken();
+                return mClient.GetIdToken();
             }
             return null;
         }
