@@ -308,6 +308,12 @@ namespace GooglePlayGames.Native
         }
         
         private string GetEmail() {
+            if (!this.IsAuthenticated())
+            {
+                Debug.Log("Cannot get API client - not authenticated");
+                return null;
+            }
+
             string email;
             using (AndroidJavaClass jc_plus = new AndroidJavaClass("com.google.android.gms.plus.Plus")) {
                 using (AndroidJavaObject jo_plusAccountApi = jc_plus.GetStatic<AndroidJavaObject>("AccountApi")) {
@@ -326,6 +332,12 @@ namespace GooglePlayGames.Native
         /// <returns>The OAuth 2.0 access token.</returns>
         public string GetAccessToken()
         {
+            if (!this.IsAuthenticated())
+            {
+                Debug.Log("Cannot get API client - not authenticated");
+                return null;
+            }
+
             string token = null;
             string email = GetEmail() ?? "NULL";
             string scope = "oauth2:https://www.googleapis.com/auth/plus.me";
@@ -344,6 +356,12 @@ namespace GooglePlayGames.Native
         }
         
         public string GetIdToken() {
+            if (!this.IsAuthenticated())
+            {
+                Debug.Log("Cannot get API client - not authenticated");
+                return null;
+            }
+
 			if( String.IsNullOrEmpty(GameInfo.AndroidClientId) || ("__ANDROID_CLIENTID__" == GameInfo.AndroidClientId) )
 			{
 				throw new Exception("Client ID has not been set, cannot request id token.");
@@ -370,6 +388,12 @@ namespace GooglePlayGames.Native
         
         public string GetIdToken()
         {
+            if (!this.IsAuthenticated())
+            {
+                Debug.Log("Cannot get API client - not authenticated");
+                return null;
+            }
+
             return _GooglePlayGetIdToken();
         }
         
@@ -378,6 +402,12 @@ namespace GooglePlayGames.Native
         
         public string GetAccessToken()
         {
+            if (!this.IsAuthenticated())
+            {
+                Debug.Log("Cannot get API client - not authenticated");
+                return null;
+            }
+
             return _GooglePlayGetAccessToken();
         }
         
