@@ -360,7 +360,7 @@ namespace GooglePlayGames
 
             return mClient.GetUserId();
         }
-
+        
         /// <summary>
         /// Returns an id token for the user.
         /// </summary>
@@ -372,6 +372,21 @@ namespace GooglePlayGames
             if (mClient != null)
             {
                 return mClient.GetIdToken();
+            }
+            return null;
+        }
+        
+        /// <summary>
+        /// Returns an id token for the user.
+        /// </summary>
+        /// <returns>
+        /// An id token for the user.
+        /// </returns>
+        public string GetAccessToken()
+        {
+            if (mClient != null)
+            {
+                return mClient.GetAccessToken();
             }
             return null;
         }
