@@ -49,6 +49,11 @@ namespace GooglePlayGames.Native.PInvoke
         {
             C.GameServices_Builder_EnableSnapshots(SelfPtr());
         }
+        
+        internal void AddOauthScope(string scope)
+        {
+            C.GameServices_Builder_AddOauthScope(SelfPtr(), scope);
+        }
 
         [AOT.MonoPInvokeCallback(typeof(C.OnAuthActionFinishedCallback))]
         private static void InternalAuthFinishedCallback(Types.AuthOperation op,

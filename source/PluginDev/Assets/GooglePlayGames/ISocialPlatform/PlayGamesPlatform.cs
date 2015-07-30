@@ -362,6 +362,21 @@ namespace GooglePlayGames
         }
 
         /// <summary>
+        /// Returns an id token for the user.
+        /// </summary>
+        /// <returns>
+        /// An id token for the user.
+        /// </returns>
+        public string GetIdToken()
+        {
+            if (mClient != null)
+            {
+                return mClient.GetIdToken();
+            }
+            return null;
+        }
+
+        /// <summary>
         /// Returns the achievement corresponding to the passed achievement identifier.
         /// </summary>
         /// <returns>

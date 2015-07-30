@@ -38,6 +38,8 @@ namespace GooglePlayGames
         private const string UrlTypes = "CFBundleURLTypes";
         private const string UrlBundleName = "CFBundleURLName";
         private const string UrlScheme = "CFBundleURLSchemes";
+        private const string PrincipalClass = "NSPrincipalClass";
+        private const string PrincipalClassName = "CustomWebViewApplication";
 
         [PostProcessBuild]
         public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
@@ -116,6 +118,7 @@ namespace GooglePlayGames
             var gamesSchemeIndex = GamesUrlSchemeIndex(buddy);
 
             EnsureGamesUrlScheme(buddy, gamesSchemeIndex);
+            EnsurePrincipalClass(buddy);
         }
 
 
@@ -131,6 +134,16 @@ namespace GooglePlayGames
             buddy.AddArray(UrlTypes, index, UrlScheme);
             buddy.AddString(PlistBuddyHelper.ToEntryName(UrlTypes, index, UrlScheme, 0),
                 GetBundleId());
+        }
+
+        /// <summary>
+        /// Ensures the PrincipalClass is set and correct.
+        /// </summary>
+        /// <param name="buddy">Buddy.</param>
+        private static void EnsurePrincipalClass(PlistBuddyHelper buddy)
+        {
+            buddy.RemoveEntry(PrincipalClass);
+            buddy.AddString(PrincipalClass, PrincipalClassName);
         }
 
         private static string GetBundleId()
