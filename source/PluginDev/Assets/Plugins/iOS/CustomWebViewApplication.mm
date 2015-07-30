@@ -2,6 +2,7 @@
 
 #include "UnityAppController.h"
 
+#import <GTMOAuth2Authentication.h>
 #import <GooglePlus/GooglePlus.h>
 
 @interface CustomWebViewApplication()
@@ -98,17 +99,34 @@ extern "C"
 {
     const char* _GooglePlayGetIdToken()
     {
+        const char* idToken = nil;
+        GPPSignIn* gp = [GPPSignIn sharedInstance];
+        
+        NSString* user;
+        if( [gp authentication] )
+        {
+            idToken = __MakeStringCopy( [gp idToken] );
+            user = [gp userID];
+        }
+        
+        NSLog(@"\n\tOS: 'iOS',\n\tBundleId: '%@',\n\tUser: '%@',\n\t idToken: '%s'",
+              [ [NSBundle mainBundle] bundleIdentifier ], user, idToken);
+        return idToken ? idToken : "";
+    }
+    
+    const char* _GooglePlayGetAccessToken()
+    {
         const char* accessToken = nil;
         GPPSignIn* gp = [GPPSignIn sharedInstance];
         
         NSString* user;
         if( [gp authentication] )
         {
-            accessToken = __MakeStringCopy( [gp idToken] );
+            accessToken = __MakeStringCopy( [ [gp authentication] accessToken ] );
             user = [gp userID];
         }
         
-        NSLog(@"\n\tOS: 'iOS',\n\tBundleId: '%@',\n\tUser: '%@',\n\t ServiceAccessToken: '%s'",
+        NSLog(@"\n\tOS: 'iOS',\n\tBundleId: '%@',\n\tUser: '%@',\n\t AccessToken: '%s'",
               [ [NSBundle mainBundle] bundleIdentifier ], user, accessToken);
         return accessToken ? accessToken : "";
     }
