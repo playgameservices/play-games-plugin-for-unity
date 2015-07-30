@@ -96,7 +96,7 @@ char* __MakeStringCopy(NSString* nstring)
 
 extern "C"
 {
-    const char* _GooglePlayGetAccessToken()
+    const char* _GooglePlayGetIdToken()
     {
         const char* accessToken = nil;
         GPPSignIn* gp = [GPPSignIn sharedInstance];

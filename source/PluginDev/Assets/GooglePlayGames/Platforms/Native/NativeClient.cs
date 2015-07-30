@@ -306,7 +306,7 @@ namespace GooglePlayGames.Native
             return email;
         }
         
-        public string GetToken() {
+        public string GetIdToken() {
 			if( String.IsNullOrEmpty(GameInfo.AndroidClientId) || ("__ANDROID_CLIENTID__" == GameInfo.AndroidClientId) )
 			{
 				throw new Exception("Client ID has not been set, cannot request access token.");
@@ -329,9 +329,9 @@ namespace GooglePlayGames.Native
         #elif UNITY_IOS
         
         [System.Runtime.InteropServices.DllImport("__Internal")]
-        private static extern string _GooglePlayGetAccessToken();
+        private static extern string _GooglePlayGetIdToken();
         
-        public string GetToken()
+        public string GetIdToken()
         {
             return _GooglePlayGetAccessToken();
         }
