@@ -51,7 +51,7 @@ namespace GooglePlayGames
         private static string Upgrade915(string prevVer)
         {
             Debug.Log("Upgrading from format version " + prevVer + " to " + PluginVersion.VersionKeyU5);
-            
+
             // all that was done was moving the Editor files to be in GooglePlayGames/Editor
             string[] obsoleteFiles =
                 {
@@ -92,7 +92,7 @@ namespace GooglePlayGames
                     "Assets/Plugins/iOS/GPGSAppController 1.mm",
                     "Assets/Plugins/iOS/GPGSAppController 1.mm.meta"
                 };
-            
+
             foreach (string file in obsoleteFiles)
             {
                 if (File.Exists(file))
@@ -108,7 +108,7 @@ namespace GooglePlayGames
         private static string Upgrade911(string prevVer)
         {
             Debug.Log("Upgrading from format version " + prevVer + " to " + PluginVersion.VersionKeyCPP);
-            
+
             // delete obsolete files, if they are there
             string[] obsoleteFiles =
                 {
@@ -119,7 +119,7 @@ namespace GooglePlayGames
                     "Assets/Plugins/GPGSUtils.dll",
                     "Assets/Plugins/GPGSUtils.dll.meta",
                 };
-            
+
             foreach (string file in obsoleteFiles)
             {
                 if (File.Exists(file))
@@ -128,7 +128,7 @@ namespace GooglePlayGames
                     File.Delete(file);
                 }
             }
-            
+
             // delete obsolete directories, if they are there
             string[] obsoleteDirectories =
                 {
@@ -136,7 +136,7 @@ namespace GooglePlayGames
                 "Assets/GooglePlayGames/Platforms/iOS",
                 "Assets/Plugins/Android/BaseGameUtils",
             };
-            
+
             foreach (string directory in obsoleteDirectories)
             {
                 if (Directory.Exists(directory))
@@ -145,7 +145,7 @@ namespace GooglePlayGames
                     Directory.Delete(directory, true);
                 }
             }
-            
+
             Debug.Log("Done upgrading from format version " + prevVer + " to " + PluginVersion.VersionKeyCPP);
             return PluginVersion.VersionKeyCPP;
         }
