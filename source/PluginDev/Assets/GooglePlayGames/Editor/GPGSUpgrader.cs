@@ -25,7 +25,7 @@ namespace GooglePlayGames
     {
         static GPGSUpgrader()
         {
-            string prevVer = GPGSProjectSettings.Instance.Get("lastUpgrade", "00000");
+            string prevVer = GPGSProjectSettings.Instance.Get(GPGSUtil.LASTUPGRADEKEY, "00000");
             if (prevVer != PluginVersion.VersionKey)
             {
                 // if this is a really old version, upgrade to 911 first, then 915
@@ -43,7 +43,7 @@ namespace GooglePlayGames
                 EditorUtility.DisplayDialog(GPGSStrings.PostInstall.Title, msg, "OK");
             }
 
-            GPGSProjectSettings.Instance.Set("lastUpgrade", prevVer);
+            GPGSProjectSettings.Instance.Set(GPGSUtil.LASTUPGRADEKEY, prevVer);
             GPGSProjectSettings.Instance.Save();
             AssetDatabase.Refresh();
         }

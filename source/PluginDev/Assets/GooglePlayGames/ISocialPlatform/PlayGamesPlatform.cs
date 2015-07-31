@@ -395,6 +395,21 @@ namespace GooglePlayGames
         }
 
         /// <summary>
+        /// Gets the email of the current user.
+        /// This requires additional configuration of permissions in order
+        /// to work.
+        /// </summary>
+        /// <returns>The user email.</returns>
+        public string GetUserEmail()
+        {
+            if (mClient != null)
+            {
+                return mClient.GetUserEmail();
+            }
+            return null;
+        }
+
+        /// <summary>
         /// Returns the achievement corresponding to the passed achievement identifier.
         /// </summary>
         /// <returns>

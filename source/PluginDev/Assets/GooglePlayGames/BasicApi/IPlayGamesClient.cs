@@ -101,6 +101,13 @@ namespace GooglePlayGames.BasicApi
     string GetIdToken();
 
     /// <summary>
+    /// Gets the user email.
+    /// </summary>
+    /// <returns>The user email or null if not authenticated or the permission is
+    /// not available.</returns>
+    string GetUserEmail();
+
+    /// <summary>
     /// Returns the user's avatar url, if they are logged in and have an avatar.
     /// </summary>
     /// <returns>The URL to load the avatar image. <code>null</code> if they are not logged

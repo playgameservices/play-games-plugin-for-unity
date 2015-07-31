@@ -28,21 +28,21 @@ namespace GooglePlayGames
         private string mClassName = "GooglePlayGames.GPGSIds";
         private Vector2 scroll;
 
-        private string mClientId = string.Empty;
+        private string mWebClientId = string.Empty;
 
         [MenuItem("Window/Google Play Games/Setup/Android setup...", false, 1)]
         public static void MenuItemFileGPGSAndroidSetup()
         {
             EditorWindow window = EditorWindow.GetWindow(
                 typeof(GPGSAndroidSetupUI), true, GPGSStrings.AndroidSetup.Title);
-            window.minSize = new Vector2(500, 400);
+            window.minSize = new Vector2(500, 600);
         }
 
         public void OnEnable()
         {
-            mClassName = GPGSProjectSettings.Instance.Get("proj.ConstantsClassName");
-            mConfigData = GPGSProjectSettings.Instance.Get("proj.ResourceData");
-            mClientId = GPGSProjectSettings.Instance.Get(GPGSUtil.ANDROIDCLIENTIDKEY);
+            mClassName = GPGSProjectSettings.Instance.Get(GPGSUtil.CLASSNAMEKEY);
+            mConfigData = GPGSProjectSettings.Instance.Get(GPGSUtil.ANDROIDRESOURCEKEY);
+            mWebClientId = GPGSProjectSettings.Instance.Get(GPGSUtil.WEBCLIENTIDKEY);
         }
 
         public void OnGUI()
@@ -52,14 +52,24 @@ namespace GooglePlayGames
 
             GUILayout.Space(10);
             GUILayout.Label(GPGSStrings.AndroidSetup.Blurb);
-           
+
             GUILayout.Label("Constants class name", EditorStyles.boldLabel);
             GUILayout.Label("Enter the fully qualified name of the class to create containing the constants");
             GUILayout.Space(10);
 
+
+            // Client ID field
+            GUILayout.Label(GPGSStrings.Setup.WebClientIdTitle, EditorStyles.boldLabel);
+            GUILayout.Label(GPGSStrings.AndroidSetup.WebClientIdBlurb);
+
+            mWebClientId = EditorGUILayout.TextField(GPGSStrings.Setup.ClientId,
+                mWebClientId, GUILayout.Width(450));
+
+            GUILayout.Space(10);
+
             mClassName = EditorGUILayout.TextField("Constants class name",
                 mClassName,GUILayout.Width(480));
-            
+
             GUILayout.Label("Resources Definition", EditorStyles.boldLabel);
             GUILayout.Label("Paste in the Android Resources from the Play Console");
             GUILayout.Space(10);
@@ -67,15 +77,6 @@ namespace GooglePlayGames
             mConfigData = EditorGUILayout.TextArea(mConfigData,
                 GUILayout.Width(475), GUILayout.Height(Screen.height));
             GUILayout.EndScrollView();
-            GUILayout.Space(10);
-
-            // Client ID field
-            GUILayout.Label(GPGSStrings.Setup.ClientIdTitle, EditorStyles.boldLabel);
-            GUILayout.Label(GPGSStrings.AndroidSetup.ClientIdBlurb);
-      
-            mClientId = EditorGUILayout.TextField(GPGSStrings.Setup.ClientId,
-                mClientId, GUILayout.Width(450));
-
             GUILayout.Space(10);
 
             GUILayout.FlexibleSpace();
@@ -99,7 +100,7 @@ namespace GooglePlayGames
 
         public void DoSetup()
         {
-            if (PerformSetup(mClientId, mClassName, mConfigData, null))
+            if (PerformSetup(mWebClientId, mClassName, mConfigData, null))
             {
                 EditorUtility.DisplayDialog(GPGSStrings.Success,
                     GPGSStrings.AndroidSetup.SetupComplete, GPGSStrings.Ok);
@@ -111,7 +112,6 @@ namespace GooglePlayGames
                     "Invalid or missing XML resource data.  Make sure the data is" +
                     " valid and contains the app_id element");
             }
-           
         }
 
         private static bool ParseResources(string className, string res)
@@ -138,7 +138,7 @@ namespace GooglePlayGames
                         if (lastProp == "app_id")
                         {
                             appId = reader.Value;
-                            GPGSProjectSettings.Instance.Set("proj.AppId", appId);
+                            GPGSProjectSettings.Instance.Set(GPGSUtil.APPIDKEY, appId);
                         }
                         else
                         {
@@ -169,9 +169,10 @@ namespace GooglePlayGames
         {
             if (ParseResources(className, resourceXmlData))
             {
-                GPGSProjectSettings.Instance.Set("proj.ConstantsClassName", className);
-                GPGSProjectSettings.Instance.Set("proj.ResourceData", resourceXmlData);
-                return PerformSetup(clientId, GPGSProjectSettings.Instance.Get("proj.AppId"), nearbySvcId);
+                GPGSProjectSettings.Instance.Set(GPGSUtil.CLASSNAMEKEY, className);
+                GPGSProjectSettings.Instance.Set(GPGSUtil.ANDROIDRESOURCEKEY, resourceXmlData);
+                return PerformSetup(clientId,
+                    GPGSProjectSettings.Instance.Get(GPGSUtil.APPIDKEY), nearbySvcId);
             }
             return false;
         }
@@ -179,10 +180,14 @@ namespace GooglePlayGames
         /// <summary>
         /// Provide static access to setup for facilitating automated builds.
         /// </summary>
+        /// <param name="clientId">The oauth2 client id for the game.  This is only
+        /// needed if the ID Token or access token are needed.</param>
         /// <param name="appId">App identifier.</param>
         /// <param name="nearbySvcId">Optional nearby connection serviceId</param>
         public static bool PerformSetup(string clientId, string appId, string nearbySvcId)
         {
+            bool needTokenPermissions = false;
+
             if( !string.IsNullOrEmpty(clientId) )
             {
                 if (!GPGSUtil.LooksLikeValidClientId(clientId))
@@ -190,17 +195,21 @@ namespace GooglePlayGames
                     GPGSUtil.Alert(GPGSStrings.Setup.ClientIdError);
                     return false;
                 }
-                appId = clientId.Split('-')[0];
-            }
-            else
-            {
-                // check for valid app id
-                if (!GPGSUtil.LooksLikeValidAppId(appId))
-                {
-                    GPGSUtil.Alert(GPGSStrings.Setup.AppIdError);
+                string serverAppId = clientId.Split('-')[0];
+                if (!serverAppId.Equals(appId)) {
+                    GPGSUtil.Alert(GPGSStrings.Setup.AppIdMismatch);
                     return false;
                 }
+                needTokenPermissions = true;
             }
+
+            // check for valid app id
+            if (!GPGSUtil.LooksLikeValidAppId(appId))
+            {
+                GPGSUtil.Alert(GPGSStrings.Setup.AppIdError);
+                return false;
+            }
+
 
             if (nearbySvcId != null)
             {
@@ -210,8 +219,8 @@ namespace GooglePlayGames
                 }
             }
 
-            GPGSProjectSettings.Instance.Set("proj.AppId", appId);
-            GPGSProjectSettings.Instance.Set(GPGSUtil.ANDROIDCLIENTIDKEY, clientId);
+            GPGSProjectSettings.Instance.Set(GPGSUtil.APPIDKEY, appId);
+            GPGSProjectSettings.Instance.Set(GPGSUtil.WEBCLIENTIDKEY, clientId);
             GPGSProjectSettings.Instance.Save();
             GPGSUtil.UpdateGameInfo();
 
@@ -227,9 +236,7 @@ namespace GooglePlayGames
             GPGSUtil.CopySupportLibs();
 
             // Generate AndroidManifest.xml
-            GPGSUtil.GenerateAndroidManifest();
-            
-            FillInAppData(GameInfoPath, GameInfoPath, clientId);
+            GPGSUtil.GenerateAndroidManifest(needTokenPermissions);
 
             // refresh assets, and we're done
             AssetDatabase.Refresh();
@@ -237,22 +244,6 @@ namespace GooglePlayGames
             GPGSProjectSettings.Instance.Save();
 
             return true;
-        }
-        
-        /// <summary>
-        /// Helper function to do search and replace of the client and bundle ids.
-        /// </summary>
-        /// <param name="sourcePath">Source path.</param>
-        /// <param name="outputPath">Output path.</param>
-        /// <param name="clientId">Client identifier.</param>
-        /// <param name="bundleId">Bundle identifier.</param>
-        private static void FillInAppData(string sourcePath,
-                                          string outputPath,
-                                          string clientId)
-        {
-            string fileBody = GPGSUtil.ReadFully(sourcePath);
-            fileBody = fileBody.Replace(GPGSUtil.ANDROIDCLIENTIDPLACEHOLDER, clientId);
-            GPGSUtil.WriteFile(outputPath, fileBody);
         }
     }
 }

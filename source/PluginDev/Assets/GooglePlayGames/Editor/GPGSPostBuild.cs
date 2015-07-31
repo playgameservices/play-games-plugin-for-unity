@@ -188,7 +188,7 @@ namespace GooglePlayGames
 
         private static string GetBundleId()
         {
-            return GPGSProjectSettings.Instance.Get("ios.BundleId", null);
+            return GPGSProjectSettings.Instance.Get(GPGSUtil.IOSBUNDLEIDKEY);
         }
 
         /// <summary>

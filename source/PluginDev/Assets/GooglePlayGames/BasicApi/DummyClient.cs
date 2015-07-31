@@ -67,6 +67,11 @@ public class DummyClient : IPlayGamesClient
       return "DummyToken";
     }
 
+    public string GetUserEmail()
+    {
+        return string.Empty;
+    }
+
     public string GetUserDisplayName()
     {
       LogUsage();

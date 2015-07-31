@@ -88,6 +88,22 @@ namespace GooglePlayGames
             }
         }
 
+        public string Get(string key, Dictionary<string, string> overrides)
+        {
+            if (overrides.ContainsKey(key))
+            {
+                return overrides[key];
+            }
+            else if (mDict.ContainsKey(key))
+            {
+                return WWW.UnEscapeURL(mDict[key]);
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
+
         public string Get(string key, string defaultValue)
         {
             if (mDict.ContainsKey(key))
