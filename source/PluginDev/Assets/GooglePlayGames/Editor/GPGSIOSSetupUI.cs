@@ -23,13 +23,9 @@ namespace GooglePlayGames
 
     public class GPGSIOSSetupUI : EditorWindow
     {
-        private const string GameInfoPath = "Assets/GooglePlayGames/GameInfo.cs";
 
+        private string mClientId = string.Empty;
         private string mBundleId = string.Empty;
-        private Vector2 scroll;
-        private string mConfigData = string.Empty;
-        private string mClassName = "GooglePlayGames.GPGSIds";
-
         private string mWebClientId = string.Empty;
 
         [MenuItem("Window/Google Play Games/Setup/iOS setup...", false, 2)]
@@ -47,6 +43,7 @@ namespace GooglePlayGames
             mWebClientId = GPGSProjectSettings.Instance.Get(GPGSUtil.WEBCLIENTIDKEY);
             mClassName = GPGSProjectSettings.Instance.Get(GPGSUtil.CLASSNAMEKEY);
             mConfigData = GPGSProjectSettings.Instance.Get(GPGSUtil.IOSRESOURCEKEY);
+
 
             if (mBundleId.Trim().Length == 0)
             {
@@ -82,7 +79,11 @@ namespace GooglePlayGames
             GUILayout.Label(GPGSStrings.IOSSetup.BundleIdBlurb);
             mBundleId = EditorGUILayout.TextField(GPGSStrings.IOSSetup.BundleId, mBundleId,
                 GUILayout.Width(450));
-            GUILayout.Space(10);
+            
+            GUILayout.Space(30);
+            // Client ID field
+            GUILayout.Label(GPGSStrings.Setup.WebClientIdTitle, EditorStyles.boldLabel);
+            GUILayout.Label(GPGSStrings.IOSSetup.ClientIdBlurb);
 
             // Client ID field
             GUILayout.Label(GPGSStrings.Setup.WebClientIdTitle, EditorStyles.boldLabel);
@@ -90,6 +91,7 @@ namespace GooglePlayGames
 
             mWebClientId = EditorGUILayout.TextField(GPGSStrings.Setup.ClientId,
             mWebClientId, GUILayout.Width(450));
+
 
             GUILayout.Space(10);
             GUILayout.FlexibleSpace();
@@ -117,7 +119,8 @@ namespace GooglePlayGames
             {
                 DoSetup();
             }
-            if (GUILayout.Button("Cancel"))
+
+            if (GUILayout.Button(GPGSStrings.Cancel))
             {
                 this.Close();
             }
@@ -279,7 +282,7 @@ namespace GooglePlayGames
             GPGSUtil.UpdateGameInfo();
 
             // Finished!
-            GPGSProjectSettings.Instance.Set("ios.SetupDone", true);
+            GPGSProjectSettings.Instance.Set(GPGSUtil.IOSSETUPDONEKEY, true);
             GPGSProjectSettings.Instance.Save();
             AssetDatabase.Refresh();
             return true;
