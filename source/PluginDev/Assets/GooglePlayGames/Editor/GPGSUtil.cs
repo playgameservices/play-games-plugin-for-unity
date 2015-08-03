@@ -1,5 +1,5 @@
 // <copyright file="GPGSUtil.cs" company="Google Inc.">
-// Copyright (C) 2014 Google Inc.
+// Copyright (C) 2014 Google Inc. All Rights Reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ namespace GooglePlayGames
         private const string WEBCLIENTIDPLACEHOLDER = "__WEB_CLIENTID__";
         public const string WEBCLIENTIDKEY = "and.ClientId";
 
+
         private const string IOSCLIENTIDPLACEHOLDER = "__IOS_CLIENTID__";
         public const string IOSCLIENTIDKEY = "ios.ClientId";
 
@@ -56,6 +57,7 @@ namespace GooglePlayGames
         public const string IOSRESOURCEKEY = "ios.ResourceData";
 
         private const string GameInfoPath = "Assets/GooglePlayGames/GameInfo.cs";
+        public const string IOSSETUPDONEKEY = "ios.SetupDone";
 
         private const string TokenPermissions = 
             "<uses-permission android:name=\"android.permission.GET_ACCOUNTS\"/>\n" +

@@ -282,6 +282,10 @@ namespace SmokeTest
             {
                 this.mUi = Ui.Leaderboards;
             }
+            else if (GUI.Button(CalcGrid(1, 2), "User Info"))
+            {
+                DoUserInfo();
+            }
             else if (GUI.Button(this.CalcGrid(0, 3), "Cloud Save"))
             {
                 this.DoCloudSave();
@@ -938,6 +942,12 @@ namespace SmokeTest
             {
                 mUi = Ui.Main;
             }
+        }
+
+        internal void DoUserInfo()
+        {
+            Status = "I am " + Social.localUser.userName + " token is:\n" +
+                ((PlayGamesLocalUser)Social.localUser).idToken;
         }
 
         internal void DrawTitle(string title)

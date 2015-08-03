@@ -46,6 +46,7 @@ namespace GooglePlayGames
             public const string AppIdError = "The App Id does not appear to be valid. " +
                                              "It must consist solely of digits, usually 10 or more.";
 
+
             public const string WebClientIdTitle = "Web App Client ID (Optional)";
             public const string ClientId = "Client ID";
             public const string ClientIdError = "The Client ID does not appear to be valid. " +
@@ -68,6 +69,8 @@ namespace GooglePlayGames
             public const string Blurb = "To configure Google Play Games for iOS in this project,\n" +
                                         "please enter the information below and click on the Setup button.";
 
+            public const string ClientIdTitle = "iOS App Client ID";
+            public const string ClientId = "Client ID";
             public const string ClientIdBlurb = "Enter your oauth2 client ID below. To obtain this\n" +
                                                 "ID, generate an iOS linked app in Developer Console. Example:\n" +
                                                 "123456789012-jafwiawoijjfe.apps.googleusercontent.com";

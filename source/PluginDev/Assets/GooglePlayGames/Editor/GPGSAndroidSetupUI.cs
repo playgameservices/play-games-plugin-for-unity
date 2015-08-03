@@ -35,7 +35,7 @@ namespace GooglePlayGames
         {
             EditorWindow window = EditorWindow.GetWindow(
                 typeof(GPGSAndroidSetupUI), true, GPGSStrings.AndroidSetup.Title);
-            window.minSize = new Vector2(500, 600);
+            window.minSize = new Vector2(500, 400);
         }
 
         public void OnEnable()
@@ -52,19 +52,9 @@ namespace GooglePlayGames
 
             GUILayout.Space(10);
             GUILayout.Label(GPGSStrings.AndroidSetup.Blurb);
-
+           
             GUILayout.Label("Constants class name", EditorStyles.boldLabel);
             GUILayout.Label("Enter the fully qualified name of the class to create containing the constants");
-            GUILayout.Space(10);
-
-
-            // Client ID field
-            GUILayout.Label(GPGSStrings.Setup.WebClientIdTitle, EditorStyles.boldLabel);
-            GUILayout.Label(GPGSStrings.AndroidSetup.WebClientIdBlurb);
-
-            mWebClientId = EditorGUILayout.TextField(GPGSStrings.Setup.ClientId,
-                mWebClientId, GUILayout.Width(450));
-
             GUILayout.Space(10);
 
             mClassName = EditorGUILayout.TextField("Constants class name",
@@ -77,6 +67,15 @@ namespace GooglePlayGames
             mConfigData = EditorGUILayout.TextArea(mConfigData,
                 GUILayout.Width(475), GUILayout.Height(Screen.height));
             GUILayout.EndScrollView();
+            GUILayout.Space(10);
+
+            // Client ID field
+            GUILayout.Label(GPGSStrings.Setup.WebClientIdTitle, EditorStyles.boldLabel);
+            GUILayout.Label(GPGSStrings.AndroidSetup.WebClientIdBlurb);
+      
+            mWebClientId = EditorGUILayout.TextField(GPGSStrings.Setup.ClientId,
+                mWebClientId, GUILayout.Width(450));
+
             GUILayout.Space(10);
 
             GUILayout.FlexibleSpace();
@@ -180,24 +179,35 @@ namespace GooglePlayGames
         /// <summary>
         /// Provide static access to setup for facilitating automated builds.
         /// </summary>
-        /// <param name="clientId">The oauth2 client id for the game.  This is only
-        /// needed if the ID Token or access token are needed.</param>
+        /// <param name="webClientId">The oauth2 client id for the game.  This is only
+        /// needed if the ID Token or access token are needed.</param> 
         /// <param name="appId">App identifier.</param>
         /// <param name="nearbySvcId">Optional nearby connection serviceId</param>
-        public static bool PerformSetup(string clientId, string appId, string nearbySvcId)
+        public static bool PerformSetup(string webClientId, string appId, string nearbySvcId)
         {
             bool needTokenPermissions = false;
 
-            if( !string.IsNullOrEmpty(clientId) )
+            if( !string.IsNullOrEmpty(webClientId) )
             {
-                if (!GPGSUtil.LooksLikeValidClientId(clientId))
+                if (!GPGSUtil.LooksLikeValidClientId(webClientId))
                 {
                     GPGSUtil.Alert(GPGSStrings.Setup.ClientIdError);
                     return false;
                 }
-                string serverAppId = clientId.Split('-')[0];
+
+                string serverAppId = webClientId.Split('-')[0];
                 if (!serverAppId.Equals(appId)) {
                     GPGSUtil.Alert(GPGSStrings.Setup.AppIdMismatch);
+                    return false;
+                }
+                needTokenPermissions = true;
+            }
+            else
+            {
+                // check for valid app id
+                if (!GPGSUtil.LooksLikeValidAppId(appId))
+                {
+                    GPGSUtil.Alert(GPGSStrings.Setup.AppIdError);
                     return false;
                 }
                 needTokenPermissions = true;
@@ -220,7 +230,7 @@ namespace GooglePlayGames
             }
 
             GPGSProjectSettings.Instance.Set(GPGSUtil.APPIDKEY, appId);
-            GPGSProjectSettings.Instance.Set(GPGSUtil.WEBCLIENTIDKEY, clientId);
+            GPGSProjectSettings.Instance.Set(GPGSUtil.WEBCLIENTIDKEY, webClientId);
             GPGSProjectSettings.Instance.Save();
             GPGSUtil.UpdateGameInfo();
 
