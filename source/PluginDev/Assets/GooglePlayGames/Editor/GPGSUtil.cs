@@ -30,7 +30,7 @@ namespace GooglePlayGames
         public const string APPIDKEY = "proj.AppId";
 
         private const string WEBCLIENTIDPLACEHOLDER = "__WEB_CLIENTID__";
-        public const string WEBCLIENTIDKEY = "and.ClientId";
+        public const string WEBCLIENTIDKEY = "web.ClientId";
 
         private const string IOSCLIENTIDPLACEHOLDER = "__IOS_CLIENTID__";
         public const string IOSCLIENTIDKEY = "ios.ClientId";
