@@ -82,6 +82,20 @@ namespace GooglePlayGames.BasicApi
     string GetUserDisplayName();
 
     /// <summary>
+    /// Returns an access token.
+    /// </summary>
+    /// <returns>An access token. <code>null</code> if they are not logged
+    /// in</returns>
+    string GetAccessToken();
+
+    /// <summary>
+    /// Returns an id token, which can be verified server side, if they are logged in.
+    /// </summary>
+    /// <returns>An it token. <code>null</code> if they are not logged
+    /// in</returns>
+    string GetIdToken();
+
+    /// <summary>
     /// Returns the user's avatar url, if they are logged in and have an avatar.
     /// </summary>
     /// <returns>The URL to load the avatar image. <code>null</code> if they are not logged

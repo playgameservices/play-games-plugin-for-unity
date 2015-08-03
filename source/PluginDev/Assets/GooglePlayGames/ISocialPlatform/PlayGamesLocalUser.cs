@@ -28,11 +28,14 @@ namespace GooglePlayGames
         internal PlayGamesPlatform mPlatform;
 
         private WWW mAvatarUrl;
+        private Texture2D mImage;
 
         internal PlayGamesLocalUser(PlayGamesPlatform plaf)
         {
             mPlatform = plaf;
             mAvatarUrl = null;
+            mImage = null;
+
         }
 
         /// <summary>
@@ -129,6 +132,20 @@ namespace GooglePlayGames
         }
 
         /// <summary>
+        /// Gets an id token for the user.
+        /// </summary>
+        /// <returns>
+        /// An id token for the user.
+        /// </returns>
+        public new string idToken
+        {
+            get
+            {
+                return authenticated ? mPlatform.GetIdToken() : string.Empty;
+            }
+        }
+
+        /// <summary>
         /// Returns true (since this is the local user).
         /// </summary>
         public new bool isFriend
@@ -168,11 +185,17 @@ namespace GooglePlayGames
                 if (mAvatarUrl == null || mAvatarUrl.url != url)
                 {
                     mAvatarUrl = new WWW(url);
+                    mImage = null;
+                }
+
+                if (mImage != null) {
+                    return mImage;
                 }
 
                 if (mAvatarUrl.isDone)
                 {
-                    return mAvatarUrl.texture;
+                    mImage =  mAvatarUrl.texture;
+                    return mImage;
                 }
             }
 

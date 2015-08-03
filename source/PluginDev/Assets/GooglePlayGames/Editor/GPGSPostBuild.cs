@@ -21,21 +21,30 @@ namespace GooglePlayGames
     using System.IO;
     using UnityEditor.Callbacks;
     using UnityEditor;
+
+    // Use the included xcode support for unity 5+,
+    // otherwise use the backported code.
+#if UNITY_5
     using UnityEditor.iOS.Xcode;
+#else
+    using GooglePlayGames.xcode;
+#endif
     using GooglePlayGames;
     using GooglePlayGames.Editor.Util;
-    using System.Text.RegularExpressions;
+	using UnityEngine;
 
     public static class GPGSPostBuild
     {
         private const string UrlTypes = "CFBundleURLTypes";
         private const string UrlBundleName = "CFBundleURLName";
         private const string UrlScheme = "CFBundleURLSchemes";
+        private const string PrincipalClass = "NSPrincipalClass";
+        private const string PrincipalClassName = "CustomWebViewApplication";
 
         [PostProcessBuild]
         public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
         {
-#if UNITY_5_0
+#if UNITY_5
             if (target != BuildTarget.iOS) {
                 return;
             }
@@ -109,6 +118,7 @@ namespace GooglePlayGames
             var gamesSchemeIndex = GamesUrlSchemeIndex(buddy);
 
             EnsureGamesUrlScheme(buddy, gamesSchemeIndex);
+            EnsurePrincipalClass(buddy);
         }
 
 
@@ -124,6 +134,16 @@ namespace GooglePlayGames
             buddy.AddArray(UrlTypes, index, UrlScheme);
             buddy.AddString(PlistBuddyHelper.ToEntryName(UrlTypes, index, UrlScheme, 0),
                 GetBundleId());
+        }
+
+        /// <summary>
+        /// Ensures the PrincipalClass is set and correct.
+        /// </summary>
+        /// <param name="buddy">Buddy.</param>
+        private static void EnsurePrincipalClass(PlistBuddyHelper buddy)
+        {
+            buddy.RemoveEntry(PrincipalClass);
+            buddy.AddString(PrincipalClass, PrincipalClassName);
         }
 
         private static string GetBundleId()
@@ -185,6 +205,13 @@ namespace GooglePlayGames
 
             string fileGuid =
                  proj.FindFileGuidByProjectPath("Libraries/Plugins/iOS/GPGSAppController.mm");
+
+            if (fileGuid == null) {
+                // look in the legacy location
+                fileGuid =
+                    proj.FindFileGuidByProjectPath("Libraries/GPGSAppController.mm");
+            }
+
 
             List<string> list = new List<string>();
             list.Add("-fobjc-arc");
