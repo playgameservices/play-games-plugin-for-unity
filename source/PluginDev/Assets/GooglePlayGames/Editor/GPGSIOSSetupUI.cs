@@ -23,7 +23,6 @@ namespace GooglePlayGames
 
     public class GPGSIOSSetupUI : EditorWindow
     {
-
         private string mBundleId = string.Empty;
         private string mWebClientId = string.Empty;
         private string mClassName = "GooglePlayGames.GPGSIds";
