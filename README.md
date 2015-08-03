@@ -161,6 +161,12 @@ After filling in the application ID, click the **Setup** button.
 **Important:** The application ID and package name settings must match exactly
 the values you used when setting up your project on the Developer Console.
 
+**Note:**  If you are using a web application or backend server with your game,
+you can link the web application to the game to enable gettting the player's
+access token and/or email address.  To do this, link a web application to the
+game in the play console, and enter the client id for the web application into
+the setup dialog.
+
 ### Additional instructions on building for Android on Windows
 
 If you are using Windows, you must make sure that your Java SDK installation can be accessed by Unity. To do this:
@@ -211,6 +217,12 @@ When ready, click the **Setup** button to finish the configuration process.
 
 **Important:** If you ever change your bundle ID, you must perform the iOS setup
 again in order to update the necessary files where this information gets replicated.
+
+**Note:**  If you are using a web application or backend server with your game,
+you can link the web application to the game to enable gettting the player's
+access token and/or email address.  To do this, link a web application to the
+game in the play console, and enter the client id for the web application into
+the setup dialog.
 
 ## Run the Project
 

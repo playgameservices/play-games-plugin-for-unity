@@ -1,5 +1,5 @@
 // <copyright file="IPlayGamesClient.cs" company="Google Inc.">
-// Copyright (C) 2014 Google Inc.
+// Copyright (C) 2014 Google Inc. All Rights Reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -94,6 +94,13 @@ namespace GooglePlayGames.BasicApi
     /// <returns>An it token. <code>null</code> if they are not logged
     /// in</returns>
     string GetIdToken();
+
+    /// <summary>
+    /// Gets the user email.
+    /// </summary>
+    /// <returns>The user email or null if not authenticated or the permission is
+    /// not available.</returns>
+    string GetUserEmail();
 
     /// <summary>
     /// Returns the user's avatar url, if they are logged in and have an avatar.
@@ -201,13 +208,13 @@ namespace GooglePlayGames.BasicApi
     /// </summary>
     /// <seealso cref="GooglePlayGames.Multiplayer.IRealTimeMultiplayerClient"/>
     /// <returns>The rtmp client.</returns>
-    Multiplayer.IRealTimeMultiplayerClient GetRtmpClient();
+    IRealTimeMultiplayerClient GetRtmpClient();
 
     /// <summary>
     /// Returns a turn-based multiplayer client.
     /// </summary>
     /// <returns>The tbmp client.</returns>
-    Multiplayer.ITurnBasedMultiplayerClient GetTbmpClient();
+    ITurnBasedMultiplayerClient GetTbmpClient();
 
     /// <summary>
     /// Gets the saved game client.
@@ -233,7 +240,7 @@ namespace GooglePlayGames.BasicApi
     /// <param name="invitationDelegate">Invitation delegate.</param>
     void RegisterInvitationDelegate(InvitationReceivedDelegate invitationDelegate);
   }
-    
+
   /// <summary>
   /// Delegate that handles an incoming invitation (for both RTMP and TBMP).
   /// </summary>

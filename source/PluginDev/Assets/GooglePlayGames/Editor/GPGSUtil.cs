@@ -1,5 +1,5 @@
 // <copyright file="GPGSUtil.cs" company="Google Inc.">
-// Copyright (C) 2014 Google Inc.
+// Copyright (C) 2014 Google Inc. All Rights Reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,28 +16,57 @@
 
 namespace GooglePlayGames
 {
-    using System;
+    using System.Collections.Generic;
     using System.IO;
     using UnityEditor;
     using UnityEngine;
 
     public static class GPGSUtil
     {
-        public const string SERVICEIDPLACEHOLDER = "__NEARBY_SERVICE_ID__";
+        private const string SERVICEIDPLACEHOLDER = "__NEARBY_SERVICE_ID__";
         public const string SERVICEIDKEY = "App.NearbdServiceId";
-        public const string APPIDPLACEHOLDER = "___APP_ID___";
+
+        private const string APPIDPLACEHOLDER = "__APP_ID__";
         public const string APPIDKEY = "proj.AppId";
 
-        public const string ANDROIDCLIENTIDPLACEHOLDER = "__ANDROID_CLIENTID__";
-        public const string ANDROIDCLIENTIDKEY = "and.ClientId";
+        private const string WEBCLIENTIDPLACEHOLDER = "__WEB_CLIENTID__";
+        public const string WEBCLIENTIDKEY = "web.ClientId";
 
-        public const string IOSCLIENTIDPLACEHOLDER = "__IOS_CLIENTID__";
+        private const string IOSCLIENTIDPLACEHOLDER = "__IOS_CLIENTID__";
         public const string IOSCLIENTIDKEY = "ios.ClientId";
-        public const string IOSBUNDLEIDPLACEHOLDER = "__BUNDLEID__";
+
+        private const string IOSBUNDLEIDPLACEHOLDER = "__BUNDLEID__";
         public const string IOSBUNDLEIDKEY = "ios.BundleId";
 
+        private const string TOKENPERMISSIONSHOLDER = "__TOKEN_PERMISSIONS__";
+        private const string TOKENPERMISSIONKEY = "proj.tokenPermissions";
+
+        public const string LASTUPGRADEKEY = "lastUpgrade";
+
+        public const string IOSSETUPDONEKEY = "ios.SetupDone";
+
         private const string GameInfoPath = "Assets/GooglePlayGames/GameInfo.cs";
-        private const string GameInfoTemplatePath = "Assets/GooglePlayGames/Editor/GameInfo.template";
+ 
+        private const string TokenPermissions = 
+            "<uses-permission android:name=\"android.permission.GET_ACCOUNTS\"/>\n" +
+            "<uses-permission android:name=\"android.permission.USE_CREDENTIALS\"/>";
+
+
+        /// <summary>
+        /// The map of replacements for filling in code templates.  The
+        /// key is the string that appears in the template as a placeholder,
+        /// the value is the key into the GPGSProjectSettings.
+        /// </summary>
+        private static Dictionary<string,string> Replacements = 
+            new Dictionary<string, string>()
+        {
+            {SERVICEIDPLACEHOLDER, SERVICEIDKEY},
+            {APPIDPLACEHOLDER, APPIDKEY},
+            {WEBCLIENTIDPLACEHOLDER, WEBCLIENTIDKEY},
+            {IOSCLIENTIDPLACEHOLDER, IOSCLIENTIDKEY},
+            {IOSBUNDLEIDPLACEHOLDER, IOSBUNDLEIDKEY},
+            {TOKENPERMISSIONSHOLDER, TOKENPERMISSIONKEY}
+        };
 
         public static string SlashesToPlatformSeparator(string path)
         {
@@ -214,52 +243,43 @@ namespace GooglePlayGames
             FileUtil.CopyFileOrDirectory(supportJarPath, supportJarDest);
         }
 
-        public static void GenerateAndroidManifest()
+        public static void GenerateAndroidManifest(bool needTokenPermissions)
         {
             string destFilename = GPGSUtil.SlashesToPlatformSeparator(
                                       "Assets/Plugins/Android/MainLibProj/AndroidManifest.xml");
 
             // Generate AndroidManifest.xml
-            string appId = GPGSProjectSettings.Instance.Get(APPIDKEY, string.Empty);
-            string nearbyServiceId = GPGSProjectSettings.Instance.Get(SERVICEIDKEY, string.Empty);
             string manifestBody = GPGSUtil.ReadEditorTemplate("template-AndroidManifest");
-            manifestBody = manifestBody.Replace(APPIDPLACEHOLDER, appId);
-            manifestBody = manifestBody.Replace(SERVICEIDPLACEHOLDER, nearbyServiceId);
+
+            Dictionary<string,string> overrideValues = new Dictionary<string,string>();
+            if (!needTokenPermissions) {
+                overrideValues[TOKENPERMISSIONKEY] = "";
+                overrideValues[WEBCLIENTIDPLACEHOLDER] = "";
+            } else
+            {
+                overrideValues[TOKENPERMISSIONKEY] = TokenPermissions;
+            }
+
+            foreach(KeyValuePair<string, string> ent in Replacements)
+            {
+                string value = 
+                    GPGSProjectSettings.Instance.Get(ent.Value, overrideValues);
+                manifestBody = manifestBody.Replace(ent.Key, value);
+            }
+
             GPGSUtil.WriteFile(destFilename, manifestBody);
             GPGSUtil.UpdateGameInfo();
         }
 
         public static void UpdateGameInfo()
         {
-            string fileBody = GPGSUtil.ReadFully(GameInfoTemplatePath);
-            var appId = GPGSProjectSettings.Instance.Get(APPIDKEY, null);
-            if (appId != null)
-            {
-                fileBody = fileBody.Replace(APPIDPLACEHOLDER, appId);
-            }
+            string fileBody = GPGSUtil.ReadEditorTemplate("template-GameInfo");
 
-            var nearbyServiceId = GPGSProjectSettings.Instance.Get(SERVICEIDKEY, null);
-            if (nearbyServiceId != null)
+            foreach(KeyValuePair<string, string> ent in Replacements)
             {
-                fileBody = fileBody.Replace(SERVICEIDPLACEHOLDER, appId);
-            }
-
-            var iosClientId = GPGSProjectSettings.Instance.Get(IOSCLIENTIDKEY, null);
-            if (iosClientId != null)
-            {
-                fileBody = fileBody.Replace(IOSCLIENTIDPLACEHOLDER, iosClientId);
-            }
-
-            var andClientId = GPGSProjectSettings.Instance.Get(ANDROIDCLIENTIDKEY, null);
-            if (andClientId != null)
-            {
-                fileBody = fileBody.Replace(ANDROIDCLIENTIDPLACEHOLDER, andClientId);
-            }
-
-            var bundleId = GPGSProjectSettings.Instance.Get(IOSBUNDLEIDKEY, null);
-            if (bundleId != null)
-            {
-                fileBody = fileBody.Replace(IOSBUNDLEIDPLACEHOLDER, bundleId);
+                string value = 
+                    GPGSProjectSettings.Instance.Get(ent.Value);
+                fileBody = fileBody.Replace(ent.Key, value);
             }
 
             GPGSUtil.WriteFile(GameInfoPath, fileBody);
