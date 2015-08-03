@@ -31,7 +31,7 @@ namespace GooglePlayGames
 #endif
     using GooglePlayGames;
     using GooglePlayGames.Editor.Util;
-	using UnityEngine;
+    using UnityEngine;
 
     public static class GPGSPostBuild
     {
@@ -45,7 +45,8 @@ namespace GooglePlayGames
         public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
         {
 #if UNITY_5
-            if (target != BuildTarget.iOS) {
+            if (target != BuildTarget.iOS)
+            {
                 return;
             }
 #else
@@ -77,7 +78,8 @@ namespace GooglePlayGames
             //Copy the podfile into the project.
             string podfile = "Assets/GooglePlayGames/Editor/Podfile.txt";
             string destpodfile = pathToBuiltProject + "/Podfile";
-            if (!System.IO.File.Exists(destpodfile)) {
+            if (!System.IO.File.Exists(destpodfile))
+            {
                 FileUtil.CopyFileOrDirectory(podfile, destpodfile);
             }
 
@@ -148,7 +150,7 @@ namespace GooglePlayGames
 
         private static string GetBundleId()
         {
-            return GPGSProjectSettings.Instance.Get("ios.BundleId", null);
+            return GPGSProjectSettings.Instance.Get(GPGSUtil.IOSBUNDLEIDKEY);
         }
 
         /// <summary>
@@ -206,7 +208,8 @@ namespace GooglePlayGames
             string fileGuid =
                  proj.FindFileGuidByProjectPath("Libraries/Plugins/iOS/GPGSAppController.mm");
 
-            if (fileGuid == null) {
+            if (fileGuid == null)
+            {
                 // look in the legacy location
                 fileGuid =
                     proj.FindFileGuidByProjectPath("Libraries/GPGSAppController.mm");
