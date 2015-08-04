@@ -26,6 +26,6 @@ namespace GooglePlayGames
     public const string VersionKey = "00921";
 
     // only needed to upgrade to 00915
-    public const int MinGmsCoreVersionCode = 0;
+    public const int MinGmsCoreVersionCode = 7571000;
   }
 }

@@ -19,6 +19,8 @@ namespace GooglePlayGames
     using System.Collections;
     using System.Collections.Generic;
     using System.IO;
+    using System.Xml;
+    using System;
     using UnityEditor;
     using UnityEngine;
 
@@ -59,7 +61,7 @@ namespace GooglePlayGames
         private const string GameInfoPath = "Assets/GooglePlayGames/GameInfo.cs";
         public const string IOSSETUPDONEKEY = "ios.SetupDone";
 
-        private const string TokenPermissions = 
+        private const string TokenPermissions =
             "<uses-permission android:name=\"android.permission.GET_ACCOUNTS\"/>\n" +
             "<uses-permission android:name=\"android.permission.USE_CREDENTIALS\"/>";
 
@@ -69,7 +71,7 @@ namespace GooglePlayGames
         /// key is the string that appears in the template as a placeholder,
         /// the value is the key into the GPGSProjectSettings.
         /// </summary>
-        private static Dictionary<string,string> Replacements = 
+        private static Dictionary<string,string> Replacements =
             new Dictionary<string, string>()
         {
             {SERVICEIDPLACEHOLDER, SERVICEIDKEY},
@@ -215,7 +217,7 @@ namespace GooglePlayGames
                 libProjPath + GPGSUtil.SlashesToPlatformSeparator("/AndroidManifest.xml");
             string libProjDestDir = GPGSUtil.SlashesToPlatformSeparator(
                                         "Assets/Plugins/Android/google-play-services_lib");
-            
+
             // check that the Google Play Services lib project is there
             if (!System.IO.Directory.Exists(libProjPath) || !System.IO.File.Exists(libProjAM))
             {
@@ -223,6 +225,28 @@ namespace GooglePlayGames
                 EditorUtility.DisplayDialog(GPGSStrings.AndroidSetup.LibProjNotFound,
                     GPGSStrings.AndroidSetup.LibProjNotFoundBlurb, GPGSStrings.Ok);
                 return;
+            }
+
+            // check version
+            int version = GetGPSVersion(libProjPath);
+            if (version < 0)
+            {
+                Debug.LogError("Google Play Services lib version cannot be found!");
+            }
+            if (version < PluginVersion.MinGmsCoreVersionCode)
+            {
+                if (!EditorUtility.DisplayDialog(string.Format(
+                            GPGSStrings.AndroidSetup.LibProjVerTooOld,
+                            version, PluginVersion.MinGmsCoreVersionCode),
+                        GPGSStrings.Ok, GPGSStrings.Cancel))
+                {
+                    Debug.LogError("Google Play Services lib is too old! " +
+                       " Found version " +
+                        version + " require at least version " +
+                        PluginVersion.MinGmsCoreVersionCode);
+                    return;
+                }
+                Debug.Log("Ignoring the version mismatch and continuing the build.");
             }
 
             // clear out the destination library project
@@ -275,7 +299,7 @@ namespace GooglePlayGames
 
             foreach(KeyValuePair<string, string> ent in Replacements)
             {
-                string value = 
+                string value =
                     GPGSProjectSettings.Instance.Get(ent.Value, overrideValues);
                 manifestBody = manifestBody.Replace(ent.Key, value);
             }
@@ -337,7 +361,7 @@ namespace GooglePlayGames
 
             foreach(KeyValuePair<string, string> ent in Replacements)
             {
-                string value = 
+                string value =
                     GPGSProjectSettings.Instance.Get(ent.Value);
                 fileBody = fileBody.Replace(ent.Key, value);
             }
@@ -360,6 +384,35 @@ namespace GooglePlayGames
             {
                 System.IO.Directory.Delete(dir, true);
             }
+        }
+
+        static int GetGPSVersion(string libProjPath)
+        {
+            string versionFile = libProjPath + "/res/values/version.xml";
+
+            XmlTextReader reader = new XmlTextReader(new StreamReader(versionFile));
+            bool inResource = false;
+            int version = -1;
+
+            while (reader.Read())
+            {
+                if (reader.Name == "resources")
+                {
+                    inResource = true;
+                }
+                if (inResource && reader.Name == "integer")
+                {
+                    if ("google_play_services_version".Equals(
+                           reader.GetAttribute("name")))
+                    {
+                        reader.Read();
+                        Debug.Log("Read version string: " + reader.Value);
+                        version = Convert.ToInt32(reader.Value);
+                    }
+                }
+            }
+            reader.Close();
+            return version;
         }
     }
 }
