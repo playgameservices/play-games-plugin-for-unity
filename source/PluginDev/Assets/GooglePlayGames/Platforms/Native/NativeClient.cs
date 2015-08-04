@@ -63,6 +63,7 @@ namespace GooglePlayGames.Native
         private volatile Action<Invitation, bool> mInvitationDelegate;
         private volatile Dictionary<String, Achievement> mAchievements = null;
         private volatile Player mUser = null;
+        private volatile List<Player> mFriends = null;
         private volatile Action<bool> mPendingAuthCallbacks;
         private volatile Action<bool> mSilentAuthCallbacks;
         private volatile AuthState mAuthState = AuthState.Unauthenticated;
@@ -537,6 +538,42 @@ namespace GooglePlayGames.Native
             }
         }
 
+        public void LoadFriends(Action<bool> callback)
+        {
+
+            if (!IsAuthenticated())
+            {
+                Logger.d("Cannot loadFriends when not authenticated");
+                callback(false);
+                return;
+            }
+            mServices.PlayerManager().FetchFriends((status, players) =>
+                {
+                    if (status == ResponseStatus.Success ||
+                        status == ResponseStatus.SuccessWithStale) {
+                        mFriends = players;
+                         callback(true);
+                    }
+                    else {
+                        mFriends = null;
+                        Logger.e("Got " + status + " loading friends");
+                    }
+                });
+        }
+
+        public IUserProfile[] GetFriends()
+        {
+            if (mFriends == null)
+            {
+                Logger.w("Getting friends before they are loaded!!!");
+                LoadFriends((ok) =>
+                    {
+                        Logger.d("loading: " + ok);
+                    });
+            }
+            return mFriends.ToArray();
+        }
+
         private void PopulateAchievements(uint authGeneration,
                                           AchievementManager.FetchAllResponse response)
         {
@@ -638,6 +675,7 @@ namespace GooglePlayGames.Native
                 }
 
                 mUser = response.Self().AsPlayer();
+                mFriends = null;
             }
             Logger.d("Found User: " + mUser);
             Logger.d("Maybe finish for User");
@@ -711,6 +749,7 @@ namespace GooglePlayGames.Native
             lock (AuthStateLock)
             {
                 mUser = null;
+                mFriends = null;
                 mAchievements = null;
                 mAuthState = AuthState.Unauthenticated;
                 mAuthGeneration++;
@@ -740,7 +779,7 @@ namespace GooglePlayGames.Native
                 return null;
             }
 
-            return mUser.PlayerId;
+            return mUser.id;
         }
 
         ///<summary></summary>
@@ -752,7 +791,7 @@ namespace GooglePlayGames.Native
                 return null;
             }
 
-            return mUser.DisplayName;
+            return mUser.userName;
         }
 
         ///<summary></summary>
@@ -1038,7 +1077,7 @@ namespace GooglePlayGames.Native
         {
             GameServices().LeaderboardManager().LoadLeaderboardData(
                 leaderboardId, start, rowCount, collection, timeSpan,
-                this.mUser.PlayerId, callback
+                this.mUser.id, callback
             );
         }
 

@@ -1142,7 +1142,7 @@ namespace GooglePlayGames.Native
                 foreach (var participant in mParticipants.Values)
                 {
                     if (participant.Player != null
-                    && participant.Player.PlayerId.Equals(mSession.SelfPlayerId()))
+                    && participant.Player.id.Equals(mSession.SelfPlayerId()))
                     {
                         return participant;
                     }

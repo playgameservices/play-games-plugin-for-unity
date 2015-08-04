@@ -16,8 +16,6 @@
 
 namespace GooglePlayGames.BasicApi.Multiplayer
 {
-    using System;
-    using UnityEngine.SocialPlatforms;
     using UnityEngine;
 
     /// <summary>
@@ -26,156 +24,11 @@ namespace GooglePlayGames.BasicApi.Multiplayer
     /// (tied to a Google account). The player exists across matches, the Participant
     /// only exists in the context of a particular match.
     /// </summary>
-    public class Player : IUserProfile
+    public class Player : PlayGamesUserProfile
     {
-        private readonly string mDisplayName;
-        private readonly string mPlayerId;
-        private readonly string mAvatarUrl;
-
-        private WWW wwwImage;
-        private Texture2D mImage;
-
         internal Player(string displayName, string playerId, string avatarUrl)
+            : base(displayName, playerId, avatarUrl)
         {
-            mDisplayName = displayName;
-            mPlayerId = playerId;
-            mAvatarUrl = avatarUrl;
         }
-
-        /// Player's display name.
-        public string DisplayName
-        {
-            get
-            {
-                return mDisplayName;
-            }
-        }
-
-        /// Player's ID. Always the same for a particular person. It does not vary across matches.
-        public string PlayerId
-        {
-            get
-            {
-                return mPlayerId;
-            }
-        }
-
-        /// Player's AvatarUrl - can be null if the user has no avatar.
-        public string AvatarURL
-        {
-            get
-            {
-                return mAvatarUrl;
-            }
-        }
-
-        public override string ToString()
-        {
-            return string.Format("[Player: '{0}' (id {1})]", mDisplayName, mPlayerId);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj == null)
-            {
-                return false;
-            }
-
-            if (ReferenceEquals(this, obj))
-            {
-                return true;
-            }
-
-            if (obj.GetType() != typeof(Player))
-            {
-                return false;
-            }
-
-            Player other = (Player)obj;
-            return mPlayerId == other.mPlayerId;
-        }
-
-        public override int GetHashCode()
-        {
-            return mPlayerId != null ? mPlayerId.GetHashCode() : 0;
-        }
-
-        #region IUserProfile implementation
-
-        public string userName
-        {
-            get
-            {
-                return DisplayName;
-            }
-        }
-
-        public string id
-        {
-            get
-            {
-                return mPlayerId;
-            }
-        }
-
-        public bool isFriend
-        {
-            get
-            {
-                return false;
-            }
-        }
-
-        public UserState state
-        {
-            get
-            {
-                return UserState.Offline;
-            }
-        }
-
-        public UnityEngine.Texture2D image
-        {
-            get
-            {
-                return LoadImage();
-            }
-        }
-
-        #endregion
-
-        /// <summary>
-        /// Loads the local user's image from the url.  Loading urls
-        /// is asynchronous so the return from this call is fast,
-        /// the image is returned once it is loaded.  null is returned
-        /// up to that point.
-        /// </summary>
-        private Texture2D LoadImage()
-        {
-            // the url can be null if the user does not have an
-            // avatar configured.
-            if (!string.IsNullOrEmpty(mAvatarUrl))
-            {
-                if (wwwImage == null || wwwImage.url != mAvatarUrl)
-                {
-                    wwwImage = new WWW(mAvatarUrl);
-                    mImage = null;
-                }
-
-                if (mImage != null) {
-                    return mImage;
-                }
-
-                if (wwwImage.isDone)
-                {
-                    mImage =  wwwImage.texture;
-                    return mImage;
-                }
-            }
-
-            // if there is no url, always return null.
-            return null;
-        }
-
     }
 }

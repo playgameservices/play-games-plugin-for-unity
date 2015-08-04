@@ -80,6 +80,12 @@ namespace GooglePlayGames.BasicApi
     string GetUserId();
 
     /// <summary>
+    /// Load friends of the authenticated user
+    /// </summary>
+    /// <param name="callback"></param>
+    void LoadFriends(Action<bool> callback);
+
+    /// <summary>
     /// Returns a human readable name for the user, if they are logged in.
     /// </summary>
     /// <returns>The user's human-readable name. <code>null</code> if they are not logged
@@ -319,6 +325,8 @@ namespace GooglePlayGames.BasicApi
     /// </summary>
     /// <param name="invitationDelegate">Invitation delegate.</param>
     void RegisterInvitationDelegate(InvitationReceivedDelegate invitationDelegate);
+
+    IUserProfile[] GetFriends();
   }
 
   /// <summary>

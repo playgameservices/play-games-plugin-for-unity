@@ -271,6 +271,18 @@ public class DummyClient : IPlayGamesClient
       return false;
     }
 
+    public void LoadFriends(Action<bool> callback)
+    {
+      LogUsage();
+      callback(false);
+    }
+
+    public IUserProfile[] GetFriends()
+    {
+      LogUsage();
+      return new IUserProfile[0];
+    }
+
     private static void LogUsage()
     {
       Logger.d("Received method call on DummyClient - using stub implementation.");

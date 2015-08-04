@@ -363,7 +363,7 @@ namespace GooglePlayGames
 
             return mClient.GetUserId();
         }
-        
+
         /// <summary>
         /// Returns an id token for the user.
         /// </summary>
@@ -378,7 +378,7 @@ namespace GooglePlayGames
             }
             return null;
         }
-        
+
         /// <summary>
         /// Returns an id token for the user.
         /// </summary>
@@ -920,16 +920,22 @@ namespace GooglePlayGames
             mDefaultLbUi = lbid;
         }
 
-        /// <summary>
-        /// Not implemented yet. Calls the callback with <c>false</c>.
-        /// </summary>
+       /// <summary>
+       /// Loads the friends that also play this game.  See loadConnectedPlayers.
+       /// </summary>
+       /// <param name="callback">Callback.</param>
         public void LoadFriends(ILocalUser user, Action<bool> callback)
         {
-            Logger.w("PlayGamesPlatform.LoadFriends not implemented.");
-            if (callback != null)
+            if (!IsAuthenticated())
             {
-                callback.Invoke(false);
+                Logger.e("LoadScores can only be called after authentication.");
+                if (callback != null)
+                {
+                    callback(false);
+                }
             }
+
+            mClient.LoadFriends(callback);
         }
 
         /// <summary>
@@ -1097,6 +1103,16 @@ namespace GooglePlayGames
             }
 
             return id;
+        }
+
+        internal IUserProfile[] GetFriends()
+        {
+            if(!IsAuthenticated())
+            {
+                Logger.d("Cannot get friends when not authenticated!");
+                return new IUserProfile[0];
+            }
+            return mClient.GetFriends();
         }
 
         /// <summary>
