@@ -58,47 +58,29 @@ namespace GooglePlayGames
 
             #if NO_GPGS
 
+            string[] filesToRemove = {
+                "Libraries/Plugins/iOS/GPGSAppController.mm",
+                "Libraries/GPGSAppController.mm",
+                "Libraries/Plugins/iOS/GPGSAppController.h",
+                "Libraries/GPGSAppController.h",
+                "Libraries/Plugins/iOS/CustomWebViewApplication.h",
+                "Libraries/CustomWebViewApplication.h",
+                "Libraries/Plugins/iOS/CustomWebViewApplication.mm",
+                "Libraries/CustomWebViewApplication.mm"
+            };
+
             string pbxprojPath = pathToBuiltProject + "/Unity-iPhone.xcodeproj/project.pbxproj";
             PBXProject proj = new PBXProject();
             proj.ReadFromString(File.ReadAllText(pbxprojPath));
 
-            string fileGuid =
-                proj.FindFileGuidByProjectPath("Libraries/Plugins/iOS/GPGSAppController.mm");
-
-            if (fileGuid == null)
+            foreach(string name in filesToRemove)
             {
-                // look in the legacy location
-                fileGuid =
-                    proj.FindFileGuidByProjectPath("Libraries/GPGSAppController.mm");
-            }
-            string headerGuid =
-                proj.FindFileGuidByProjectPath("Libraries/Plugins/iOS/GPGSAppController.h");
-
-            if (headerGuid == null)
-            {
-                // look in the legacy location
-                headerGuid =
-                    proj.FindFileGuidByProjectPath("Libraries/GPGSAppController.h");
-            }
-
-            if (fileGuid != null)
-            {
-                Debug.Log ("Removing GPGSAppController.mm from xcode project");
-                proj.RemoveFile(fileGuid);
-            }
-            else
-            {
-                Debug.Log("Could not find GPGSAppController.mm in the xcode project");
-            }
-
-            if (headerGuid != null)
-            {
-                Debug.Log ("Removing GPGSAppController.h from xcode project");
-                proj.RemoveFile(headerGuid);
-            }
-            else
-            {
-                Debug.Log("Could not find GPGSAppController.h in the xcode project");
+                string fileGuid = proj.FindFileGuidByProjectPath(name);
+                if (fileGuid != null)
+                {
+                    Debug.Log ("Removing " + name + " from xcode project");
+                    proj.RemoveFile(fileGuid);
+                }
             }
 
             File.WriteAllText(pbxprojPath, proj.WriteToString());
