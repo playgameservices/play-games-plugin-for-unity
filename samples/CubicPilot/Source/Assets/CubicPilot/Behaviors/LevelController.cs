@@ -121,8 +121,8 @@ public class LevelController : MonoBehaviour {
         // select the music for this level and start playing it
         if (BgmChoices.Length > 0) {
             AudioClip bgm = BgmChoices[GameManager.Instance.Level % BgmChoices.Length];
-            audio.clip = bgm;
-            audio.Play();
+            GetComponent<AudioSource>().clip = bgm;
+            GetComponent<AudioSource>().Play();
         }
     }
 
@@ -204,7 +204,7 @@ public class LevelController : MonoBehaviour {
                 GameManager.Instance.UnlockAchievement(GameIds.Achievements.PerfectAccuracy);
             }
 
-            audio.Stop();
+            GetComponent<AudioSource>().Stop();
             AudioSource.PlayClipAtPoint(LevelClearSfx, Vector3.zero);
         }
     }
@@ -285,7 +285,7 @@ public class LevelController : MonoBehaviour {
             mGameState = GameState.GameOver;
             mAutoAdvanceCountdown.Start(GameConsts.AutoRetryTime);
         }
-        audio.Stop();
+        GetComponent<AudioSource>().Stop();
     }
 
     public void HandleCivilianDestroyed() {
