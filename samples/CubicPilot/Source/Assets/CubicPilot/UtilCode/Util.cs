@@ -83,8 +83,8 @@ public class Util : MonoBehaviour {
     }
 
     public static void ShowObject(GameObject o, bool show) {
-        if (o.renderer != null) {
-            o.renderer.enabled = show;
+        if (o.GetComponent<Renderer>() != null) {
+            o.GetComponent<Renderer>().enabled = show;
         }
         int i;
         for (i = 0; i < o.transform.childCount; i++) {

@@ -73,8 +73,9 @@ public class Vulnerable : MonoBehaviour {
     }
 
     void MultColor(GameObject o, float factor) {
-        Color c = o.renderer.material.color;
-        o.renderer.material.color = new Color(c.r * factor, c.g * factor, c.b * factor, c.a);
+        Color c = o.GetComponent<Renderer>().material.color;
+        o.GetComponent<Renderer>().material.color = 
+            new Color(c.r * factor, c.g * factor, c.b * factor, c.a);
     }
 
     void ToggleHurtColor(bool turnOn) {
