@@ -172,7 +172,6 @@ namespace GooglePlayGames.Native
                         // the game was opened because of a user accepting an invitation through
                         // a system notification.
                         RegisterInvitationDelegate(mConfiguration.InvitationDelegate);
-
                         builder.SetOnAuthFinishedCallback(HandleAuthTransition);
                         builder.SetOnTurnBasedMatchEventCallback((eventType, matchId, match) => mTurnBasedClient.HandleMatchEvent(eventType, matchId, match));
                         builder.SetOnMultiplayerInvitationEventCallback(HandleInvitation);
@@ -180,6 +179,8 @@ namespace GooglePlayGames.Native
                         {
                             builder.EnableSnapshots();
                         }
+                        Debug.Log("Building GPG services, implicitly attempts silent auth");
+                        mAuthState = AuthState.SilentPending;
                         mServices = builder.Build(config);
                         mEventsClient = new NativeEventClient(new EventManager(mServices));
                         mQuestsClient = new NativeQuestClient(new QuestManager(mServices));
@@ -719,14 +720,18 @@ namespace GooglePlayGames.Native
                                 mAuthState = AuthState.Unauthenticated;
                                 var silentCallbacks = mSilentAuthCallbacks;
                                 mSilentAuthCallbacks = null;
+                                Debug.Log("Invoking callbacks, AuthState changed from silentPending to Unauthenticated.");
+
                                 InvokeCallbackOnGameThread(silentCallbacks, false);
                                 if (mPendingAuthCallbacks != null)
                                 {
+                                    Debug.Log("there are pending auth callbacks - starting AuthUI");
                                     GameServices().StartAuthorizationUI();
                                 }
                             }
                             else
                             {
+                                Debug.Log("AuthState == " + mAuthState + " calling auth callbacks with failure");
                                 // Noisy sign-in failed - report failure.
                                 Action<bool> localCallbacks = mPendingAuthCallbacks;
                                 mPendingAuthCallbacks = null;

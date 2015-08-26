@@ -21,6 +21,7 @@ Version 0.9.25 (codename: frengle)
        * #563 Custom UI for invitation UI.
        * #614 OnRoomConnected() getting called twice after implementing ShowWaitingRoomUI
        * #619 NO_GPGS does not work with Symlink Unity libraries
+       * #655 Authenticate fails at first, then succeeds second time
 Version 0.9.21
   **BREAKING CHANGES**
        * #382 Callback for declined invitation when creating RTMP room
