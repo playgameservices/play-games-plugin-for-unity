@@ -37,10 +37,12 @@ namespace GooglePlayGames
                 prevVer = Upgrade915(prevVer);
 
                 // there is no migration needed to 920+
+                Debug.Log("Upgrading from format version " + prevVer + " to " + PluginVersion.VersionKey);
                 prevVer = PluginVersion.VersionKey;
                 string msg = GPGSStrings.PostInstall.Text.Replace("$VERSION",
                                  PluginVersion.VersionString);
                 EditorUtility.DisplayDialog(GPGSStrings.PostInstall.Title, msg, "OK");
+
             }
 
             GPGSProjectSettings.Instance.Set(GPGSUtil.LASTUPGRADEKEY, prevVer);

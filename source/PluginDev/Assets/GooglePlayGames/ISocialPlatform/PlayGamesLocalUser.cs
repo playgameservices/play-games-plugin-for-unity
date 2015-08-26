@@ -142,6 +142,7 @@ namespace GooglePlayGames
 
         /// <summary>
         /// Gets an id token for the user.
+        /// NOTE: This property can only be accessed using the main Unity thread.
         /// </summary>
         /// <returns>
         /// An id token for the user.
@@ -156,6 +157,7 @@ namespace GooglePlayGames
 
         /// <summary>
         /// Gets an access token for the user.
+        /// NOTE: This property can only be accessed using the main Unity thread.
         /// </summary>
         /// <returns>
         /// An id token for the user.
@@ -214,6 +216,7 @@ namespace GooglePlayGames
         /// Gets the email of the signed in player.  This is only available
         /// if the web client id is added to the setup (which enables additional
         /// permissions for the application).
+        /// NOTE: This property can only be accessed using the main Unity thread.
         /// </summary>
         /// <value>The email.</value>
         public string Email
