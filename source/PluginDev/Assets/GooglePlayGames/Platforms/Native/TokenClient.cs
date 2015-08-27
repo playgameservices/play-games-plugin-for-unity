@@ -19,7 +19,11 @@ namespace GooglePlayGames.Native
 {
     internal interface TokenClient
     {
-        string GetToken(string clientId);
+        string GetEmail();
+
+        string GetAccessToken();
+        string GetAuthorizationCode(string serverClientId);
+        string GetIdToken(string serverClientId);
     }
 }
 #endif

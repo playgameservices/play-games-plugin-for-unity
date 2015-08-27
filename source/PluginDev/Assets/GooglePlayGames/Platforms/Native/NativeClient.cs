@@ -18,6 +18,14 @@
 
 namespace GooglePlayGames.Native
 {
+
+    #if UNITY_ANDROID
+    using GooglePlayGames.Android;
+    #endif
+    #if (UNITY_IPHONE && !NO_GPGS)
+    using GooglePlayGames.IOS;
+    #endif
+
     using GooglePlayGames.BasicApi;
     using GooglePlayGames.BasicApi.Multiplayer;
     using GooglePlayGames.BasicApi.SavedGame;
@@ -233,9 +241,10 @@ namespace GooglePlayGames.Native
         private TokenClient CreateTokenClient()
         {
             #if UNITY_ANDROID
-            return new AndroidTokenClient(mServices);
+            return new AndroidTokenClient();
+            #elif (UNITY_IOS && !NO_GPGS)
+            return new IOSTokenClient();
             #else
-            // TODO: (class) iOS implementation
             return null;
             #endif
         }
@@ -266,14 +275,6 @@ namespace GooglePlayGames.Native
         }
 
         #if UNITY_ANDROID
-        internal static AndroidJavaObject GetActivity()
-        {
-            using (var jc = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
-            {
-                return jc.GetStatic<AndroidJavaObject>("currentActivity");
-            }
-        }
-
         // Must be launched from the game thread (otherwise the classloader cannot locate the unity
         // java classes we require).
         private static void LaunchBridgeIntent(IntPtr bridgedIntent)
@@ -284,7 +285,7 @@ namespace GooglePlayGames.Native
             {
                 using (var bridgeClass = new AndroidJavaClass(BridgeActivityClass))
                 {
-                    using (var currentActivity = GetActivity())
+                    using (var currentActivity = AndroidTokenClient.GetActivity())
                     {
                         // Unity no longer supports constructing an AndroidJavaObject using an IntPtr,
                         // so I have to manually munge with JNI here.
@@ -302,35 +303,17 @@ namespace GooglePlayGames.Native
                 AndroidJNIHelper.DeleteJNIArgArray(objectArray, jArgs);
             }
         }
+        #endif
 
-        private AndroidJavaObject GetApiClient(GameServices services)
-        {
-            Debug.Log("Calling GetApiClient....");
-            using (var currentActivity = GetActivity())
-            {
-                using (AndroidJavaClass jc_plus = new AndroidJavaClass("com.google.android.gms.plus.Plus"))
-                {
-                    using (AndroidJavaObject jc_builder = new AndroidJavaObject("com.google.android.gms.common.api.GoogleApiClient$Builder",currentActivity))
-                    {
-                        jc_builder.Call<AndroidJavaObject> ("addApi", jc_plus.GetStatic<AndroidJavaObject>("API"));
-                        jc_builder.Call<AndroidJavaObject> ("addScope", jc_plus.GetStatic<AndroidJavaObject>("SCOPE_PLUS_LOGIN"));
-                        AndroidJavaObject client = jc_builder.Call<AndroidJavaObject> ("build");
-                        client.Call ("connect");
+        #if (UNITY_IPHONE && !NO_GPGS)
+        [System.Runtime.InteropServices.DllImport("__Internal")]
+        static extern void _GooglePlayEnableProfileScope();
+        #endif
 
-                        // limit spinning to 100, to minimize blocking when not
-                        // working as expected.
-                        int ct = 100;
-                        while( ( !client.Call<bool>("isConnected") ) && (ct-- != 0) )
-                        {
-                            System.Threading.Thread.Sleep(100);
-                        }
-                        Debug.Log("Done GetApiClient is " + client);
-                        return client;
-                    }
-                }
-            }
-        }
 
+        /// <summary>Gets the user email.</summary>
+        /// <returns>The user email or null if not authenticated or the permission is
+        /// not available.</returns>
         public string GetUserEmail()
         {
             if (!this.IsAuthenticated())
@@ -339,21 +322,7 @@ namespace GooglePlayGames.Native
                 return null;
             }
 
-            string email = null;
-            using (AndroidJavaClass jc_plus = new AndroidJavaClass("com.google.android.gms.plus.Plus"))
-            {
-                using (AndroidJavaObject jo_plusAccountApi = jc_plus.GetStatic<AndroidJavaObject>("AccountApi"))
-                {
-                    Debug.Log("jo_plusAccountApi: " + (jo_plusAccountApi == null ? "NULL" : jo_plusAccountApi.ToString()));
-                    using (var apiClient = GetApiClient(mServices))
-                    {
-                        Debug.Log("apiClient: " + (apiClient == null ? "NULL" : apiClient.ToString()));
-                        email  = jo_plusAccountApi.Call<string>("getAccountName", apiClient);
-                        Logger.d("Player email: " + email);
-                    }
-                }
-            }
-            return email;
+            return mTokenClient.GetEmail();
         }
 
         /// <summary>Gets the access token currently associated with the Unity activity.</summary>
@@ -366,23 +335,14 @@ namespace GooglePlayGames.Native
                 return null;
             }
 
-            string token = null;
-            string email = GetUserEmail() ?? "NULL";
-            string scope = "oauth2:https://www.googleapis.com/auth/plus.me";
-
-            using (AndroidJavaClass unityActivity = new AndroidJavaClass("com.unity3d.player.UnityPlayer"),
-                   googleAuthUtil = new AndroidJavaClass("com.google.android.gms.auth.GoogleAuthUtil"))
-            {
-                using(AndroidJavaObject currentActivity =
-                      unityActivity.GetStatic<AndroidJavaObject>("currentActivity"))
-                {
-                    token = googleAuthUtil.CallStatic<string>("getToken", currentActivity, email, scope);
-                }
-            }
-
-            return token;
+            return mTokenClient.GetAccessToken();
         }
 
+
+        /// <summary>
+        /// Returns an id token, which can be verified server side, if they are logged in.
+        /// </summary>
+        /// <returns>The identifier token.</returns>
         public string GetIdToken()
         {
             if (!this.IsAuthenticated())
@@ -395,93 +355,15 @@ namespace GooglePlayGames.Native
             {
                 throw new Exception("Client ID has not been set, cannot request id token.");
             }
-            string token = null;
-            Debug.Log("Before GetEmail");
-            string email = GetUserEmail() ?? "NULL";
-            Debug.Log("After GetEmail email: " + email);
-            string scope = "audience:server:client_id:" + GameInfo.WebClientId;
-            using (AndroidJavaClass jc_unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
-            {
-                if (jc_unityPlayer != null)
-                {
-                    using (AndroidJavaClass jc_gau = new AndroidJavaClass("com.google.android.gms.auth.GoogleAuthUtil"))
-                    {
-                        if (jc_gau != null)
-                        {
-                            using (AndroidJavaObject jo_Activity = jc_unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
-                            {
-                                token = jc_gau.CallStatic<string>("getToken", jo_Activity, email, scope);
-                            }
-                        }
-                        else
-                        {
-                            Debug.Log("jc_gau is null!");
-                        }
-                    }
-                }
-                else
-                {
-                    Debug.Log("jc_unityPlayer is null!");
-                }
-            }
-            Debug.Log("Token " + token);
-            return token;
+            return mTokenClient.GetIdToken(GameInfo.WebClientId);
         }
-
-        #elif UNITY_IOS
-        [System.Runtime.InteropServices.DllImport("__Internal")]
-        private static extern void _GooglePlayEnableProfileScope();
-
-        [System.Runtime.InteropServices.DllImport("__Internal")]
-        private static extern string _GooglePlayGetIdToken();
-
-        public string GetIdToken()
-        {
-            if (!this.IsAuthenticated())
-            {
-                Debug.Log("Cannot get API client - not authenticated");
-                return null;
-            }
-
-            return _GooglePlayGetIdToken();
-        }
-
-        [System.Runtime.InteropServices.DllImport("__Internal")]
-        private static extern string _GooglePlayGetAccessToken();
-
-        public string GetAccessToken()
-        {
-            if (!this.IsAuthenticated())
-            {
-                Debug.Log("Cannot get API client - not authenticated");
-                return null;
-            }
-
-            return _GooglePlayGetAccessToken();
-        }
-
-        [System.Runtime.InteropServices.DllImport("__Internal")]
-        private static extern string _GooglePlayGetUserEmail();
-
-        public string GetUserEmail()
-        {
-            if (!this.IsAuthenticated())
-            {
-                Debug.Log("Cannot get user email - not authenticated");
-                return null;
-            }
-
-            return _GooglePlayGetUserEmail();
-        }
-
-        #endif
 
         internal static PlatformConfiguration CreatePlatformConfiguration()
         {
             #if UNITY_ANDROID
             var config = AndroidPlatformConfiguration.Create();
             config.EnableAppState();
-            using (var activity = GetActivity())
+            using (var activity = AndroidTokenClient.GetActivity())
             {
                 config.SetActivity(activity.GetRawObject());
                 config.SetOptionalIntentHandlerForUI((intent) =>
@@ -1254,7 +1136,7 @@ namespace GooglePlayGames.Native
         {
             if (mTokenClient != null)
             {
-                return mTokenClient.GetToken(null);
+                return mTokenClient.GetAccessToken();
             }
             return null;
         }
