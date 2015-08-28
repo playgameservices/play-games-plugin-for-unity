@@ -1,10 +1,10 @@
-platform :ios
+platform :ios, '7.0'
 
 target 'Unity-iPhone' do
-pod 'GooglePlayGames', '~> 4.4'
+pod 'GooglePlayGames', '~> 5.0'
 end
 
 target 'Unity-iPhone Tests' do
-
+pod 'GooglePlayGames', '~> 5.0'
 end
 

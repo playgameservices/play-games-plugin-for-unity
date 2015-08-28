@@ -38,8 +38,8 @@ namespace GooglePlayGames
         private const string UrlTypes = "CFBundleURLTypes";
         private const string UrlBundleName = "CFBundleURLName";
         private const string UrlScheme = "CFBundleURLSchemes";
-        private const string PrincipalClass = "NSPrincipalClass";
-        private const string PrincipalClassName = "CustomWebViewApplication";
+        private const string BundleSchemeKey = "com.google.BundleId";
+        private const string ReverseClientIdSchemeKey = "com.google.ReverseClientId";
 
         [PostProcessBuild]
         public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
@@ -107,6 +107,7 @@ namespace GooglePlayGames
                 true,
                 "Building for IOS",
                 true);
+            w.minSize = new Vector2(400, 300);
             w.UsingCocoaPod = CocoaPodHelper.Update(pathToBuiltProject);
 
             UnityEngine.Debug.Log("Adding URL Types for authentication using PlistBuddy.");
@@ -137,70 +138,75 @@ namespace GooglePlayGames
                 buddy.AddArray(UrlTypes);
             }
 
-            var gamesSchemeIndex = GamesUrlSchemeIndex(buddy);
-
-            EnsureGamesUrlScheme(buddy, gamesSchemeIndex);
-            EnsurePrincipalClass(buddy);
+            AddURLScheme (buddy, BundleSchemeKey, GetBundleId ());
+            AddURLScheme (buddy, ReverseClientIdSchemeKey, GetReverseClientId());
         }
 
-
         /// <summary>
-        /// Ensures the games URL scheme is well formed. This is done by removing the UrlScheme field
-        /// and adding a fresh one in a known-good state.
+        /// Adds the URL scheme to the plist.
+        /// If the key already exists, the value is updated to the given value.
+        /// If the key cannot be found, it is added.
         /// </summary>
-        /// <param name="buddy">Buddy.</param>
-        /// <param name="index">Index.</param>
-        private static void EnsureGamesUrlScheme(PlistBuddyHelper buddy, int index)
+        /// <param name="buddy">buddy - the plist helper to use.</param>
+        /// <param name="key">Key - the url scheme key to look for</param>
+        /// <param name="value">Value - the value of the scheme.</param>
+        private static void AddURLScheme (PlistBuddyHelper buddy, string key, string value)
         {
-            buddy.RemoveEntry(UrlTypes, index, UrlScheme);
+            int index = 0;
+
+            while (buddy.EntryValue(UrlTypes, index) != null)
+            {
+               string urlName = buddy.EntryValue(UrlTypes, index, UrlBundleName);
+
+                if (key.Equals(urlName))
+                {
+                    // remove the existing value
+                    buddy.RemoveEntry (UrlTypes, index, UrlScheme);
+                    //add the array back
+                    buddy.AddArray(UrlTypes, index, UrlScheme);
+                    //add the value
+                    buddy.AddString (PlistBuddyHelper.ToEntryName (UrlTypes, index, UrlScheme, 0),
+                        value);
+                    return;
+                }
+
+                index++;
+            }
+
+            // not found, add new entry
+            buddy.AddDictionary(UrlTypes, index);
+            buddy.AddString(PlistBuddyHelper.ToEntryName(UrlTypes, index, UrlBundleName),
+                key);
+            //add the array
             buddy.AddArray(UrlTypes, index, UrlScheme);
-            buddy.AddString(PlistBuddyHelper.ToEntryName(UrlTypes, index, UrlScheme, 0),
-                GetBundleId());
+            //add the value
+            buddy.AddString (PlistBuddyHelper.ToEntryName (UrlTypes, index, UrlScheme, 0),
+                value);
         }
 
-        /// <summary>
-        /// Ensures the PrincipalClass is set and correct.
-        /// </summary>
-        /// <param name="buddy">Buddy.</param>
-        private static void EnsurePrincipalClass(PlistBuddyHelper buddy)
-        {
-            buddy.RemoveEntry(PrincipalClass);
-            buddy.AddString(PrincipalClass, PrincipalClassName);
-        }
 
         private static string GetBundleId()
         {
             return GPGSProjectSettings.Instance.Get(GPGSUtil.IOSBUNDLEIDKEY);
         }
 
-        /// <summary>
-        /// Finds the index of the CFBundleURLTypes array where the entry for Play Games is stored. If
-        /// this is not present, a new entry will be appended to the end of this array.
-        /// </summary>
-        /// <returns>The index in the CFBundleURLTypes array corresponding to Play Games.</returns>
-        /// <param name="buddy">The helper corresponding to the plist file.</param>
-        private static int GamesUrlSchemeIndex(PlistBuddyHelper buddy)
+        private static string GetReverseClientId()
         {
-            int index = 0;
-
-            while (buddy.EntryValue(UrlTypes, index) != null)
+            string clientId = GPGSProjectSettings.Instance.Get(GPGSUtil.IOSCLIENTIDKEY);
+            string[] parts = clientId.Split ('.');
+            string revClientId = "";
+            foreach (string p in parts)
             {
-                var urlName = buddy.EntryValue(UrlTypes, index, UrlBundleName);
-
-                if (GetBundleId().Equals(urlName))
+                if (revClientId.Length == 0)
                 {
-                    return index;
+                    revClientId = p;
                 }
-
-                index++;
+                else
+                {
+                    revClientId = p + "." + revClientId;
+                }
             }
-
-            // The current array does not contain the Games url scheme - add a value to the end.
-            buddy.AddDictionary(UrlTypes, index);
-            buddy.AddString(PlistBuddyHelper.ToEntryName(UrlTypes, index, UrlBundleName),
-                GetBundleId());
-
-            return index;
+            return revClientId;
         }
 
         /// <summary>

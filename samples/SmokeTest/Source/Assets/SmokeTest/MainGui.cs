@@ -24,6 +24,7 @@ using GooglePlayGames.BasicApi.Quests;
 using GooglePlayGames.BasicApi.SavedGame;
 using GooglePlayGames.OurUtils;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
 
 namespace SmokeTest
 {
@@ -90,7 +91,8 @@ namespace SmokeTest
             QuestsAndEvents,
             NearbyConnections,
             Achievements,
-            Leaderboards
+            Leaderboards,
+            UserInfo
         }
 
         public void Start()
@@ -284,7 +286,7 @@ namespace SmokeTest
             }
             else if (GUI.Button(CalcGrid(1, 2), "User Info"))
             {
-                DoUserInfo();
+                this.mUi = Ui.UserInfo;
             }
             else if (GUI.Button(this.CalcGrid(0, 3), "Cloud Save"))
             {
@@ -944,10 +946,45 @@ namespace SmokeTest
             }
         }
 
-        internal void DoUserInfo()
+        internal void ShowUserInfoUi()
         {
-            Status = "I am " + Social.localUser.userName + " token is:\n" +
-                ((PlayGamesLocalUser)Social.localUser).idToken;
+            GUI.Label(
+                this.CalcGrid(0, 1, 2, 1),
+                "User info for " + Social.localUser.userName);
+
+            GUI.Label(
+                this.CalcGrid(0, 2, 2, 1),
+                "Email: " + 
+                ((PlayGamesLocalUser) Social.localUser).Email);
+
+            GUI.Label(
+                this.CalcGrid(0, 3, 2, 1),
+                "ID Token: " + 
+                ((PlayGamesLocalUser) Social.localUser).idToken);
+
+            GUI.Label(
+                this.CalcGrid(0, 4,2, 1),
+                "Access Token: " + 
+                ((PlayGamesLocalUser) Social.localUser).accessToken);
+                
+            string friendString = "";
+            if (Social.localUser.friends.Count() > 0) {
+                foreach(IUserProfile p in Social.localUser.friends) {
+                    friendString += p.userName + "\n";   
+                }   
+            }
+            else {
+                Social.localUser.LoadFriends((ok) => Debug.Log("Friends loaded OK: " + ok));
+            }
+            GUI.Label(
+                CalcGrid(0,5,2,2),
+                "Friends: " + friendString);
+            
+
+            if (GUI.Button(CalcGrid(1, 8), "Back"))
+            {
+                mUi = Ui.Main;
+            }
         }
 
         internal void DrawTitle(string title)
@@ -1093,6 +1130,9 @@ namespace SmokeTest
                     case Ui.NearbyConnections:
                         mNearbyGui.OnGUI();
                         break;
+                    case Ui.UserInfo:
+                        ShowUserInfoUi();
+                    break;
                     default:
                         // check for a status of interest, and if there
                         // is one, then don't touch it.  Otherwise

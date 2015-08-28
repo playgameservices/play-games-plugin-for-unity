@@ -116,9 +116,10 @@ namespace GooglePlayGames.Native.PInvoke
             if (rsp.Status() == Status.ResponseStatus.VALID ||
                 rsp.Status() == Status.ResponseStatus.VALID_BUT_STALE)
             {
+                Logger.d("Got "  + rsp.Length().ToUInt64() + " players");
                 foreach (NativePlayer p in rsp)
                 {
-                    players.Add(p.AsPlayer());
+                   players.Add(p.AsPlayer());
                 }
             }
             callback((BasicApi.ResponseStatus)rsp.Status(), players);
@@ -144,19 +145,18 @@ namespace GooglePlayGames.Native.PInvoke
 
             public IEnumerator<NativePlayer> GetEnumerator()
             {
-                return GetEnumerator();
+                return PInvokeUtilities.ToEnumerator<NativePlayer>(Length(),
+                (index) => GetElement(index));
             }
 
             System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
             {
-                return PInvokeUtilities.ToEnumerator<NativePlayer>(
-                 C.PlayerManager_FetchListResponse_GetData_Length(SelfPtr()),
-                (index) => GetElement(index));
+                return GetEnumerator();
             }
 
 #endregion
 
-            private UIntPtr Length()
+            internal UIntPtr Length()
             {
                 return C.PlayerManager_FetchListResponse_GetData_Length(SelfPtr());
             }

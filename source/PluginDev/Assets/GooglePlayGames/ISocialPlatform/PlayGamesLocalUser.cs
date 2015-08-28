@@ -26,10 +26,13 @@ namespace GooglePlayGames
     {
         internal PlayGamesPlatform mPlatform;
 
+        private string emailAddress;
+
         internal PlayGamesLocalUser(PlayGamesPlatform plaf) :
             base("localUser", null, null)
         {
             mPlatform = plaf;
+            emailAddress = null;
         }
 
         /// <summary>
@@ -223,7 +226,14 @@ namespace GooglePlayGames
         {
             get
             {
-                return authenticated ? mPlatform.GetUserEmail() : string.Empty;
+                // treat null as unitialized, empty as no email.  This can
+                // happen when the web client is not initialized.
+                if (authenticated && emailAddress == null)
+                {
+                    emailAddress = mPlatform.GetUserEmail();
+                    emailAddress = emailAddress != null ? emailAddress : string.Empty;
+                }
+                return authenticated ? emailAddress : string.Empty;
             }
         }
     }

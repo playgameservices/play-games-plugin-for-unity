@@ -77,7 +77,11 @@ namespace GooglePlayGames.Native
         private volatile AuthState mAuthState = AuthState.Unauthenticated;
         private volatile uint mAuthGeneration = 0;
         private volatile bool mSilentAuthFailed = false;
+        private volatile bool friendsLoading = false;
 
+        private int webclientWarningFreq = 100000;
+        private int noWebClientIdWarningCount = 0;
+ 
         public NativeClient(PlayGamesClientConfiguration configuration)
         {
             PlayGamesHelperObject.CreateObject();
@@ -322,6 +326,18 @@ namespace GooglePlayGames.Native
                 return null;
             }
 
+            if(!GameInfo.WebClientIdInitialized())
+            {
+                //don't spam the log, only do this every so often
+                if (noWebClientIdWarningCount++ % webclientWarningFreq == 0)
+                {
+                    Debug.LogError("Web client ID has not been set, cannot request email.");
+                    // avoid int overflow
+                    noWebClientIdWarningCount = (noWebClientIdWarningCount/ webclientWarningFreq) + 1;
+                }
+                return null;
+            }
+
             return mTokenClient.GetEmail();
         }
 
@@ -335,9 +351,20 @@ namespace GooglePlayGames.Native
                 return null;
             }
 
+            if(!GameInfo.WebClientIdInitialized())
+            {
+                //don't spam the log, only do this every webclientWarningFreq times.
+                if (noWebClientIdWarningCount++ % webclientWarningFreq == 0)
+                {
+                    Debug.LogError("Web client ID has not been set, cannot request access token.");
+                    // avoid int overflow
+                    noWebClientIdWarningCount = (noWebClientIdWarningCount/ webclientWarningFreq) + 1;
+                }
+                return null;
+            }
+
             return mTokenClient.GetAccessToken();
         }
-
 
         /// <summary>
         /// Returns an id token, which can be verified server side, if they are logged in.
@@ -353,7 +380,14 @@ namespace GooglePlayGames.Native
 
             if(!GameInfo.WebClientIdInitialized())
             {
-                throw new Exception("Client ID has not been set, cannot request id token.");
+                //don't spam the log, only do this every webclientWarningFreq times.
+                if (noWebClientIdWarningCount++ % webclientWarningFreq == 0)
+                {
+                    Debug.LogError("Web client ID has not been set, cannot request id token.");
+                    // avoid int overflow
+                    noWebClientIdWarningCount = (noWebClientIdWarningCount/ webclientWarningFreq) + 1;
+                }
+                return null;
             }
             return mTokenClient.GetIdToken(GameInfo.WebClientId);
         }
@@ -433,7 +467,8 @@ namespace GooglePlayGames.Native
             mServices.PlayerManager().FetchFriends((status, players) =>
                 {
                     if (status == ResponseStatus.Success ||
-                        status == ResponseStatus.SuccessWithStale) {
+                        status == ResponseStatus.SuccessWithStale)
+                    {
                         mFriends = players;
                          callback(true);
                     }
@@ -446,15 +481,17 @@ namespace GooglePlayGames.Native
 
         public IUserProfile[] GetFriends()
         {
-            if (mFriends == null)
+            if (mFriends == null && !friendsLoading)
             {
                 Logger.w("Getting friends before they are loaded!!!");
+                friendsLoading = true;
                 LoadFriends((ok) =>
                     {
                         Logger.d("loading: " + ok);
+                        friendsLoading = false;
                     });
             }
-            return mFriends.ToArray();
+            return (mFriends == null) ? new IUserProfile[0] : mFriends.ToArray();
         }
 
         private void PopulateAchievements(uint authGeneration,

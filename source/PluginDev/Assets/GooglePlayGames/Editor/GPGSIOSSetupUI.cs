@@ -34,7 +34,7 @@ namespace GooglePlayGames
         {
             EditorWindow window = EditorWindow.GetWindow(
                     typeof(GPGSIOSSetupUI), true, GPGSStrings.IOSSetup.Title);
-            window.minSize = new Vector2(500, 500);
+            window.minSize = new Vector2(500, 600);
         }
 
         public void OnEnable()

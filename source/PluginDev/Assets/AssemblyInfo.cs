@@ -17,7 +17,5 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-[assembly: AssemblyTitle("Assembly-CSharp")]
-
 // Allow internal visibility for testing purposes.
 [assembly: InternalsVisibleTo("PluginDev.UnitTests")]
