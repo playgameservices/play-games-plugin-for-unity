@@ -73,7 +73,9 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 - (void)application:(UIApplication *)application
 didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
 
+  [super application:application didRegisterForRemoteNotificationsWithDeviceToken:deviceToken];
   NSLog(@"Got Token for APNS: %@", deviceToken);
+
 
   // send the token to GPGS server so invitations can be sent to the local player
   // NOTE: false indicates this is using the production APNS service.  true indicates
@@ -85,12 +87,15 @@ didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
 
 - (void)application:(UIApplication *)application
 didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
+  [super application:application didFailToRegisterForRemoteNotificationsWithError:error];
+   
   NSLog(@"Error registering for remote notifications! %@", error);
 }
 
 
 - (void)application:(UIApplication *)application
 didReceiveRemoteNotification:(NSDictionary *)userInfo {
+  [super application:application didReceiveRemoteNotification:userInfo];
   // this returns a bool if it was handled (here you might pass off to another
   // company's sdk for example).
   NSLog(@"Received notification: %@", userInfo);
@@ -112,7 +117,6 @@ didReceiveRemoteNotification:(NSDictionary *)userInfo {
 - (void)signInWillDispatch:(GIDSignIn *)signIn error:(NSError *)error {
 
   NSLog(@"signInWillDispatch: %@", error);
-
 }
 
 @end
