@@ -360,6 +360,51 @@ namespace GooglePlayGames
 
             return mClient.GetUserId();
         }
+        
+        /// <summary>
+        /// Returns an id token for the user.
+        /// </summary>
+        /// <returns>
+        /// An id token for the user.
+        /// </returns>
+        public string GetIdToken()
+        {
+            if (mClient != null)
+            {
+                return mClient.GetIdToken();
+            }
+            return null;
+        }
+        
+        /// <summary>
+        /// Returns an id token for the user.
+        /// </summary>
+        /// <returns>
+        /// An id token for the user.
+        /// </returns>
+        public string GetAccessToken()
+        {
+            if (mClient != null)
+            {
+                return mClient.GetAccessToken();
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Gets the email of the current user.
+        /// This requires additional configuration of permissions in order
+        /// to work.
+        /// </summary>
+        /// <returns>The user email.</returns>
+        public string GetUserEmail()
+        {
+            if (mClient != null)
+            {
+                return mClient.GetUserEmail();
+            }
+            return null;
+        }
 
         /// <summary>
         /// Returns the achievement corresponding to the passed achievement identifier.

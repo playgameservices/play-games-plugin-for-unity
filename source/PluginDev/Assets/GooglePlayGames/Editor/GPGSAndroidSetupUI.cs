@@ -21,6 +21,7 @@ namespace GooglePlayGames
 
     public class GPGSAndroidSetupUI : EditorWindow
     {
+        private string mWebClientId = string.Empty;
         private string mAppId = string.Empty;
 
         [MenuItem("Window/Google Play Games/Setup/Android setup...", false, 1)]
@@ -28,12 +29,13 @@ namespace GooglePlayGames
         {
             EditorWindow window = EditorWindow.GetWindow(
                 typeof(GPGSAndroidSetupUI), true, GPGSStrings.AndroidSetup.Title);
-            window.minSize = new Vector2(400, 200);
+            window.minSize = new Vector2(400, 300);
         }
 
         public void OnEnable()
         {
-            mAppId = GPGSProjectSettings.Instance.Get("proj.AppId");
+            mAppId = GPGSProjectSettings.Instance.Get(GPGSUtil.APPIDKEY);
+            mWebClientId = GPGSProjectSettings.Instance.Get(GPGSUtil.WEBCLIENTIDKEY);
         }
 
         public void OnGUI()
@@ -46,10 +48,22 @@ namespace GooglePlayGames
 
             GUILayout.Label(GPGSStrings.Setup.AppId, EditorStyles.boldLabel);
             GUILayout.Label(GPGSStrings.Setup.AppIdBlurb);
+
             GUILayout.Space(10);
 
             mAppId = EditorGUILayout.TextField(GPGSStrings.Setup.AppId,
                 mAppId,GUILayout.Width(300));
+
+            GUILayout.Space(30);
+
+            // Client ID field
+            GUILayout.Label(GPGSStrings.Setup.WebClientIdTitle, EditorStyles.boldLabel);
+            GUILayout.Label(GPGSStrings.AndroidSetup.WebClientIdBlurb);
+      
+            GUILayout.Space(10);
+
+            mWebClientId = EditorGUILayout.TextField(GPGSStrings.Setup.WebAppClientId,
+                mWebClientId, GUILayout.Width(450));
 
             GUILayout.FlexibleSpace();
             GUILayout.BeginHorizontal();
@@ -72,7 +86,7 @@ namespace GooglePlayGames
 
         public void DoSetup()
         {
-            if (PerformSetup(mAppId, null))
+            if (PerformSetup(mWebClientId, mAppId, null))
             {
                 EditorUtility.DisplayDialog(GPGSStrings.Success,
                     GPGSStrings.AndroidSetup.SetupComplete, GPGSStrings.Ok);
@@ -84,15 +98,36 @@ namespace GooglePlayGames
         /// <summary>
         /// Provide static access to setup for facilitating automated builds.
         /// </summary>
+        /// <param name="webClientId">The oauth2 client id for the game.  This is only
+        /// needed if the ID Token or access token are needed.</param> 
         /// <param name="appId">App identifier.</param>
         /// <param name="nearbySvcId">Optional nearby connection serviceId</param>
-        public static bool PerformSetup(string appId, string nearbySvcId)
+        public static bool PerformSetup(string webClientId, string appId, string nearbySvcId)
         {
-            // check for valid app id
-            if (!GPGSUtil.LooksLikeValidAppId(appId))
+            bool needTokenPermissions = false;
+
+            if( !string.IsNullOrEmpty(webClientId) )
             {
-                GPGSUtil.Alert(GPGSStrings.Setup.AppIdError);
-                return false;
+                if (!GPGSUtil.LooksLikeValidClientId(webClientId))
+                {
+                    GPGSUtil.Alert(GPGSStrings.Setup.ClientIdError);
+                    return false;
+                }
+                string serverAppId = webClientId.Split('-')[0];
+                if (!serverAppId.Equals(appId)) {
+                    GPGSUtil.Alert(GPGSStrings.Setup.AppIdMismatch);
+                    return false;
+                }
+                needTokenPermissions = true;
+            }
+            else
+            {
+                // check for valid app id
+                if (!GPGSUtil.LooksLikeValidAppId(appId))
+                {
+                    GPGSUtil.Alert(GPGSStrings.Setup.AppIdError);
+                    return false;
+                }
             }
 
             if (nearbySvcId != null)
@@ -103,8 +138,10 @@ namespace GooglePlayGames
                 }
             }
 
-            GPGSProjectSettings.Instance.Set("proj.AppId", appId);
+            GPGSProjectSettings.Instance.Set(GPGSUtil.APPIDKEY, appId);
+            GPGSProjectSettings.Instance.Set(GPGSUtil.WEBCLIENTIDKEY, webClientId);
             GPGSProjectSettings.Instance.Save();
+            GPGSUtil.UpdateGameInfo();
 
             // check that Android SDK is there
             if (!GPGSUtil.HasAndroidSdk())
@@ -118,7 +155,7 @@ namespace GooglePlayGames
             GPGSUtil.CopySupportLibs();
 
             // Generate AndroidManifest.xml
-            GPGSUtil.GenerateAndroidManifest();
+            GPGSUtil.GenerateAndroidManifest(needTokenPermissions);
 
             // refresh assets, and we're done
             AssetDatabase.Refresh();

@@ -132,6 +132,20 @@ namespace GooglePlayGames
         }
 
         /// <summary>
+        /// Gets an id token for the user.
+        /// </summary>
+        /// <returns>
+        /// An id token for the user.
+        /// </returns>
+        public string idToken
+        {
+            get
+            {
+                return authenticated ? mPlatform.GetIdToken() : string.Empty;
+            }
+        }
+
+        /// <summary>
         /// Returns true (since this is the local user).
         /// </summary>
         public new bool isFriend
@@ -151,6 +165,20 @@ namespace GooglePlayGames
             get
             {
                 return UserState.Online;
+            }
+        }
+
+        /// <summary>
+        /// Gets the email of the signed in player.  This is only available
+        /// if the web client id is added to the setup (which enables additional
+        /// permissions for the application).
+        /// </summary>
+        /// <value>The email.</value>
+        public string Email
+        {
+            get
+            {
+                return authenticated ? mPlatform.GetUserEmail() : string.Empty;
             }
         }
 

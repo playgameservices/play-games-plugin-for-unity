@@ -45,6 +45,12 @@ namespace GooglePlayGames
            
             public const string AppIdError = "The App Id does not appear to be valid. " +
                                              "It must consist solely of digits, usually 10 or more.";
+            
+            public const string WebClientIdTitle = "Oauth Web App Client ID (Optional)";
+            public const string WebAppClientId = "Web App Client ID";
+            public const string ClientIdError = "The Client ID does not appear to be valid. " +
+                                                "It should end in .apps.googleusercontent.com.";
+            public const string AppIdMismatch = "Web app client ID not associated with this game!";
 
             public const string NearbyServiceId = "Nearby Connection Service ID";
             public const string NearbyServiceBlurb = "Enter the service id that identifies the " +
@@ -62,14 +68,11 @@ namespace GooglePlayGames
             public const string Blurb = "To configure Google Play Games for iOS in this project,\n" +
                                         "please enter the information below and click on the Setup button.";
 
-            public const string ClientIdTitle = "Oauth Client ID";
+            public const string ClientIdTitle = "iOS App Client ID";
             public const string ClientId = "Client ID";
             public const string ClientIdBlurb = "Enter your oauth2 client ID below. To obtain this\n" +
                                                 "ID, generate an iOS linked app in Developer Console. Example:\n" +
                                                 "123456789012-jafwiawoijjfe.apps.googleusercontent.com";
-
-            public const string ClientIdError = "The Client ID does not appear to be valid. " +
-                                                "It should end in .apps.googleusercontent.com.";
 
             public const string BundleIdTitle = "Bundle Identifier";
             public const string BundleId = "Bundle ID";
@@ -94,6 +97,12 @@ namespace GooglePlayGames
             public const string Title = "Google Play Games - Android Configuration";
             public const string Blurb = "To configure Google Play Games in this project,\n" +
                                         "please enter the information below and click on the Setup button.";
+
+            public const string WebClientIdBlurb = "The web app client ID is needed to access the user's ID token and " +
+                "call other APIs onbehalf of the user." +
+                "  It is not required for Game Services.  Enter your oauth2 client ID below.\nTo obtain this " +
+                "ID, generate a web linked app in Developer Console. Example:\n" +
+                "123456789012-abcdefghijklm.apps.googleusercontent.com";
 
             public const string PkgName = "Package name";
             public const string PkgNameBlurb = "Enter your application's package name below.\n" +
@@ -175,7 +184,7 @@ namespace GooglePlayGames
                                         "https://github.com/playgameservices/play-games-plugin-for-unity\n\nPlugin version: ";
 
         public const string LicenseTitle = "Google Play Games Plugin for Unity";
-        public const string LicenseText = "Copyright (C) 2014 Google Inc.\n\n" +
+        public const string LicenseText = "Copyright (C) 2014 Google Inc. All Rights Reserved.\n\n" +
                                           "Licensed under the Apache License, Version 2.0 (the \"License\"); " +
                                           "you may not use this file except in compliance with the License. " +
                                           "You may obtain a copy of the License at\n\n" +

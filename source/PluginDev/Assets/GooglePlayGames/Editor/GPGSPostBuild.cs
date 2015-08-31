@@ -31,19 +31,22 @@ namespace GooglePlayGames
 #endif
     using GooglePlayGames;
     using GooglePlayGames.Editor.Util;
-	using UnityEngine;
+    using UnityEngine;
 
     public static class GPGSPostBuild
     {
         private const string UrlTypes = "CFBundleURLTypes";
         private const string UrlBundleName = "CFBundleURLName";
         private const string UrlScheme = "CFBundleURLSchemes";
+        private const string PrincipalClass = "NSPrincipalClass";
+        private const string PrincipalClassName = "CustomWebViewApplication";
 
         [PostProcessBuild]
         public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
         {
 #if UNITY_5
-            if (target != BuildTarget.iOS) {
+            if (target != BuildTarget.iOS)
+            {
                 return;
             }
 #else
@@ -75,7 +78,8 @@ namespace GooglePlayGames
             //Copy the podfile into the project.
             string podfile = "Assets/GooglePlayGames/Editor/Podfile.txt";
             string destpodfile = pathToBuiltProject + "/Podfile";
-            if (!System.IO.File.Exists(destpodfile)) {
+            if (!System.IO.File.Exists(destpodfile))
+            {
                 FileUtil.CopyFileOrDirectory(podfile, destpodfile);
             }
 
@@ -116,6 +120,7 @@ namespace GooglePlayGames
             var gamesSchemeIndex = GamesUrlSchemeIndex(buddy);
 
             EnsureGamesUrlScheme(buddy, gamesSchemeIndex);
+            EnsurePrincipalClass(buddy);
         }
 
 
@@ -133,9 +138,19 @@ namespace GooglePlayGames
                 GetBundleId());
         }
 
+        /// <summary>
+        /// Ensures the PrincipalClass is set and correct.
+        /// </summary>
+        /// <param name="buddy">Buddy.</param>
+        private static void EnsurePrincipalClass(PlistBuddyHelper buddy)
+        {
+            buddy.RemoveEntry(PrincipalClass);
+            buddy.AddString(PrincipalClass, PrincipalClassName);
+        }
+
         private static string GetBundleId()
         {
-            return GPGSProjectSettings.Instance.Get("ios.BundleId", null);
+            return GPGSProjectSettings.Instance.Get(GPGSUtil.IOSBUNDLEIDKEY);
         }
 
         /// <summary>
@@ -193,7 +208,8 @@ namespace GooglePlayGames
             string fileGuid =
                  proj.FindFileGuidByProjectPath("Libraries/Plugins/iOS/GPGSAppController.mm");
 
-            if (fileGuid == null) {
+            if (fileGuid == null)
+            {
                 // look in the legacy location
                 fileGuid =
                     proj.FindFileGuidByProjectPath("Libraries/GPGSAppController.mm");

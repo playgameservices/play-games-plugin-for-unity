@@ -1,5 +1,5 @@
 // <copyright file="DummyClient.cs" company="Google Inc.">
-// Copyright (C) 2014 Google Inc.
+// Copyright (C) 2014 Google Inc. All Rights Reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -43,10 +43,27 @@ public class DummyClient : IPlayGamesClient
       LogUsage();
     }
 
+    public string GetAccessToken()
+    {
+      LogUsage();
+      return "DummyAccessToken";
+    }
+
+    public string GetIdToken()
+    {
+      LogUsage();
+      return "DummyIdToken";
+    }
+
     public string GetUserId()
     {
       LogUsage();
       return "DummyID";
+    }
+
+    public string GetUserEmail()
+    {
+        return string.Empty;
     }
 
     public string GetUserDisplayName()

@@ -318,6 +318,10 @@ public class MainGui : MonoBehaviour, OnStateLoadedListener,
         {
             this.DoSignOut();
         }
+        if (GUI.Button(this.CalcGrid(1, 7), "User Info"))
+        {
+            this.DoUserInfo();
+        }
     }
 
     internal void ShowMultiplayerUi()
@@ -1137,6 +1141,16 @@ public class MainGui : MonoBehaviour, OnStateLoadedListener,
             });
     }
 
+    internal void DoUserInfo()
+    {
+        string email = ((PlayGamesPlatform)Social.Active).GetUserEmail();
+        string token = ((PlayGamesPlatform)Social.Active).GetIdToken();
+        string accessToken = ((PlayGamesPlatform)Social.Active).GetAccessToken();
+
+        Debug.Log("IDToken: " + token);
+        Status = Social.localUser.userName + " (" + email + ")\ntoken: " + accessToken;
+
+    }
     internal void DoSignOut()
     {
         ((PlayGamesPlatform)Social.Active).SignOut();

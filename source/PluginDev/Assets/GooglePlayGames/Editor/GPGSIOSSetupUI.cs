@@ -21,10 +21,9 @@ namespace GooglePlayGames
 
     public class GPGSIOSSetupUI : EditorWindow
     {
-        private const string GameInfoPath = "Assets/GooglePlayGames/GameInfo.cs";
-
         private string mClientId = string.Empty;
         private string mBundleId = string.Empty;
+        private string mWebClientId = string.Empty;
 
         [MenuItem("Window/Google Play Games/Setup/iOS setup...", false, 2)]
         public static void MenuItemGPGSIOSSetup()
@@ -36,8 +35,9 @@ namespace GooglePlayGames
 
         public void OnEnable()
         {
-            mClientId = GPGSProjectSettings.Instance.Get("ios.ClientId");
-            mBundleId = GPGSProjectSettings.Instance.Get("ios.BundleId");
+            mClientId = GPGSProjectSettings.Instance.Get(GPGSUtil.IOSCLIENTIDKEY);
+            mBundleId = GPGSProjectSettings.Instance.Get(GPGSUtil.IOSBUNDLEIDKEY);
+            mWebClientId = GPGSProjectSettings.Instance.Get(GPGSUtil.WEBCLIENTIDKEY);
 
             if (mBundleId.Trim().Length == 0)
             {
@@ -51,10 +51,12 @@ namespace GooglePlayGames
         /// </summary>
         /// <param name="clientId">Client identifier.</param>
         /// <param name="bundleId">Bundle identifier.</param>
-        static void Save(string clientId, string bundleId)
+        /// <param name="webClientId">web app clientId.</param>
+        static void Save(string clientId, string bundleId, string webClientId)
         {
-            GPGSProjectSettings.Instance.Set("ios.ClientId", clientId);
-            GPGSProjectSettings.Instance.Set("ios.BundleId", bundleId);
+            GPGSProjectSettings.Instance.Set(GPGSUtil.IOSCLIENTIDKEY, clientId);
+            GPGSProjectSettings.Instance.Set(GPGSUtil.IOSBUNDLEIDKEY, bundleId);
+            GPGSProjectSettings.Instance.Set(GPGSUtil.WEBCLIENTIDKEY, webClientId);
             GPGSProjectSettings.Instance.Save();
         }
 
@@ -80,8 +82,16 @@ namespace GooglePlayGames
             GUILayout.Label(GPGSStrings.IOSSetup.BundleIdBlurb);
             mBundleId = EditorGUILayout.TextField(GPGSStrings.IOSSetup.BundleId, mBundleId,
                 GUILayout.Width(450));
-            GUILayout.Space(10);
+            
+            GUILayout.Space(30);
+            // Client ID field
+            GUILayout.Label(GPGSStrings.Setup.WebClientIdTitle, EditorStyles.boldLabel);
+            GUILayout.Label(GPGSStrings.IOSSetup.ClientIdBlurb);
 
+            mWebClientId = EditorGUILayout.TextField(GPGSStrings.Setup.WebAppClientId,
+                mWebClientId, GUILayout.Width(450));
+
+            GUILayout.Space(10);
             GUILayout.FlexibleSpace();
       
             GUILayout.BeginHorizontal();
@@ -91,7 +101,8 @@ namespace GooglePlayGames
             {
                 DoSetup();
             }
-            if (GUILayout.Button("Cancel"))
+
+            if (GUILayout.Button(GPGSStrings.Cancel))
             {
                 this.Close();
             }
@@ -103,28 +114,11 @@ namespace GooglePlayGames
         }
 
         /// <summary>
-        /// Helper function to do search and replace of the client and bundle ids.
-        /// </summary>
-        /// <param name="sourcePath">Source path.</param>
-        /// <param name="outputPath">Output path.</param>
-        /// <param name="clientId">Client identifier.</param>
-        /// <param name="bundleId">Bundle identifier.</param>
-        private static void FillInAppData(string sourcePath,
-                                      string outputPath,
-                                      string clientId, string bundleId)
-        {
-            string fileBody = GPGSUtil.ReadFully(sourcePath);
-            fileBody = fileBody.Replace("__CLIENTID__", clientId);
-            fileBody = fileBody.Replace("__BUNDLEID__", bundleId);
-            GPGSUtil.WriteFile(outputPath, fileBody);
-        }
-
-        /// <summary>
         /// Called by the UI to process the configuration.
         /// </summary>
         void DoSetup()
         {
-            if (PerformSetup(mClientId, mBundleId, null))
+            if (PerformSetup(mClientId, mBundleId, mWebClientId, null))
             {
                 GPGSUtil.Alert(GPGSStrings.Success, GPGSStrings.IOSSetup.SetupComplete);
                 Close();
@@ -137,13 +131,15 @@ namespace GooglePlayGames
         /// </summary>
         /// <param name="clientId">Client identifier.</param>
         /// <param name="bundleId">Bundle identifier.</param>
+        /// <param name="webClientId">web app client id.</param>
         /// <param name="nearbySvcId">Nearby connections service Id.</param>
-        public static bool PerformSetup(string clientId, string bundleId, string nearbySvcId)
+        public static bool PerformSetup(string clientId, string bundleId,
+            string webClientId, string nearbySvcId)
         {
 
             if (!GPGSUtil.LooksLikeValidClientId(clientId))
             {
-                GPGSUtil.Alert(GPGSStrings.IOSSetup.ClientIdError);
+                GPGSUtil.Alert(GPGSStrings.Setup.ClientIdError);
                 return false;
             }
             if (!GPGSUtil.LooksLikeValidBundleId(bundleId))
@@ -162,13 +158,11 @@ namespace GooglePlayGames
                 }
             }
 
-            Save(clientId, bundleId);
+            Save(clientId, bundleId, webClientId);
             GPGSUtil.UpdateGameInfo();
 
-            FillInAppData(GameInfoPath, GameInfoPath, clientId, bundleId);
-
             // Finished!
-            GPGSProjectSettings.Instance.Set("ios.SetupDone", true);
+            GPGSProjectSettings.Instance.Set(GPGSUtil.IOSSETUPDONEKEY, true);
             GPGSProjectSettings.Instance.Save();
             AssetDatabase.Refresh();
             return true;
