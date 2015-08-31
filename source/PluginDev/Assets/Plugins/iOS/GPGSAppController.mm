@@ -19,6 +19,7 @@
 
 #import <GooglePlus/GooglePlus.h>
 #import <gpg/ios_support.h>
+#import <gpg/GPGEnums.h>
 
 @implementation GPGSAppController
 
@@ -68,12 +69,14 @@
    
     NSLog(@"Got Token for APNS: %@", deviceToken);
 
- 
-    // send the token to GPGS server so invitations can be sent to the local player
-    // NOTE: false indicates this is using the production APNS service.  true indicates
-    // that the sandbox service should be used.  This value needs to match the cooresponding
-    // certificate registered in the play app console, under linked apps > ios in
-    gpg::RegisterDeviceToken(deviceToken, false);
+  // send the token to GPGS server so invitations can be sent to the local player
+  // NOTE: GPGPushNotificationEnvironmentProduction indicates this is
+  // using the production APNS service.
+  // GPGPushNotificationEnvironmentSandbox indicates that the sandbox
+  // service should be used.  This value needs to match the cooresponding
+  // certificate registered in the play app console, under linked apps > ios in
+  // the section for push notifications.
+  gpg::RegisterDeviceToken(deviceToken, GPGPushNotificationEnvironmentProduction);
 }
 
 - (void)application:(UIApplication *)application
