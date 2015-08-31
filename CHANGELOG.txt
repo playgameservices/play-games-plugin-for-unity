@@ -1,3 +1,6 @@
+2015-08-31 Version 0.9.21(ios)
+       * #672 iOS compatibility fix with push notifications
+       * #606 push notification not working in production environment.
 Version 0.9.21
   **BREAKING CHANGES**
        * #382 Callback for declined invitation when creating RTMP room

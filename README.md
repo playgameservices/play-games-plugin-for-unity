@@ -638,6 +638,53 @@ Once the saved game file is opened, it can be read to load the game state.  This
         }
     }
 ```
+
+## Retrieving player's email or access token ##
+
+In order to access the player's email or access token, you need to configure
+a web app associated with your game in the Play Game Console.  If your game
+does not use a custom back-end application, you can set the launch URL to be
+`https://localhost`.
+
+Copy the client id from the web application and enter it in the setup dialog for
+this plugin.  This will configure the correct permissions and settings needed
+to access the email address and access token.
+
+To get the email:
+
+```csharp
+    Debug.Log("Local user's email is " +
+        ((PlayGamesLocalUser)Social.localUser).Email);
+```
+
+To get the access token:
+
+```charp
+    Debug.Log("AccessToken is " +
+        ((PlayGamesLocalUser)Social.localUser).accessToken);
+```
+
+
+To get the id token:
+
+```charp
+    Debug.Log("IdToken is " +
+        ((PlayGamesLocalUser)Social.localUser).idToken);
+```
+
+__NOTE:__ The email and access tokens are only available on the UI Thread.
+If you need to get these from the non-UI thread, you can use the helper function
+RunOnGameThread:
+
+```csharp
+    GooglePlayGames.OurUtils.PlayGamesHelperObject.RunOnGameThread(
+        () => { Debug.Log("Local user's email is " +
+                    ((PlayGamesLocalUser)Social.localUser).Email);
+                // use the email as needed
+              });
+```
+
+
 ## Loading Legacy 'Cloud Save service' Game State from the Cloud (only on Android)
 
 __NOTICE: Cloud Save service has been deprecated and existing games should migrate saved data to
