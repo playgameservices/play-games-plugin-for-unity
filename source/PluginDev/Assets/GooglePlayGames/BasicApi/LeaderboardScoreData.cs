@@ -62,6 +62,7 @@ namespace GooglePlayGames.BasicApi
             {
                 return mStatus;
             }
+
             internal set
             {
                 mStatus = value;
@@ -74,6 +75,7 @@ namespace GooglePlayGames.BasicApi
             {
                 return mApproxCount;
             }
+
             internal set
             {
                 mApproxCount  = value;
@@ -105,12 +107,14 @@ namespace GooglePlayGames.BasicApi
                 mId = value;
             }
         }
+
         public IScore PlayerScore
         {
             get
             {
                 return mPlayerScore;
             }
+
             internal set
             {
                 mPlayerScore = value;
@@ -137,6 +141,7 @@ namespace GooglePlayGames.BasicApi
             {
                 return mPrevPage;
             }
+
             internal set
             {
                 mPrevPage = value;
@@ -149,6 +154,7 @@ namespace GooglePlayGames.BasicApi
             {
                 return mNextPage;
             }
+
             internal set
             {
                 mNextPage = value;
@@ -157,7 +163,9 @@ namespace GooglePlayGames.BasicApi
 
         public override string ToString()
         {
-            return string.Format("[LeaderboardScoreData: mId={0}, mStatus={1}, mApproxCount={2}, mTitle={3}]", mId, mStatus, mApproxCount, mTitle);
+            return string.Format("[LeaderboardScoreData: mId={0}, " +
+                " mStatus={1}, mApproxCount={2}, mTitle={3}]",
+                mId, mStatus, mApproxCount, mTitle);
         }
     }
 }

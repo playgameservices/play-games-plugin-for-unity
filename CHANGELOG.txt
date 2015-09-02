@@ -1,4 +1,6 @@
 Version 0.9.25 (codename: frengle)
+    ** BREAKING CHANGES **
+       * Cloud Save service (AppState) has been removed.
     New Features:
        * Updated Configuration setup using Resource data from Play Console.
        * Added support for exclusiveBitmask in Turnbased quickmatches.

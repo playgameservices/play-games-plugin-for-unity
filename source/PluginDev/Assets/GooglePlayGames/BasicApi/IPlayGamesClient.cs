@@ -70,7 +70,7 @@ namespace GooglePlayGames.BasicApi
 
     /// <summary>Retrieves an OAuth 2.0 bearer token for the client.</summary>
     /// <returns>A string representing the bearer token.</returns>
-    String GetToken();
+    string GetToken();
 
     /// <summary>
     /// Returns the authenticated user's ID. Note that this value may change if a user signs
@@ -82,7 +82,8 @@ namespace GooglePlayGames.BasicApi
     /// <summary>
     /// Load friends of the authenticated user
     /// </summary>
-    /// <param name="callback"></param>
+    /// <param name="callback">Callback invoked when complete.  bool argument
+    /// indicates success.</param>
     void LoadFriends(Action<bool> callback);
 
     /// <summary>
@@ -218,26 +219,25 @@ namespace GooglePlayGames.BasicApi
     /// <param name="leaderboardId">Leaderboard identifier.</param>
     /// <param name="start">Start indicating the top scores or player centric</param>
     /// <param name="rowCount">max number of scores to return. non-positive indicates
-    /// no rows should be returned.  This causes only the summary info to
+    // no rows should be returned.  This causes only the summary info to
     /// be loaded. This can be limited
     // by the SDK.</param>
     /// <param name="collection">leaderboard collection: public or social</param>
     /// <param name="timeSpan">leaderboard timespan</param>
     /// <param name="callback">callback with the scores, and a page token.
-    /// The token can be used to load next/prev pages.</param>
+    ///   The token can be used to load next/prev pages.</param>
     void LoadScores(string leaderboardId, LeaderboardStart start,
                     int rowCount, LeaderboardCollection collection,
                     LeaderboardTimeSpan timeSpan,
             Action<LeaderboardScoreData> callback);
-
 
     /// <summary>
     /// Loads the more scores for the leaderboard.  The token is accessed
     /// by calling LoadScores() with a positive row count.
     /// </summary>
     /// <param name="token">Token.</param>
-    /// <param name="rowCount">max number of scores to return.  This can be limited
-    // by the SDK.</param>
+    /// <param name="rowCount">max number of scores to return.
+    ///    This can be limited by the SDK.</param>
     /// <param name="callback">Callback.</param>
     void LoadMoreScores(ScorePageToken token, int rowCount,
             Action<LeaderboardScoreData> callback);
@@ -271,23 +271,6 @@ namespace GooglePlayGames.BasicApi
     /// <param name="callback">Callback upon completion.</param>
     void SubmitScore(string leaderboardId, long score, string metadata,
             Action<bool> successOrFailureCalllback);
-
-    /// <summary>
-    /// Loads state from the cloud for the passed slot.
-    /// </summary>
-    /// <param name="slot">The slot to read from.</param>
-    /// <param name="listener">The listener to use to report results and resolve possible
-    /// state conflicts.</param>
-    void LoadState(int slot, OnStateLoadedListener listener);
-
-    /// <summary>
-    /// Updates state in the passed slot to the passed data.
-    /// </summary>
-    /// <param name="slot">The slot to read from.</param>
-    /// <param name="data">The data to save.</param>
-    /// <param name="listener">The listener to use to report results and resolve possible
-    /// state conflicts.</param>
-    void UpdateState(int slot, byte[] data, OnStateLoadedListener listener);
 
     /// <summary>
     /// Returns a real-time multiplayer client.

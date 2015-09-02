@@ -19,13 +19,6 @@
 namespace GooglePlayGames.Native
 {
 
-    #if UNITY_ANDROID
-    using GooglePlayGames.Android;
-    #endif
-    #if (UNITY_IPHONE && !NO_GPGS)
-    using GooglePlayGames.IOS;
-    #endif
-
     using GooglePlayGames.BasicApi;
     using GooglePlayGames.BasicApi.Multiplayer;
     using GooglePlayGames.BasicApi.SavedGame;
@@ -44,10 +37,7 @@ namespace GooglePlayGames.Native
     public class NativeClient : IPlayGamesClient
     {
 
-        private const string BridgeActivityClass = "com.google.games.bridge.NativeBridgeActivity";
-        private const string LaunchBridgeMethod = "launchBridgeIntent";
-        private const string LaunchBridgeSignature =
-            "(Landroid/app/Activity;Landroid/content/Intent;)V";
+        private readonly IClientImpl clientImpl;
 
         private enum AuthState
         {
@@ -66,7 +56,6 @@ namespace GooglePlayGames.Native
         private volatile ISavedGameClient mSavedGameClient;
         private volatile IEventsClient mEventsClient;
         private volatile IQuestsClient mQuestsClient;
-        private volatile AppStateClient mAppStateClient;
         private volatile TokenClient mTokenClient;
         private volatile Action<Invitation, bool> mInvitationDelegate;
         private volatile Dictionary<String, Achievement> mAchievements = null;
@@ -81,11 +70,13 @@ namespace GooglePlayGames.Native
 
         private int webclientWarningFreq = 100000;
         private int noWebClientIdWarningCount = 0;
- 
-        public NativeClient(PlayGamesClientConfiguration configuration)
+
+        internal NativeClient(PlayGamesClientConfiguration configuration,
+            IClientImpl clientImpl)
         {
             PlayGamesHelperObject.CreateObject();
             this.mConfiguration = Misc.CheckNotNull(configuration);
+            this.clientImpl = clientImpl;
         }
 
         private GameServices GameServices()
@@ -177,7 +168,7 @@ namespace GooglePlayGames.Native
 
                 using (var builder = GameServicesBuilder.Create())
                 {
-                    using (var config = CreatePlatformConfiguration())
+                    using (var config = clientImpl.CreatePlatformConfiguration())
                     {
                         // We need to make sure that the invitation delegate is registered before the
                         // services object is initialized - otherwise we might miss a callback if
@@ -216,41 +207,11 @@ namespace GooglePlayGames.Native
                                 "See PlayGamesClientConfiguration.Builder.EnableSavedGames.");
                         }
 
-                        mAppStateClient = CreateAppStateClient();
                         mAuthState = AuthState.SilentPending;
-                        mTokenClient = CreateTokenClient();
+                        mTokenClient = clientImpl.CreateTokenClient();
                     }
                 }
             }
-        }
-
-        private AppStateClient CreateAppStateClient()
-        {
-            #if UNITY_ANDROID
-            if (mConfiguration.EnableDeprecatedCloudSave)
-            {
-                return new AndroidAppStateClient(mServices);
-            }
-            else
-            {
-                return new UnsupportedAppStateClient(
-                    "You must explicitly enable cloud save - see " +
-                    "PlayGamesClientConfiguration.Builder.EnableDeprecatedCloudSave.");
-            }
-            #else
-            return new UnsupportedAppStateClient("App State is not supported on this platform.");
-            #endif
-        }
-
-        private TokenClient CreateTokenClient()
-        {
-            #if UNITY_ANDROID
-            return new AndroidTokenClient();
-            #elif (UNITY_IOS && !NO_GPGS)
-            return new IOSTokenClient();
-            #else
-            return null;
-            #endif
         }
 
         internal void HandleInvitation(Types.MultiplayerEvent eventType, string invitationId,
@@ -277,43 +238,6 @@ namespace GooglePlayGames.Native
 
             currentHandler(invitation.AsInvitation(), shouldAutolaunch);
         }
-
-        #if UNITY_ANDROID
-        // Must be launched from the game thread (otherwise the classloader cannot locate the unity
-        // java classes we require).
-        private static void LaunchBridgeIntent(IntPtr bridgedIntent)
-        {
-            object[] objectArray = new object[2];
-            jvalue[] jArgs = AndroidJNIHelper.CreateJNIArgArray(objectArray);
-            try
-            {
-                using (var bridgeClass = new AndroidJavaClass(BridgeActivityClass))
-                {
-                    using (var currentActivity = AndroidTokenClient.GetActivity())
-                    {
-                        // Unity no longer supports constructing an AndroidJavaObject using an IntPtr,
-                        // so I have to manually munge with JNI here.
-                        IntPtr methodId = AndroidJNI.GetStaticMethodID(bridgeClass.GetRawClass(),
-                                              LaunchBridgeMethod,
-                                              LaunchBridgeSignature);
-                        jArgs[0].l = currentActivity.GetRawObject();
-                        jArgs[1].l = bridgedIntent;
-                        AndroidJNI.CallStaticVoidMethod(bridgeClass.GetRawClass(), methodId, jArgs);
-                    }
-                }
-            }
-            finally
-            {
-                AndroidJNIHelper.DeleteJNIArgArray(objectArray, jArgs);
-            }
-        }
-        #endif
-
-        #if (UNITY_IPHONE && !NO_GPGS)
-        [System.Runtime.InteropServices.DllImport("__Internal")]
-        static extern void _GooglePlayEnableProfileScope();
-        #endif
-
 
         /// <summary>Gets the user email.</summary>
         /// <returns>The user email or null if not authenticated or the permission is
@@ -390,59 +314,6 @@ namespace GooglePlayGames.Native
                 return null;
             }
             return mTokenClient.GetIdToken(GameInfo.WebClientId);
-        }
-
-        internal static PlatformConfiguration CreatePlatformConfiguration()
-        {
-            #if UNITY_ANDROID
-            var config = AndroidPlatformConfiguration.Create();
-            config.EnableAppState();
-            using (var activity = AndroidTokenClient.GetActivity())
-            {
-                config.SetActivity(activity.GetRawObject());
-                config.SetOptionalIntentHandlerForUI((intent) =>
-                    {
-                        // Capture a global reference to the intent we are to show. This is required
-                        // since we are launching the intent from the game thread, and this callback
-                        // will return before this happens. If we do not hold onto a durable reference,
-                        // the code calling us will clean up the intent before we have a chance to display
-                        // it.
-                        IntPtr intentRef = AndroidJNI.NewGlobalRef(intent);
-
-                        PlayGamesHelperObject.RunOnGameThread(() =>
-                            {
-                                try
-                                {
-                                    LaunchBridgeIntent(intentRef);
-                                }
-                                finally
-                                {
-                                    // Now that we've launched the intent, release the global reference.
-                                    AndroidJNI.DeleteGlobalRef(intentRef);
-                                }
-                            });
-                    });
-            }
-
-            return config;
-            #endif
-
-            #if UNITY_IPHONE
-            if (!GameInfo.IosClientIdInitialized())
-            {
-                throw new System.InvalidOperationException("Could not locate the OAuth Client ID, " +
-                    "provide this by navigating to Google Play Games > iOS Setup");
-            }
-
-            if (GameInfo.WebClientIdInitialized())
-            {
-                _GooglePlayEnableProfileScope();
-            }
-
-            var config = IosPlatformConfiguration.Create();
-            config.SetClientId(GameInfo.IosClientId);
-            return config;
-            #endif
         }
 
         ///<summary></summary>
@@ -1059,41 +930,6 @@ namespace GooglePlayGames.Native
                 score, metadata);
             // Score submissions cannot fail.
             callback(true);
-        }
-
-        ///<summary></summary>
-        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.LoadState"/>
-        public void LoadState(int slot, OnStateLoadedListener listener)
-        {
-            Misc.CheckNotNull(listener);
-            lock (GameServicesLock)
-            {
-                if (mAuthState != AuthState.Authenticated)
-                {
-                    Logger.e("You can only call LoadState after the user has successfully logged in");
-                    listener.OnStateLoaded(false, slot, null);
-                }
-
-                mAppStateClient.LoadState(slot, listener);
-            }
-        }
-
-        ///<summary></summary>
-        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.UploadState"/>
-        public void UpdateState(int slot, byte[] data, OnStateLoadedListener listener)
-        {
-            Misc.CheckNotNull(listener);
-
-            lock (GameServicesLock)
-            {
-                if (mAuthState != AuthState.Authenticated)
-                {
-                    Logger.e("You can only call UpdateState after the user has successfully logged in");
-                    listener.OnStateSaved(false, slot);
-                }
-
-                mAppStateClient.UpdateState(slot, data, listener);
-            }
         }
 
         ///<summary></summary>

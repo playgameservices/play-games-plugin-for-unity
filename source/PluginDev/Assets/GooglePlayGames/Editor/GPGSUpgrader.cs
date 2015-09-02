@@ -134,9 +134,7 @@ namespace GooglePlayGames
             // delete obsolete directories, if they are there
             string[] obsoleteDirectories =
                 {
-                "Assets/GooglePlayGames/Platforms/Android",
-                "Assets/GooglePlayGames/Platforms/iOS",
-                "Assets/Plugins/Android/BaseGameUtils",
+                "Assets/Plugins/Android/BaseGameUtils"
             };
 
             foreach (string directory in obsoleteDirectories)
