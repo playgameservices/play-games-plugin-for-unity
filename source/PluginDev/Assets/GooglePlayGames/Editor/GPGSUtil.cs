@@ -173,6 +173,33 @@ namespace GooglePlayGames
             return !s.Contains(" ") && s.Split(new char[] { '.' }).Length > 1;
         }
 
+        /// <summary>
+        /// Makes legal identifier from string.
+        /// Returns a legal C# identifier from the given string.  The transformations are:
+        ///   - spaces => underscore _
+        ///   - punctuation => empty string
+        ///   - leading numbers are prefixed with underscore.
+        /// </summary>
+        /// <returns>the id</returns>
+        /// <param name="key">Key.</param>
+        static string makeIdentifier (string key)
+        {
+            string s;
+            string retval = "";
+            if (string.IsNullOrEmpty (key)) {
+                return "_";
+            }
+
+            s = key.Trim().Replace (' ', '_');
+
+            foreach (char c in s) {
+                    if (char.IsLetterOrDigit(c) || c == '_') {
+                        retval += c;
+                    }
+            }
+            return retval;
+        }
+
         public static void Alert(string s)
         {
             Alert(GPGSStrings.Error, s);
@@ -327,8 +354,9 @@ namespace GooglePlayGames
             EnsureDirExists(dirName);
             foreach (DictionaryEntry ent in resourceKeys)
             {
+                string key = makeIdentifier ((string)ent.Key);
                 constantsValues += "        public const string " +
-                    ent.Key + " = \"" + ent.Value + "\"; // <GPGSID>\n";
+                    key + " = \"" + ent.Value + "\"; // <GPGSID>\n";
             }
 
             string fileBody = GPGSUtil.ReadEditorTemplate("template-Constants");
