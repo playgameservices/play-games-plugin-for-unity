@@ -20,30 +20,30 @@
 /// These are the constants defined in the Play Games Console for Game Services
 /// Resources.
 ///
+/// Keep the <GPGSID> tag on the line with the variable.  This is used
+/// by the git hook to make sure real resource IDs are not checked in.
 
-namespace CubicPilot.Behaviors
+namespace CubicPilot
 {
-public static class GPGSIds
-{
-        public const string achievement_round_1 = "CgkIgqLAirYNEAIQDg"; // <GPGSID>
-        public const string achievement_full_combo = "CgkIgqLAirYNEAIQAg"; // <GPGSID>
-        public const string achievement_round_3 = "CgkIgqLAirYNEAIQEA"; // <GPGSID>
-        public const string achievement_not_a_disaster = "CgkIgqLAirYNEAIQAA"; // <GPGSID>
-        public const string achievement_captain = "CgkIgqLAirYNEAIQBg"; // <GPGSID>
-        public const string achievement_perfect_accuracy = "CgkIgqLAirYNEAIQBA"; // <GPGSID>
-        public const string achievement_time_play_level_1 = "CgkIgqLAirYNEAIQCw"; // <GPGSID>
-        public const string achievement_time_play_level_2 = "CgkIgqLAirYNEAIQDA"; // <GPGSID>
-        public const string achievement_time_play_level_3 = "CgkIgqLAirYNEAIQDQ"; // <GPGSID>
-        public const string achievement_twofour = "CgkIgqLAirYNEAIQCQ"; // <GPGSID>
-        public const string leaderboard_the_winners = "CgkIgqLAirYNEAIQEQ"; // <GPGSID>
-        public const string achievement_round_2 = "CgkIgqLAirYNEAIQDw"; // <GPGSID>
-        public const string achievement_clear_all_levels = "CgkIgqLAirYNEAIQAw"; // <GPGSID>
-        public const string achievement_step_by_step = "CgkIgqLAirYNEAIQFA"; // <GPGSID>
-        public const string achievement_sargent = "CgkIgqLAirYNEAIQBQ"; // <GPGSID>
-        public const string achievement_dozen = "CgkIgqLAirYNEAIQCA"; // <GPGSID>
-        public const string achievement_point_blank = "CgkIgqLAirYNEAIQAQ"; // <GPGSID>
-        public const string achievement_tree_sick = "CgkIgqLAirYNEAIQCg"; // <GPGSID>
-        public const string achievement_admiral = "CgkIgqLAirYNEAIQBw"; // <GPGSID>
-
-}
+    public static class GPGSIds
+    {
+        public const string achievement_not_a_disaster = "PLACEHOLDER"; // <GPGSID>
+        public const string achievement_point_blank = "PLACEHOLDER"; // <GPGSID>
+        public const string achievement_full_combo = "PLACEHOLDER"; // <GPGSID>
+        public const string achievement_clear_all_levels = "PLACEHOLDER"; // <GPGSID>
+        public const string achievement_perfect_accuracy = "PLACEHOLDER"; // <GPGSID>
+        public const string achievement_sargent = "PLACEHOLDER"; // <GPGSID>
+        public const string achievement_captain = "PLACEHOLDER"; // <GPGSID>
+        public const string achievement_admiral = "PLACEHOLDER"; // <GPGSID>
+        public const string achievement_1_dozen_stars = "PLACEHOLDER"; // <GPGSID>
+        public const string achievement_two_dozen_stars = "PLACEHOLDER"; // <GPGSID>
+        public const string achievement_3_dozen_stars = "PLACEHOLDER"; // <GPGSID>
+        public const string achievement_five_minute_master = "PLACEHOLDER"; // <GPGSID>
+        public const string achievement_30_minutes_of_excitement = "PLACEHOLDER"; // <GPGSID>
+        public const string achievement_procrastinate_much = "PLACEHOLDER"; // <GPGSID>
+        public const string achievement_played_2_rounds = "PLACEHOLDER"; // <GPGSID>
+        public const string achievement_played_10_rounds = "PLACEHOLDER"; // <GPGSID>
+        public const string achievement_played_25_rounds = "PLACEHOLDER"; // <GPGSID>
+        public const string leaderboard_cubic_pilot_hall_of_fame = "PLACEHOLDER"; // <GPGSID>
+    }
 }
