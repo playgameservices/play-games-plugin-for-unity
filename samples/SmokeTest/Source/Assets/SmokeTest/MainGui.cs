@@ -29,8 +29,7 @@ using UnityEngine.SocialPlatforms;
 namespace SmokeTest
 {
 
-    public class MainGui : MonoBehaviour, OnStateLoadedListener,
-            RealTimeMultiplayerListener
+    public class MainGui : MonoBehaviour, RealTimeMultiplayerListener
     {
         public GUISkin GuiSkin;
 
@@ -288,31 +287,19 @@ namespace SmokeTest
             {
                 this.mUi = Ui.UserInfo;
             }
-            else if (GUI.Button(this.CalcGrid(0, 3), "Cloud Save"))
-            {
-                this.DoCloudSave();
-            }
-            else if (GUI.Button(this.CalcGrid(1, 3), "Cloud Load"))
-            {
-                this.DoCloudLoad();
-            }
-
-            if (GUI.Button(this.CalcGrid(0, 4), "Multiplayer"))
+            else if (GUI.Button(this.CalcGrid(0, 4), "Multiplayer"))
             {
                 this.mUi = Ui.Multiplayer;
             }
-
-            if (GUI.Button(this.CalcGrid(1, 4), "Saved Game"))
+            else if (GUI.Button(this.CalcGrid(1, 4), "Saved Game"))
             {
                 this.mUi = Ui.SavedGame;
             }
-
-            if (GUI.Button(this.CalcGrid(1, 6), "Nearby Connections"))
+            else if (GUI.Button(this.CalcGrid(1, 6), "Nearby Connections"))
             {
                 this.mUi = Ui.NearbyConnections;
             }
-
-            if (GUI.Button(this.CalcGrid(0, 6), "Sign Out"))
+            else if (GUI.Button(this.CalcGrid(0, 6), "Sign Out"))
             {
                 this.DoSignOut();
             }
@@ -1224,27 +1211,6 @@ namespace SmokeTest
             }
 
             return x;
-        }
-
-        internal void DoCloudSave()
-        {
-            string word = GenString();
-
-            SetStandBy("Saving string to cloud: " + word);
-            PlayGamesPlatform p = (PlayGamesPlatform)Social.Active;
-            p.UpdateState(0, System.Text.ASCIIEncoding.Default.GetBytes(word), this);
-            EndStandBy();
-            Status = "Saved string to cloud: " + word;
-            mLastLocalSave = word;
-            Logger.d("Saved string: " + word);
-            ShowEffect(true);
-        }
-
-        private void DoCloudLoad()
-        {
-            mHadCloudConflict = false;
-            SetStandBy("Loading from cloud...");
-            ((PlayGamesPlatform)Social.Active).LoadState(0, this);
         }
 
         private void DoQuickGame(uint players, ulong bitmask)

@@ -49,7 +49,7 @@ namespace CubicPilot.GameLogic
                 {
                     GPGSIds.achievement_five_minute_master,
                     GPGSIds.achievement_30_minutes_of_excitement,
-                GPGSIds.achievement_procrastinate_much
+                    GPGSIds.achievement_procrastinate_much
                 };
 
             public readonly static string[] IncGameplayRounds =
