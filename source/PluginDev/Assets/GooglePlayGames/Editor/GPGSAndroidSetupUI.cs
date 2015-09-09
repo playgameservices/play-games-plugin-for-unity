@@ -52,7 +52,6 @@ namespace GooglePlayGames
 
             GUILayout.Space(10);
             GUILayout.Label(GPGSStrings.AndroidSetup.Blurb);
-           
             GUILayout.Label("Constants class name", EditorStyles.boldLabel);
             GUILayout.Label("Enter the fully qualified name of the class to create containing the constants");
             GUILayout.Space(10);
@@ -72,7 +71,7 @@ namespace GooglePlayGames
             // Client ID field
             GUILayout.Label(GPGSStrings.Setup.WebClientIdTitle, EditorStyles.boldLabel);
             GUILayout.Label(GPGSStrings.AndroidSetup.WebClientIdBlurb);
-      
+
             mWebClientId = EditorGUILayout.TextField(GPGSStrings.Setup.ClientId,
                 mWebClientId, GUILayout.Width(450));
 
@@ -166,6 +165,12 @@ namespace GooglePlayGames
         /// <param name="nearbySvcId">Nearby svc identifier.</param>
         public static bool PerformSetup(string clientId, string className, string resourceXmlData, string nearbySvcId)
         {
+            if (string.IsNullOrEmpty(resourceXmlData) &&
+                !string.IsNullOrEmpty(nearbySvcId))
+            {
+                return PerformSetup(clientId,
+                    GPGSProjectSettings.Instance.Get(GPGSUtil.APPIDKEY), nearbySvcId);
+            }
             if (ParseResources(className, resourceXmlData))
             {
                 GPGSProjectSettings.Instance.Set(GPGSUtil.CLASSNAMEKEY, className);
@@ -180,7 +185,7 @@ namespace GooglePlayGames
         /// Provide static access to setup for facilitating automated builds.
         /// </summary>
         /// <param name="webClientId">The oauth2 client id for the game.  This is only
-        /// needed if the ID Token or access token are needed.</param> 
+        /// needed if the ID Token or access token are needed.</param>
         /// <param name="appId">App identifier.</param>
         /// <param name="nearbySvcId">Optional nearby connection serviceId</param>
         public static bool PerformSetup(string webClientId, string appId, string nearbySvcId)
@@ -204,17 +209,11 @@ namespace GooglePlayGames
             }
             else
             {
-                // check for valid app id
-                if (!GPGSUtil.LooksLikeValidAppId(appId))
-                {
-                    GPGSUtil.Alert(GPGSStrings.Setup.AppIdError);
-                    return false;
-                }
-                needTokenPermissions = true;
+                 needTokenPermissions = false;
             }
 
             // check for valid app id
-            if (!GPGSUtil.LooksLikeValidAppId(appId))
+            if (!GPGSUtil.LooksLikeValidAppId(appId) && string.IsNullOrEmpty(nearbySvcId))
             {
                 GPGSUtil.Alert(GPGSStrings.Setup.AppIdError);
                 return false;
