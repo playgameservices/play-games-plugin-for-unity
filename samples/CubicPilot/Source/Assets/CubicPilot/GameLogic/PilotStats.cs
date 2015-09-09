@@ -13,55 +13,70 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+namespace CubicPilot.GameLogic
+{
+    using CubicPilot.UtilCode;
 
-using System;
-using UnityEngine;
+    public class PilotStats
+    {
+        int mLevel;
 
-public class PilotStats {
-    int mLevel;
-
-    public PilotStats(int level) {
-        mLevel = Util.Clamp(level, 1, GameConsts.Progression.MaxLevel);
-    }
-
-    public string Title {
-        get {
-            int l = Util.Clamp(mLevel, 1, GameConsts.Progression.Titles.Length - 1);
-            return GameConsts.Progression.Titles[l];
+        public PilotStats(int level)
+        {
+            mLevel = Util.Clamp(level, 1, GameConsts.Progression.MaxLevel);
         }
-    }
 
-    public float FireCooldown {
-        get {
-            int l = Util.Clamp(mLevel, 1, GameConsts.Progression.FireCooldown.Length - 1);
-            return GameConsts.Progression.FireCooldown[l];
+        public string Title
+        {
+            get
+            {
+                int l = Util.Clamp(mLevel, 1, GameConsts.Progression.Titles.Length - 1);
+                return GameConsts.Progression.Titles[l];
+            }
         }
-    }
 
-    public int ShieldPoints {
-        get {
-            int l = Util.Clamp(mLevel, 1, GameConsts.Progression.ShieldPoints.Length - 1);
-            return GameConsts.Progression.ShieldPoints[l];
+        public float FireCooldown
+        {
+            get
+            {
+                int l = Util.Clamp(mLevel, 1, GameConsts.Progression.FireCooldown.Length - 1);
+                return GameConsts.Progression.FireCooldown[l];
+            }
         }
-    }
 
-    public float LaserSpeed {
-        get {
-            int l = Util.Clamp(mLevel, 1, GameConsts.Progression.LaserSpeed.Length - 1);
-            return GameConsts.Progression.LaserSpeed[l];
+        public int ShieldPoints
+        {
+            get
+            {
+                int l = Util.Clamp(mLevel, 1, GameConsts.Progression.ShieldPoints.Length - 1);
+                return GameConsts.Progression.ShieldPoints[l];
+            }
         }
-    }
 
-    public int Level {
-        get {
-            return mLevel;
+        public float LaserSpeed
+        {
+            get
+            {
+                int l = Util.Clamp(mLevel, 1, GameConsts.Progression.LaserSpeed.Length - 1);
+                return GameConsts.Progression.LaserSpeed[l];
+            }
         }
-    }
 
-    public int Damage {
-        get {
-            int l = Util.Clamp(mLevel, 1, GameConsts.Progression.Damage.Length - 1);
-            return GameConsts.Progression.Damage[l];
+        public int Level
+        {
+            get
+            {
+                return mLevel;
+            }
+        }
+
+        public int Damage
+        {
+            get
+            {
+                int l = Util.Clamp(mLevel, 1, GameConsts.Progression.Damage.Length - 1);
+                return GameConsts.Progression.Damage[l];
+            }
         }
     }
 }

@@ -13,16 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+namespace CubicPilot.Behaviors
+{
+    using UnityEngine;
 
-using UnityEngine;
-using System.Collections;
+    public class HurtsPlayer : MonoBehaviour
+    {
+        public int Damage = 1;
 
-public class HurtsPlayer : MonoBehaviour {
-    public int Damage = 1;
-
-    void OnTriggerEnter(Collider c) {
-        if (c.tag == "Player") {
-            Destroy(gameObject);
+        void OnTriggerEnter(Collider c)
+        {
+            if (c.tag == "Player")
+            {
+                Destroy(gameObject);
+            }
         }
     }
 }

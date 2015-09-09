@@ -13,28 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+namespace CubicPilot.Behaviors
+{
+    using UnityEngine;
 
-using UnityEngine;
-using System.Collections;
+    public class Shoots : MonoBehaviour
+    {
+        public Vector3 ShotVelocity = new Vector3(-10, 0, 0);
+        public GameObject ProjectilePrefab;
+        public Vector3 SpawnOffset;
+        public float Interval = 2.0f;
+        public float Countdown = 0.0f;
 
-public class Shoots : MonoBehaviour {
-    public Vector3 ShotVelocity = new Vector3(-10, 0, 0);
-    public GameObject ProjectilePrefab;
-    public Vector3 SpawnOffset;
-    public float Interval = 2.0f;
-    public float Countdown = 0.0f;
-
-    void Update () {
-        if ((Countdown -= Time.deltaTime) < 0) {
-            Fire();
-            Countdown = Interval;
+        void Update()
+        {
+            if ((Countdown -= Time.deltaTime) < 0)
+            {
+                Fire();
+                Countdown = Interval;
+            }
         }
-    }
 
-    void Fire() {
-        GameObject o = (GameObject) Instantiate(ProjectilePrefab);
-        o.transform.Translate(gameObject.transform.position + SpawnOffset);
-        ConstVelocity c = o.GetComponent<ConstVelocity>();
-        c.Velocity = ShotVelocity;
+        void Fire()
+        {
+            GameObject o = (GameObject)Instantiate(ProjectilePrefab);
+            o.transform.Translate(gameObject.transform.position + SpawnOffset);
+            ConstVelocity c = o.GetComponent<ConstVelocity>();
+            c.Velocity = ShotVelocity;
+        }
     }
 }

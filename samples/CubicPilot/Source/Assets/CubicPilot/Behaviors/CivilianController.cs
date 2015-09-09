@@ -13,25 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+namespace CubicPilot.Behaviors
+{
+    using UnityEngine;
 
-using UnityEngine;
-using System.Collections;
+    public class CivilianController : MonoBehaviour
+    {
+        public GameObject ExplodeEffect;
+        public AudioClip ExplodeSfx;
+        public GameObject LevelController;
 
-public class CivilianController : MonoBehaviour {
-    public GameObject ExplodeEffect;
-    public AudioClip ExplodeSfx;
-    public GameObject LevelController;
+        void OnTriggerEnter(Collider c)
+        {
+            Vulnerable v = c.gameObject.GetComponent<Vulnerable>();
+            if (v != null && v.ExplodeOnCivilian)
+            {
+                Destroy(gameObject);
+                GameObject o = (GameObject)Instantiate(ExplodeEffect);
+                o.transform.Translate(gameObject.transform.position);
+                AudioSource.PlayClipAtPoint(ExplodeSfx, Vector3.zero);
 
-    void OnTriggerEnter(Collider c) {
-        Vulnerable v = c.gameObject.GetComponent<Vulnerable>();
-        if (v != null && v.ExplodeOnCivilian) {
-            Destroy(gameObject);
-            GameObject o = (GameObject) Instantiate(ExplodeEffect);
-            o.transform.Translate(gameObject.transform.position);
-            AudioSource.PlayClipAtPoint(ExplodeSfx, Vector3.zero);
-
-            LevelController lc = LevelController.GetComponent<LevelController>();
-            lc.HandleCivilianDestroyed();
+                LevelController lc = LevelController.GetComponent<LevelController>();
+                lc.HandleCivilianDestroyed();
+            }
         }
     }
 }

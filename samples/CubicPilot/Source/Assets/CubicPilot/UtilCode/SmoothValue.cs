@@ -14,53 +14,66 @@
  * limitations under the License.
  */
 
-using System;
+namespace CubicPilot.UtilCode
+{
+    using System;
 
-public class SmoothValue {
-    private float mValue = 0.0f;
-    private float mMaxChangeRate = 0.0f;
-    private float mMin = float.NegativeInfinity;
-    private float mMax = float.PositiveInfinity;
-    private int mFilterSamples;
-    private float mFilteredValue = 0.0f;
+    public class SmoothValue
+    {
+        private float mValue = 0.0f;
+        private float mMaxChangeRate = 0.0f;
+        private float mMin = float.NegativeInfinity;
+        private float mMax = float.PositiveInfinity;
+        private int mFilterSamples;
+        private float mFilteredValue = 0.0f;
 
-    public SmoothValue(float initialValue, float maxChangeRate) {
-        mValue = initialValue;
-        mMaxChangeRate = maxChangeRate;
-    }
-
-    public SmoothValue(float initialValue, float maxChangeRate, float min,
-                float max, int filterSamples) {
-        mValue = initialValue;
-        mMaxChangeRate = maxChangeRate;
-        mMin = min;
-        mMax = max;
-        mFilterSamples = filterSamples < 0 ? 0 : filterSamples;
-    }
-
-    public void SetBounds(float min, float max) {
-        mMin = min;
-        mMax = max;
-    }
-
-    public float PullTowards(float target, float deltaT) {
-        mFilteredValue = (mFilteredValue * mFilterSamples + target) /
-                (mFilterSamples + 1);
-        target = mFilteredValue;
-
-        float displac = deltaT * mMaxChangeRate;
-        if (Math.Abs(target - mValue) <= displac) {
-            mValue = target;
-        } else {
-            mValue = Util.Clamp(mValue > target ? mValue - displac : mValue + displac,
-                mMin, mMax);
+        public SmoothValue(float initialValue, float maxChangeRate)
+        {
+            mValue = initialValue;
+            mMaxChangeRate = maxChangeRate;
         }
-        return mValue;
-    }
 
-    public float Value {
-        get {
+        public SmoothValue(float initialValue, float maxChangeRate, float min,
+                       float max, int filterSamples)
+        {
+            mValue = initialValue;
+            mMaxChangeRate = maxChangeRate;
+            mMin = min;
+            mMax = max;
+            mFilterSamples = filterSamples < 0 ? 0 : filterSamples;
+        }
+
+        public void SetBounds(float min, float max)
+        {
+            mMin = min;
+            mMax = max;
+        }
+
+        public float PullTowards(float target, float deltaT)
+        {
+            mFilteredValue = (mFilteredValue * mFilterSamples + target) /
+            (mFilterSamples + 1);
+            target = mFilteredValue;
+
+            float displac = deltaT * mMaxChangeRate;
+            if (Math.Abs(target - mValue) <= displac)
+            {
+                mValue = target;
+            }
+            else
+            {
+                mValue = Util.Clamp(mValue > target ? mValue - displac : mValue + displac,
+                    mMin, mMax);
+            }
             return mValue;
+        }
+
+        public float Value
+        {
+            get
+            {
+                return mValue;
+            }
         }
     }
 }
