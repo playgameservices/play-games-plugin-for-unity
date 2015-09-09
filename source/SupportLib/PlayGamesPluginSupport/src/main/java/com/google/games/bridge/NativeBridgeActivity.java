@@ -64,6 +64,11 @@ public final class NativeBridgeActivity extends Activity {
     public void startActivityForResult(Intent intent, int requestCode) {
         // set the pending result flag if this activity is for GPG
         pendingResult = requestCode == GPG_RESPONSE_CODE;
+        if (pendingResult) {
+            Log.d(TAG, "starting GPG activity: " + intent);
+        } else {
+            Log.i(TAG,"starting non-GPG activity: " + requestCode  +" " + intent);
+        }
         super.startActivityForResult(intent, requestCode);
     }
 
@@ -75,6 +80,8 @@ public final class NativeBridgeActivity extends Activity {
 
             // clear the pending flag.
             pendingResult = false;
+        } else {
+           Log.d(TAG, "onActivityResult for unknown request code: " + requestCode + " calling finish()");
         }
 
         finish();
@@ -126,6 +133,7 @@ public final class NativeBridgeActivity extends Activity {
         // means the activity we are waiting for is also destroyed, so cancel it out
         // with the SDK.
          if (pendingResult) {
+            Log.w(TAG, "onDestroy called with pendingResult == true.  forwarding canceled result");
             forwardActivityResult(GPG_RESPONSE_CODE,RESULT_CANCELED, null);
             pendingResult = false;
         }
