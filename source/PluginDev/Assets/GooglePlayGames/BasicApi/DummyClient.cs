@@ -152,7 +152,8 @@ namespace GooglePlayGames.BasicApi
             }
         }
 
-        public void ShowLeaderboardUI(string lbId, Action<UIStatus> callback)
+        public void ShowLeaderboardUI(string lbId, LeaderboardTimeSpan span,
+            Action<UIStatus> callback)
         {
             LogUsage();
             if (callback != null)

@@ -837,7 +837,8 @@ namespace GooglePlayGames.Native
 
         ///<summary></summary>
         /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.ShowLeaderboardUI"/>
-        public void ShowLeaderboardUI(string leaderboardId, Action<UIStatus> cb)
+        public void ShowLeaderboardUI(string leaderboardId, LeaderboardTimeSpan span,
+            Action<UIStatus> cb)
         {
             if (!IsAuthenticated())
             {
@@ -859,7 +860,7 @@ namespace GooglePlayGames.Native
             }
             else
             {
-                GameServices().LeaderboardManager().ShowUI(leaderboardId, callback);
+                GameServices().LeaderboardManager().ShowUI(leaderboardId, span, callback);
             }
         }
 

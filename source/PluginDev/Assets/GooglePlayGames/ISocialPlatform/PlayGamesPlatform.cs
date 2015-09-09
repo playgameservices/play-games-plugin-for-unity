@@ -322,7 +322,7 @@ namespace GooglePlayGames
             return mClient != null && mClient.IsAuthenticated();
         }
 
-        /// <summary>Sign out. After signing out, 
+        /// <summary>Sign out. After signing out,
         /// Authenticate must be called again to sign back in.
         /// </summary>
         public void SignOut()
@@ -897,7 +897,7 @@ namespace GooglePlayGames
                 lbId = MapId(lbId);
             }
 
-            mClient.ShowLeaderboardUI(lbId, null);
+            mClient.ShowLeaderboardUI(lbId, LeaderboardTimeSpan.AllTime, null);
         }
 
         /// <summary>
@@ -908,6 +908,18 @@ namespace GooglePlayGames
         /// <param name="callback">Callback to call.  If null, nothing is called.</param>
         public void ShowLeaderboardUI(string lbId, Action<UIStatus> callback)
         {
+            ShowLeaderboardUI(lbId, LeaderboardTimeSpan.AllTime, callback);
+        }
+        /// <summary>
+        /// Shows the leaderboard UI and calls the specified callback upon
+        /// completion.
+        /// </summary>
+        /// <param name="lbId">leaderboard ID, can be null meaning all leaderboards.</param>
+        /// <param name="span">Timespan to display scores in the leaderboard.</param>
+        /// <param name="callback">Callback to call.  If null, nothing is called.</param>
+        public void ShowLeaderboardUI(string lbId, LeaderboardTimeSpan span,
+            Action<UIStatus> callback)
+        {
             if (!IsAuthenticated())
             {
                 Logger.e("ShowLeaderboardUI can only be called after authentication.");
@@ -916,7 +928,7 @@ namespace GooglePlayGames
             }
 
             Logger.d("ShowLeaderboardUI, lbId=" + lbId + " callback is " + callback);
-            mClient.ShowLeaderboardUI(lbId, callback);
+            mClient.ShowLeaderboardUI(lbId, span, callback);
         }
 
         /// <summary>
@@ -1033,7 +1045,7 @@ namespace GooglePlayGames
         {
             return board != null && board.loading;
         }
-            
+
         /// <summary>
         /// Gets the local user.
         /// </summary>
@@ -1049,7 +1061,7 @@ namespace GooglePlayGames
         }
 
         /// <summary>
-        /// Register an invitation delegate to be 
+        /// Register an invitation delegate to be
         /// notified when a multiplayer invitation arrives
         /// </summary>
         public void RegisterInvitationDelegate(BasicApi.InvitationReceivedDelegate deleg)

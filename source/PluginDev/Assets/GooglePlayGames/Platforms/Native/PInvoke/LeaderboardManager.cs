@@ -62,12 +62,15 @@ namespace GooglePlayGames.Native.PInvoke
                 Callbacks.ToIntPtr(callback));
         }
 
-        internal void ShowUI(string leaderboardId, Action<Status.UIStatus> callback)
+        internal void ShowUI(string leaderboardId, 
+            LeaderboardTimeSpan span, Action<Status.UIStatus> callback)
         {
             Misc.CheckNotNull(callback);
 
             C.LeaderboardManager_ShowUI(mServices.AsHandle(), leaderboardId,
-                Callbacks.InternalShowUICallback, Callbacks.ToIntPtr(callback));
+                (Types.LeaderboardTimeSpan)span,
+                Callbacks.InternalShowUICallback, 
+                Callbacks.ToIntPtr(callback));
         }
 
         /// <summary>

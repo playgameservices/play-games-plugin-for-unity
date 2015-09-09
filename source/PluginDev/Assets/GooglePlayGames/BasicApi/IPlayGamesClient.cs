@@ -208,10 +208,13 @@ namespace GooglePlayGames.BasicApi
     /// </summary>
     /// <param name="leaderboardId">The leaderboard to display. <code>null</code> to display
     /// all.</param>
+    /// <param name="span">Timespan to display for the leaderboard</param>
     /// <param name="callback">If non-null, the callback to invoke when the
     /// leaderboard is dismissed.
     /// </param>
-    void ShowLeaderboardUI(string leaderboardId, Action<UIStatus> callback);
+    void ShowLeaderboardUI(string leaderboardId,
+            LeaderboardTimeSpan span,
+            Action<UIStatus> callback);
 
     /// <summary>
     /// Loads the score data for the given leaderboard.
