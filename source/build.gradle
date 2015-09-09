@@ -8,7 +8,7 @@ buildscript {
         mavenLocal()
     }
 }
-/* 
+/*
     Project level variables
 */
 project.ext {
@@ -37,8 +37,8 @@ project.ext {
     currentPluginName = 'GooglePlayGamesPlugin-0.9.25.unitypackage'
 
     sampleList = ['CubicPilot', 'Minimal',
-         'QuizRacer',  'TicTacToe', 'CubicPilot_4.6',
-         'NearbyDroids', 'QuizRacer_4.6', 'SmokeTest', 'TrivialQuest']
+         'QuizRacer',  'TicTacToe',
+         'NearbyDroids', 'SmokeTest', 'TrivialQuest']
 
     gpg_sdk_link = 'https://developers.google.com/games/services/downloads/gpg-cpp-sdk.v1.4.1.zip'
 }
@@ -82,7 +82,7 @@ task unity_package(dependsOn:'export_package') {
     doLast {
         println "Packaging Complete!"
     }
-    
+
     // Mark this a build phase task for remoteTask support.
     ext.remoteTaskPhase = 'build'
 
@@ -99,7 +99,7 @@ sampleList.each { sampleName ->
     def createTask   = project.tasks.create('CreateSample' + sampleName)
     def copySrcTask   = project.tasks.create('CopySrcSample' + sampleName)
     def copyBuildSrcTask   = project.tasks.create('CopyBuildSrcSample' + sampleName)
-    
+
     // this is the path to the source code
     def sampleSrcDir = samplesPath + '/' + sampleName + '/Source/Assets/' + sampleName
 
@@ -108,7 +108,15 @@ sampleList.each { sampleName ->
 
     // this is the path to build the sample package
     def sampleDestSrcDir = buildPath + '/Samples/' + sampleName + '/Assets/' + sampleName
-    
+
+    // the relative path to the sample assets within the project.
+    def sampleAssets = "Assets/${sampleName}"
+
+    def sampleDir = file("${buildPath}/Samples")
+    if (!sampleDir.exists()) {
+        sampleDir.mkdirs()
+    }
+
     /*
         Create the sample in the build directory
     */
@@ -117,14 +125,14 @@ sampleList.each { sampleName ->
     createTask.doFirst {
         exec {
             executable "${unity_exe}"
-                args "-batchmode", "-createProject", "${buildPath}/Samples/${sampleName}", "-logFile", "${buildPath}/CreateSample${sampleName}.log",  "-importPackage", "${exportPath}", "-quit"
+                args "-buildTarget", "android", "-batchmode", "-createProject", "${buildPath}/Samples/${sampleName}", "-logFile", "${buildPath}/CreateSample${sampleName}.log",  "-importPackage", "${exportPath}", "-quit"
         }
     }
     // This is a build task
     createTask.ext.remoteTaskPhase = 'build'
 
     /*
-        Copy the source of the sample into build dir.  
+        Copy the source of the sample into build dir.
         This is done so it can be remoted and assembled as a part of a RemoteTask.
     */
     copyBuildSrcTask.description = "Copies sample ${sampleName} source code to build area"
@@ -171,7 +179,7 @@ sampleList.each { sampleName ->
         packageTask.doLast {
             exec {
                 executable "${unity_exe}"
-                args "-batchmode", "-projectPath", "${buildPath}/Samples/${sampleName}", "-logFile", "${buildPath}/ExportSample${sampleName}.log",  "-exportPackage", "Assets/${sampleName}",  "${buildPath}/Samples/${sampleName}.unitypackage",  "-quit"
+                args "-buildTarget", "android", "-batchmode", "-projectPath", "${buildPath}/Samples/${sampleName}", "-logFile", "${buildPath}/ExportSample${sampleName}.log",  "-exportPackage", "${sampleAssets}",  "${buildPath}/Samples/${sampleName}.unitypackage",  "-quit"
             }
         }
         packageTask.ext.remoteTaskPhase = 'build'
@@ -201,7 +209,7 @@ task export_package () {
     doLast {
         exec {
             executable "${unity_exe}"
-                args "-g.building", "-batchmode", "-projectPath", "${pluginProj}", "-logFile", "build/unity.log",  "-exportPackage", "Assets/GooglePlayGames", "Assets/Plugins", "${exportPath}", "-quit"
+                args "-g.building", "-buildTarget", "android", "-batchmode", "-projectPath", "${pluginProj}", "-logFile", "build/unity.log",  "-exportPackage", "Assets/GooglePlayGames", "Assets/Plugins", "${exportPath}", "-quit"
         }
     }
 }
@@ -274,10 +282,10 @@ compile_gpg.dependsOn 'copy_native'
 compile_gpg.ext.remoteTaskPhase = 'prebuild'
 
 task copy_native << {
-	copy {
-	from {'native'}
-	into {'build/jni'}
-	}
+    copy {
+        from {'native'}
+        into {'build/jni'}
+    }
 }
 copy_native.description = "Copies the native code of the plugin into the build/jni dir for compiling"
 copy_native.ext.remoteTaskPhase = 'prebuild'
@@ -294,11 +302,11 @@ copy_plugin_source.ext.remoteTaskPhase = 'prebuild'
 
 
 task copy_gpg_sdk << {
- copy {
-	from zipTree('gpg_cpp_sdk.zip')
-    	// Determine the destination directory later
-    	into {'build/jni' }
-}
+    copy {
+        from zipTree('gpg_cpp_sdk.zip')
+        // Determine the destination directory later
+        into {'build/jni' }
+    }
 }
 copy_gpg_sdk.description = "Unzips the GPG SDK into the correct dir for NDK"
 copy_gpg_sdk.dependsOn get_gpg_cpp_sdk
