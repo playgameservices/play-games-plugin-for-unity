@@ -16,6 +16,7 @@
 
 namespace QuizRacer.MenuPanels
 {
+    using QuizRacer.GameLogic;
     using UnityEngine;
     using GooglePlayGames;
     using GooglePlayGames.BasicApi;
