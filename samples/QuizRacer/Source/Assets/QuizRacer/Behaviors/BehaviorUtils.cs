@@ -14,7 +14,7 @@
 //    limitations under the License.
 // </copyright>
 
-namespace QuizRacer
+namespace QuizRacer.Behaviors
 {
     using UnityEngine;
 
