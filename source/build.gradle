@@ -40,7 +40,7 @@ project.ext {
          'QuizRacer',  'TicTacToe',
          'NearbyDroids', 'SmokeTest', 'TrivialQuest']
 
-    gpg_sdk_link = 'https://developers.google.com/games/services/downloads/gpg-cpp-sdk.v1.4.1.zip'
+    gpg_sdk_link = 'https://developers.google.com/games/services/downloads/gpg-cpp-sdk.v2.0.zip'
 }
 
 
