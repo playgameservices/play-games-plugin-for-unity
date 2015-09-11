@@ -8,21 +8,13 @@ It is meant to show the minimal amount of code necessary to set up an integratio
 with Google Play Games.
 
 **Cubic Pilot** is a complete game that demonstrates how to use the plugin to implement sign in,
-achievements, leaderboards and cloud save.
+achievements, leaderboards and cloud save.  It also supports gamepad controllers.
 
-**Cubic Pilot_4.6** is a complete game that demonstrates how to use the plugin to implement sign in,
-achievements, leaderboards and cloud save. This sample uses features from **Unity 4.6** for targeting different resolutions and orientations, 
-and external controllers and gamepads such as used with the Nexus Player. Warning: **_You must open this sample in
-Unity 4.6 or greater_**.
+**SmokeTest** is a "kitchen sink" sample - with buttons for each API call.
 
 **Tic Tac Toe** is a complete game that demonstrates how to use the plugin to implement turn-based multiplayer.
 
 **Quiz Racer** is a complete game that demonstrates how to use the plugin to implement real-time multiplayer.
-
-**Quiz Racer_4.6** is a complete game that demonstrates how to use the plugin to implement
-real-time multiplayer using **Unity 4.6** for targeting different resolutions and orientations, 
-and external controllers and gamepads such as used with the Nexus Player. Warning: **_You must open this sample in
-Unity 4.6 or greater_**.
 
 **Nearby Droids** is a game demonstrating the nearby connection API.  This sample requires android play services sdk 23 or higher.
 The nearby connections API is only available on Android.  The UI in this game uses the 'new' Unity UI system, 
@@ -42,45 +34,173 @@ Google Play Developer Console. Follow the instructions on creating a client ID
 for Android and/or iOS (depending on what platforms you intend to run the game).
 More information about this can be found in the **Getting Started Guide**.
 
-## Configure Achievements and the Leaderboard
+All the samples follow the same basic steps, see the section for the the specific
+sample for what resources need to be configured in the play console.
 
-For the **Minimal**, **QuizRacer** and **TicTacToe** samples, no achievements or leaderboards are necessary.
+ 1. Create a new Unity Project
+ 2. Import the Google Play Games plugin
+ 3. Import the <sampleName>.unitypackage
+ 4. Create the linked application remembering to use the
+    same configuration information when configuring your game in Unity.
+ 5. Create the resource configuration needed for the sample in the play console.
+ 6. Then at the bottom of the Achievement (or Leaderboards, or Events) list,
+     click "Get Resources", and copy
+    the resource definitions to the clipboard.
+ 7. Back in the Unity editor, open the Google Play Games setup dialog
+    4.1 Enter the constants class name for the sample
+    4.2 Paste the resource definitions from the Play Console into the text box.
+ 8. Click Setup
+ 9. Build and run!
 
-For the **Cubic Pilot** sample, you must create the necessary achievements and leaderboards
-for this game. To do this, open the **Assets/GameLogic/GameIds.cs** file
-and look at the achievements required by the game. Then, as you create the
-corresponding achievements and leaderboard in the Developer Console,
-and replace the "PLACEHOLDER" strings in the file by the corresponding IDs.
+## Configuration for Minimal
 
-## Set up your package name
+Minimal lives up to its name and needs the minimum configuration to test.
 
-Go to the Android and iOS Player Settings window in Unity and configure your
-package name and/or Bundle ID. To access this window, click
-**File | Build Settings...**, select the appropriate platform and click the
-**Switch Platform** button, and then the **Player Settings** button.
+ 1. Create 1 Achievment named "Welcome"
+ 2. Use the constants class name: `Minimal.GPGSIds`
 
-Use the package name that corresponds to the Client ID you have configured
-in the Developer Console.
+## Configuration for CubicPilot
+ There are several achievements for CubicPilot:
 
-## Import the Google Play Games plugin
+ Make sure Saved Games is enabled.
 
-Import the Google Play Games plugin file (the **GooglePlayGamesPlugin-X.YY.ZZ.unitypackage** 
-file) into Unity. Then select **File | Play Games - Android Settings** from the
-menu to set up the game for Android, and/or **File | Play Games - iOS
-Settings** to set up the game for iOS.
+1. Name: "Not a Disaster..."<br/>
+    Description: "Get 1 point without dying."
+2. Name: "Point Blank!"<br/>
+    Description: "Kill an enemy at point blank range."
+3. Name: "Full Combo"<br/>
+    Description: "Complete the maximum combo bonus chain."
+4. Name: "Clear All Levels"<br/>
+    Description: "Clear all the levels."
+5. Name: "Perfect Accuracy"<br/>
+    Description: "Clear a level with 100% accuracy."
+6. Name: "Sargent"<br/>
+    Description: "Advancement based on levels completed."
+7. Name: "Captain"<br/>
+    Description: "Advancement based on levels completed."
+8. Name: "Admiral"<br/>
+    Description: "Advancement based on levels completed."
 
-In each of those dialogs, enter the corresponding configuration values as
-set up in the Developer Console.
+These are incremental achievements that have counts to be met to unlock the
+achievement.
 
-## Import the packaged asset containing the sample
+1. Name: "1 Dozen Stars"
+    Description: "Earn 12 stars"
+    Incremental: Yes
+    Steps needed: 12
+2. Name: "Two Dozen Stars"
+    Description: "Earn 24 stars"
+    Incremental: Yes
+    Steps needed: 24
+3. Name: "3 Dozen Stars"
+    Description: "Earn 36 stars"
+    Incremental: Yes
+    Steps needed: 36
+4. Name: "Five Minute Master"
+    Description: "Play for a total of 5 minutes."
+    Incremental: Yes
+    Steps needed: 300
+5. Name: "30 Minutes of Excitement"
+    Description: "Play for a total of 30 minutes."
+    Incremental: Yes
+    Steps needed: 1800
+6. Name: "Procrastinate Much?"
+    Description: "Play for a total of 1 hour."
+    Incremental: Yes
+    Steps needed: 3600
+7. Name: "Play 2 rounds"
+    Description: "Played 2 rounds"
+    Incremental: Yes
+    Steps needed: 2
+8. Name: "Play 10 rounds"
+    Description: "Played 10 rounds"
+    Incremental: Yes
+    Steps needed: 10
+9. Name: "Played 25 rounds"
+    Description: "Play 25 rounds"
+    Incremental: Yes
+    Steps needed: 25
 
-Each sample is packaged as a Unity package.  This package should be imported into your project, and the 
-scenes selected in the build dialog.
 
-## Build and Run
+Create 1 leaderboard:
 
-Follow the instructions on the **Getting Started Guide** to build and run the
-game on Android and/or iOS.
+1. Name: Cubic Pilot Hall of Fame"
+
+Use `CubicPilot.GPGSIds` as the name of the constants class when setting up the game.
+
+## Configuration for QuizRacer
+This is a real-time multi-player game.  Create the achievements:
+
+Make sure real-time multiplayer is enabled.
+
+1. Name: "Play"
+    Description:  "Play Quiz Racer"
+2. Name: "Score"
+    Description: "Score at least 1 point"
+3. Name: "Win"
+    Description: "Win a match"
+4. Name: "Lose"
+    Description: "Lose a match"
+5. Name: "Don't play"
+    Description: "Don't play a match"
+
+Use `QuizRacer.GPGSIds` for the constants class when setting up the game.
+
+## Configuration for SmokeTest
+This is a sample demonstrating each function.
+
+Make sure Save Games, Real-time and Turn-based multiplayer are enabled.
+
+Events:
+
+1. Name: "SmokingEvent"
+
+Achievements:
+
+1. Name: "AchievementToReveal"
+    Description: "A hidden achievement to be revealed later"
+    Initial State: "Hidden"
+2. Name: "AchievementToUnlock"
+    Description: "A normal achievement"
+3. Name: "AchievementToIncrement"
+    Description: "Incremental achievement to unlock - 25 times"
+    Incremental: yes
+    Steps needed: 25
+4. Name: "Achievement hidden incremental"
+    Description: "Initially hidden, incremental achievement"
+    Incremental: yes
+    Steps needed: 25
+    Initial State: Hidden
+5. Name: "Lucky5"
+    Description: "You need 5 achievements to publish"
+
+Leaderboards:
+
+1. Name: "Leaders in SmokeTesting"
+
+
+Use `SmokeTest.GPGSIds` for the constants class when setting up the game.
+
+## Configuration for TicTacToe
+This is a turn-based game.
+
+Events:
+    1. Name: "Play"
+
+Use `TicTacToe.GPGSIds` for the constants class when setting up the game.
+
+## Configuration for TrivalQuest
+This is a sample for Events and Quests.  The Quest definition configuration
+is left as an exercise for you.
+
+Events:
+
+1. Name: "Red"
+2. Name: "Green"
+3. Name: "Blue"
+4. Name: "Yellow"
+
+Use `TrivialQuest.GPGSIds` for the constants class when setting up the game.
 
 ## Acknowledgements
 

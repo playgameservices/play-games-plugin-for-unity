@@ -40,7 +40,7 @@ Features:
 
 System requirements:
 
-* Unity&reg; 4.5 or above
+* Unity&reg; 4.5 or above (4.6.8 if building for iOS).
 * To deploy on Android:
     * Android SDK
     * Android v4.0 or higher
@@ -68,22 +68,16 @@ If you intend to use real-time or turn-based multiplayer in your game, remember
 to activate those features in the Google Play Developer Console when creating
 your application instances.
 
-Please note the following pieces of information when creating your client IDs,
-as they will be necessary later:
+Please note the package name (also called bundle identifier)
+(e.g. "com.example.awesomegame") when creating your game configurations
+as it will be necessary later.
 
-**Android**
+Once you configure at least one resource (event, achievement, or leaderboard),
+you can copy the resource configuration from the Google Play Developer Console, and paste it
+into the setup configuration in Unity.
 
-* Your package name (e.g. "com.example.awesomegame")
-* Your application ID (e.g. 123456789012)
-
-**iOS**
-
-* Your bundle identifier (e.g. "com.example.AwesomeGame")
-* Your client ID (e.g. "46798138751-afwa4iejsfjskj.apps.googleusercontent.com")
-
-_[*] The application ID is the number that Google Play Developer Console
-assigns to your project. Please note that is not the same as your Apple
-application ID._
+The setup process will configure your game with the client id and generate a
+C# class that contains constants for each of your resources.
 
 **Note:** Do not forget to add your test accounts (the accounts with which you
 will try signing in) to the **Testing** section of the Developer Console,
@@ -96,9 +90,10 @@ Add
 and
 [leaderboards](https://developers.google.com/games/services/common/concepts/leaderboards)
 to your game in the Google Play Developer Console. For each achievement and
-leaderboard you configure, make sure to note the corresponding **achievement ID** or **leaderboard ID**, as those will be needed when making the API calls.
-Achievement and leaderboard IDs are alphanumeric strings (e.g.
-"Cgkx9eiuwi8_AQ").
+leaderboard you configure, make sure to note 
+the corresponding **achievement ID** or **leaderboard ID**, 
+as those will be needed when making the API calls.
+Achievement and leaderboard IDs are alphanumeric strings (e.g.  "Cgkx9eiuwi8_AQ").
 
 ## Add Events and Quests
 Events and Quests are a way to introduce new challenges for players to complete and
@@ -154,17 +149,23 @@ Player Settings window. In that window, look for the **Bundle Identifier** setti
 under **Other Settings**. Enter your package name there (for example
 _com.example.my.awesome.game_).
 
+
+In order to sign in to Play Game Services, you need to sign your APK file,
+make sure that you are signing it with the
+correct certificate, that is, the one that corresponds to the SHA1 certificate
+fingerprint you entered in the Developer Console during the setup.
+
 Next, click the **Window |Google Play Games|Setup - Android setup** menu item.
 This will display the Android setup screen.
 
 Enter the Constants class name.  This is the name of the fully qualified class
 that will be updated (or created) which contains the IDs of the game resources.
-The format of the name is <namespace>.<classname>.
+The format of the name is <namespace>.<classname>.  For example, `AwesomeGame.GPGSIds`
 
-Enter the resource definition data.  This is the XML data from the play console
+Paste the resource definition data.  This is the XML data from the Google Play Developer Console
 which contains the resource IDs as well as the Application ID for Android.
 
-This data is found in the play console by clicking "Get resources" on any of the
+This data is found in the Google Play Developer Console by clicking "Get resources" on any of the
 resource pages (e.g. Achievements or Leaderboards), then clicking Android.
 
 After pasting the data into the text area, click the **Setup** button.
@@ -172,15 +173,18 @@ After pasting the data into the text area, click the **Setup** button.
 **Note:**  If you are using a web application or backend server with your game,
 you can link the web application to the game to enable gettting the player's
 access token and/or email address.  To do this, link a web application to the
-game in the play console, and enter the client id for the web application into
+game in the Google Play Developer Console, and enter the client id for the web application into
 the setup dialog.
 
 ### Additional instructions on building for Android on Windows
 
-If you are using Windows, you must make sure that your Java SDK installation can be accessed by Unity. To do this:
+If you are using Windows, you must make sure that your Java SDK installation
+can be accessed by Unity. To do this:
 
-1. Set the JAVA_HOME environment variable to your Java SDK installation path (for example, `C:\Program Files\Java\jdk1.7.0_45`).
-2. Add the Java SDK's `bin` folder to your `PATH` environment variable (for example, `C:\Program Files\Java\jdk1.7.0_45\bin`)
+1. Set the JAVA_HOME environment variable to your Java SDK installation path
+(for example, `C:\Program Files\Java\jdk1.7.0_45`).
+2. Add the Java SDK's `bin` folder to your `PATH` environment variable
+(for example, `C:\Program Files\Java\jdk1.7.0_45\bin`)
 3. Reboot.
 
 **How to edit environment variables:** In Windows 2000/XP/Vista/7,
@@ -207,8 +211,6 @@ a linker error when building the Xcode application.  If you see the error:
 Then open the project tree, expand Frameworks, and delete libPods-Unity-iPhone.a
 and rebuild.
 
-
-
 Next, open the iOS build settings dialog. To do so, click **File | Build Settings**,
 select the **iOS** platform, and click **Player Settings**. Find the **Bundle Identifier**
 setting and enter your bundle identifier there.
@@ -217,21 +219,13 @@ Next, click the **Window | Google Play Games | Setup  - iOS setup menu item.
 
 Enter the Constants class name.  This is the name of the fully qualified class
 that will be updated (or created) which contains the IDs of the game resources.
-The format of the name is <namespace>.<classname>.
+The format of the name is <namespace>.<classname>. For example, AwesomeGame.GPGSIds
 
-Enter the resource definition data.  This is the Objective-C  data from the play console
+Enter the resource definition data.  This is the Objective-C  data from the Google Play Developer Console
 which contains the resource IDs as well as the Client ID.
 
-This data is found in the play console by clicking "Get resources" on any of the
+This data is found in the Google Play Developer Console by clicking "Get resources" on any of the
 resource pages (e.g. Achievements or Leaderboards), then clicking Objective-C.
-
-After pasting the data into the text area, click the **Setup** button.
-
-* Your client ID (e.g. "46798138751-afwa4iejsfjskj.apps.googleusercontent.com")
-* Your bundle identifier (e.g. "com.example.AwesomeGame")
-
-All of these settings must match exactly the values you used when setting up
-your client ID on the Developer Console previously.
 
 When ready, click the **Setup** button to finish the configuration process.
 
@@ -241,7 +235,7 @@ again in order to update the necessary files where this information gets replica
 **Note:**  If you are using a web application or backend server with your game,
 you can link the web application to the game to enable gettting the player's
 access token and/or email address.  To do this, link a web application to the
-game in the play console, and enter the client id for the web application into
+game in the Google Play Developer Console, and enter the client id for the web application into
 the setup dialog.
 
 ## Run the Project
@@ -250,8 +244,8 @@ If you are working with the **Minimal** sample, you should be able to build
 and run the project at this point. You will see a screen with an **Authenticate** button,
 and you should be able to sign in when you click it.
 
-To build and run on
-Android, click **File | Build Settings**, select the **Android** platform, then
+To build and run on Android, click
+**File | Build Settings**, select the **Android** platform, then
 **Switch to Platform**, then **Build and Run**.
 
 To build and run on iOS, click **File | Build Settings**, select the **iOS** platform,
@@ -263,8 +257,9 @@ own code to integrate Play Games services into your game.
 
 ## ISocialPlatform Compliance
 
-The Google Play Games plugin implements a subset of Unity's [social interface](http://docs.unity3d.com/Documentation/ScriptReference/Social.html), for compatibility
-with games that already use that interface when integrating with other
+The Google Play Games plugin implements  Unity's
+[social interface](http://docs.unity3d.com/Documentation/ScriptReference/Social.html),
+for compatibility with games that already use that interface when integrating with other
 platforms. However, some features are unique to Play Games and are
 offered as extensions to the standard social interface provided by Unity.
 
@@ -275,22 +270,29 @@ object to the **PlayGamesPlatform** class, where the additional methods are
 available.
 
 ## Nearby Connections Configuration
-In order to use nearby connections, a service id which uniquely identifies the set of applications that can interact needs to be
-configured.  This is done by clicking the **Window | Google Play Games | Nearby Connections setup...** menu item. This will display the
-nearby conections setup screen.  On this screen enter the service ID you want to use.  It should be something that identifies your application,
-and  follows the same rules as the bundle id (for example: com.example.myawesomegame.nearby). Once you enter the id, press **Setup**.
+In order to use nearby connections, a service id which uniquely identifies the
+set of applications that can interact needs to be configured.
+This is done by clicking the **Window | Google Play Games | Nearby Connections setup...**
+menu item. This will display the
+nearby conections setup screen.  On this screen enter the service ID you want to use.
+It should be something that identifies your application, and  follows the
+same rules as the bundle id (for example: com.example.myawesomegame.nearby).
+Once you enter the id, press **Setup**.
 
-To use nearby connections, the player does not need to be authenticated, and no play console configuration is needed.
+To use nearby connections, the player does not need to be authenticated,
+and no Google Play Developer Console configuration is needed.
 
-For detailed information on nearby connection usage, please refer to [nearby connections](NEARBY.md).
-
+For detailed information on nearby connection usage,
+please refer to [nearby connections](NEARBY.md).
 
 ## Configuration & Initialization Play Game Services
 
-In order to save game progress or handle multiplayer invitations and turn notifications, the default configuration needs to be replaced with a custom configuration.
-To do this use the **PlayGamesClientConfiguration**.  If your game does not use these features, then there is no need to
-initialize the platform configuration.  Once the instance is initialized, make it your default social platform by calling
-**PlayGamesPlatform.Activate**:
+In order to save game progress or handle multiplayer invitations and
+turn notifications, the default configuration needs to be replaced with a custom configuration.
+To do this use the **PlayGamesClientConfiguration**.  If your game does not
+use these features, then there is no need to
+initialize the platform configuration.  Once the instance is initialized,
+make it your default social platform by calling **PlayGamesPlatform.Activate**:
 
 ```csharp
     using GooglePlayGames;
@@ -850,12 +852,6 @@ After signing out, no further API calls can be made until the user authenticates
 
 ## Building for Android
 
-To build your game for Android, do as you would normally do in Unity. Select
-**File | Build Settings**, then select the **Android** platform and build. If
-you are signing your APK file, please make sure that you are signing it with the
-correct certificate, that is, the one that corresponds to the SHA1 certificate
-fingerprint you entered in the Developer Console during the setup.
-
 ## Building for iOS
 
 To build your game for iOS, do as you would normally do in Unity. Select **File | Build Settings**, then select the **iOS** platform.
@@ -876,7 +872,6 @@ a workspace configuration called Unity-iPhone.xcworkspace.
 
 To open and build the project open a terminal window in the project directory, and type
 `open Unity-iPhone.xcworkspace`. Alternatively, you can double click the file in Finder.
-
 
 
 ## Excluding all Google Play Game Services when building for iOS
@@ -970,13 +965,6 @@ The final structure should be similar to the following:
     }
 ```
 
-**Note:** Some versions of Unity (4.2), re-exporting to an existing
-XCode project path will overwrite **Libraries/RegisterMonoModule.cpp**, even if
-you use the **Append** option. Therefore, you must perform these changes every time
-you export the project. To simplify your workflow, consider copying the files to
-a different location before re-exporting, and copy them back after the process
-is complete.
-
 ## (Advanced) Using the Plugin Without Overriding the Default Social Platform
 
 When you call `PlayGamesPlatform.Activate`, Google Play Games becomes your default social platform implementation, which means that static calls to methods in `Social` and `Social.Active` will be carried out by the Google Play Games plugin. This is the desired behavior for most games using the plugin.
@@ -1022,10 +1010,10 @@ frameworks to that list:
 2. Add the following bundles and frameworks from the Google Plus and Google Play
    Games C++ SDK that you have previously downloaded. If you have not downloaded
    these files yet, they can be found [in the downloads section](https://developers.google.com/games/services/downloads) of the Google Play Games developer site. To add these frameworks you can simply drag
-and drop those 5 files on the top-level project item (labeled **Unity-iPhone**).<br/><br/>
+and drop these files on the top-level project item (labeled **Unity-iPhone**).<br/><br/>
+     **GoogleSignIn.framework**<br/>
+     **GoogleSignIn.bundle**<br/>
      **GoogleOpenSource.framework**<br/>
-     **GooglePlus.bundle**<br/>
-     **GooglePlus.framework**<br/>
      **gpg.bundle**<br/>
      **gpg.framework**<br/><br/>
 3. Add the **"-ObjC"** linker flag. To do this, select the top-level project
