@@ -151,8 +151,8 @@ namespace CubicPilot.Behaviors
             if (BgmChoices.Length > 0)
             {
                 AudioClip bgm = BgmChoices[GameManager.Instance.Level % BgmChoices.Length];
-                audio.clip = bgm;
-                audio.Play();
+                GetComponent<AudioSource>().clip = bgm;
+                GetComponent<AudioSource>().Play();
             }
         }
 
@@ -252,7 +252,7 @@ namespace CubicPilot.Behaviors
                     GameManager.Instance.UnlockAchievement(GameIds.Achievements.PerfectAccuracy);
                 }
 
-                audio.Stop();
+                GetComponent<AudioSource>().Stop();
                 AudioSource.PlayClipAtPoint(LevelClearSfx, Vector3.zero);
             }
         }
@@ -359,7 +359,7 @@ namespace CubicPilot.Behaviors
                 mAutoAdvanceCountdown.Start(GameConsts.AutoRetryTime);
             }
 
-            audio.Stop();
+            GetComponent<AudioSource>().Stop();
         }
 
         public void HandleCivilianDestroyed()

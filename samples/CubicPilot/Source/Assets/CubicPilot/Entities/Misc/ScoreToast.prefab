@@ -38,16 +38,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 100000}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4141de5e696cc4c18a0f552dc337c8d2, type: 3}
+  m_Script: {fileID: 11500000, guid: 5bdeffd9e21164360a55ed3faba21623, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GuiSkin: {fileID: 11400000, guid: 9a260d2320c0f4275a9c3623a4646f8a, type: 2}
+  GuiSkin: {fileID: 11400000, guid: 2aaea2e896167453a98546b2b868b5e5, type: 2}
   Value: 50
-  ToastColor:
-    r: 0
-    g: 0
-    b: 0
-    a: 1
+  ToastColor: {r: 0, g: 0, b: 0, a: 1}
 --- !u!114 &11400002
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -56,7 +52,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 100000}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8fc417eeeb69b4d47bf60829b5e2fbdc, type: 3}
+  m_Script: {fileID: 11500000, guid: 62a8c5354509d4974932b17aead12716, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ObjectMovesForward: 0
@@ -70,7 +66,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 100000}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1c28061baed34cdb8d79d65e8b3f49a, type: 3}
+  m_Script: {fileID: 11500000, guid: 978eda6528fc14b228e9e9cd18f76db3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Velocity: {x: 0, y: 2, z: 0}
@@ -80,7 +76,20 @@ Prefab:
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
-    m_Modifications: []
+    m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: GuiSkin
+      value: 
+      objectReference: {fileID: 11400000, guid: 2aaea2e896167453a98546b2b868b5e5,
+        type: 2}
+    - target: {fileID: 0}
+      propertyPath: Countdown
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Velocity.y
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 100000}

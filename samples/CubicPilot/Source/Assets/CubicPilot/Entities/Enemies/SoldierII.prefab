@@ -88,9 +88,9 @@ GameObject:
   - 114: {fileID: 11400016}
   - 114: {fileID: 11400018}
   - 114: {fileID: 11400002}
+  - 114: {fileID: 11400020}
   - 114: {fileID: 11400000}
   - 54: {fileID: 5400000}
-  - 114: {fileID: 11400020}
   m_Layer: 0
   m_Name: SoldierII
   m_TagString: Enemy
@@ -172,7 +172,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: d2303b143a580411da1cdd5afe56296c, type: 2}
+  - {fileID: 2100000, guid: 3a2617ed3e8514b3990a55a88f397406, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
@@ -196,7 +196,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: d2303b143a580411da1cdd5afe56296c, type: 2}
+  - {fileID: 2100000, guid: 3a2617ed3e8514b3990a55a88f397406, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
@@ -220,7 +220,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: d2303b143a580411da1cdd5afe56296c, type: 2}
+  - {fileID: 2100000, guid: 3a2617ed3e8514b3990a55a88f397406, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
@@ -244,7 +244,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: d2303b143a580411da1cdd5afe56296c, type: 2}
+  - {fileID: 2100000, guid: 3a2617ed3e8514b3990a55a88f397406, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
@@ -268,7 +268,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: d2303b143a580411da1cdd5afe56296c, type: 2}
+  - {fileID: 2100000, guid: 3a2617ed3e8514b3990a55a88f397406, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
@@ -352,14 +352,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 100008}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be57da3095bb1433cb28fe009a96ae7e, type: 3}
+  m_Script: {fileID: 11500000, guid: a781e582619a94a5996ae470f5a6f303, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShotVelocity: {x: -10, y: 2, z: 0}
-  ProjectilePrefab: {fileID: 100000, guid: f053fe96e9b0b432494645d044869c4e, type: 2}
-  SpawnOffset: {x: -1, y: .200000003, z: 0}
-  Interval: 2.20000005
-  Countdown: 0
+  Damage: 1
 --- !u!114 &11400002
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -368,12 +364,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 100008}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be57da3095bb1433cb28fe009a96ae7e, type: 3}
+  m_Script: {fileID: 11500000, guid: 548bed79551cb4df090371167344f14f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ShotVelocity: {x: -10, y: -2, z: 0}
-  ProjectilePrefab: {fileID: 100000, guid: f053fe96e9b0b432494645d044869c4e, type: 2}
-  SpawnOffset: {x: -1, y: -.200000003, z: 0}
+  ProjectilePrefab: {fileID: 100000, guid: c149f623c199a43a9a40e324beb7e02c, type: 2}
+  SpawnOffset: {x: -1, y: .200000003, z: 0}
   Interval: 2
   Countdown: 0
 --- !u!114 &11400004
@@ -435,7 +431,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 100008}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8fc417eeeb69b4d47bf60829b5e2fbdc, type: 3}
+  m_Script: {fileID: 11500000, guid: 62a8c5354509d4974932b17aead12716, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ObjectMovesForward: 0
@@ -466,7 +462,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 100008}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1c28061baed34cdb8d79d65e8b3f49a, type: 3}
+  m_Script: {fileID: 11500000, guid: 978eda6528fc14b228e9e9cd18f76db3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Velocity: {x: -3, y: 0, z: 0}
@@ -478,20 +474,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 100008}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e79a8037142ff4e4c909992193da944f, type: 3}
+  m_Script: {fileID: 11500000, guid: 85961146a5f4c4e65a70af1944d67a51, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   LifePoints: 5
-  DestroyEffect: {fileID: 100000, guid: 82605e396240c4339b762cfc6226e43f, type: 2}
-  DestroySfx: {fileID: 8300000, guid: 1919d31d9a4084efca800e0715cb2ab5, type: 3}
-  TakeDamageSfx: {fileID: 8300000, guid: e550f0c16cd2e4648a2b6abd0f7a7ecd, type: 3}
+  DestroyEffect: {fileID: 100000, guid: a119d2fc7bca7442ba12b22b38602ee6, type: 2}
+  DestroySfx: {fileID: 8300000, guid: e426cb5853c23456e80a2160b31fdced, type: 3}
+  TakeDamageSfx: {fileID: 8300000, guid: 6932e540d0f294c299fcd0ec0a80fa26, type: 3}
   ScoreValue: 2000
-  ScoreToastPrefab: {fileID: 100000, guid: 0c18016b4eb524a36a3112e416a4434a, type: 2}
-  ScoreToastColor:
-    r: 1
-    g: .266666681
-    b: .266666681
-    a: 1
+  ScoreToastPrefab: {fileID: 100000, guid: 649219dd6dc564706b0ba119104beb12, type: 2}
+  ScoreToastColor: {r: .977941155, g: 0, b: .0882352963, a: 0}
   ExplodeOnCivilian: 1
 --- !u!114 &11400018
 MonoBehaviour:
@@ -501,11 +493,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 100008}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be57da3095bb1433cb28fe009a96ae7e, type: 3}
+  m_Script: {fileID: 11500000, guid: 548bed79551cb4df090371167344f14f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ShotVelocity: {x: -10, y: 0, z: 0}
-  ProjectilePrefab: {fileID: 100000, guid: f053fe96e9b0b432494645d044869c4e, type: 2}
+  ProjectilePrefab: {fileID: 100000, guid: c149f623c199a43a9a40e324beb7e02c, type: 2}
   SpawnOffset: {x: -1, y: 0, z: 0}
   Interval: 2.20000005
   Countdown: 0
@@ -517,17 +509,81 @@ MonoBehaviour:
   m_GameObject: {fileID: 100008}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 71ec80952f8e74842a067e38d3b16353, type: 3}
+  m_Script: {fileID: 11500000, guid: 548bed79551cb4df090371167344f14f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Damage: 1
+  ShotVelocity: {x: -10, y: 2, z: 0}
+  ProjectilePrefab: {fileID: 100000, guid: c149f623c199a43a9a40e324beb7e02c, type: 2}
+  SpawnOffset: {x: -1, y: .200000003, z: 0}
+  Interval: 2.20000005
+  Countdown: 0
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
-    m_Modifications: []
+    m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 3a2617ed3e8514b3990a55a88f397406, type: 2}
+    - target: {fileID: 0}
+      propertyPath: Velocity.x
+      value: -3
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: LifePoints
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: DestroyEffect
+      value: 
+      objectReference: {fileID: 100000, guid: a119d2fc7bca7442ba12b22b38602ee6, type: 2}
+    - target: {fileID: 0}
+      propertyPath: DestroySfx
+      value: 
+      objectReference: {fileID: 8300000, guid: e426cb5853c23456e80a2160b31fdced, type: 3}
+    - target: {fileID: 0}
+      propertyPath: TakeDamageSfx
+      value: 
+      objectReference: {fileID: 8300000, guid: 6932e540d0f294c299fcd0ec0a80fa26, type: 3}
+    - target: {fileID: 0}
+      propertyPath: ScoreValue
+      value: 2000
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: ScoreToastPrefab
+      value: 
+      objectReference: {fileID: 100000, guid: 649219dd6dc564706b0ba119104beb12, type: 2}
+    - target: {fileID: 0}
+      propertyPath: ScoreToastColor.r
+      value: .977941155
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: ScoreToastColor.b
+      value: .0882352963
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: ShotVelocity.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: ProjectilePrefab
+      value: 
+      objectReference: {fileID: 100000, guid: c149f623c199a43a9a40e324beb7e02c, type: 2}
+    - target: {fileID: 0}
+      propertyPath: SpawnOffset.x
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Interval
+      value: 2.20000005
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: SpawnOffset.y
+      value: .200000003
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 100008}

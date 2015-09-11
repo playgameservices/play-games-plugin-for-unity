@@ -44,7 +44,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: 219928d1f99cb4813afed2051b49ac4e, type: 2}
+  - {fileID: 2100000, guid: 6670cd521a5684f55b0e2403946056b7, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
@@ -100,7 +100,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 100000}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1c28061baed34cdb8d79d65e8b3f49a, type: 3}
+  m_Script: {fileID: 11500000, guid: 978eda6528fc14b228e9e9cd18f76db3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Velocity: {x: 0, y: 0, z: 0}
@@ -112,7 +112,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 100000}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8fc417eeeb69b4d47bf60829b5e2fbdc, type: 3}
+  m_Script: {fileID: 11500000, guid: 62a8c5354509d4974932b17aead12716, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ObjectMovesForward: 0
@@ -126,7 +126,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 100000}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 71ec80952f8e74842a067e38d3b16353, type: 3}
+  m_Script: {fileID: 11500000, guid: a781e582619a94a5996ae470f5a6f303, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Damage: 1
@@ -136,7 +136,15 @@ Prefab:
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
-    m_Modifications: []
+    m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 6670cd521a5684f55b0e2403946056b7, type: 2}
+    - target: {fileID: 0}
+      propertyPath: Countdown
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 100000}

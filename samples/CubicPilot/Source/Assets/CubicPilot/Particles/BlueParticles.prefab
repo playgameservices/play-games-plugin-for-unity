@@ -38,7 +38,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 100000}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8fc417eeeb69b4d47bf60829b5e2fbdc, type: 3}
+  m_Script: {fileID: 11500000, guid: 62a8c5354509d4974932b17aead12716, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ObjectMovesForward: 0
@@ -1107,7 +1107,7 @@ ParticleSystemRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: 66b70b2f52e59448b92063de9709df72, type: 2}
+  - {fileID: 2100000, guid: 64ee01f43511a4e7ab6d855a91ea146d, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
@@ -1139,7 +1139,15 @@ Prefab:
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
-    m_Modifications: []
+    m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: Countdown
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 64ee01f43511a4e7ab6d855a91ea146d, type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 100000}

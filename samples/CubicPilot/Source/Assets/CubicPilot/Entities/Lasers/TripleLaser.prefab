@@ -132,7 +132,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: 66b70b2f52e59448b92063de9709df72, type: 2}
+  - {fileID: 2100000, guid: 64ee01f43511a4e7ab6d855a91ea146d, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
@@ -156,7 +156,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: 66b70b2f52e59448b92063de9709df72, type: 2}
+  - {fileID: 2100000, guid: 64ee01f43511a4e7ab6d855a91ea146d, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
@@ -180,7 +180,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: 66b70b2f52e59448b92063de9709df72, type: 2}
+  - {fileID: 2100000, guid: 64ee01f43511a4e7ab6d855a91ea146d, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
@@ -250,7 +250,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 100004}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4fee8e850f2c59546acb58dec07498ff, type: 3}
+  m_Script: {fileID: 11500000, guid: d48e1e24169d44cfb8834656f83be4e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   XThreshold: 14
@@ -262,7 +262,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 100004}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 810ffa09331c947a8aa1bde3c0f33e49, type: 3}
+  m_Script: {fileID: 11500000, guid: a91739344fb1a4d7884defb48d7c9d4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Damage: 3
@@ -274,7 +274,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 100004}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3286c69c447a7405d821e94b1844882c, type: 3}
+  m_Script: {fileID: 11500000, guid: 487be67f057d14878b09bdb1d4297db9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &100100000
@@ -283,7 +283,19 @@ Prefab:
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
-    m_Modifications: []
+    m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: Damage
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: XThreshold
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 64ee01f43511a4e7ab6d855a91ea146d, type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 100004}

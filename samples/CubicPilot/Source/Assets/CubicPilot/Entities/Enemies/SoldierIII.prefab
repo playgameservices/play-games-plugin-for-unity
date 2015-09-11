@@ -157,7 +157,7 @@ Transform:
   m_GameObject: {fileID: 100008}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 400006}
   - {fileID: 400004}
@@ -175,7 +175,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: b30a24fb15f150342a5a9bd5498cd59a, type: 2}
+  - {fileID: 2100000, guid: 5cc8c4672d1cd4e6eafc2aca474caffd, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
@@ -199,7 +199,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: 766e67d95627140c6b63b55e23d9bf20, type: 2}
+  - {fileID: 2100000, guid: 0ce63b9215efa4d13a6e641cae30e332, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
@@ -223,7 +223,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: 766e67d95627140c6b63b55e23d9bf20, type: 2}
+  - {fileID: 2100000, guid: 0ce63b9215efa4d13a6e641cae30e332, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
@@ -247,7 +247,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: b30a24fb15f150342a5a9bd5498cd59a, type: 2}
+  - {fileID: 2100000, guid: 5cc8c4672d1cd4e6eafc2aca474caffd, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
@@ -271,7 +271,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: b30a24fb15f150342a5a9bd5498cd59a, type: 2}
+  - {fileID: 2100000, guid: 5cc8c4672d1cd4e6eafc2aca474caffd, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
@@ -355,11 +355,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 100008}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be57da3095bb1433cb28fe009a96ae7e, type: 3}
+  m_Script: {fileID: 11500000, guid: 548bed79551cb4df090371167344f14f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ShotVelocity: {x: -10, y: 0, z: 0}
-  ProjectilePrefab: {fileID: 100000, guid: 8354d63573ca7e64f86f001cf4c63af5, type: 2}
+  ProjectilePrefab: {fileID: 100000, guid: 3e176a87da1a14352bb9eb97f52bae68, type: 2}
   SpawnOffset: {x: -1, y: 0, z: 0}
   Interval: 1
   Countdown: 0
@@ -371,11 +371,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 100008}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be57da3095bb1433cb28fe009a96ae7e, type: 3}
+  m_Script: {fileID: 11500000, guid: 548bed79551cb4df090371167344f14f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ShotVelocity: {x: -10, y: -1.5, z: 0}
-  ProjectilePrefab: {fileID: 100000, guid: 8354d63573ca7e64f86f001cf4c63af5, type: 2}
+  ProjectilePrefab: {fileID: 100000, guid: 3e176a87da1a14352bb9eb97f52bae68, type: 2}
   SpawnOffset: {x: -1, y: -.150000006, z: 0}
   Interval: 1.5
   Countdown: 0
@@ -387,7 +387,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 100000}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f264ca563eb1d4807af886b0ce22a39e, type: 3}
+  m_Script: {fileID: 11500000, guid: 91a2d71b03f874c8291a2412d57a98d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   XAxis: 1
@@ -404,7 +404,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 100002}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f264ca563eb1d4807af886b0ce22a39e, type: 3}
+  m_Script: {fileID: 11500000, guid: 91a2d71b03f874c8291a2412d57a98d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   XAxis: 1
@@ -421,7 +421,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 100004}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f264ca563eb1d4807af886b0ce22a39e, type: 3}
+  m_Script: {fileID: 11500000, guid: 91a2d71b03f874c8291a2412d57a98d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   XAxis: 1
@@ -438,7 +438,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 100008}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8fc417eeeb69b4d47bf60829b5e2fbdc, type: 3}
+  m_Script: {fileID: 11500000, guid: 62a8c5354509d4974932b17aead12716, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ObjectMovesForward: 0
@@ -452,7 +452,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 100006}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f264ca563eb1d4807af886b0ce22a39e, type: 3}
+  m_Script: {fileID: 11500000, guid: 91a2d71b03f874c8291a2412d57a98d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   XAxis: 1
@@ -469,7 +469,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 100008}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1c28061baed34cdb8d79d65e8b3f49a, type: 3}
+  m_Script: {fileID: 11500000, guid: 978eda6528fc14b228e9e9cd18f76db3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Velocity: {x: -1, y: 0, z: 0}
@@ -481,20 +481,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 100008}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e79a8037142ff4e4c909992193da944f, type: 3}
+  m_Script: {fileID: 11500000, guid: 85961146a5f4c4e65a70af1944d67a51, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   LifePoints: 10
-  DestroyEffect: {fileID: 100000, guid: e029c472ed7084345a8fb6858f726893, type: 2}
-  DestroySfx: {fileID: 8300000, guid: 1919d31d9a4084efca800e0715cb2ab5, type: 3}
-  TakeDamageSfx: {fileID: 8300000, guid: e550f0c16cd2e4648a2b6abd0f7a7ecd, type: 3}
+  DestroyEffect: {fileID: 100000, guid: d2dd46ecda244498db1915d97c83d247, type: 2}
+  DestroySfx: {fileID: 8300000, guid: e426cb5853c23456e80a2160b31fdced, type: 3}
+  TakeDamageSfx: {fileID: 8300000, guid: 6932e540d0f294c299fcd0ec0a80fa26, type: 3}
   ScoreValue: 5000
-  ScoreToastPrefab: {fileID: 100000, guid: 0c18016b4eb524a36a3112e416a4434a, type: 2}
-  ScoreToastColor:
-    r: .400000006
-    g: .600000024
-    b: 0
-    a: 1
+  ScoreToastPrefab: {fileID: 100000, guid: 649219dd6dc564706b0ba119104beb12, type: 2}
+  ScoreToastColor: {r: .21960783, g: .568965495, b: .21960786, a: 0}
   ExplodeOnCivilian: 1
 --- !u!114 &11400018
 MonoBehaviour:
@@ -504,11 +500,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 100008}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be57da3095bb1433cb28fe009a96ae7e, type: 3}
+  m_Script: {fileID: 11500000, guid: 548bed79551cb4df090371167344f14f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ShotVelocity: {x: -10, y: -3, z: 0}
-  ProjectilePrefab: {fileID: 100000, guid: 8354d63573ca7e64f86f001cf4c63af5, type: 2}
+  ProjectilePrefab: {fileID: 100000, guid: 3e176a87da1a14352bb9eb97f52bae68, type: 2}
   SpawnOffset: {x: -1, y: -.300000012, z: 0}
   Interval: 2
   Countdown: 0
@@ -520,11 +516,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 100008}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be57da3095bb1433cb28fe009a96ae7e, type: 3}
+  m_Script: {fileID: 11500000, guid: 548bed79551cb4df090371167344f14f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ShotVelocity: {x: -10, y: 1.5, z: 0}
-  ProjectilePrefab: {fileID: 100000, guid: 8354d63573ca7e64f86f001cf4c63af5, type: 2}
+  ProjectilePrefab: {fileID: 100000, guid: 3e176a87da1a14352bb9eb97f52bae68, type: 2}
   SpawnOffset: {x: -1, y: .150000006, z: 0}
   Interval: 1.5
   Countdown: 0
@@ -536,11 +532,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 100008}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be57da3095bb1433cb28fe009a96ae7e, type: 3}
+  m_Script: {fileID: 11500000, guid: 548bed79551cb4df090371167344f14f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ShotVelocity: {x: -10, y: 3, z: 0}
-  ProjectilePrefab: {fileID: 100000, guid: 8354d63573ca7e64f86f001cf4c63af5, type: 2}
+  ProjectilePrefab: {fileID: 100000, guid: 3e176a87da1a14352bb9eb97f52bae68, type: 2}
   SpawnOffset: {x: -1, y: .300000012, z: 0}
   Interval: 2
   Countdown: 0
@@ -552,7 +548,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 100008}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 77bac8661567f794dbc4322a4492e386, type: 3}
+  m_Script: {fileID: 11500000, guid: e8e995df825584b058bea174e853df8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Amplitude: 3
@@ -565,7 +561,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 100008}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 71ec80952f8e74842a067e38d3b16353, type: 3}
+  m_Script: {fileID: 11500000, guid: a781e582619a94a5996ae470f5a6f303, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Damage: 1
@@ -575,7 +571,91 @@ Prefab:
   serializedVersion: 2
   m_Modification:
     m_TransformParent: {fileID: 0}
-    m_Modifications: []
+    m_Modifications:
+    - target: {fileID: 0}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 5cc8c4672d1cd4e6eafc2aca474caffd, type: 2}
+    - target: {fileID: 0}
+      propertyPath: Velocity.x
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: LifePoints
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: DestroyEffect
+      value: 
+      objectReference: {fileID: 100000, guid: d2dd46ecda244498db1915d97c83d247, type: 2}
+    - target: {fileID: 0}
+      propertyPath: DestroySfx
+      value: 
+      objectReference: {fileID: 8300000, guid: e426cb5853c23456e80a2160b31fdced, type: 3}
+    - target: {fileID: 0}
+      propertyPath: TakeDamageSfx
+      value: 
+      objectReference: {fileID: 8300000, guid: 6932e540d0f294c299fcd0ec0a80fa26, type: 3}
+    - target: {fileID: 0}
+      propertyPath: ScoreValue
+      value: 5000
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: ScoreToastPrefab
+      value: 
+      objectReference: {fileID: 100000, guid: 649219dd6dc564706b0ba119104beb12, type: 2}
+    - target: {fileID: 0}
+      propertyPath: ScoreToastColor.g
+      value: .568965495
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: ScoreToastColor.b
+      value: .21960786
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: ScoreToastColor.r
+      value: .21960783
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: ShotVelocity.y
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: SpawnOffset.x
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: SpawnOffset.y
+      value: .300000012
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: ProjectilePrefab
+      value: 
+      objectReference: {fileID: 100000, guid: 3e176a87da1a14352bb9eb97f52bae68, type: 2}
+    - target: {fileID: 0}
+      propertyPath: Interval
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Amplitude
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: LatSpeed
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: XAxis
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Period
+      value: 1.10000002
+      objectReference: {fileID: 0}
+    - target: {fileID: 0}
+      propertyPath: Phase
+      value: .600000024
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 100008}

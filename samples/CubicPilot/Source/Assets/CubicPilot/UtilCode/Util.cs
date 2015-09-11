@@ -102,9 +102,9 @@ namespace CubicPilot.UtilCode
 
         public static void ShowObject(GameObject o, bool show)
         {
-            if (o.renderer != null)
+            if (o.GetComponent<Renderer>() != null)
             {
-                o.renderer.enabled = show;
+                o.GetComponent<Renderer>().enabled = show;
             }
             int i;
             for (i = 0; i < o.transform.childCount; i++)
