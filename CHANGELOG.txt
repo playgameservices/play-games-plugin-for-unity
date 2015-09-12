@@ -1,6 +1,11 @@
 Version 0.9.25 (codename: frengle)
+    11 Sept 2015
     ** BREAKING CHANGES **
        * Cloud Save service (AppState) has been removed.
+       * The setup dialog now requires the generated resource data from 
+            Google Play Developer Console.  This reduces the number of 
+            copy & pastes needed and makes it harder to make a mistake with the
+            client id.
     New Features:
        * Updated Configuration setup using Resource data from Play Console.
        * Added support for exclusiveBitmask in Turnbased quickmatches.
