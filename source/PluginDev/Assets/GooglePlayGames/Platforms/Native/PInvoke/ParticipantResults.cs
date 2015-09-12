@@ -1,5 +1,5 @@
 // <copyright file="ParticipantResults.cs" company="Google Inc.">
-// Copyright (C) 2014 Google Inc.
+// Copyright (C) 2014 Google Inc. All Rights Reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -18,9 +18,7 @@
 namespace GooglePlayGames.Native.PInvoke
 {
     using System;
-    using GooglePlayGames.Native.PInvoke;
     using System.Runtime.InteropServices;
-    using GooglePlayGames.Native.Cwrapper;
     using C = GooglePlayGames.Native.Cwrapper.ParticipantResults;
     using Types = GooglePlayGames.Native.Cwrapper.Types;
     using Status = GooglePlayGames.Native.Cwrapper.CommonErrorStatus;

@@ -18,6 +18,7 @@ namespace GooglePlayGames.BasicApi
 {
   using System;
   using GooglePlayGames.BasicApi.Multiplayer;
+  using UnityEngine.SocialPlatforms;
 
   /// <summary>
   /// Defines an abstract interface for a Play Games Client. Concrete implementations
@@ -67,12 +68,23 @@ namespace GooglePlayGames.BasicApi
     /// </summary>
     void SignOut();
 
+    /// <summary>Retrieves an OAuth 2.0 bearer token for the client.</summary>
+    /// <returns>A string representing the bearer token.</returns>
+    string GetToken();
+
     /// <summary>
     /// Returns the authenticated user's ID. Note that this value may change if a user signs
     /// on and signs in with a different account.
     /// </summary>
     /// <returns>The user's ID, <code>null</code> if the user is not logged in.</returns>
     string GetUserId();
+
+    /// <summary>
+    /// Load friends of the authenticated user
+    /// </summary>
+    /// <param name="callback">Callback invoked when complete.  bool argument
+    /// indicates success.</param>
+    void LoadFriends(Action<bool> callback);
 
     /// <summary>
     /// Returns a human readable name for the user, if they are logged in.
@@ -110,12 +122,26 @@ namespace GooglePlayGames.BasicApi
     string GetUserImageUrl();
 
     /// <summary>
+    /// Loads the users specified.  This is mainly used by the leaderboard
+    /// APIs to get the information of a high scorer.
+    /// </summary>
+    /// <param name="userIds">User identifiers.</param>
+    /// <param name="callback">Callback.</param>
+    void LoadUsers(string[] userIds, Action<IUserProfile[]> callback);
+
+    /// <summary>
     /// Returns the achievement corresponding to the passed achievement identifier.
     /// </summary>
     /// <returns>The achievement corresponding to the identifer. <code>null</code> if no such
     /// achievement is found or if authentication has not occurred.</returns>
     /// <param name="achievementId">The identifier of the achievement.</param>
     Achievement GetAchievement(string achievementId);
+
+    /// <summary>
+    /// Loads the achievements for the current signed in user and invokes
+    /// the callback.
+    /// </summary>
+    void LoadAchievements(Action<Achievement[]> callback);
 
     /// <summary>
     /// Unlocks the achievement with the passed identifier. If the operation succeeds, the callback
@@ -158,6 +184,18 @@ namespace GooglePlayGames.BasicApi
                                   Action<bool> successOrFailureCalllback);
 
     /// <summary>
+    /// Set an achievement to have at least the given number of steps completed.
+    /// Calling this method while the achievement already has more steps than
+    /// the provided value is a no-op. Once the achievement reaches the
+    /// maximum number of steps, the achievement is automatically unlocked,
+    /// and any further mutation operations are ignored.
+    /// </summary>
+    /// <param name="achId">Ach identifier.</param>
+    /// <param name="steps">Steps.</param>
+    /// <param name="callback">Callback.</param>
+    void SetStepsAtLeast(string achId, int steps, Action<bool> callback);
+
+    /// <summary>
     /// Shows the appropriate platform-specific achievements UI.
     /// <param name="callback">The callback to invoke when complete.  If null,
     /// no callback is called. </param>
@@ -170,10 +208,48 @@ namespace GooglePlayGames.BasicApi
     /// </summary>
     /// <param name="leaderboardId">The leaderboard to display. <code>null</code> to display
     /// all.</param>
+    /// <param name="span">Timespan to display for the leaderboard</param>
     /// <param name="callback">If non-null, the callback to invoke when the
     /// leaderboard is dismissed.
     /// </param>
-    void ShowLeaderboardUI(string leaderboardId, Action<UIStatus> callback);
+    void ShowLeaderboardUI(string leaderboardId,
+            LeaderboardTimeSpan span,
+            Action<UIStatus> callback);
+
+    /// <summary>
+    /// Loads the score data for the given leaderboard.
+    /// </summary>
+    /// <param name="leaderboardId">Leaderboard identifier.</param>
+    /// <param name="start">Start indicating the top scores or player centric</param>
+    /// <param name="rowCount">max number of scores to return. non-positive indicates
+    // no rows should be returned.  This causes only the summary info to
+    /// be loaded. This can be limited
+    // by the SDK.</param>
+    /// <param name="collection">leaderboard collection: public or social</param>
+    /// <param name="timeSpan">leaderboard timespan</param>
+    /// <param name="callback">callback with the scores, and a page token.
+    ///   The token can be used to load next/prev pages.</param>
+    void LoadScores(string leaderboardId, LeaderboardStart start,
+                    int rowCount, LeaderboardCollection collection,
+                    LeaderboardTimeSpan timeSpan,
+            Action<LeaderboardScoreData> callback);
+
+    /// <summary>
+    /// Loads the more scores for the leaderboard.  The token is accessed
+    /// by calling LoadScores() with a positive row count.
+    /// </summary>
+    /// <param name="token">Token.</param>
+    /// <param name="rowCount">max number of scores to return.
+    ///    This can be limited by the SDK.</param>
+    /// <param name="callback">Callback.</param>
+    void LoadMoreScores(ScorePageToken token, int rowCount,
+            Action<LeaderboardScoreData> callback);
+
+    /// <summary>
+    /// Returns the max number of scores returned per call.
+    /// </summary>
+    /// <returns>The max results.</returns>
+    int LeaderboardMaxResults();
 
     /// <summary>
     /// Submits the passed score to the passed leaderboard. This operation will immediately fail
@@ -184,24 +260,20 @@ namespace GooglePlayGames.BasicApi
     /// <param name="score">Score.</param>
     /// <param name="successOrFailureCalllback">Callback used to indicate whether the operation
     /// succeeded or failed.</param>
-    void SubmitScore(string leaderboardId, long score, Action<bool> successOrFailureCalllback);
+    void SubmitScore(string leaderboardId, long score,
+            Action<bool> successOrFailureCalllback);
 
     /// <summary>
-    /// Loads state from the cloud for the passed slot.
+    /// Submits the score for the currently signed-in player
+    /// to the leaderboard associated with a specific id
+    /// and metadata (such as something the player did to earn the score).
     /// </summary>
-    /// <param name="slot">The slot to read from.</param>
-    /// <param name="listener">The listener to use to report results and resolve possible
-    /// state conflicts.</param>
-    void LoadState(int slot, OnStateLoadedListener listener);
-
-    /// <summary>
-    /// Updates state in the passed slot to the passed data.
-    /// </summary>
-    /// <param name="slot">The slot to read from.</param>
-    /// <param name="data">The data to save.</param>
-    /// <param name="listener">The listener to use to report results and resolve possible
-    /// state conflicts.</param>
-    void UpdateState(int slot, byte[] data, OnStateLoadedListener listener);
+    /// <param name="score">Score.</param>
+    /// <param name="board">leaderboard id.</param>
+    /// <param name="metadata">metadata about the score.</param>
+    /// <param name="callback">Callback upon completion.</param>
+    void SubmitScore(string leaderboardId, long score, string metadata,
+            Action<bool> successOrFailureCalllback);
 
     /// <summary>
     /// Returns a real-time multiplayer client.
@@ -239,6 +311,8 @@ namespace GooglePlayGames.BasicApi
     /// </summary>
     /// <param name="invitationDelegate">Invitation delegate.</param>
     void RegisterInvitationDelegate(InvitationReceivedDelegate invitationDelegate);
+
+    IUserProfile[] GetFriends();
   }
 
   /// <summary>

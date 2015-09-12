@@ -13,19 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+namespace CubicPilot.Behaviors
+{
+    using UnityEngine;
 
-using UnityEngine;
-using System.Collections;
+    public class LaserAutoDelete : MonoBehaviour
+    {
+        public float XThreshold = 10.0f;
 
-public class LaserAutoDelete : MonoBehaviour {
-    public float XThreshold = 10.0f;
-
-    // Update is called once per frame
-    void Update () {
-        if (gameObject.transform.position.x > XThreshold) {
-            GameObject o = GameObject.Find("LevelController");
-            o.GetComponent<LevelController>().HandleLaserMissed();
-            Destroy(gameObject);
+        // Update is called once per frame
+        void Update()
+        {
+            if (gameObject.transform.position.x > XThreshold)
+            {
+                GameObject o = GameObject.Find("LevelController");
+                o.GetComponent<LevelController>().HandleLaserMissed();
+                Destroy(gameObject);
+            }
         }
     }
 }

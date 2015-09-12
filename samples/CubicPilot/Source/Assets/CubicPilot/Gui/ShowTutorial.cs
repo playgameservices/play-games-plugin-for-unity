@@ -14,83 +14,109 @@
  * limitations under the License.
  */
 
-using UnityEngine;
-using System.Collections;
+namespace CubicPilot.Gui
+{
+    using CubicPilot.GameLogic;
+    using CubicPilot.UtilCode;
+    using UnityEngine;
 
-public class ShowTutorial : MonoBehaviour {
-    public GUISkin GuiSkin;
-    public Texture2D ArrowTex;
-    public float DelayBeforeStart;
+    public class ShowTutorial : MonoBehaviour
+    {
+        public GUISkin GuiSkin;
+        public Texture2D ArrowTex;
+        public float DelayBeforeStart;
 
-    private Countdown mCountdown = new Countdown(false,
-        GameConsts.Tutorial.PhaseDuration);
-    private Countdown mTransitionCd = new Countdown(false,
-        GameConsts.Menu.TransitionDuration);
-    int phase = 0;
-    const int Phases = 3;
+        private Countdown mCountdown = new Countdown(false,
+                                           GameConsts.Tutorial.PhaseDuration);
+        private Countdown mTransitionCd = new Countdown(false,
+                                              GameConsts.Menu.TransitionDuration);
+        int phase = 0;
+        const int Phases = 3;
 
-    void Start() {
-        phase = 0;
-        mCountdown.Start();
-        mTransitionCd.Start();
-
-        if (GameManager.Instance.Level > 0) {
-            // no tutorial
-            this.enabled = false;
-        }
-    }
-
-    void Update () {
-        DelayBeforeStart -= Time.deltaTime;
-        if (DelayBeforeStart > 0) {
-            return;
-        }
-
-        mCountdown.Update(Time.deltaTime);
-        mTransitionCd.Update(Time.deltaTime);
-        if (mCountdown.Expired) {
-            ++phase;
-            if (phase >= Phases) {
-                this.enabled = false;
-            }
+        void Start()
+        {
+            phase = 0;
             mCountdown.Start();
             mTransitionCd.Start();
-        }
-    }
 
-    void OnGUI() {
-        if (DelayBeforeStart > 0) {
-            return;
+            bool hasController = Input.GetJoystickNames().Length > 0;
+            // skip over the touch interface steps if using a controller.
+            if (hasController)
+            {
+                phase = 3;
+            }
+            if (GameManager.Instance.Level > 0)
+            {
+                // no tutorial
+                this.enabled = false;
+            }
         }
 
-        GUI.skin = GuiSkin;
-        switch (phase) {
-        case 0:
-            float aspect = ArrowTex.width / (float)ArrowTex.height;
-            GUI.DrawTexture(new Rect(Gu.Left(GameConsts.Tutorial.SteerArrowX),
-                Gu.Top(0), aspect * Screen.height,
-                (int)(mTransitionCd.NormalizedElapsed * Screen.height)), ArrowTex);
-            Gu.Label(
-                Gu.Left(GameConsts.Tutorial.SteerTextX),
-                (int)Util.Interpolate(0.0f, 0.0f, 1.0f, Gu.Middle(0),
-                    mTransitionCd.NormalizedElapsed),
-                Gu.Dim(GameConsts.Tutorial.FontSize),
-                Strings.Tutorial1);
-            break;
-        case 1:
-            Gu.Label(Gu.Right(GameConsts.Tutorial.FireTextX),
-                (int)Util.Interpolate(0.0f, Screen.height, 1.0f, Gu.Middle(0),
-                    mTransitionCd.NormalizedElapsed),
-                Gu.Dim(GameConsts.Tutorial.FontSize),
-                Strings.Tutorial2);
-            break;
-        default:
-            Gu.Label(Gu.Center(0),
-                (int)(Util.Interpolate(0.0f, 0.0f, 1.0f, Gu.Middle(0),
-                    mTransitionCd.NormalizedElapsed)),
-                Gu.Dim(GameConsts.Tutorial.FontSize),
-                Strings.Tutorial3);
-            break;
+        void Update()
+        {
+            DelayBeforeStart -= Time.deltaTime;
+            if (DelayBeforeStart > 0)
+            {
+                return;
+            }
+
+            mCountdown.Update(Time.deltaTime);
+            mTransitionCd.Update(Time.deltaTime);
+            if (mCountdown.Expired)
+            {
+                ++phase;
+                if (phase >= Phases)
+                {
+                    this.enabled = false;
+                }
+                mCountdown.Start();
+                mTransitionCd.Start();
+            }
+        }
+
+        void OnGUI()
+        {
+
+            if (Time.timeScale == 0)
+            {
+                return;
+            }
+        
+            if (DelayBeforeStart > 0)
+            {
+                return;
+            }
+
+            GUI.skin = GuiSkin;
+            switch (phase)
+            {
+                case 0:
+                    float aspect = ArrowTex.width / (float)ArrowTex.height;
+                    GUI.DrawTexture(new Rect(Gu.Left(GameConsts.Tutorial.SteerArrowX),
+                            Gu.Top(0), aspect * Screen.height,
+                            (int)(mTransitionCd.NormalizedElapsed * Screen.height)), ArrowTex);
+                    Gu.Label(
+                        Gu.Left(GameConsts.Tutorial.SteerTextX),
+                        (int)Util.Interpolate(0.0f, 0.0f, 1.0f, Gu.Middle(0),
+                            mTransitionCd.NormalizedElapsed),
+                        Gu.Dim(GameConsts.Tutorial.FontSize),
+                        Strings.Tutorial1);
+                    break;
+                case 1:
+                    Gu.Label(Gu.Right(GameConsts.Tutorial.FireTextX),
+                        (int)Util.Interpolate(0.0f, Screen.height, 1.0f, Gu.Middle(0),
+                            mTransitionCd.NormalizedElapsed),
+                        Gu.Dim(GameConsts.Tutorial.FontSize),
+                        Strings.Tutorial2);
+                    break;
+                default:
+                    Gu.Label(Gu.Center(0),
+                        (int)(Util.Interpolate(0.0f, 0.0f, 1.0f, Gu.Middle(0),
+                            mTransitionCd.NormalizedElapsed)),
+                        Gu.Dim(GameConsts.Tutorial.FontSize),
+                        Strings.Tutorial3);
+                    break;
+            }
         }
     }
 }

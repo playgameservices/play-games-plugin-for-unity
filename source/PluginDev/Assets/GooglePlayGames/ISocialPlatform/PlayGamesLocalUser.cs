@@ -18,7 +18,6 @@ namespace GooglePlayGames
 {
     using System;
     using UnityEngine.SocialPlatforms;
-    using UnityEngine;
 
     /// <summary>
     /// Represents the Google Play Games local user.
@@ -27,15 +26,13 @@ namespace GooglePlayGames
     {
         internal PlayGamesPlatform mPlatform;
 
-        private WWW mAvatarUrl;
-        private Texture2D mImage;
+        private string emailAddress;
 
-        internal PlayGamesLocalUser(PlayGamesPlatform plaf)
+        internal PlayGamesLocalUser(PlayGamesPlatform plaf) :
+            base("localUser", null, null)
         {
             mPlatform = plaf;
-            mAvatarUrl = null;
-            mImage = null;
-
+            emailAddress = null;
         }
 
         /// <summary>
@@ -57,14 +54,11 @@ namespace GooglePlayGames
         }
 
         /// <summary>
-        /// Not implemented. Calls the callback with <c>false</c>.
+        /// Loads all friends of the authenticated user.
         /// </summary>
         public void LoadFriends(Action<bool> callback)
         {
-            if (callback != null)
-            {
-                callback.Invoke(false);
-            }
+            mPlatform.LoadFriends(this, callback);
         }
 
         /// <summary>
@@ -74,7 +68,7 @@ namespace GooglePlayGames
         {
             get
             {
-                return new IUserProfile[0];
+                return mPlatform.GetFriends();
             }
         }
 
@@ -113,7 +107,16 @@ namespace GooglePlayGames
         {
             get
             {
-                return authenticated ? mPlatform.GetUserDisplayName() : string.Empty;
+                string retval = string.Empty;
+                if (authenticated)
+                {
+                    retval = mPlatform.GetUserDisplayName();
+                    if (!base.userName.Equals(retval))
+                    {
+                        ResetIdentity(retval, mPlatform.GetUserId(), mPlatform.GetUserImageUrl());
+                    }
+                }
+                return retval;
             }
         }
 
@@ -127,12 +130,22 @@ namespace GooglePlayGames
         {
             get
             {
-                return authenticated ? mPlatform.GetUserId() : string.Empty;
+                string retval = string.Empty;
+                if (authenticated)
+                {
+                    retval = mPlatform.GetUserId();
+                    if (!base.id.Equals(retval))
+                    {
+                        ResetIdentity(mPlatform.GetUserDisplayName(), retval, mPlatform.GetUserImageUrl());
+                    }
+                }
+                return retval;
             }
         }
 
         /// <summary>
         /// Gets an id token for the user.
+        /// NOTE: This property can only be accessed using the main Unity thread.
         /// </summary>
         /// <returns>
         /// An id token for the user.
@@ -142,6 +155,21 @@ namespace GooglePlayGames
             get
             {
                 return authenticated ? mPlatform.GetIdToken() : string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// Gets an access token for the user.
+        /// NOTE: This property can only be accessed using the main Unity thread.
+        /// </summary>
+        /// <returns>
+        /// An id token for the user.
+        /// </returns>
+        public string accessToken
+        {
+            get
+            {
+                return authenticated ? mPlatform.GetAccessToken() : string.Empty;
             }
         }
 
@@ -168,66 +196,44 @@ namespace GooglePlayGames
             }
         }
 
+
+        public new string AvatarURL
+        {
+            get
+            {
+                string retval = string.Empty;
+                if (authenticated)
+                {
+                    retval = mPlatform.GetUserImageUrl();
+                    if (!base.id.Equals(retval))
+                    {
+                        ResetIdentity(mPlatform.GetUserDisplayName(),
+                            mPlatform.GetUserId(), retval);
+                    }
+                }
+                return retval;
+            }
+        }
+
         /// <summary>
         /// Gets the email of the signed in player.  This is only available
         /// if the web client id is added to the setup (which enables additional
         /// permissions for the application).
+        /// NOTE: This property can only be accessed using the main Unity thread.
         /// </summary>
         /// <value>The email.</value>
         public string Email
         {
             get
             {
-                return authenticated ? mPlatform.GetUserEmail() : string.Empty;
-            }
-        }
-
-        /// <summary>
-        /// Loads the local user's image from the url.  Loading urls
-        /// is asynchronous so the return from this call is fast,
-        /// the image is returned once it is loaded.  null is returned
-        /// up to that point.
-        /// </summary>
-        private Texture2D LoadImage()
-        {
-            string url = mPlatform.GetUserImageUrl();
-
-            // the url can be null if the user does not have an
-            // avatar configured.
-            if (!string.IsNullOrEmpty(url))
-            {
-                if (mAvatarUrl == null || mAvatarUrl.url != url)
+                // treat null as unitialized, empty as no email.  This can
+                // happen when the web client is not initialized.
+                if (authenticated && emailAddress == null)
                 {
-                    mAvatarUrl = new WWW(url);
-                    mImage = null;
+                    emailAddress = mPlatform.GetUserEmail();
+                    emailAddress = emailAddress != null ? emailAddress : string.Empty;
                 }
-
-                if (mImage != null) {
-                    return mImage;
-                }
-
-                if (mAvatarUrl.isDone)
-                {
-                    mImage =  mAvatarUrl.texture;
-                    return mImage;
-                }
-            }
-
-            // if there is no url, always return null.
-            return null;
-        }
-
-        /// <summary>
-        /// Gets the display image of the user.
-        /// </summary>
-        /// <returns>
-        /// null if the user has no avatar, or it has not loaded yet.
-        /// </returns>
-        public new Texture2D image
-        {
-            get
-            {
-                return LoadImage();
+                return authenticated ? emailAddress : string.Empty;
             }
         }
     }

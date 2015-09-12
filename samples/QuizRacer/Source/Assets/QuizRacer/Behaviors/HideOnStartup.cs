@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-using UnityEngine;
-using System.Collections;
+namespace QuizRacer.Behaviors
+{
+    using UnityEngine;
 
-public class HideOnStartup : MonoBehaviour {
-    void Start() {
-        BehaviorUtils.MakeVisible(gameObject, false);
+    public class HideOnStartup : MonoBehaviour
+    {
+        void Start()
+        {
+            BehaviorUtils.MakeVisible(gameObject, false);
+        }
     }
 }

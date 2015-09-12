@@ -16,7 +16,7 @@
 
 namespace GooglePlayGames.BasicApi.Multiplayer
 {
-    using System;
+    using UnityEngine;
 
     /// <summary>
     /// Represents a player. A player is different from a participant! The participant is
@@ -24,75 +24,11 @@ namespace GooglePlayGames.BasicApi.Multiplayer
     /// (tied to a Google account). The player exists across matches, the Participant
     /// only exists in the context of a particular match.
     /// </summary>
-    public class Player
+    public class Player : PlayGamesUserProfile
     {
-        private readonly string mDisplayName;
-        private readonly string mPlayerId;
-        private readonly string mAvatarUrl;
-
         internal Player(string displayName, string playerId, string avatarUrl)
+            : base(displayName, playerId, avatarUrl)
         {
-            mDisplayName = displayName;
-            mPlayerId = playerId;
-            mAvatarUrl = avatarUrl;
-        }
-
-        /// Player's display name.
-        public string DisplayName
-        {
-            get
-            {
-                return mDisplayName;
-            }
-        }
-
-        /// Player's ID. Always the same for a particular person. It does not vary across matches.
-        public string PlayerId
-        {
-            get
-            {
-                return mPlayerId;
-            }
-        }
-
-        /// Player's AvatarUrl - can be null if the user has no avatar.
-        public string AvatarURL
-        {
-            get
-            {
-                return mAvatarUrl;
-            }
-        }
-
-        public override string ToString()
-        {
-            return string.Format("[Player: '{0}' (id {1})]", mDisplayName, mPlayerId);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj == null)
-            {
-                return false;
-            }
-
-            if (ReferenceEquals(this, obj))
-            {
-                return true;
-            }
-
-            if (obj.GetType() != typeof(Player))
-            {
-                return false;
-            }
-
-            Player other = (Player)obj;
-            return mPlayerId == other.mPlayerId;
-        }
-
-        public override int GetHashCode()
-        {
-            return mPlayerId != null ? mPlayerId.GetHashCode() : 0;
         }
     }
 }

@@ -19,11 +19,9 @@
 namespace GooglePlayGames.Native.PInvoke
 {
     using System;
-    using GooglePlayGames.Native.PInvoke;
     using System.Runtime.InteropServices;
     using GooglePlayGames.OurUtils;
     using System.Collections.Generic;
-    using GooglePlayGames.Native.Cwrapper;
     using C = GooglePlayGames.Native.Cwrapper.TurnBasedMatch;
     using Types = GooglePlayGames.Native.Cwrapper.Types;
     using Status = GooglePlayGames.Native.Cwrapper.CommonErrorStatus;
@@ -122,7 +120,7 @@ namespace GooglePlayGames.Native.PInvoke
         internal string RematchId()
         {
             // There is a bug in C++ for android that always returns true for
-            // HasRematchId - so commenting out this optimization until it is 
+            // HasRematchId - so commenting out this optimization until it is
             // fixed.
             //if (!HasRematchId())
             //{

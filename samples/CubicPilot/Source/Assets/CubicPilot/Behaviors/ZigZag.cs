@@ -14,24 +14,31 @@
  * limitations under the License.
  */
 
-using UnityEngine;
-using System.Collections;
+namespace CubicPilot.Behaviors
+{
+    using CubicPilot.UtilCode;
+    using UnityEngine;
 
-public class ZigZag : MonoBehaviour {
-    public float Amplitude = 1.0f;
-    public float LatSpeed = 5.0f;
+    public class ZigZag : MonoBehaviour
+    {
+        public float Amplitude = 1.0f;
+        public float LatSpeed = 5.0f;
 
-    private bool mIncreasing = false;
-    private float mDelta = 0.0f;
+        private bool mIncreasing = false;
+        private float mDelta = 0.0f;
 
-    void Update () {
-        float diff;
-        if (Util.CalcTargetedDisplacement(mDelta, mIncreasing ? Amplitude : -Amplitude,
-                Time.deltaTime * LatSpeed, out diff)) {
-            // we hit the target coord, so reverse movement
-            mIncreasing = !mIncreasing;
+        void Update()
+        {
+            float diff;
+            if (Util.CalcTargetedDisplacement(mDelta, mIncreasing ? Amplitude : -Amplitude,
+                    Time.deltaTime * LatSpeed, out diff))
+            {
+                // we hit the target coord, so reverse movement
+                mIncreasing = !mIncreasing;
+            }
+
+            gameObject.transform.Translate(0.0f, diff, 0.0f, Space.World);
+            mDelta += diff;
         }
-        gameObject.transform.Translate(0.0f, diff, 0.0f, Space.World);
-        mDelta += diff;
     }
 }

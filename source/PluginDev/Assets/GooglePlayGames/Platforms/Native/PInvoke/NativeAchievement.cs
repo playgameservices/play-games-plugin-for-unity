@@ -1,5 +1,5 @@
 // <copyright file="NativeAchievement.cs" company="Google Inc.">
-// Copyright (C) 2014 Google Inc.
+// Copyright (C) 2014 Google Inc. All Rights Reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
@@ -16,17 +16,17 @@
 
 #if (UNITY_ANDROID || (UNITY_IPHONE && !NO_GPGS))
 
-namespace GooglePlayGames.Native
+namespace GooglePlayGames.Native.PInvoke
 {
     using System;
     using System.Runtime.InteropServices;
-    using GooglePlayGames.Native.PInvoke;
     using GooglePlayGames.BasicApi;
+    using UnityEngine;
     using C = GooglePlayGames.Native.Cwrapper.Achievement;
-    using Types = GooglePlayGames.Native.Cwrapper.Types;
 
     internal class NativeAchievement : BaseReferenceHolder
     {
+        private const ulong MinusOne = 18446744073709551615L;
 
         internal NativeAchievement(IntPtr selfPointer)
             : base(selfPointer)
@@ -56,7 +56,7 @@ namespace GooglePlayGames.Native
                 (out_string, out_size) => C.Achievement_Name(SelfPtr(), out_string, out_size));
         }
 
-        internal Types.AchievementState State()
+        internal Cwrapper.Types.AchievementState State()
         {
             return C.Achievement_State(SelfPtr());
         }
@@ -66,9 +66,35 @@ namespace GooglePlayGames.Native
             return C.Achievement_TotalSteps(SelfPtr());
         }
 
-        internal Types.AchievementType Type()
+        internal Cwrapper.Types.AchievementType Type()
         {
             return C.Achievement_Type(SelfPtr());
+        }
+
+        internal ulong LastModifiedTime()
+        {
+            if (C.Achievement_Valid(SelfPtr()))
+            {
+                return C.Achievement_LastModifiedTime(SelfPtr());
+            }
+            return 0;
+        }
+
+        internal ulong getXP()
+        {
+            return C.Achievement_XP (SelfPtr ());
+        }
+
+        internal string getRevealedImageUrl()
+        {
+            return PInvokeUtilities.OutParamsToString (
+                (out_string, out_size) => C.Achievement_RevealedIconUrl (SelfPtr (), out_string, out_size));
+        }
+
+        internal string getUnlockedImageUrl()
+        {
+            return PInvokeUtilities.OutParamsToString (
+                (out_string, out_size) => C.Achievement_UnlockedIconUrl (SelfPtr (), out_string, out_size));
         }
 
         protected override void CallDispose(HandleRef selfPointer)
@@ -83,16 +109,26 @@ namespace GooglePlayGames.Native
             achievement.Id = Id();
             achievement.Name = Name();
             achievement.Description = Description();
+            DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            ulong val = LastModifiedTime();
+            if (val == MinusOne)
+            {
+                val = 0;
+            }
+            achievement.LastModifiedTime  = UnixEpoch.AddMilliseconds(val);
+            achievement.Points = getXP ();
+            achievement.RevealedImageUrl = getRevealedImageUrl();
+            achievement.UnlockedImageUrl = getUnlockedImageUrl();
 
-            if (Type() == Types.AchievementType.INCREMENTAL)
+            if (Type() == Cwrapper.Types.AchievementType.INCREMENTAL)
             {
                 achievement.IsIncremental = true;
                 achievement.CurrentSteps = (int)CurrentSteps();
                 achievement.TotalSteps = (int)TotalSteps();
             }
 
-            achievement.IsRevealed = State() == Types.AchievementState.REVEALED;
-            achievement.IsUnlocked = State() == Types.AchievementState.UNLOCKED;
+            achievement.IsRevealed = State() == Cwrapper.Types.AchievementState.REVEALED;
+            achievement.IsUnlocked = State() == Cwrapper.Types.AchievementState.UNLOCKED;
 
             return achievement;
         }

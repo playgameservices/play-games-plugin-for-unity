@@ -40,7 +40,7 @@ Features:
 
 System requirements:
 
-* Unity&reg; 4.5 or above
+* Unity&reg; 4.5 or above (4.6.8 if building for iOS).
 * To deploy on Android:
     * Android SDK
     * Android v4.0 or higher
@@ -68,22 +68,16 @@ If you intend to use real-time or turn-based multiplayer in your game, remember
 to activate those features in the Google Play Developer Console when creating
 your application instances.
 
-Please note the following pieces of information when creating your client IDs,
-as they will be necessary later:
+Please note the package name (also called bundle identifier)
+(e.g. "com.example.awesomegame") when creating your game configurations
+as it will be necessary later.
 
-**Android**
+Once you configure at least one resource (event, achievement, or leaderboard),
+you can copy the resource configuration from the Google Play Developer Console, and paste it
+into the setup configuration in Unity.
 
-* Your package name (e.g. "com.example.awesomegame")
-* Your application ID (e.g. 123456789012)
-
-**iOS**
-
-* Your bundle identifier (e.g. "com.example.AwesomeGame")
-* Your client ID (e.g. "46798138751-afwa4iejsfjskj.apps.googleusercontent.com")
-
-_[*] The application ID is the number that Google Play Developer Console
-assigns to your project. Please note that is not the same as your Apple
-application ID._
+The setup process will configure your game with the client id and generate a
+C# class that contains constants for each of your resources.
 
 **Note:** Do not forget to add your test accounts (the accounts with which you
 will try signing in) to the **Testing** section of the Developer Console,
@@ -96,14 +90,15 @@ Add
 and
 [leaderboards](https://developers.google.com/games/services/common/concepts/leaderboards)
 to your game in the Google Play Developer Console. For each achievement and
-leaderboard you configure, make sure to note the corresponding **achievement ID** or **leaderboard ID**, as those will be needed when making the API calls.
-Achievement and leaderboard IDs are alphanumeric strings (e.g.
-"Cgkx9eiuwi8_AQ").
+leaderboard you configure, make sure to note 
+the corresponding **achievement ID** or **leaderboard ID**, 
+as those will be needed when making the API calls.
+Achievement and leaderboard IDs are alphanumeric strings (e.g.  "Cgkx9eiuwi8_AQ").
 
-## Add Events and Quests 
-Events and Quests are a way to introduce new challenges for players to complete and 
+## Add Events and Quests
+Events and Quests are a way to introduce new challenges for players to complete and
 incentivizing them with some in-game reward or benefit if they succeed.
-Read more about how to configure and use Events and Quests on 
+Read more about how to configure and use Events and Quests on
 [Game Concepts - Events and Quests](https://developers.google.com/games/services/common/concepts/quests)
 
 ## Load Your Game Project
@@ -130,7 +125,7 @@ the **current-build** directory:
 To install the plugin, simply open your game project in Unity and import that file into
 your project's assets, as you would any other Unity package. This is accomplished through
 the **Assets | Import Package | Custom Package** menu item (you can also reach this menu it
-by right-clicking the **Assets** folder). After importing, you should see that 
+by right-clicking the **Assets** folder). After importing, you should see that
 a new menu item was added to the Window menu: **"Google Play Games"**.
 If you don't see the new menu items, refresh the assets by
 clicking **Assets | Refresh** and try again.
@@ -154,25 +149,42 @@ Player Settings window. In that window, look for the **Bundle Identifier** setti
 under **Other Settings**. Enter your package name there (for example
 _com.example.my.awesome.game_).
 
-Next, click the **Window |Google Play Games|Setup - Android setup** menu item. This will display the Android setup screen, where you must input your Application ID (e.g. 12345678012).
 
-After filling in the application ID, click the **Setup** button.
+In order to sign in to Play Game Services, you need to sign your APK file,
+make sure that you are signing it with the
+correct certificate, that is, the one that corresponds to the SHA1 certificate
+fingerprint you entered in the Developer Console during the setup.
 
-**Important:** The application ID and package name settings must match exactly
-the values you used when setting up your project on the Developer Console.
+Next, click the **Window |Google Play Games|Setup - Android setup** menu item.
+This will display the Android setup screen.
+
+Enter the Constants class name.  This is the name of the fully qualified class
+that will be updated (or created) which contains the IDs of the game resources.
+The format of the name is <namespace>.<classname>.  For example, `AwesomeGame.GPGSIds`
+
+Paste the resource definition data.  This is the XML data from the Google Play Developer Console
+which contains the resource IDs as well as the Application ID for Android.
+
+This data is found in the Google Play Developer Console by clicking "Get resources" on any of the
+resource pages (e.g. Achievements or Leaderboards), then clicking Android.
+
+After pasting the data into the text area, click the **Setup** button.
 
 **Note:**  If you are using a web application or backend server with your game,
 you can link the web application to the game to enable gettting the player's
 access token and/or email address.  To do this, link a web application to the
-game in the play console, and enter the client id for the web application into
+game in the Google Play Developer Console, and enter the client id for the web application into
 the setup dialog.
 
 ### Additional instructions on building for Android on Windows
 
-If you are using Windows, you must make sure that your Java SDK installation can be accessed by Unity. To do this:
+If you are using Windows, you must make sure that your Java SDK installation
+can be accessed by Unity. To do this:
 
-1. Set the JAVA_HOME environment variable to your Java SDK installation path (for example, `C:\Program Files\Java\jdk1.7.0_45`).
-2. Add the Java SDK's `bin` folder to your `PATH` environment variable (for example, `C:\Program Files\Java\jdk1.7.0_45\bin`)
+1. Set the JAVA_HOME environment variable to your Java SDK installation path
+(for example, `C:\Program Files\Java\jdk1.7.0_45`).
+2. Add the Java SDK's `bin` folder to your `PATH` environment variable
+(for example, `C:\Program Files\Java\jdk1.7.0_45\bin`)
 3. Reboot.
 
 **How to edit environment variables:** In Windows 2000/XP/Vista/7,
@@ -199,19 +211,21 @@ a linker error when building the Xcode application.  If you see the error:
 Then open the project tree, expand Frameworks, and delete libPods-Unity-iPhone.a
 and rebuild.
 
-
-
 Next, open the iOS build settings dialog. To do so, click **File | Build Settings**,
 select the **iOS** platform, and click **Player Settings**. Find the **Bundle Identifier**
 setting and enter your bundle identifier there.
 
-Next, click the **Window | Google Play Games | Setup  - iOS **setup menu item. This will display the iOS setup screen, where you must input:
+Next, click the **Window | Google Play Games | Setup  - iOS setup menu item.
 
-* Your client ID (e.g. "46798138751-afwa4iejsfjskj.apps.googleusercontent.com")
-* Your bundle identifier (e.g. "com.example.AwesomeGame")
+Enter the Constants class name.  This is the name of the fully qualified class
+that will be updated (or created) which contains the IDs of the game resources.
+The format of the name is <namespace>.<classname>. For example, AwesomeGame.GPGSIds
 
-All of these settings must match exactly the values you used when setting up
-your client ID on the Developer Console previously.
+Enter the resource definition data.  This is the Objective-C  data from the Google Play Developer Console
+which contains the resource IDs as well as the Client ID.
+
+This data is found in the Google Play Developer Console by clicking "Get resources" on any of the
+resource pages (e.g. Achievements or Leaderboards), then clicking Objective-C.
 
 When ready, click the **Setup** button to finish the configuration process.
 
@@ -221,7 +235,7 @@ again in order to update the necessary files where this information gets replica
 **Note:**  If you are using a web application or backend server with your game,
 you can link the web application to the game to enable gettting the player's
 access token and/or email address.  To do this, link a web application to the
-game in the play console, and enter the client id for the web application into
+game in the Google Play Developer Console, and enter the client id for the web application into
 the setup dialog.
 
 ## Run the Project
@@ -230,8 +244,8 @@ If you are working with the **Minimal** sample, you should be able to build
 and run the project at this point. You will see a screen with an **Authenticate** button,
 and you should be able to sign in when you click it.
 
-To build and run on
-Android, click **File | Build Settings**, select the **Android** platform, then
+To build and run on Android, click
+**File | Build Settings**, select the **Android** platform, then
 **Switch to Platform**, then **Build and Run**.
 
 To build and run on iOS, click **File | Build Settings**, select the **iOS** platform,
@@ -243,8 +257,9 @@ own code to integrate Play Games services into your game.
 
 ## ISocialPlatform Compliance
 
-The Google Play Games plugin implements a subset of Unity's [social interface](http://docs.unity3d.com/Documentation/ScriptReference/Social.html), for compatibility
-with games that already use that interface when integrating with other
+The Google Play Games plugin implements  Unity's
+[social interface](http://docs.unity3d.com/Documentation/ScriptReference/Social.html),
+for compatibility with games that already use that interface when integrating with other
 platforms. However, some features are unique to Play Games and are
 offered as extensions to the standard social interface provided by Unity.
 
@@ -255,22 +270,29 @@ object to the **PlayGamesPlatform** class, where the additional methods are
 available.
 
 ## Nearby Connections Configuration
-In order to use nearby connections, a service id which uniquely identifies the set of applications that can interact needs to be
-configured.  This is done by clicking the **Window | Google Play Games | Nearby Connections setup...** menu item. This will display the
-nearby conections setup screen.  On this screen enter the service ID you want to use.  It should be something that identifies your application,
-and  follows the same rules as the bundle id (for example: com.example.myawesomegame.nearby). Once you enter the id, press **Setup**.
+In order to use nearby connections, a service id which uniquely identifies the
+set of applications that can interact needs to be configured.
+This is done by clicking the **Window | Google Play Games | Nearby Connections setup...**
+menu item. This will display the
+nearby conections setup screen.  On this screen enter the service ID you want to use.
+It should be something that identifies your application, and  follows the
+same rules as the bundle id (for example: com.example.myawesomegame.nearby).
+Once you enter the id, press **Setup**.
 
-To use nearby connections, the player does not need to be authenticated, and no play console configuration is needed.
+To use nearby connections, the player does not need to be authenticated,
+and no Google Play Developer Console configuration is needed.
 
-For detailed information on nearby connection usage, please refer to [nearby connections](NEARBY.md).
-
+For detailed information on nearby connection usage,
+please refer to [nearby connections](NEARBY.md).
 
 ## Configuration & Initialization Play Game Services
 
-In order to save game progress or handle multiplayer invitations and turn notifications, the default configuration needs to be replaced with a custom configuration.
-To do this use the **PlayGamesClientConfiguration**.  If your game does not use these features, then there is no need to
-initialize the platform configuration.  Once the instance is initialized, make it your default social platform by calling
-**PlayGamesPlatform.Activate**:
+In order to save game progress or handle multiplayer invitations and
+turn notifications, the default configuration needs to be replaced with a custom configuration.
+To do this use the **PlayGamesClientConfiguration**.  If your game does not
+use these features, then there is no need to
+initialize the platform configuration.  Once the instance is initialized,
+make it your default social platform by calling **PlayGamesPlatform.Activate**:
 
 ```csharp
     using GooglePlayGames;
@@ -427,6 +449,126 @@ object first:
     PlayGamesPlatform.Instance.ShowLeaderboardUI("Cfji293fjsie_QA");
 ```
 
+## Accessing Leaderboard data
+
+There are 2 methods to retrieving the leaderboard score data.
+
+### Using Social.ILeaderboard
+
+This method uses the ILeaderboard interface to define the scope and filters
+for getting the data.  This approach allows you to configure:
+1. The leaderboard Id
+2. The collection (social or public)
+3. The timeframe (daily, weekly, all-time)
+4. The rank position to start retrieving scores.
+5. The number of scores (the default is 25).
+6. Filter by user id.
+
+If the from parameter is non-positive, then the results returned are
+player-centered, meaning the scores around the current player's score are
+returned.
+
+Note: the play game services API only supports paging, so retrieving using a
+high 'from' position will have a performance impact.
+
+```csharp
+    ILeaderboard lb = PlayGamesPlatform.Instance.CreateLeaderboard();
+    lb.id = "MY_LEADERBOARD_ID";
+    lb.LoadScores(ok =>
+        {
+            if (ok) {
+                LoadUsersAndDisplay(lb);
+            }
+            else {
+                Debug.Log("Error retrieving leaderboardi");
+            }
+        });
+```
+
+### Using PlayGamesPlatform.LoadScores()
+
+This method uses the PlayGamesPlatform directly.  This approach provides
+additional flexibility and information when accessing the leaderboard data.
+
+```csharp
+    PlayGamesPlatform.Instance.LoadScores(
+            GPGSIds.leaderboard_leaders_in_smoketesting,
+            LeaderboardStart.PlayerCentered,
+            100,
+            LeaderboardCollection.Public,
+            LeaderboardTimeSpan.AllTime,
+            (data) =>
+            {
+                mStatus = "Leaderboard data valid: " + data.Valid;
+                mStatus += "\n approx:" +data.ApproximateCount + " have " + data.Scores.Length;
+            });
+```
+
+The parameters for LoadScores() are:
+    1. leaderboardId
+    2. start position (top scores or player centered)
+    3. row count
+    4. leaderboard collection (social or public)
+    5. time span (daily, weekly, all-time)
+    6. callback accepting a LeaderboardScoreData object.
+
+The `LeaderboardScoreData` class is used to return information back to the
+caller when loading scores.  The members are:
+    1. Id - the leaderboard id
+    2. Valid - true if the returned data is valid (the call was successful)
+    3. Status - the ResponseStatus of the call
+    4. ApproximateCount - the approximate number of scores in the leaderboard
+    5. Title - the title of the leaderboard
+    6. PlayerScore - the score of the current player
+    7. Scores - the list of scores
+    8. PrevPageToken - a token that can be used to call `LoadMoreScores()` to
+        get the previous page of scores.
+    9. NextPageToken - a token that can be used to call `LoadMoreScores()` to
+        get the next page of scores.
+
+```csharp
+    void GetNextPage(LeaderboardScoreData data)
+    {
+        PlayGamesPlatform.Instance.LoadMoreScores(data.NextPageToken, 10,
+            (results) =>
+            {
+                mStatus = "Leaderboard data valid: " + data.Valid;
+                mStatus += "\n approx:" +data.ApproximateCount + " have " + data.Scores.Length;
+            });
+    }
+```
+
+### Getting player names
+
+Each score has the userId of the player that made the score.  You can use
+`Social.LoadUsers()` to load the player profile.  Remember that the contents
+of the player profile are subject to privacy settings of the players.
+
+```csharp
+    internal void LoadUsersAndDisplay(ILeaderboard lb)
+    {
+        // get the user ids
+        List<string> userIds = new List<string>();
+
+        foreach(IScore score in lb.scores) {
+            userIds.Add(score.userID);
+        }
+        // load the profiles and display (or in this case, log)
+        Social.LoadUsers(userIds.ToArray(), (users) =>
+            {
+                string status = "Leaderboard loading: " + lb.title + " count = " +
+                    lb.scores.Length;
+                foreach(IScore score in lb.scores) {
+                    IUserProfile user = FindUser(users, score.userID);
+                    status += "\n" + score.formattedValue + " by " +
+                        (string)(
+                            (user != null) ? user.userName : "**unk_" + score.userID + "**");
+                }
+                Debug.log(status);
+            });
+    }
+```
+
 ## Recording Events
 Incrementing an event is very simple, just call the following method:
 
@@ -450,7 +592,7 @@ your app must present the quests UI.  To bring up the UI, call the following met
         // ...
     });
 ```
-After the user dismisses the quests UI or takes some action within the UI, your application 
+After the user dismisses the quests UI or takes some action within the UI, your application
 will receive a callback.  If the user has tried to accept a quest or claim a quest milestone
 reward, you should take the appropriate action.  The code below demonstrates one way to handle
 user actions:
@@ -685,78 +827,6 @@ RunOnGameThread:
 ```
 
 
-## Loading Legacy 'Cloud Save service' Game State from the Cloud (only on Android)
-
-__NOTICE: Cloud Save service has been deprecated and existing games should migrate saved data to
-Saved Games as soon as possible.__
-
-To enable support for the legacy Cloud saved service, the plugin must be initialized with saved games enabled by calling
-**PlayGamesPlatform.InitializeInstance**:
-
-```csharp
-    PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder()
-        // enables legacy cloud save
-        .EnableDeprecatedCloudSave()
-        .EnableSavedGames()
-        .Build();
-    PlayGamesPlatform.InitializeInstance(config);
-```
-
-To load game state from the cloud, use the **PlayGamesPlatform.LoadState**
-method.  Once the data is loaded, you should consider migrating it to Saved Game data.
-
-
-```csharp
-    using GooglePlayGames;
-    using UnityEngine.SocialPlatforms;
-    using GooglePlayGames.BasicApi;
-    public class MyClass : OnStateLoadedListener {
-        void LoadState() {
-            int slot = 0; // slot number to use
-            PlayGamesPlatform.Instance.LoadState(slot, this);
-        }
-        public void OnStateLoaded(bool success, int slot, byte[] data) {
-            if (success) {
-                // do something with data[] and save it using SavedGame API.
-            } else {
-                // handle failure
-            }
-        }
-        ....
-```
-
-## Migrating from Cloud Save to Saved Games
-
-If your game has existing saved data using Cloud Saved app state, you should consider migrating to SavedGames API.  One possible approach for
-migrating is:
-
-1. Call **FetchAllSavedGames** to get the list of all Saved Games.
-2. For each Cloud saved slot your game may have, check for a saved game with a filename of something like "migratedSlot_x" where x is the slot number.
-3. if the file exists, then you can consider the saved data has been migrated. Call one of the open APIs, such as **OpenWithAutomaticConflictResolution**
-to read the saved game data.
-4. if the file does not exist, then load the state data by calling **LoadState**, and then save it a filename called "migratedSlot_x".
-
-
-## Resolving State Conflicts
-
-A conflict happens when a device attempts to save state to the cloud but the
-data currently on the cloud was written by a different device. When this
-condition occurs, the OnStateConflict method of your OnStateLoadedListener will
-be called, and you choose between (or merge) the two states and return a new
-byte array representing the resolved state:<br/>
-
-```csharp
-    using GooglePlayGames;
-    using UnityEngine.SocialPlatforms;
-    using GooglePlayGames.BasicApi;
-    public class MyClass : OnStateLoadedListener {
-        public byte[] OnStateConflict(int slot, byte[] local, byte[] server) {
-            // resolve conflict and return a byte[] representing the
-            // resolved state.
-        }
-    }
-```
-
 ## Multiplayer
 
 If you wish to integrate **turn-based multiplayer** in your game, refer to the
@@ -782,12 +852,6 @@ After signing out, no further API calls can be made until the user authenticates
 
 ## Building for Android
 
-To build your game for Android, do as you would normally do in Unity. Select
-**File | Build Settings**, then select the **Android** platform and build. If
-you are signing your APK file, please make sure that you are signing it with the
-correct certificate, that is, the one that corresponds to the SHA1 certificate
-fingerprint you entered in the Developer Console during the setup.
-
 ## Building for iOS
 
 To build your game for iOS, do as you would normally do in Unity. Select **File | Build Settings**, then select the **iOS** platform.
@@ -810,7 +874,6 @@ To open and build the project open a terminal window in the project directory, a
 `open Unity-iPhone.xcworkspace`. Alternatively, you can double click the file in Finder.
 
 
-
 ## Excluding all Google Play Game Services when building for iOS
 
 This plugin can be disabled for building on iOS.  What this means is that the libraries and references
@@ -829,7 +892,10 @@ Build Options | Debug Information Format | Debug. Select **DWARF** instead of **
 
 **URL errors while signing in.** This is often a sign that either the client ID or the Bundle Identifier is not correctly set up, or that your **Info.plist** file got corrupted. Check that your client ID and Bundle ID are correctly configured in the project and that they correspond to the data in the Developer Console.
 
-## Building for iOS to run on the simulator
+## Building for iOS to run on the simulator (pre-Unity 5.0)
+
+**Note:** If you are using Unity 5.0 or greater, no changes to the generated project
+is needed.
 
 To run your game in the simulator as opposed to a real device, you must export
 it from Unity with the "Simulator SDK" instead of the "Device SDK". To do this,
@@ -899,13 +965,6 @@ The final structure should be similar to the following:
     }
 ```
 
-**Note:** Some versions of Unity (4.2), re-exporting to an existing
-XCode project path will overwrite **Libraries/RegisterMonoModule.cpp**, even if
-you use the **Append** option. Therefore, you must perform these changes every time
-you export the project. To simplify your workflow, consider copying the files to
-a different location before re-exporting, and copy them back after the process
-is complete.
-
 ## (Advanced) Using the Plugin Without Overriding the Default Social Platform
 
 When you call `PlayGamesPlatform.Activate`, Google Play Games becomes your default social platform implementation, which means that static calls to methods in `Social` and `Social.Active` will be carried out by the Google Play Games plugin. This is the desired behavior for most games using the plugin.
@@ -951,10 +1010,10 @@ frameworks to that list:
 2. Add the following bundles and frameworks from the Google Plus and Google Play
    Games C++ SDK that you have previously downloaded. If you have not downloaded
    these files yet, they can be found [in the downloads section](https://developers.google.com/games/services/downloads) of the Google Play Games developer site. To add these frameworks you can simply drag
-and drop those 5 files on the top-level project item (labeled **Unity-iPhone**).<br/><br/>
+and drop these files on the top-level project item (labeled **Unity-iPhone**).<br/><br/>
+     **GoogleSignIn.framework**<br/>
+     **GoogleSignIn.bundle**<br/>
      **GoogleOpenSource.framework**<br/>
-     **GooglePlus.bundle**<br/>
-     **GooglePlus.framework**<br/>
      **gpg.bundle**<br/>
      **gpg.framework**<br/><br/>
 3. Add the **"-ObjC"** linker flag. To do this, select the top-level project

@@ -14,104 +14,140 @@
  * limitations under the License.
  */
 
-using System;
+namespace CubicPilot.UtilCode
+{
+    public class Countdown
+    {
+        private bool mActive = false;
+        private float mInitial = 1.0f;
+        private float mRemaining = 1.0f;
 
-
-public class Countdown {
-    private bool mActive = false;
-    private float mInitial = 1.0f;
-    private float mRemaining = 1.0f;
-
-    public Countdown(float initial) : this(true, initial) {}
-    public Countdown(bool active) : this(active, 1.0f) {}
-    public Countdown() : this(false, 1.0f) {}
-    public Countdown(bool active, float initial) {
-        mActive = active;
-        mInitial = mRemaining = initial;
-    }
-
-    public void Update(float deltaT, bool autoStopOnExpired) {
-        if (mActive) {
-            mRemaining = Util.Clamp(mRemaining - deltaT, 0, mInitial);
+        public Countdown(float initial)
+            : this(true, initial)
+        {
         }
-        if (autoStopOnExpired && Expired) {
-            Stop();
+
+        public Countdown(bool active)
+            : this(active, 1.0f)
+        {
         }
-    }
 
-    public void Update(float deltaT) {
-        Update(deltaT, false);
-    }
-
-    public void Start() {
-        mRemaining = mInitial;
-        mActive = true;
-    }
-
-    public void Start(float initial) {
-        mRemaining = mInitial = initial;
-        mActive = true;
-    }
-
-    public void Stop() {
-        mRemaining = mInitial;
-        mActive = false;
-    }
-
-    public void Pause() {
-        mActive = false;
-    }
-
-    public void Resume() {
-        mActive = true;
-    }
-
-    public bool Expired {
-        get {
-            return mActive && mRemaining <= 0;
+        public Countdown()
+            : this(false, 1.0f)
+        {
         }
-    }
 
-    public float Initial {
-        get {
-            return mInitial;
+        public Countdown(bool active, float initial)
+        {
+            mActive = active;
+            mInitial = mRemaining = initial;
         }
-    }
 
-    public float Remaining {
-        get {
-            return mRemaining;
+        public void Update(float deltaT, bool autoStopOnExpired)
+        {
+            if (mActive)
+            {
+                mRemaining = Util.Clamp(mRemaining - deltaT, 0, mInitial);
+            }
+            if (autoStopOnExpired && Expired)
+            {
+                Stop();
+            }
         }
-    }
 
-    public float Elapsed {
-        get {
-            return mInitial - mRemaining;
+        public void Update(float deltaT)
+        {
+            Update(deltaT, false);
         }
-    }
 
-    public float NormalizedElapsed {
-        get {
-            return Elapsed / mInitial;
+        public void Start()
+        {
+            mRemaining = mInitial;
+            mActive = true;
         }
-    }
 
-    public float NormalizedRemaining {
-        get {
-            return Remaining / mInitial;
+        public void Start(float initial)
+        {
+            mRemaining = mInitial = initial;
+            mActive = true;
         }
-    }
 
-    public bool Active {
-        get {
-            return mActive;
+        public void Stop()
+        {
+            mRemaining = mInitial;
+            mActive = false;
         }
-    }
 
-    public override string ToString () {
-        return string.Format("[Countdown: active={0}, initial={1}, remaining={2}]", mActive,
-            mInitial, mRemaining);
+        public void Pause()
+        {
+            mActive = false;
+        }
+
+        public void Resume()
+        {
+            mActive = true;
+        }
+
+        public bool Expired
+        {
+            get
+            {
+                return mActive && mRemaining <= 0;
+            }
+        }
+
+        public float Initial
+        {
+            get
+            {
+                return mInitial;
+            }
+        }
+
+        public float Remaining
+        {
+            get
+            {
+                return mRemaining;
+            }
+        }
+
+        public float Elapsed
+        {
+            get
+            {
+                return mInitial - mRemaining;
+            }
+        }
+
+        public float NormalizedElapsed
+        {
+            get
+            {
+                return Elapsed / mInitial;
+            }
+        }
+
+        public float NormalizedRemaining
+        {
+            get
+            {
+                return Remaining / mInitial;
+            }
+        }
+
+        public bool Active
+        {
+            get
+            {
+                return mActive;
+            }
+        }
+
+        public override string ToString()
+        {
+            return string.Format("[Countdown: active={0}, initial={1}, remaining={2}]", mActive,
+                mInitial, mRemaining);
+        }
     }
 }
-
-

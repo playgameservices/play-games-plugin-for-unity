@@ -14,49 +14,61 @@
  * limitations under the License.
  */
 
-using UnityEngine;
-using System.Collections;
-using GooglePlayGames;
-using GooglePlayGames.BasicApi.Multiplayer;
-using System.Collections.Generic;
+namespace QuizRacer.GameLogic
+{
+    using GooglePlayGames;
+    using GooglePlayGames.BasicApi.Multiplayer;
 
-public class InvitationManager {
-    private static InvitationManager sInstance = new InvitationManager();
-    public static InvitationManager Instance {
-        get {
-            return sInstance;
+    public class InvitationManager
+    {
+        private static InvitationManager sInstance = new InvitationManager();
+
+        public static InvitationManager Instance
+        {
+            get
+            {
+                return sInstance;
+            }
         }
-    }
 
-    private Invitation mInvitation = null;
-    private bool mShouldAutoAccept = false;   
+        private Invitation mInvitation = null;
+        private bool mShouldAutoAccept = false;
 
-    public void OnInvitationReceived(Invitation inv, bool shouldAutoAccept) {
-        mInvitation = inv;
-        mShouldAutoAccept = shouldAutoAccept;
-    }
-
-    public Invitation Invitation {
-        get {
-            return mInvitation;
+        public void OnInvitationReceived(Invitation inv, bool shouldAutoAccept)
+        {
+            mInvitation = inv;
+            mShouldAutoAccept = shouldAutoAccept;
         }
-    }
 
-    public bool ShouldAutoAccept {
-        get {
-            return mShouldAutoAccept;
+        public Invitation Invitation
+        {
+            get
+            {
+                return mInvitation;
+            }
         }
-    }
 
-    public void DeclineInvitation() {
-        if (mInvitation != null) {
-            PlayGamesPlatform.Instance.RealTime.DeclineInvitation(mInvitation.InvitationId);
+        public bool ShouldAutoAccept
+        {
+            get
+            {
+                return mShouldAutoAccept;
+            }
         }
-        Clear();
-    }
 
-    public void Clear() {
-        mInvitation = null;
-        mShouldAutoAccept = false;
+        public void DeclineInvitation()
+        {
+            if (mInvitation != null)
+            {
+                PlayGamesPlatform.Instance.RealTime.DeclineInvitation(mInvitation.InvitationId);
+            }
+            Clear();
+        }
+
+        public void Clear()
+        {
+            mInvitation = null;
+            mShouldAutoAccept = false;
+        }
     }
 }

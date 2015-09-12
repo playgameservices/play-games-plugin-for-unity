@@ -17,6 +17,7 @@
 namespace GooglePlayGames.OurUtils
 {
     using System;
+    using System.Collections;
     using UnityEngine;
     using System.Collections.Generic;
 
@@ -29,7 +30,7 @@ namespace GooglePlayGames.OurUtils
         private static bool sIsDummy = false;
 
         // queue of actions to run on the game thread
-        private static List<System.Action> sQueue = new List<System.Action>();
+        private static List<System.Action> sQueue = new List<Action>();
 
         // flag that alerts us that we should check the queue
         // (we do this just so we don't have to lock() the queue every
@@ -37,8 +38,11 @@ namespace GooglePlayGames.OurUtils
         private volatile static bool sQueueEmpty = true;
 
         // callback for application pause and focus events
-        private static Action<bool> sPauseCallback = null;
-        private static Action<bool> sFocusCallback = null;
+        private static List<Action<bool>> sPauseCallbackList =
+            new List<Action<bool>>();
+        
+        private static List<Action<bool>> sFocusCallbackList =
+            new List<Action<bool>>();
 
         // Call this once from the game thread
         public static void CreateObject()
@@ -72,6 +76,14 @@ namespace GooglePlayGames.OurUtils
             if (instance == this)
             {
                 instance = null;
+            }
+        }
+
+        public static void RunCoroutine(IEnumerator action)
+        {
+            if (instance != null)
+            {
+                instance.StartCoroutine(action);
             }
         }
 
@@ -116,28 +128,84 @@ namespace GooglePlayGames.OurUtils
 
         public void OnApplicationFocus(bool focused)
         {
-            if (null != sFocusCallback)
+            foreach (Action<bool> cb in sFocusCallbackList)
             {
-                sFocusCallback.Invoke(focused);
+                try
+                {
+                    cb(focused);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("Exception in OnApplicationFocus:" +
+                        e.Message + "\n" + e.StackTrace);
+                }
             }
         }
 
         public void OnApplicationPause(bool paused)
         {
-            if (null != sPauseCallback)
+            foreach (Action<bool> cb in sPauseCallbackList)
             {
-                sPauseCallback.Invoke(paused);
+                try
+                {
+                    cb(paused);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("Exception in OnApplicationPause:" +
+                        e.Message + "\n" + e.StackTrace);
+                }
             }
         }
 
-        public static void SetFocusCallback(Action<bool> callback)
+        /// <summary>
+        /// Adds a callback that is called when the Unity method OnApplicationFocus
+        /// is called.
+        /// </summary>
+        /// <see cref="OnApplicationFocus"/>
+        /// <param name="callback">Callback.</param>
+        public static void AddFocusCallback(Action<bool> callback)
         {
-            sFocusCallback = callback;
+            if (!sFocusCallbackList.Contains(callback))
+            {
+                sFocusCallbackList.Add(callback);
+            }
         }
 
-        public static void SetPauseCallback(Action<bool> callback)
+        /// <summary>
+        /// Removes the callback from the list to call when handling OnApplicationFocus
+        /// is called.
+        /// </summary>
+        /// <returns><c>true</c>, if focus callback was removed, <c>false</c> otherwise.</returns>
+        /// <param name="callback">Callback.</param>
+        public static bool RemoveFocusCallback(Action<bool> callback)
         {
-            sPauseCallback = callback;
+            return sFocusCallbackList.Remove(callback);
+        }
+
+        /// <summary>
+        /// Adds a callback that is called when the Unity method OnApplicationPause
+        /// is called.
+        /// </summary>
+        /// <see cref="OnApplicationPause"/>
+        /// <param name="callback">Callback.</param>
+        public static void AddPauseCallback(Action<bool> callback)
+        {
+            if (!sPauseCallbackList.Contains(callback))
+            {
+                sPauseCallbackList.Add(callback);
+            }
+        }
+
+        /// <summary>
+        /// Removes the callback from the list to call when handling OnApplicationPause
+        /// is called.
+        /// </summary>
+        /// <returns><c>true</c>, if focus callback was removed, <c>false</c> otherwise.</returns>
+        /// <param name="callback">Callback.</param>
+        public static bool RemovePauseCallback(Action<bool> callback)
+        {
+            return sPauseCallbackList.Remove(callback);
         }
     }
 }

@@ -1,6 +1,34 @@
-2015-08-31 Version 0.9.21(ios)
-       * #672 iOS compatibility fix with push notifications
-       * #606 push notification not working in production environment.
+Version 0.9.25 (codename: frengle)
+    11 Sept 2015
+    ** BREAKING CHANGES **
+       * Cloud Save service (AppState) has been removed.
+       * The setup dialog now requires the generated resource data from 
+            Google Play Developer Console.  This reduces the number of 
+            copy & pastes needed and makes it harder to make a mistake with the
+            client id.
+    New Features:
+       * Updated Configuration setup using Resource data from Play Console.
+       * Added support for exclusiveBitmask in Turnbased quickmatches.
+       * Implementing Google Auth 2.0 for iOS authentication
+       * #120 implement setStepsAtLeast for achievements
+       * #274 Added the score reception functionality - method LoadCurrentScore
+       * #256 Get all turn-based invitations
+       * #259 implement LoadAchievements
+       * #186 Return Leaderboard Rank?
+       * #380 Callback on CreateWithInvitationScreen
+       * #480 Get score rank after submitting
+       * #503 LoadScores not implemented
+       * #546 Loading friends of logged in user. (Thanks @ashkan-saeedi-mazdeh
+                for the initial implementation).
+       * #617 Get all turn-based matches
+    Bug Fixes:
+       * #182 Response to Submit Score or Load Scores
+       * #387 OnLeftRoom not called when application is paused
+       * #445 Variant error in turn based match
+       * #563 Custom UI for invitation UI.
+       * #614 OnRoomConnected() getting called twice after implementing ShowWaitingRoomUI
+       * #619 NO_GPGS does not work with Symlink Unity libraries
+       * #655 Authenticate fails at first, then succeeds second time
 Version 0.9.21
   **BREAKING CHANGES**
        * #382 Callback for declined invitation when creating RTMP room
@@ -41,13 +69,13 @@ Version 0.9.15 (codename: auto-dogey5)
         * #331 Corrected Download menu item text.
         * #331 Added support for new android-support jar location.
         * #331 Removed Google play services version check when building.
-	* #361 Fixed player image not refreshed when changing players.
+        * #361 Fixed player image not refreshed when changing players.
         * #318 Removed armeabi libraries which broke Unity 5 building.
         * #371 Unable to reshow Achievement or Leaderboard UI after Home button is pressed
 Version 0.9.12 (codename: auto-dogey)
     New features:
         * Refactored AndroidSetup script to facilitate automated builds.
-	* Refactored Samples to be packaged as custom packaged Assets vs. projects.
+        * Refactored Samples to be packaged as custom packaged Assets vs. projects.
 Version 0.9.11 (codename: extra-dogey)
     New features:
         * Image property of IUserProfile implemented

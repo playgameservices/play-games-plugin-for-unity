@@ -13,26 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+namespace CubicPilot.Behaviors
+{
+    using CubicPilot.GameLogic;
+    using UnityEngine;
 
-using UnityEngine;
-using System.Collections;
+    public class LaserController : MonoBehaviour
+    {
+        private float mSpeed;
 
-public class LaserController : MonoBehaviour {
-    private float mSpeed;
+        void Start()
+        {
+            mSpeed = GameManager.Instance.Progress.CurPilotStats.LaserSpeed;
+        }
 
-    void Start() {
-        mSpeed = GameManager.Instance.Progress.CurPilotStats.LaserSpeed;
-    }
+        void Update()
+        {
+            gameObject.transform.Translate(mSpeed * Time.deltaTime,
+                0, 0, Space.World);
+        }
 
-    void Update () {
-        gameObject.transform.Translate(mSpeed * Time.deltaTime,
-            0, 0, Space.World);
-    }
-
-    void OnTriggerEnter(Collider c) {
-        if (c.gameObject.GetComponent<Vulnerable>() != null) {
-            GameObject.Find("LevelController").GetComponent<LevelController>().HandleLaserHit();
-            Destroy(gameObject);
+        void OnTriggerEnter(Collider c)
+        {
+            if (c.gameObject.GetComponent<Vulnerable>() != null)
+            {
+                LevelController controller =
+                    GameObject.Find("LevelController").GetComponent<LevelController>();
+                controller.HandleLaserHit();
+                Destroy(gameObject);
+            }
         }
     }
 }

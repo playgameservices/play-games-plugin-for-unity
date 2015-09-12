@@ -42,12 +42,13 @@ namespace GooglePlayGames
             public const string AppId = "Application ID";
             public const string AppIdBlurb = "Enter your application ID below. This is the numeric\n" +
                                              "identifier provided by the Developer Console (for example, 123456789012).";
-           
+
             public const string AppIdError = "The App Id does not appear to be valid. " +
                                              "It must consist solely of digits, usually 10 or more.";
-            
-            public const string WebClientIdTitle = "Oauth Web App Client ID (Optional)";
-            public const string WebAppClientId = "Web App Client ID";
+
+
+            public const string WebClientIdTitle = "Web App Client ID (Optional)";
+            public const string ClientId = "Client ID";
             public const string ClientIdError = "The Client ID does not appear to be valid. " +
                                                 "It should end in .apps.googleusercontent.com.";
             public const string AppIdMismatch = "Web app client ID not associated with this game!";

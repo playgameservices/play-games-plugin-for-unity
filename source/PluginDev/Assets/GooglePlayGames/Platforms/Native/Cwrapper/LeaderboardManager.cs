@@ -103,6 +103,7 @@ namespace GooglePlayGames.Native.Cwrapper
         internal static extern void LeaderboardManager_ShowUI(
             HandleRef self,
          /* from(char const *) */string leaderboard_id,
+         /* from(LeaderboardTimeSpan_t) */Types.LeaderboardTimeSpan time_span,
          /* from(LeaderboardManager_ShowUICallback_t) */ShowUICallback callback,
          /* from(void *) */IntPtr callback_arg);
 
