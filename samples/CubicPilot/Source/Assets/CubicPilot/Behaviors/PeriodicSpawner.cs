@@ -13,39 +13,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+namespace CubicPilot.Behaviors
+{
+    using UnityEngine;
 
-using UnityEngine;
-using System.Collections;
+    public class PeriodicSpawner : MonoBehaviour
+    {
+        public GameObject[] Spawnables;
+        public float Interval = 2.0f;
+        public float Countdown = 0.0f;
+        public int WarmUpIterations = 0;
 
-public class PeriodicSpawner : MonoBehaviour {
-    public GameObject[] Spawnables;
-    public float Interval = 2.0f;
-    public float Countdown = 0.0f;
-    public int WarmUpIterations = 0;
-
-    void Start() {
-        int i;
-        for (i = 0; i < WarmUpIterations; i++) {
-            GameObject o = SpawnOne();
-            ConstVelocity cv = o.GetComponent<ConstVelocity>();
-            if (cv != null) {
-                o.transform.Translate(cv.Velocity * i * Interval);
+        void Start()
+        {
+            int i;
+            for (i = 0; i < WarmUpIterations; i++)
+            {
+                GameObject o = SpawnOne();
+                ConstVelocity cv = o.GetComponent<ConstVelocity>();
+                if (cv != null)
+                {
+                    o.transform.Translate(cv.Velocity * i * Interval);
+                }
             }
         }
-    }
 
-    void Update () {
-        Countdown -= Time.deltaTime;
-        if (Countdown <= 0) {
-            Countdown = Interval;
-            SpawnOne();
+        void Update()
+        {
+            Countdown -= Time.deltaTime;
+            if (Countdown <= 0)
+            {
+                Countdown = Interval;
+                SpawnOne();
+            }
         }
-    }
 
-    GameObject SpawnOne() {
-        GameObject prefab = Spawnables[Random.Range(0, Spawnables.Length)];
-        GameObject o = (GameObject) Instantiate(prefab);
-        o.transform.Translate(gameObject.transform.position);
-        return o;
+        GameObject SpawnOne()
+        {
+            GameObject prefab = Spawnables[Random.Range(0, Spawnables.Length)];
+            GameObject o = (GameObject)Instantiate(prefab);
+            o.transform.Translate(gameObject.transform.position);
+            return o;
+        }
     }
 }

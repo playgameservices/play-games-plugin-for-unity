@@ -24,15 +24,6 @@ namespace TrivialQuest
 
     public class TrivialQuest : MonoBehaviour
     {
-        // Note: DO NOT edit or reomve the GPGSID markers next to the achievement/leaderboard
-        // IDs. They are used by the git pre-commit script to check if you are accidentally
-        // trying to commit actual IDs instead of placeholders to the repository.
-
-        private static string EVENT_ATTACK_RED = "PLACEHOLDER"; // <GPGSID>
-        private static string EVENT_ATTACK_GREEN = "PLACEHOLDER"; // <GPGSID>
-        private static string EVENT_ATTACK_BLUE = "PLACEHOLDER"; // <GPGSID>
-        private static string EVENT_ATTACK_YELLOW = "PLACEHOLDER"; // <GPGSID>
-
         private GameObject[] signedInObjects;
         private GameObject[] signedOutObjects;
         private Text statusText;
@@ -162,25 +153,25 @@ namespace TrivialQuest
         public void AttackRed()
         {
             Debug.Log("clicked:AttackRed");
-            PlayGamesPlatform.Instance.Events.IncrementEvent(EVENT_ATTACK_RED, 1);
+            PlayGamesPlatform.Instance.Events.IncrementEvent(GPGSIds.event_red, 1);
         }
 
         public void AttackYellow()
         {
             Debug.Log("clicked:AttackYellow");
-            PlayGamesPlatform.Instance.Events.IncrementEvent(EVENT_ATTACK_YELLOW, 1);
+            PlayGamesPlatform.Instance.Events.IncrementEvent(GPGSIds.event_yellow, 1);
         }
 
         public void AttackBlue()
         {
             Debug.Log("clicked:AttackBlue");
-            PlayGamesPlatform.Instance.Events.IncrementEvent(EVENT_ATTACK_BLUE, 1);
+            PlayGamesPlatform.Instance.Events.IncrementEvent(GPGSIds.event_blue, 1);
         }
 
         public void AttackGreen()
         {
             Debug.Log("clicked:AttackGreen");
-            PlayGamesPlatform.Instance.Events.IncrementEvent(EVENT_ATTACK_GREEN, 1);
+            PlayGamesPlatform.Instance.Events.IncrementEvent(GPGSIds.event_green, 1);
         }
     }
 }

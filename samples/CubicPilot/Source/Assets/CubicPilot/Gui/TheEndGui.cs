@@ -14,45 +14,55 @@
  * limitations under the License.
  */
 
-using UnityEngine;
-using System.Collections;
+namespace CubicPilot.Gui
+{
+    using CubicPilot.GameLogic;
+    using CubicPilot.UtilCode;
+    using UnityEngine;
 
-public class TheEndGui : MonoBehaviour {
-    public GUISkin GuiSkin;
-    private Countdown mTransitionCd = new Countdown(false, GameConsts.Menu.TransitionDuration);
+    public class TheEndGui : MonoBehaviour
+    {
+        public GUISkin GuiSkin;
+        private Countdown mTransitionCd = new Countdown(false, GameConsts.Menu.TransitionDuration);
 
-    void Start() {
-        mTransitionCd.Start();
-    }
-
-    void Update() {
-        mTransitionCd.Update(Time.deltaTime, false);
-    }
-
-    void OnGUI() {
-        GUI.skin = GuiSkin;
-        Gu.SetColor(Color.black);
-        Gu.Label(Gu.Center(GameConsts.EndScreen.EndTextX),
-            (int)Util.Interpolate(0.0f, Screen.height, 1.0f,
-                Gu.Middle(GameConsts.EndScreen.EndTextY),
-                mTransitionCd.NormalizedElapsed),
-            Gu.Dim(GameConsts.EndScreen.EndTextFontSize),
-            Strings.EndText, false);
-
-        bool wantOut = DrawUpButton();
-        if (mTransitionCd.Expired && wantOut) {
-            GameManager.Instance.QuitToMenu();
+        void Start()
+        {
+            mTransitionCd.Start();
         }
-    }
 
-    bool DrawUpButton() {
-        Gu.SetColor(Color.white);
-        return Gu.Button(
-            Gu.Left(GameConsts.Menu.UpButtonLeft),
-            Gu.Top(GameConsts.Menu.UpButtonTop),
-            Gu.Dim(GameConsts.Menu.UpButtonWidth),
-            Gu.Dim(GameConsts.Menu.UpButtonHeight),
-            Gu.Dim(GameConsts.Menu.UpButtonFontSize),
-            "<<");
+        void Update()
+        {
+            mTransitionCd.Update(Time.deltaTime, false);
+        }
+
+        void OnGUI()
+        {
+            GUI.skin = GuiSkin;
+            Gu.SetColor(Color.black);
+            Gu.Label(Gu.Center(GameConsts.EndScreen.EndTextX),
+                (int)Util.Interpolate(0.0f, Screen.height, 1.0f,
+                    Gu.Middle(GameConsts.EndScreen.EndTextY),
+                    mTransitionCd.NormalizedElapsed),
+                Gu.Dim(GameConsts.EndScreen.EndTextFontSize),
+                Strings.EndText, false);
+
+            bool wantOut = DrawUpButton();
+            if (mTransitionCd.Expired && wantOut)
+            {
+                GameManager.Instance.QuitToMenu();
+            }
+        }
+
+        bool DrawUpButton()
+        {
+            Gu.SetColor(Color.white);
+            return Gu.Button(
+                Gu.Left(GameConsts.Menu.UpButtonLeft),
+                Gu.Top(GameConsts.Menu.UpButtonTop),
+                Gu.Dim(GameConsts.Menu.UpButtonWidth),
+                Gu.Dim(GameConsts.Menu.UpButtonHeight),
+                Gu.Dim(GameConsts.Menu.UpButtonFontSize),
+                "<<");
+        }
     }
 }

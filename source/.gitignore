@@ -19,6 +19,5 @@ PluginDev/Library/
 PluginDev/Temp/
 PluginDev/obj/
 SupportLib/.idea/
-SupportLib/BaseGameUtils/BaseGameUtils.iml
-SupportLib/PlayGamesPluginSupport/PlayGamesPluginSupport.iml
-SupportLib/SupportLib.iml
+SupportLib/**/*.iml
+SupportLib/PlayGamesPluginSupport/local.properties

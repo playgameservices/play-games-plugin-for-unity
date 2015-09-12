@@ -13,24 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+namespace CubicPilot.Behaviors
+{
+    using CubicPilot.GameLogic;
+    using CubicPilot.UtilCode;
+    using UnityEngine;
 
-using UnityEngine;
-using System.Collections;
+    public class ScoreToastController : MonoBehaviour
+    {
+        public GUISkin GuiSkin;
+        public int Value = 50;
+        public Color ToastColor = Color.black;
 
-public class ScoreToastController : MonoBehaviour {
-    public GUISkin GuiSkin;
-    public int Value = 50;
-    public Color ToastColor = Color.black;
-
-    void Update () {
-
-    }
-
-    void OnGUI() {
-        GUI.skin = GuiSkin;
-        Vector3 pos = Camera.main.WorldToScreenPoint(gameObject.transform.position);
-        Gu.SetColor(ToastColor);
-        Gu.Label((int)pos.x, Screen.height - (int)pos.y, Gu.Dim(GameConsts.ScoreToastFontSize),
-            Value.ToString());
+        void OnGUI()
+        {
+            GUI.skin = GuiSkin;
+            Vector3 pos = Camera.main.WorldToScreenPoint(gameObject.transform.position);
+            Gu.SetColor(ToastColor);
+            Gu.Label((int)pos.x, Screen.height - (int)pos.y, Gu.Dim(GameConsts.ScoreToastFontSize),
+                Value.ToString());
+        }
     }
 }

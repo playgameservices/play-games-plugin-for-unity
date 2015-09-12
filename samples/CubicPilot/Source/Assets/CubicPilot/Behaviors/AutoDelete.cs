@@ -14,28 +14,34 @@
  * limitations under the License.
  */
 
-using UnityEngine;
-using System.Collections;
+namespace CubicPilot.Behaviors
+{
+    using CubicPilot.GameLogic;
+    using UnityEngine;
 
-public class AutoDelete : MonoBehaviour {
-    public bool ObjectMovesForward = false;
-    public float Countdown = float.PositiveInfinity;
-    public float AdditionalTolerance = 0.0f;
+    public class AutoDelete : MonoBehaviour
+    {
+        public bool ObjectMovesForward = false;
+        public float Countdown = float.PositiveInfinity;
+        public float AdditionalTolerance = 0.0f;
 
-    void Update () {
-        Vector3 pos = gameObject.transform.position;
+        void Update()
+        {
+            Vector3 pos = gameObject.transform.position;
 
-        Countdown -= Time.deltaTime;
+            Countdown -= Time.deltaTime;
 
-        float a = AdditionalTolerance; // shorthand
-        bool destroy = (Countdown <= 0) ||
-            (ObjectMovesForward && pos.x > GameConsts.ArenaMaxX + a) ||
-            (pos.x < GameConsts.ArenaMinX - a) ||
-            (pos.y < GameConsts.ArenaMinY - a) ||
-            (pos.y > GameConsts.ArenaMaxY + a);
+            float a = AdditionalTolerance; // shorthand
+            bool destroy = (Countdown <= 0) ||
+                           (ObjectMovesForward && pos.x > GameConsts.ArenaMaxX + a) ||
+                           (pos.x < GameConsts.ArenaMinX - a) ||
+                           (pos.y < GameConsts.ArenaMinY - a) ||
+                           (pos.y > GameConsts.ArenaMaxY + a);
 
-        if (destroy) {
-            Destroy(gameObject);
+            if (destroy)
+            {
+                Destroy(gameObject);
+            }
         }
     }
 }

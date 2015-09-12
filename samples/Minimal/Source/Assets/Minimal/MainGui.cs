@@ -71,6 +71,8 @@ public class MainGui : MonoBehaviour {
                     mWaitingForAuth = false;
                     if (success) {
                       mStatusText = "Welcome " + Social.localUser.userName;
+                      string token = GooglePlayGames.PlayGamesPlatform.Instance.GetToken();
+                      Debug.Log(token);
                     } else {
                       mStatusText = "Authentication failed.";
                     }

@@ -16,28 +16,35 @@
 
 namespace GooglePlayGames
 {
+    using System.IO;
+    using System.Collections;
     using UnityEngine;
     using UnityEditor;
 
     public class GPGSIOSSetupUI : EditorWindow
     {
-        private string mClientId = string.Empty;
         private string mBundleId = string.Empty;
         private string mWebClientId = string.Empty;
+        private string mClassName = "GooglePlayGames.GPGSIds";
+        private string mConfigData = string.Empty;
+        private Vector2 scroll;
 
         [MenuItem("Window/Google Play Games/Setup/iOS setup...", false, 2)]
         public static void MenuItemGPGSIOSSetup()
         {
             EditorWindow window = EditorWindow.GetWindow(
                     typeof(GPGSIOSSetupUI), true, GPGSStrings.IOSSetup.Title);
-            window.minSize = new Vector2(500, 300);
+            window.minSize = new Vector2(500, 600);
         }
 
         public void OnEnable()
         {
-            mClientId = GPGSProjectSettings.Instance.Get(GPGSUtil.IOSCLIENTIDKEY);
             mBundleId = GPGSProjectSettings.Instance.Get(GPGSUtil.IOSBUNDLEIDKEY);
+
             mWebClientId = GPGSProjectSettings.Instance.Get(GPGSUtil.WEBCLIENTIDKEY);
+            mClassName = GPGSProjectSettings.Instance.Get(GPGSUtil.CLASSNAMEKEY);
+            mConfigData = GPGSProjectSettings.Instance.Get(GPGSUtil.IOSRESOURCEKEY);
+
 
             if (mBundleId.Trim().Length == 0)
             {
@@ -68,15 +75,6 @@ namespace GooglePlayGames
             GUILayout.Label(GPGSStrings.IOSSetup.Blurb);
             GUILayout.Space(10);
 
-            // Client ID field
-            GUILayout.Label(GPGSStrings.IOSSetup.ClientIdTitle, EditorStyles.boldLabel);
-            GUILayout.Label(GPGSStrings.IOSSetup.ClientIdBlurb);
-      
-            mClientId = EditorGUILayout.TextField(GPGSStrings.IOSSetup.ClientId,
-                mClientId, GUILayout.Width(450));
-
-            GUILayout.Space(10);
-
             // Bundle ID field
             GUILayout.Label(GPGSStrings.IOSSetup.BundleIdTitle, EditorStyles.boldLabel);
             GUILayout.Label(GPGSStrings.IOSSetup.BundleIdBlurb);
@@ -88,12 +86,33 @@ namespace GooglePlayGames
             GUILayout.Label(GPGSStrings.Setup.WebClientIdTitle, EditorStyles.boldLabel);
             GUILayout.Label(GPGSStrings.IOSSetup.ClientIdBlurb);
 
-            mWebClientId = EditorGUILayout.TextField(GPGSStrings.Setup.WebAppClientId,
-                mWebClientId, GUILayout.Width(450));
+            // Client ID field
+            GUILayout.Label(GPGSStrings.Setup.WebClientIdTitle, EditorStyles.boldLabel);
+            GUILayout.Label(GPGSStrings.AndroidSetup.WebClientIdBlurb);
+
+            mWebClientId = EditorGUILayout.TextField(GPGSStrings.Setup.ClientId,
+            mWebClientId, GUILayout.Width(450));
+
 
             GUILayout.Space(10);
             GUILayout.FlexibleSpace();
-      
+
+            GUILayout.Label("Constants class name", EditorStyles.boldLabel);
+            GUILayout.Label("Enter the fully qualified name of the class to create containing the constants");
+            GUILayout.Space(10);
+
+            mClassName = EditorGUILayout.TextField("Constants class name",
+                mClassName,GUILayout.Width(480));
+
+            GUILayout.Label("Resources Definition", EditorStyles.boldLabel);
+            GUILayout.Label("Paste in the Objective-C Resources from the Play Console");
+            GUILayout.Space(10);
+            scroll = GUILayout.BeginScrollView(scroll);
+            mConfigData = EditorGUILayout.TextArea(mConfigData,
+                GUILayout.Width(475), GUILayout.Height(Screen.height));
+            GUILayout.EndScrollView();
+            GUILayout.Space(10);
+
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
             // Setup button
@@ -118,12 +137,114 @@ namespace GooglePlayGames
         /// </summary>
         void DoSetup()
         {
-            if (PerformSetup(mClientId, mBundleId, mWebClientId, null))
+            if (PerformSetup(mClassName, mConfigData, mWebClientId, mBundleId, null))
             {
                 GPGSUtil.Alert(GPGSStrings.Success, GPGSStrings.IOSSetup.SetupComplete);
                 Close();
             }
+            else
+            {
+                GPGSUtil.Alert(GPGSStrings.Error,
+                    "Missing or invalid resource data.  Check that CLIENT_ID is defined.");
+            }
         }
+
+        /// <summary>
+        /// Performs setup using the Android resources downloaded XML file
+        /// from the play console.
+        /// </summary>
+        /// <returns><c>true</c>, if setup was performed, <c>false</c> otherwise.</returns>
+        /// <param name="className">Fully qualified class name for the resource Ids.</param>
+        /// <param name="resourceXmlData">Resource xml data.</param>
+        /// <param name="webClientId">Client identifier.</param>
+        /// <param name="bundleId">Bundle identifier.</param>
+        /// <param name="nearbySvcId">Nearby svc identifier.</param>
+        public static bool PerformSetup(
+            string className, string resourceXmlData, 
+            string webClientId, string bundleId,  string nearbySvcId)
+        {
+            if (ParseResources(className, resourceXmlData))
+            {
+                GPGSProjectSettings.Instance.Set(GPGSUtil.CLASSNAMEKEY, className);
+                GPGSProjectSettings.Instance.Set(GPGSUtil.IOSRESOURCEKEY, resourceXmlData);
+                GPGSProjectSettings.Instance.Set(GPGSUtil.WEBCLIENTIDKEY, webClientId);
+                return PerformSetup(GPGSProjectSettings.Instance.Get(GPGSUtil.IOSCLIENTIDKEY),
+                    bundleId, webClientId, nearbySvcId);
+            }
+            return false;
+        }
+
+        private static bool ParseResources(string className, string res)
+        {
+           // parse the resources, they keys are in the form of
+            // #define <KEY> @"<VALUE>"
+
+            //transform the string to make it easier to parse
+            string input = res.Replace("#define ","");
+            input = input.Replace("@\"", "");
+            input = input.Replace("\"", "");
+
+            // now input is name value, one per line
+            StringReader reader = new StringReader(input);
+            string line = reader.ReadLine();
+            string key;
+            string value;
+            string clientId = null;
+            Hashtable resourceKeys = new Hashtable();
+            while (line != null)
+            {
+                string[] parts = line.Split(' ');
+                key = parts[0];
+                if (parts.Length > 1)
+                {
+                    value = parts[1];
+                }
+                else
+                {
+                    value = null;
+                }
+                if (!string.IsNullOrEmpty(value))
+                {
+                    if (key == "CLIENT_ID")
+                    {
+                        clientId = value;
+                        GPGSProjectSettings.Instance.Set(GPGSUtil.IOSCLIENTIDKEY, clientId);
+                    }
+                    else if (key.StartsWith("ACH_"))
+                    {
+                        string prop = "achievement_" + key.Substring(4).ToLower();
+                        resourceKeys[prop] = value;
+                    }
+                    else if (key.StartsWith("LEAD_"))
+                    {
+                        string prop = "leaderboard_" + key.Substring(5).ToLower();
+                        resourceKeys[prop] = value;
+                    }
+                    else if (key.StartsWith("EVENT_"))
+                    {
+                        string prop = "event_" + key.Substring(6).ToLower();
+                        resourceKeys[prop] = value;
+                    }
+                    else if (key.StartsWith("QUEST_"))
+                    {
+                        string prop = "quest_" + key.Substring(6).ToLower();
+                        resourceKeys[prop] = value;
+                    }
+                    else
+                    {
+                        resourceKeys[key] = value;
+                    }
+                }
+                line = reader.ReadLine();
+            }
+            reader.Close();
+            if (resourceKeys.Count > 0)
+            {
+                GPGSUtil.WriteResourceIds(className, resourceKeys);
+            }
+            return !string.IsNullOrEmpty(clientId);
+        }
+
 
         /// <summary>
         /// Performs the setup.  This is called externally to facilitate

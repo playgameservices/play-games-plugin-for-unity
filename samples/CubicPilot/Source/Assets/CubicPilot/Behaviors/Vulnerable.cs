@@ -14,101 +14,125 @@
  * limitations under the License.
  */
 
-using UnityEngine;
-using System.Collections;
+namespace CubicPilot.Behaviors
+{
+    using CubicPilot.GameLogic;
+    using CubicPilot.UtilCode;
+    using UnityEngine;
 
-public class Vulnerable : MonoBehaviour {
-    public int LifePoints = 1;
-    public GameObject DestroyEffect;
-    public AudioClip DestroySfx;
-    public AudioClip TakeDamageSfx;
-    public int ScoreValue = 50;
-    public GameObject ScoreToastPrefab;
-    private LevelController mLevelController;
-    public Color ScoreToastColor;
+    public class Vulnerable : MonoBehaviour
+    {
+        public int LifePoints = 1;
+        public GameObject DestroyEffect;
+        public AudioClip DestroySfx;
+        public AudioClip TakeDamageSfx;
+        public int ScoreValue = 50;
+        public GameObject ScoreToastPrefab;
+        private LevelController mLevelController;
+        public Color ScoreToastColor;
 
-    public bool ExplodeOnCivilian = true;
+        public bool ExplodeOnCivilian = true;
 
-    private Countdown mHurtColorCountdown = new Countdown(false,
-        GameConsts.EnemyHitColorDuration);
+        private Countdown mHurtColorCountdown = new Countdown(false,
+                                                    GameConsts.EnemyHitColorDuration);
 
-    void Start() {
-        mLevelController = GameObject.FindGameObjectWithTag("LevelController")
+        void Start()
+        {
+            mLevelController = GameObject.FindGameObjectWithTag("LevelController")
             .GetComponent<LevelController>();
-    }
+        }
 
-    void OnTriggerEnter(Collider c) {
-        CausesDamage cd = c.gameObject.GetComponent<CausesDamage>();
-        if (cd != null) {
-            LifePoints -= cd.Damage;
-            if (LifePoints <= 0) {
-                // enemy died!
-                CreateScoreToast(ReportKill());
+        void OnTriggerEnter(Collider c)
+        {
+            CausesDamage cd = c.gameObject.GetComponent<CausesDamage>();
+            if (cd != null)
+            {
+                LifePoints -= cd.Damage;
+                if (LifePoints <= 0)
+                {
+                    // enemy died!
+                    CreateScoreToast(ReportKill());
+                    Kaboom();
+                    return;
+                }
+                else
+                {
+                    // take damage, but don't die
+                    TakeDamage();
+                }
+            }
+
+            if (ExplodeOnCivilian && c.gameObject.tag == "Civilian")
+            {
                 Kaboom();
                 return;
-
-            } else {
-                // take damage, but don't die
-                TakeDamage();
             }
         }
 
-        if (ExplodeOnCivilian && c.gameObject.tag == "Civilian") {
-            Kaboom();
-            return;
-        }
-    }
-
-    void CreateScoreToast(int earned) {
-        GameObject o = (GameObject) Instantiate(ScoreToastPrefab);
-        o.transform.Translate(gameObject.transform.position);
-        ScoreToastController c = o.GetComponent<ScoreToastController>();
-        c.Value = earned;
-        c.ToastColor = ScoreToastColor;
-    }
-
-    int ReportKill() {
-        // report score to level controller
-        return mLevelController.ReportKill(ScoreValue, gameObject.transform.position.x);
-    }
-
-    void MultColor(GameObject o, float factor) {
-        Color c = o.renderer.material.color;
-        o.renderer.material.color = new Color(c.r * factor, c.g * factor, c.b * factor, c.a);
-    }
-
-    void ToggleHurtColor(bool turnOn) {
-        float factor = turnOn ? 0.25f : 4.0f;
-        MultColor(gameObject, factor);
-        int i = 0;
-        for (i = 0; i < gameObject.transform.childCount; ++i) {
-            MultColor(gameObject.transform.GetChild(i).gameObject, factor);
-        }
-    }
-
-    void Update() {
-        mHurtColorCountdown.Update(Time.deltaTime, false);
-        if (mHurtColorCountdown.Expired) {
-            ToggleHurtColor(false);
-            mHurtColorCountdown.Stop();
-        }
-    }
-
-    void Kaboom() {
-        if (DestroyEffect != null) {
-            GameObject o = (GameObject) Instantiate(DestroyEffect);
+        void CreateScoreToast(int earned)
+        {
+            GameObject o = (GameObject)Instantiate(ScoreToastPrefab);
             o.transform.Translate(gameObject.transform.position);
+            ScoreToastController c = o.GetComponent<ScoreToastController>();
+            c.Value = earned;
+            c.ToastColor = ScoreToastColor;
         }
-        Destroy(gameObject);
-        AudioSource.PlayClipAtPoint(DestroySfx, Vector3.zero);
-    }
 
-    void TakeDamage() {
-        // take damage, but don't die yet
-        if (!mHurtColorCountdown.Active) {
-            ToggleHurtColor(true);
+        int ReportKill()
+        {
+            // report score to level controller
+            return mLevelController.ReportKill(ScoreValue, gameObject.transform.position.x);
         }
-        mHurtColorCountdown.Start();
-        AudioSource.PlayClipAtPoint(TakeDamageSfx, Vector3.zero);
+
+        void MultColor(GameObject o, float factor)
+        {
+            Color c = o.GetComponent<Renderer>().material.color;
+            o.GetComponent<Renderer>().material.color = new Color(c.r * factor, c.g * factor, c.b * factor, c.a);
+        }
+
+        void ToggleHurtColor(bool turnOn)
+        {
+            float factor = turnOn ? 0.25f : 4.0f;
+            MultColor(gameObject, factor);
+            int i = 0;
+            for (i = 0; i < gameObject.transform.childCount; ++i)
+            {
+                MultColor(gameObject.transform.GetChild(i).gameObject, factor);
+            }
+        }
+
+        void Update()
+        {
+            mHurtColorCountdown.Update(Time.deltaTime, false);
+            if (mHurtColorCountdown.Expired)
+            {
+                ToggleHurtColor(false);
+                mHurtColorCountdown.Stop();
+            }
+        }
+
+        void Kaboom()
+        {
+            if (DestroyEffect != null)
+            {
+                GameObject o = (GameObject)Instantiate(DestroyEffect);
+                o.transform.Translate(gameObject.transform.position);
+            }
+
+            Destroy(gameObject);
+            AudioSource.PlayClipAtPoint(DestroySfx, Vector3.zero);
+        }
+
+        void TakeDamage()
+        {
+            // take damage, but don't die yet
+            if (!mHurtColorCountdown.Active)
+            {
+                ToggleHurtColor(true);
+            }
+
+            mHurtColorCountdown.Start();
+            AudioSource.PlayClipAtPoint(TakeDamageSfx, Vector3.zero);
+        }
     }
 }

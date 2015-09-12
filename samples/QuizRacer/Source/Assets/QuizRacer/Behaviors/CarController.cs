@@ -14,61 +14,79 @@
  * limitations under the License.
  */
 
-using UnityEngine;
-using System.Collections;
+namespace QuizRacer.Behaviors
+{
+    using QuizRacer.GameLogic;
+    using UnityEngine;
 
-public class CarController : MonoBehaviour {
-    const float MaxAnimSpeed = 2.0f;
-    public float StartX;
-    public float EndX;
 
-    private bool mBlink = false;
-    private string mParticipantId = null;
+    public class CarController : MonoBehaviour
+    {
+        const float MaxAnimSpeed = 2.0f;
+        public float StartX;
+        public float EndX;
 
-    void Update () {
-        if (mParticipantId == null) {
-            MakeVisible(false);
-            return;
+        private bool mBlink = false;
+        private string mParticipantId = null;
+
+        void Update()
+        {
+            if (mParticipantId == null)
+            {
+                MakeVisible(false);
+                return;
+            }
+
+            RaceManager mgr = RaceManager.Instance;
+            if (mParticipantId != null && mgr != null)
+            {
+                float progress = mgr.GetRacerProgress(mParticipantId);
+                float diff = StartX + (EndX - StartX) * progress - gameObject.transform.position.x;
+                if (diff > MaxAnimSpeed * Time.deltaTime)
+                {
+                    diff = MaxAnimSpeed * Time.deltaTime;
+                }
+                else if (diff < -MaxAnimSpeed * Time.deltaTime)
+                {
+                    diff = -MaxAnimSpeed * Time.deltaTime;
+                }
+                gameObject.transform.Translate(new Vector3(diff, 0.0f, 0.0f), Space.World);
+                if (mBlink)
+                {
+                    MakeVisible(!mBlink || 0 != (int)(Time.time / 0.25f) % 3);
+                }
+            }
         }
 
-        RaceManager mgr = RaceManager.Instance;
-        if (mParticipantId != null && mgr != null) {
-            float progress = mgr.GetRacerProgress(mParticipantId);
-            float diff = StartX + (EndX - StartX) * progress - gameObject.transform.position.x;
-            if (diff > MaxAnimSpeed * Time.deltaTime) {
-                diff = MaxAnimSpeed * Time.deltaTime;
-            } else if (diff < -MaxAnimSpeed * Time.deltaTime) {
-                diff = -MaxAnimSpeed * Time.deltaTime;
+        public void SetParticipantId(string id)
+        {
+            mParticipantId = id;
+        }
+
+        public void SetBlinking(bool blink)
+        {
+            mBlink = blink;
+        }
+
+        private void MakeVisible(bool visible)
+        {
+            BehaviorUtils.MakeVisible(gameObject, visible);
+        }
+
+        public string ParticipantId
+        {
+            get
+            {
+                return mParticipantId;
             }
+        }
+
+        public void Reset()
+        {
+            mParticipantId = null;
+            mBlink = false;
+            float diff = StartX - gameObject.transform.position.x;
             gameObject.transform.Translate(new Vector3(diff, 0.0f, 0.0f), Space.World);
-            if (mBlink) {
-                MakeVisible(!mBlink || 0 != (int)(Time.time / 0.25f) % 3);
-            }
         }
-    }
-
-    public void SetParticipantId(string id) {
-        mParticipantId = id;
-    }
-
-    public void SetBlinking(bool blink) {
-        mBlink = blink;
-    }
-
-    private void MakeVisible(bool visible) {
-        BehaviorUtils.MakeVisible(gameObject, visible);
-    }
-
-    public string ParticipantId {
-        get {
-            return mParticipantId;
-        }
-    }
-
-    public void Reset() {
-        mParticipantId = null;
-        mBlink = false;
-        float diff = StartX - gameObject.transform.position.x;
-        gameObject.transform.Translate(new Vector3(diff, 0.0f, 0.0f), Space.World);
     }
 }

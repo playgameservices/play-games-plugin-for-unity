@@ -24,6 +24,9 @@ namespace GooglePlayGames.BasicApi
     /// </summary>
     public class Achievement
     {
+        static readonly DateTime UnixEpoch =
+                new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+
         private string mId = string.Empty;
         private bool mIsIncremental = false;
         private bool mIsRevealed = false;
@@ -32,6 +35,10 @@ namespace GooglePlayGames.BasicApi
         private int mTotalSteps = 0;
         private string mDescription = string.Empty;
         private string mName = string.Empty;
+        private long mLastModifiedTime = 0;
+        private ulong mPoints;
+        private string mRevealedImageUrl;
+        private string mUnlockedImageUrl;
 
         /// <summary>
         /// Returns a <see cref="System.String"/> that represents the current <see cref="GooglePlayGames.BasicApi.Achievement"/>.
@@ -55,7 +62,7 @@ namespace GooglePlayGames.BasicApi
             {
                 return mIsIncremental;
             }
-        
+
             set
             {
                 mIsIncremental = value;
@@ -68,7 +75,7 @@ namespace GooglePlayGames.BasicApi
             {
                 return mCurrentSteps;
             }
-        
+
             set
             {
                 mCurrentSteps = value;
@@ -81,7 +88,7 @@ namespace GooglePlayGames.BasicApi
             {
                 return mTotalSteps;
             }
-        
+
             set
             {
                 mTotalSteps = value;
@@ -94,10 +101,10 @@ namespace GooglePlayGames.BasicApi
             {
                 return mIsUnlocked;
             }
-        
+
             set
             {
-                mIsUnlocked = value;
+               mIsUnlocked = value;
             }
         }
 
@@ -107,7 +114,7 @@ namespace GooglePlayGames.BasicApi
             {
                 return mIsRevealed;
             }
-        
+
             set
             {
                 mIsRevealed = value;
@@ -120,7 +127,7 @@ namespace GooglePlayGames.BasicApi
             {
                 return mId;
             }
-        
+
             set
             {
                 mId = value;
@@ -133,7 +140,7 @@ namespace GooglePlayGames.BasicApi
             {
                 return this.mDescription;
             }
-        
+
             set
             {
                 mDescription = value;
@@ -146,10 +153,63 @@ namespace GooglePlayGames.BasicApi
             {
                 return this.mName;
             }
-        
+
             set
             {
                 mName = value;
+            }
+        }
+
+        public DateTime LastModifiedTime
+        {
+            get
+            {
+                return UnixEpoch.AddMilliseconds(mLastModifiedTime);
+            }
+
+            set
+            {
+                TimeSpan ts = value - UnixEpoch;
+                mLastModifiedTime = (long)ts.TotalMilliseconds;
+            }
+        }
+
+        public ulong Points
+        {
+            get
+            {
+                return mPoints;
+            }
+
+            set
+            {
+                mPoints = value;
+            }
+        }
+
+        public string RevealedImageUrl
+        {
+            get
+            {
+                return mRevealedImageUrl;
+            }
+
+            set
+            {
+                mRevealedImageUrl = value;
+            }
+        }
+
+        public string UnlockedImageUrl
+        {
+            get
+            {
+                return mUnlockedImageUrl;
+            }
+
+            set
+            {
+                mUnlockedImageUrl = value;
             }
         }
     }

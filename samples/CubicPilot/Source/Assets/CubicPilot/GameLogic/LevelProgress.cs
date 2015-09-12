@@ -13,76 +13,96 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+namespace CubicPilot.GameLogic
+{
+    using System;
+    using UnityEngine;
 
-using System;
-using UnityEngine;
+    public class LevelProgress
+    {
+        private int mScore, mStars;
 
-public class LevelProgress {
-    private int mScore, mStars;
-
-    public int Score {
-        get {
-            return mScore;
+        public int Score
+        {
+            get
+            {
+                return mScore;
+            }
+            set
+            {
+                mScore = value;
+            }
         }
-        set {
-            mScore = value;
+
+        public int Stars
+        {
+            get
+            {
+                return mStars;
+            }
+            set
+            {
+                mStars = value;
+            }
         }
-    }
 
-    public int Stars {
-        get {
-            return mStars;
+        public bool Cleared
+        {
+            get
+            {
+                return mScore > 0;
+            }
         }
-        set {
-            mStars = value;
+
+        public LevelProgress()
+        {
+            mScore = mStars = 0;
         }
-    }
 
-    public bool Cleared {
-        get {
-            return mScore > 0;
+        public LevelProgress(int score, int stars)
+        {
+            mScore = score;
+            mStars = stars;
         }
-    }
 
-    public LevelProgress() {
-        mScore = mStars = 0;
-    }
-
-    public LevelProgress(int score, int stars) {
-        mScore = score;
-        mStars = stars;
-    }
-
-    public override string ToString () {
-        return string.Format("LP {0} {1}", Score, Stars);
-    }
-
-    public void SetFromString(string s) {
-        string[] p = s.Split(new char[] { ' ' });
-        if (p.Length != 3 || !p[0].Equals("LP")) {
-            Debug.LogError("Failed to parse level progress from: " + s);
-            mStars = mScore = 0;
+        public override string ToString()
+        {
+            return string.Format("LP {0} {1}", Score, Stars);
         }
-        mScore = Convert.ToInt32(p[1]);
-        mStars = Convert.ToInt32(p[2]);
-    }
 
-    public static LevelProgress FromString(string s) {
-        LevelProgress lp = new LevelProgress();
-        lp.SetFromString(s);
-        return lp;
-    }
+        public void SetFromString(string s)
+        {
+            string[] p = s.Split(new char[] { ' ' });
+            if (p.Length != 3 || !p[0].Equals("LP"))
+            {
+                Debug.LogError("Failed to parse level progress from: " + s);
+                mStars = mScore = 0;
+            }
+            mScore = Convert.ToInt32(p[1]);
+            mStars = Convert.ToInt32(p[2]);
+        }
 
-    public bool MergeWith(LevelProgress other) {
-        bool modified = false;
-        if (other.mScore > mScore) {
-            mScore = other.mScore;
-            modified = true;
+        public static LevelProgress FromString(string s)
+        {
+            LevelProgress lp = new LevelProgress();
+            lp.SetFromString(s);
+            return lp;
         }
-        if (other.mStars > mStars) {
-            mStars = other.mStars;
-            modified = true;
+
+        public bool MergeWith(LevelProgress other)
+        {
+            bool modified = false;
+            if (other.mScore > mScore)
+            {
+                mScore = other.mScore;
+                modified = true;
+            }
+            if (other.mStars > mStars)
+            {
+                mStars = other.mStars;
+                modified = true;
+            }
+            return modified;
         }
-        return modified;
     }
 }

@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+namespace CubicPilot.Behaviors
+{
+    using UnityEngine;
 
-using UnityEngine;
-using System.Collections;
-
-public class CausesDamage : MonoBehaviour {
-    public int Damage = 1;
+    public class CausesDamage : MonoBehaviour
+    {
+        public int Damage = 1;
+    }
 }

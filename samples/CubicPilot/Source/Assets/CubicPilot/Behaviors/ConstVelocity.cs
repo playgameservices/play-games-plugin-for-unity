@@ -13,14 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+namespace CubicPilot.Behaviors
+{
+    using UnityEngine;
 
-using UnityEngine;
-using System.Collections;
+    public class ConstVelocity : MonoBehaviour
+    {
+        public Vector3 Velocity;
 
-public class ConstVelocity : MonoBehaviour {
-    public Vector3 Velocity;
-
-    void Update () {
-        gameObject.transform.Translate(Velocity * Time.deltaTime);
+        void Update()
+        {
+            gameObject.transform.Translate(Velocity * Time.deltaTime);
+        }
     }
 }

@@ -25,7 +25,7 @@ namespace GooglePlayGames
     {
         static GPGSUpgrader()
         {
-            string prevVer = GPGSProjectSettings.Instance.Get("lastUpgrade", "00000");
+            string prevVer = GPGSProjectSettings.Instance.Get(GPGSUtil.LASTUPGRADEKEY, "00000");
             if (prevVer != PluginVersion.VersionKey)
             {
                 // if this is a really old version, upgrade to 911 first, then 915
@@ -37,13 +37,15 @@ namespace GooglePlayGames
                 prevVer = Upgrade915(prevVer);
 
                 // there is no migration needed to 920+
+                Debug.Log("Upgrading from format version " + prevVer + " to " + PluginVersion.VersionKey);
                 prevVer = PluginVersion.VersionKey;
                 string msg = GPGSStrings.PostInstall.Text.Replace("$VERSION",
                                  PluginVersion.VersionString);
                 EditorUtility.DisplayDialog(GPGSStrings.PostInstall.Title, msg, "OK");
+
             }
 
-            GPGSProjectSettings.Instance.Set("lastUpgrade", prevVer);
+            GPGSProjectSettings.Instance.Set(GPGSUtil.LASTUPGRADEKEY, prevVer);
             GPGSProjectSettings.Instance.Save();
             AssetDatabase.Refresh();
         }
@@ -51,7 +53,7 @@ namespace GooglePlayGames
         private static string Upgrade915(string prevVer)
         {
             Debug.Log("Upgrading from format version " + prevVer + " to " + PluginVersion.VersionKeyU5);
-            
+
             // all that was done was moving the Editor files to be in GooglePlayGames/Editor
             string[] obsoleteFiles =
                 {
@@ -92,7 +94,7 @@ namespace GooglePlayGames
                     "Assets/Plugins/iOS/GPGSAppController 1.mm",
                     "Assets/Plugins/iOS/GPGSAppController 1.mm.meta"
                 };
-            
+
             foreach (string file in obsoleteFiles)
             {
                 if (File.Exists(file))
@@ -108,7 +110,7 @@ namespace GooglePlayGames
         private static string Upgrade911(string prevVer)
         {
             Debug.Log("Upgrading from format version " + prevVer + " to " + PluginVersion.VersionKeyCPP);
-            
+
             // delete obsolete files, if they are there
             string[] obsoleteFiles =
                 {
@@ -119,7 +121,7 @@ namespace GooglePlayGames
                     "Assets/Plugins/GPGSUtils.dll",
                     "Assets/Plugins/GPGSUtils.dll.meta",
                 };
-            
+
             foreach (string file in obsoleteFiles)
             {
                 if (File.Exists(file))
@@ -128,15 +130,13 @@ namespace GooglePlayGames
                     File.Delete(file);
                 }
             }
-            
+
             // delete obsolete directories, if they are there
             string[] obsoleteDirectories =
                 {
-                "Assets/GooglePlayGames/Platforms/Android",
-                "Assets/GooglePlayGames/Platforms/iOS",
-                "Assets/Plugins/Android/BaseGameUtils",
+                "Assets/Plugins/Android/BaseGameUtils"
             };
-            
+
             foreach (string directory in obsoleteDirectories)
             {
                 if (Directory.Exists(directory))
@@ -145,7 +145,7 @@ namespace GooglePlayGames
                     Directory.Delete(directory, true);
                 }
             }
-            
+
             Debug.Log("Done upgrading from format version " + prevVer + " to " + PluginVersion.VersionKeyCPP);
             return PluginVersion.VersionKeyCPP;
         }

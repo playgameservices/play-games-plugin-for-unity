@@ -16,8 +16,11 @@
 
 namespace GooglePlayGames
 {
+    using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.IO;
+    using System.Xml;
     using UnityEditor;
     using UnityEngine;
 
@@ -29,8 +32,12 @@ namespace GooglePlayGames
         private const string APPIDPLACEHOLDER = "__APP_ID__";
         public const string APPIDKEY = "proj.AppId";
 
+        private const string CLASSNAMEPLACEHOLDER = "__Class__";
+        public const string CLASSNAMEKEY = "proj.ConstantsClassName";
+
         private const string WEBCLIENTIDPLACEHOLDER = "__WEB_CLIENTID__";
-        public const string WEBCLIENTIDKEY = "web.ClientId";
+        public const string WEBCLIENTIDKEY = "and.ClientId";
+
 
         private const string IOSCLIENTIDPLACEHOLDER = "__IOS_CLIENTID__";
         public const string IOSCLIENTIDKEY = "ios.ClientId";
@@ -41,13 +48,20 @@ namespace GooglePlayGames
         private const string TOKENPERMISSIONSHOLDER = "__TOKEN_PERMISSIONS__";
         private const string TOKENPERMISSIONKEY = "proj.tokenPermissions";
 
+        private const string NAMESPACESTARTPLACEHOLDER = "__NameSpaceStart__";
+        private const string NAMESPACEENDPLACEHOLDER = "__NameSpaceEnd__";
+
+        private const string CONSTANTSPLACEHOLDER = "__Constant_Properties__";
+
         public const string LASTUPGRADEKEY = "lastUpgrade";
 
-        public const string IOSSETUPDONEKEY = "ios.SetupDone";
+        public const string ANDROIDRESOURCEKEY = "and.ResourceData";
+        public const string IOSRESOURCEKEY = "ios.ResourceData";
 
         private const string GameInfoPath = "Assets/GooglePlayGames/GameInfo.cs";
- 
-        private const string TokenPermissions = 
+        public const string IOSSETUPDONEKEY = "ios.SetupDone";
+
+        private const string TokenPermissions =
             "<uses-permission android:name=\"android.permission.GET_ACCOUNTS\"/>\n" +
             "<uses-permission android:name=\"android.permission.USE_CREDENTIALS\"/>";
 
@@ -57,11 +71,12 @@ namespace GooglePlayGames
         /// key is the string that appears in the template as a placeholder,
         /// the value is the key into the GPGSProjectSettings.
         /// </summary>
-        private static Dictionary<string,string> Replacements = 
+        private static Dictionary<string,string> Replacements =
             new Dictionary<string, string>()
         {
             {SERVICEIDPLACEHOLDER, SERVICEIDKEY},
             {APPIDPLACEHOLDER, APPIDKEY},
+            {CLASSNAMEPLACEHOLDER, CLASSNAMEKEY},
             {WEBCLIENTIDPLACEHOLDER, WEBCLIENTIDKEY},
             {IOSCLIENTIDPLACEHOLDER, IOSCLIENTIDKEY},
             {IOSBUNDLEIDPLACEHOLDER, IOSBUNDLEIDKEY},
@@ -158,6 +173,33 @@ namespace GooglePlayGames
             return !s.Contains(" ") && s.Split(new char[] { '.' }).Length > 1;
         }
 
+        /// <summary>
+        /// Makes legal identifier from string.
+        /// Returns a legal C# identifier from the given string.  The transformations are:
+        ///   - spaces => underscore _
+        ///   - punctuation => empty string
+        ///   - leading numbers are prefixed with underscore.
+        /// </summary>
+        /// <returns>the id</returns>
+        /// <param name="key">Key.</param>
+        static string makeIdentifier (string key)
+        {
+            string s;
+            string retval = "";
+            if (string.IsNullOrEmpty (key)) {
+                return "_";
+            }
+
+            s = key.Trim().Replace (' ', '_');
+
+            foreach (char c in s) {
+                    if (char.IsLetterOrDigit(c) || c == '_') {
+                        retval += c;
+                    }
+            }
+            return retval;
+        }
+
         public static void Alert(string s)
         {
             Alert(GPGSStrings.Error, s);
@@ -202,7 +244,7 @@ namespace GooglePlayGames
                 libProjPath + GPGSUtil.SlashesToPlatformSeparator("/AndroidManifest.xml");
             string libProjDestDir = GPGSUtil.SlashesToPlatformSeparator(
                                         "Assets/Plugins/Android/google-play-services_lib");
-            
+
             // check that the Google Play Services lib project is there
             if (!System.IO.Directory.Exists(libProjPath) || !System.IO.File.Exists(libProjAM))
             {
@@ -210,6 +252,28 @@ namespace GooglePlayGames
                 EditorUtility.DisplayDialog(GPGSStrings.AndroidSetup.LibProjNotFound,
                     GPGSStrings.AndroidSetup.LibProjNotFoundBlurb, GPGSStrings.Ok);
                 return;
+            }
+
+            // check version
+            int version = GetGPSVersion(libProjPath);
+            if (version < 0)
+            {
+                Debug.LogError("Google Play Services lib version cannot be found!");
+            }
+            if (version < PluginVersion.MinGmsCoreVersionCode)
+            {
+                if (!EditorUtility.DisplayDialog(string.Format(
+                            GPGSStrings.AndroidSetup.LibProjVerTooOld,
+                            version, PluginVersion.MinGmsCoreVersionCode),
+                        GPGSStrings.Ok, GPGSStrings.Cancel))
+                {
+                    Debug.LogError("Google Play Services lib is too old! " +
+                       " Found version " +
+                        version + " require at least version " +
+                        PluginVersion.MinGmsCoreVersionCode);
+                    return;
+                }
+                Debug.Log("Ignoring the version mismatch and continuing the build.");
             }
 
             // clear out the destination library project
@@ -262,7 +326,7 @@ namespace GooglePlayGames
 
             foreach(KeyValuePair<string, string> ent in Replacements)
             {
-                string value = 
+                string value =
                     GPGSProjectSettings.Instance.Get(ent.Value, overrideValues);
                 manifestBody = manifestBody.Replace(ent.Key, value);
             }
@@ -271,13 +335,61 @@ namespace GooglePlayGames
             GPGSUtil.UpdateGameInfo();
         }
 
+        public static void WriteResourceIds(string className, Hashtable resourceKeys)
+        {
+
+            string constantsValues = string.Empty;
+            string[] parts = className.Split('.');
+            string dirName = "Assets";
+            string nameSpace = string.Empty;
+            for (int i = 0; i < parts.Length - 1; i++)
+            {
+                dirName += "/" + parts[i];
+                if (nameSpace != string.Empty)
+                {
+                    nameSpace += ".";
+                }
+                nameSpace += parts[i];
+            }
+            EnsureDirExists(dirName);
+            foreach (DictionaryEntry ent in resourceKeys)
+            {
+                string key = makeIdentifier ((string)ent.Key);
+                constantsValues += "        public const string " +
+                    key + " = \"" + ent.Value + "\"; // <GPGSID>\n";
+            }
+
+            string fileBody = GPGSUtil.ReadEditorTemplate("template-Constants");
+            if (nameSpace != string.Empty)
+            {
+                fileBody = fileBody.Replace(NAMESPACESTARTPLACEHOLDER,
+                    "namespace " + nameSpace + "\n{");
+            }
+            else
+            {
+                fileBody = fileBody.Replace(NAMESPACESTARTPLACEHOLDER, "");
+            }
+            fileBody = fileBody.Replace(CLASSNAMEPLACEHOLDER, parts[parts.Length - 1]);
+            fileBody = fileBody.Replace(CONSTANTSPLACEHOLDER, constantsValues);
+            if (nameSpace != string.Empty)
+            {
+                fileBody = fileBody.Replace(NAMESPACEENDPLACEHOLDER,
+                    "}");
+            }
+            else
+            {
+                fileBody = fileBody.Replace(NAMESPACEENDPLACEHOLDER, "");
+            }
+            WriteFile(dirName + "/" + parts[parts.Length-1] + ".cs", fileBody);
+        }
+
         public static void UpdateGameInfo()
         {
             string fileBody = GPGSUtil.ReadEditorTemplate("template-GameInfo");
 
             foreach(KeyValuePair<string, string> ent in Replacements)
             {
-                string value = 
+                string value =
                     GPGSProjectSettings.Instance.Get(ent.Value);
                 fileBody = fileBody.Replace(ent.Key, value);
             }
@@ -300,6 +412,35 @@ namespace GooglePlayGames
             {
                 System.IO.Directory.Delete(dir, true);
             }
+        }
+
+        static int GetGPSVersion(string libProjPath)
+        {
+            string versionFile = libProjPath + "/res/values/version.xml";
+
+            XmlTextReader reader = new XmlTextReader(new StreamReader(versionFile));
+            bool inResource = false;
+            int version = -1;
+
+            while (reader.Read())
+            {
+                if (reader.Name == "resources")
+                {
+                    inResource = true;
+                }
+                if (inResource && reader.Name == "integer")
+                {
+                    if ("google_play_services_version".Equals(
+                           reader.GetAttribute("name")))
+                    {
+                        reader.Read();
+                        Debug.Log("Read version string: " + reader.Value);
+                        version = Convert.ToInt32(reader.Value);
+                    }
+                }
+            }
+            reader.Close();
+            return version;
         }
     }
 }

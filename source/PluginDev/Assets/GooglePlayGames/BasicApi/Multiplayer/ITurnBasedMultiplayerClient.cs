@@ -37,6 +37,22 @@ namespace GooglePlayGames.BasicApi.Multiplayer
                               Action<bool, TurnBasedMatch> callback);
 
         /// <summary>
+        /// Starts a game with randomly selected opponent(s) using exclusiveBitMask.
+        ///  No UI will be shown.
+        /// </summary>
+        /// <param name="minOpponents">Minimum number opponents, not counting the current
+        /// player -- so for a 2-player game, use 1).</param>
+        /// <param name="maxOpponents">Max opponents, not counting the current player.</param>
+        /// <param name="variant">Variant. Use 0 for default.</param>
+        /// <param name="exclusiveBitmask">The bitmask used to match players.  The
+        /// xor operation of all the bitmasks must be 0 to match players.</param>
+        /// <param name="callback">Callback. Called when match setup is complete or fails.
+        /// If it succeeds, will be called with (true, match); if it fails, will be
+        /// called with (false, null).</param>
+        void CreateQuickMatch(uint minOpponents, uint maxOpponents, uint variant,
+            ulong exclusiveBitmask, Action<bool, TurnBasedMatch> callback);
+
+        /// <summary>
         /// Starts a game with an invitation screen. An invitation screen will be shown
         /// allowing the player to select opponents to play against.
         /// </summary>
@@ -48,6 +64,31 @@ namespace GooglePlayGames.BasicApi.Multiplayer
         /// and (false, null) if there is an error or the user cancelled.</param>
         void CreateWithInvitationScreen(uint minOpponents, uint maxOpponents, uint variant,
                                         Action<bool, TurnBasedMatch> callback);
+
+        /// <summary>
+        /// Starts a game with an invitation screen. An invitation screen will be shown
+        /// allowing the player to select opponents to play against.
+        /// </summary>
+        /// <param name="minOpponents">Minimum number of opponents, not including self
+        /// (so for a 2-player game, use 1).</param>
+        /// <param name="maxOpponents">Maximum number of opponents.</param>
+        /// <param name="variant">Variant. Use 0 for default.</param>
+        /// <param name="callback">Callback. Will be called with (UIStatus, match).  The UIStatus
+        /// parameter indicates the type of error or if the user cancelled the UI.</param>
+        void CreateWithInvitationScreen(uint minOpponents, uint maxOpponents, uint variant,
+            Action<UIStatus, TurnBasedMatch> callback);
+
+        /// <summary>
+        /// Gets all invitations.
+        /// </summary>
+        /// <param name="callback">Callback.</param>
+        void GetAllInvitations(Action<Invitation[]> callback);
+
+        /// <summary>
+        /// Gets all matches.
+        /// </summary>
+        /// <param name="callback">Callback.</param>
+        void GetAllMatches(Action<TurnBasedMatch[]> callback);
 
         /// <summary>
         /// Starts a game by showing the match inbox. The player's match inbox will be
