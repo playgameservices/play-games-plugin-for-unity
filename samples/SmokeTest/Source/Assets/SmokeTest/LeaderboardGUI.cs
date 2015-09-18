@@ -52,9 +52,9 @@ namespace SmokeTest
             }
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal(GUILayout.Height(height));
-            if (GUILayout.Button("Load Scores", GUILayout.Height(height),GUILayout.ExpandWidth(true)))
+            if (GUILayout.Button("Load Public Scores", GUILayout.Height(height),GUILayout.ExpandWidth(true)))
             {
-                DoLoadScores();
+                DoPublicLoadScores();
             }
             if (GUILayout.Button("Load Leaderboard", GUILayout.Height(height),GUILayout.ExpandWidth(true)))
             {
@@ -63,6 +63,10 @@ namespace SmokeTest
             GUILayout.EndHorizontal();
             GUILayout.Space(20);
             GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Load Social Scores", GUILayout.Height(height),GUILayout.ExpandWidth(true)))
+            {
+                DoSocialLoadScores();
+            }
             if (GUILayout.Button("Back",GUILayout.Height(height),GUILayout.ExpandWidth(true)))
             {
                 mOwner.SetUI(MainGui.Ui.Main);
@@ -100,7 +104,22 @@ namespace SmokeTest
             ShowEffect(true);
         }
 
-        internal void DoLoadScores()
+        internal void DoSocialLoadScores()
+        {
+            PlayGamesPlatform.Instance.LoadScores(
+                GPGSIds.leaderboard_leaders_in_smoketesting,
+                LeaderboardStart.PlayerCentered,
+                100,
+                LeaderboardCollection.Social,
+                LeaderboardTimeSpan.AllTime,
+                (data) =>
+                {
+                    mStatus = "Leaderboard data valid: " + data.Valid;
+                    mStatus += "\n approx:" +data.ApproximateCount + " have " + data.Scores.Length;
+                });
+        }
+
+        internal void DoPublicLoadScores()
         {
             PlayGamesPlatform.Instance.LoadScores(
                 GPGSIds.leaderboard_leaders_in_smoketesting,
@@ -110,7 +129,8 @@ namespace SmokeTest
                 LeaderboardTimeSpan.AllTime,
                 (data) =>
                 {
-                    mStatus = "Leaderboard data valid: " + data.Valid;
+                    mStatus  = "LB data Status: " + data.Status;
+                    mStatus += " valid: " + data.Valid;
                     mStatus += "\n approx:" +data.ApproximateCount + " have " + data.Scores.Length;
                 });
         }
@@ -118,6 +138,7 @@ namespace SmokeTest
         internal void DoLoadLeaderboard()
         {
             ILeaderboard lb = PlayGamesPlatform.Instance.CreateLeaderboard();
+            lb.userScope = UserScope.FriendsOnly;
             lb.id = GPGSIds.leaderboard_leaders_in_smoketesting;
             lb.LoadScores(ok =>
                 {

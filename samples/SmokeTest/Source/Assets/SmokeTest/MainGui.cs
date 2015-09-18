@@ -42,7 +42,6 @@ namespace SmokeTest
         private static readonly PlayGamesClientConfiguration ClientConfiguration =
             new PlayGamesClientConfiguration.Builder()
                 .EnableSavedGames()
-                .EnableDeprecatedCloudSave()
                 .Build();
 
         private Ui mUi = Ui.Main;
