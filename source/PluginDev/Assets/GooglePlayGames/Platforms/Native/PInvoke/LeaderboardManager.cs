@@ -180,7 +180,7 @@ namespace GooglePlayGames.Native.PInvoke
             string selfPlayerId, int maxResults,
             ScorePageToken token, Action<LeaderboardScoreData> callback)
         {
-            if (response.GetStatus() != Status.ResponseStatus.VALID ||
+            if (response.GetStatus() != Status.ResponseStatus.VALID &&
                 response.GetStatus() != Status.ResponseStatus.VALID_BUT_STALE)
             {
                 Logger.w("Error returned from fetchScoreSummary: " + response);

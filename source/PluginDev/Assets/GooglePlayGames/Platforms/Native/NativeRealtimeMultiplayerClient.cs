@@ -969,6 +969,8 @@ namespace GooglePlayGames.Native
             private float mPercentComplete = InitialPercentComplete;
             private float mPercentPerParticipant;
 
+            private bool showingWaitingRoom = false;
+
             internal ConnectingState(NativeRealTimeRoom room, RoomSession session)
                 : base(session, room)
             {
@@ -1073,14 +1075,23 @@ namespace GooglePlayGames.Native
 
             internal override void LeaveRoom()
             {
-                mSession.EnterState(new LeavingRoom(mSession, mRoom,
-                        () => mSession.OnGameThreadListener().RoomConnected(false)));
+                if (!showingWaitingRoom)
+                {
+                    mSession.EnterState(new LeavingRoom(mSession, mRoom,
+                            () => mSession.OnGameThreadListener().RoomConnected(false)));
+                }
+                else
+                {
+                    Logger.d("Not leaving room since still showing waiting room UI");
+                }
             }
 
             internal override void ShowWaitingRoomUI(uint minimumParticipantsBeforeStarting)
             {
+                showingWaitingRoom = true;
                 mSession.Manager().ShowWaitingRoomUI(mRoom, minimumParticipantsBeforeStarting, response =>
                     {
+                        showingWaitingRoom = false;
                         Logger.d("ShowWaitingRoomUI Response: " + response.ResponseStatus());
                         if(response.ResponseStatus() == Status.UIStatus.VALID) {
                             Logger.d("Connecting state ShowWaitingRoomUI: room pcount:" + response.Room().ParticipantCount() +
