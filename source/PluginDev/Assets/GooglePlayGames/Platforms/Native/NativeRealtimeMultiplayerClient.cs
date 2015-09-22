@@ -144,9 +144,11 @@ namespace GooglePlayGames.Native
                 // current room.
                 mCurrentSession = newRoom;
 
+                mCurrentSession.ShowingUI = true;
                 mRealtimeManager.ShowPlayerSelectUI(minOpponents, maxOppponents, true,
                     response =>
                     {
+                        mCurrentSession.ShowingUI = false;
                         if (response.Status() != Status.UIStatus.VALID)
                         {
                             Logger.d("User did not complete invitation screen.");
@@ -205,9 +207,11 @@ namespace GooglePlayGames.Native
                 // The user accepted an invitation from the inbox, this is now the current room.
                 mCurrentSession = newRoom;
 
+                mCurrentSession.ShowingUI = true;
                 mRealtimeManager.ShowRoomInboxUI(
                     response =>
                     {
+                        mCurrentSession.ShowingUI = false;
                         if (response.ResponseStatus() != Status.UIStatus.VALID)
                         {
                             Logger.d("User did not complete invitation screen.");
@@ -418,6 +422,8 @@ namespace GooglePlayGames.Native
             private volatile State mState;
             private volatile bool mStillPreRoomCreation;
 
+            private volatile bool mShowingUI;
+
             private uint mMinPlayersToStart;
 
             internal RoomSession(RealtimeManager manager, RealTimeMultiplayerListener listener)
@@ -427,6 +433,18 @@ namespace GooglePlayGames.Native
 
                 EnterState(new BeforeRoomCreateStartedState(this));
                 mStillPreRoomCreation = true;
+            }
+
+            internal bool ShowingUI
+            {
+                get
+                {
+                    return mShowingUI;
+                }
+                set
+                {
+                    mShowingUI = value;
+                }
             }
 
             internal uint MinPlayersToStart
@@ -479,10 +497,18 @@ namespace GooglePlayGames.Native
 
             internal void LeaveRoom()
             {
-                lock (mLifecycleLock)
+                if (!ShowingUI)
                 {
-                    mState.LeaveRoom();
+                    lock (mLifecycleLock)
+                    {
+                        mState.LeaveRoom();
+                    }
                 }
+                else
+                {
+                    Logger.d("Not leaving room since showing UI");
+                }
+                    
             }
 
             internal void ShowWaitingRoomUI()
@@ -969,8 +995,6 @@ namespace GooglePlayGames.Native
             private float mPercentComplete = InitialPercentComplete;
             private float mPercentPerParticipant;
 
-            private bool showingWaitingRoom = false;
-
             internal ConnectingState(NativeRealTimeRoom room, RoomSession session)
                 : base(session, room)
             {
@@ -1075,23 +1099,16 @@ namespace GooglePlayGames.Native
 
             internal override void LeaveRoom()
             {
-                if (!showingWaitingRoom)
-                {
-                    mSession.EnterState(new LeavingRoom(mSession, mRoom,
-                            () => mSession.OnGameThreadListener().RoomConnected(false)));
-                }
-                else
-                {
-                    Logger.d("Not leaving room since still showing waiting room UI");
-                }
+                mSession.EnterState(new LeavingRoom(mSession, mRoom,
+                        () => mSession.OnGameThreadListener().RoomConnected(false)));
             }
 
             internal override void ShowWaitingRoomUI(uint minimumParticipantsBeforeStarting)
             {
-                showingWaitingRoom = true;
+                mSession.ShowingUI = true;
                 mSession.Manager().ShowWaitingRoomUI(mRoom, minimumParticipantsBeforeStarting, response =>
                     {
-                        showingWaitingRoom = false;
+                        mSession.ShowingUI = false;
                         Logger.d("ShowWaitingRoomUI Response: " + response.ResponseStatus());
                         if(response.ResponseStatus() == Status.UIStatus.VALID) {
                             Logger.d("Connecting state ShowWaitingRoomUI: room pcount:" + response.Room().ParticipantCount() +
