@@ -29,7 +29,7 @@ namespace GooglePlayGames
         private string emailAddress;
 
         internal PlayGamesLocalUser(PlayGamesPlatform plaf) :
-            base("localUser", null, null)
+        base("localUser", string.Empty, string.Empty)
         {
             mPlatform = plaf;
             emailAddress = null;

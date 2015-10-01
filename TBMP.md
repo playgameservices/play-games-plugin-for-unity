@@ -92,6 +92,31 @@ To accept a specific invitation whose ID you know (for example, an invitation yo
     PlayGamesPlatform.Instance.TurnBased.AcceptInvitation(invitation.InvitationId, OnMatchStarted);
 ```
 
+
+## List All Invitations
+
+To get a list of all the invitations use:
+
+```csharp
+
+    PlayGamesPlatform.Instance.TurnBased.GetAllInvitations(
+        (invites) =>
+        {
+            Debug.Log("Got " + invites.Length + " invites");
+            string logMessage = "";
+            foreach(Invitation invite in invites)
+            {
+                logMessage += " " + invite.InvitationId + " (" +
+                    invite.InvitationType + ") from " +
+                    invite.Inviter + "\n";
+                if (mFirstInvite == null) {
+                    mFirstInvite = invite;
+                }
+            }
+            Debug.Log(logMessage);
+    });
+```
+
 ## The Match Callback
 
 In the previous examples, the match callback we created was called `OnMatchStarted`. It receives two parameters:

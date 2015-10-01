@@ -97,6 +97,10 @@ namespace GooglePlayGames.BasicApi.Multiplayer
     /// </summary>
     void ShowWaitingRoomUI();
 
+    /// <summary>Gets all invitations.</summary>
+    /// <param name="callback">Callback.</param>
+    void GetAllInvitations(Action<Invitation[]> callback);
+
     /// <summary>
     /// Creates a real-time game starting with the inbox screen. On the inbox screen,
     /// the player can select an invitation to accept, in which case the room setup
@@ -122,9 +126,7 @@ namespace GooglePlayGames.BasicApi.Multiplayer
     /// <param name="listener">Listener. Listener to notify of relevant events.</param>
     void AcceptInvitation(string invitationId, RealTimeMultiplayerListener listener);
 
-    /// <summary>
-    /// Sends a message to all other participants.
-    /// </summary>
+    /// <summary>Sends a message to all other participants.</summary>
     /// <param name="reliable">If set to <c>true</c>, mesasge is reliable; if not,
     /// it is unreliable. Unreliable messages are faster, but are not guaranteed to arrive
     /// and may arrive out of order.</param>
@@ -158,26 +160,24 @@ namespace GooglePlayGames.BasicApi.Multiplayer
     /// </summary>
     void SendMessage(bool reliable, string participantId, byte[] data, int offset, int length);
 
-    /// <summary>
-    /// Gets the connected participants, including self.
-    /// </summary>
+    /// <summary>Gets the connected participants, including self.</summary>
     /// <returns>The connected participants, including self. This list is guaranteed
     /// to be ordered lexicographically by Participant ID, which means the ordering will be
     /// the same to all participants.</returns>
     List<Multiplayer.Participant> GetConnectedParticipants();
 
-    /// <summary>
-    /// Gets the participant that represents the current player.
-    /// </summary>
+    /// <summary>Gets the participant that represents the current player.</summary>
     /// <returns>Self.</returns>
     Multiplayer.Participant GetSelf();
 
-    /// <summary>
-    /// Gets a participant by ID.
-    /// </summary>
+    /// <summary>Gets a participant by ID.</summary>
     /// <returns>The participant, or <c>null</c> if not found.</returns>
     /// <param name="participantId">Participant id.</param>
-    Multiplayer.Participant GetParticipant(string participantId);
+    Participant GetParticipant(string participantId);
+
+    /// <summary>Gets the invitation used to create the game, if any.</summary>
+    /// <returns>The invitation.  Will be null if no invitation was accepted.</returns>
+    Invitation GetInvitation();
 
     /// <summary>
     /// Leaves the room. Call this method to leave the room after you have
@@ -198,9 +198,7 @@ namespace GooglePlayGames.BasicApi.Multiplayer
     /// <returns><c>true</c> if the room is connected; otherwise, <c>false</c>.</returns>
     bool IsRoomConnected();
 
-    /// <summary>
-    /// Declines the invitation.
-    /// </summary>
+    /// <summary>Declines the invitation.</summary>
     /// <param name="invitationId">Invitation id to decline.</param>
     void DeclineInvitation(string invitationId);
   }

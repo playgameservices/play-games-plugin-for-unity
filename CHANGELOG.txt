@@ -1,3 +1,12 @@
+Version 0.9.26 
+    New Features:
+        * #666 Expose invitation property for Real time game.
+    Bug Fixes:
+        * #709 ShowWaitingRoom cancels match.
+        * #712 Waiting room does not appear
+        * #719 Extra web client label in ios Setup dialog
+        * #726 inviter profile image not loading
+        * #722 Social.localUser.id throws NullPointerException
 Version 0.9.25 (codename: frengle)
     11 Sept 2015
     ** BREAKING CHANGES **

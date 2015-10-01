@@ -31,14 +31,12 @@ namespace GooglePlayGames.BasicApi
             new Builder().Build();
 
         private readonly bool mEnableSavedGames;
-        private readonly bool mEnableDeprecatedCloudSave;
         private readonly InvitationReceivedDelegate mInvitationDelegate;
         private readonly MatchDelegate mMatchDelegate;
 
         private PlayGamesClientConfiguration(Builder builder)
         {
             this.mEnableSavedGames = builder.HasEnableSaveGames();
-            this.mEnableDeprecatedCloudSave = builder.HasEnableDeprecatedCloudSave();
             this.mInvitationDelegate = builder.GetInvitationDelegate();
             this.mMatchDelegate = builder.GetMatchDelegate();
         }
@@ -48,14 +46,6 @@ namespace GooglePlayGames.BasicApi
             get
             {
                 return mEnableSavedGames;
-            }
-        }
-
-        public bool EnableDeprecatedCloudSave
-        {
-            get
-            {
-                return mEnableDeprecatedCloudSave;
             }
         }
 
@@ -78,7 +68,6 @@ namespace GooglePlayGames.BasicApi
         public class Builder
         {
             private bool mEnableSaveGames = false;
-            private bool mEnableDeprecatedCloudSave = false;
 
             private InvitationReceivedDelegate mInvitationDelegate = delegate
             {
@@ -91,20 +80,6 @@ namespace GooglePlayGames.BasicApi
             public Builder EnableSavedGames()
             {
                 mEnableSaveGames = true;
-                return this;
-            }
-
-            /// <summary>
-            /// Enables the now-deprecated cloud save. This is only present for backwards-compatibility 
-            /// and legacy purposes. New games cannot have cloud save enabled, and must use Saved Games.
-            /// Existing games should migrate off of cloud save as soon as possible.
-            /// </summary>
-            /// <returns>The builder instance</returns>
-            public Builder EnableDeprecatedCloudSave()
-            {
-                Logger.w("Cloud save is deprecated and is not available for new games. " +
-                    "Please migrate to Saved Games as soon as possible.");
-                mEnableDeprecatedCloudSave = true;
                 return this;
             }
 
@@ -123,11 +98,6 @@ namespace GooglePlayGames.BasicApi
             internal bool HasEnableSaveGames()
             {
                 return mEnableSaveGames;
-            }
-
-            internal bool HasEnableDeprecatedCloudSave()
-            {
-                return mEnableDeprecatedCloudSave;
             }
 
             internal MatchDelegate GetMatchDelegate()

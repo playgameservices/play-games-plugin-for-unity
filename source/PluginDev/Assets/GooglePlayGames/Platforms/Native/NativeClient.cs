@@ -343,9 +343,11 @@ namespace GooglePlayGames.Native
                         mFriends = players;
                          callback(true);
                     }
-                    else {
-                        mFriends = null;
+                    else
+                    {
+                        mFriends = new List<Player>();
                         Logger.e("Got " + status + " loading friends");
+                        callback(false);
                     }
                 });
         }
@@ -358,7 +360,7 @@ namespace GooglePlayGames.Native
                 friendsLoading = true;
                 LoadFriends((ok) =>
                     {
-                        Logger.d("loading: " + ok);
+                        Logger.d("loading: " + ok + " mFriends = " + mFriends);
                         friendsLoading = false;
                     });
             }

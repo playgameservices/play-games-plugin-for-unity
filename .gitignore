@@ -3,6 +3,9 @@
 siteconfig-DO-NOT-COMMIT/
 
 source/build/
+source/PluginDev/ProjectSettings/ProjectVersion.txt
+source/PluginDev/ProjectSettings/UnityAdsSettings.asset
+source/PluginDev/ProjectSettings/UnityAnalyticsManager.asset
 
 StyleCop.Cache
 StyleCop.Cache.meta

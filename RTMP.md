@@ -67,6 +67,12 @@ To show the user their invitation inbox so they can pick an invitation to accept
     PlayGamesPlatform.Instance.RealTime.AcceptFromInbox(listener);
 ```
 
+Once an invitation is accepted, the invitation can be accessed by using:
+
+```csharp
+    PlayGamesPlatform.Instance.RealTime.GetInvitation();
+```
+
 ### Accept invitation
 
 To accept an invitation whose ID you know (for example, an invitation delivered to you via the invitation delegate), use `AcceptInvitation`:
@@ -77,6 +83,32 @@ To accept an invitation whose ID you know (for example, an invitation delivered 
 ```
 
 We will cover this in more detail later.
+
+
+## List All Invitations
+
+To get a list of all the invitations use:
+
+```csharp
+
+    PlayGamesPlatform.Instance.RealTime.GetAllInvitations(
+        (invites) =>
+        {
+            Debug.Log("Got " + invites.Length + " invites");
+            string logMessage = "";
+            foreach(Invitation invite in invites)
+            {
+                logMessage += " " + invite.InvitationId + " (" +
+                    invite.InvitationType + ") from " +
+                    invite.Inviter + "\n";
+                if (mFirstInvite == null) {
+                    mFirstInvite = invite;
+                }
+            }
+            Debug.Log(logMessage);
+    });
+```
+
 
 ## Wait for Connection
 

@@ -190,6 +190,29 @@ namespace GooglePlayGames.Native
                 mCurrentSession.ShowWaitingRoomUI();
             }
         }
+            
+        public void GetAllInvitations(Action<Invitation[]> callback)
+        {
+            mRealtimeManager.FetchInvitations((response) =>
+                {
+                    if (!response.RequestSucceeded())
+                    {
+                        Logger.e("Couldn't load invitations.");
+                        callback(new Invitation[0]);
+                        return;
+                    }
+
+                    List<Invitation> invites = new List<Invitation>();
+                    foreach (var invitation in response.Invitations())
+                    {
+                        using (invitation)
+                        {
+                            invites.Add(invitation.AsInvitation());
+                        }
+                    }
+                    callback(invites.ToArray());
+                });
+        }
 
         public void AcceptFromInbox(RealTimeMultiplayerListener listener)
         {
@@ -235,6 +258,7 @@ namespace GooglePlayGames.Native
                                         using (invitation)
                                         {
                                             newRoom.HandleRoomResponse(acceptResponse);
+                                            newRoom.SetInvitation(invitation.AsInvitation());
                                         }
                                     }));
                         }
@@ -293,6 +317,11 @@ namespace GooglePlayGames.Native
                         newRoom.LeaveRoom();
                     });
             }
+        }
+
+        public Invitation GetInvitation()
+        {
+            return mCurrentSession.GetInvitation();
         }
 
         public void LeaveRoom()
@@ -422,6 +451,8 @@ namespace GooglePlayGames.Native
             private volatile State mState;
             private volatile bool mStillPreRoomCreation;
 
+            Invitation mInvitation;
+
             private volatile bool mShowingUI;
 
             private uint mMinPlayersToStart;
@@ -472,6 +503,16 @@ namespace GooglePlayGames.Native
             internal string SelfPlayerId()
             {
                 return mCurrentPlayerId;
+            }
+
+            public void SetInvitation(Invitation invitation)
+            {
+                mInvitation = invitation;
+            }
+
+            public Invitation GetInvitation()
+            {
+                return mInvitation;
             }
 
             internal OnGameThreadForwardingListener OnGameThreadListener()
@@ -571,6 +612,11 @@ namespace GooglePlayGames.Native
                 }
             }
 
+            /// <summary>
+            /// Handles the room response.
+            /// </summary>
+            /// <param name="response">Response.</param>
+            /// <param name="invitation">Invitation if accepting an invitation, this is stored in the session, otherwise null</param>
             internal void HandleRoomResponse(RealtimeManager.RealTimeRoomResponse response)
             {
                 lock (mLifecycleLock)
