@@ -14,11 +14,13 @@
 //    limitations under the License.
 // </copyright>
 
+
 namespace GooglePlayGames.BasicApi
 {
     using System;
     using GooglePlayGames.BasicApi.Multiplayer;
     using GooglePlayGames.OurUtils;
+    using UnityEngine;
     using UnityEngine.SocialPlatforms;
 
     public class DummyClient : IPlayGamesClient
@@ -69,6 +71,14 @@ namespace GooglePlayGames.BasicApi
         public string GetUserEmail()
         {
             return string.Empty;
+        }
+
+        public void GetPlayerStats(
+            Action<CommonStatusCodes, PlayGamesLocalUser.PlayerStats> callback)
+        {
+            LogUsage();
+            callback(CommonStatusCodes.ApiNotConnected,
+                    new PlayGamesLocalUser.PlayerStats());
         }
 
         public string GetUserDisplayName()
@@ -267,6 +277,12 @@ namespace GooglePlayGames.BasicApi
         {
             LogUsage();
             return new IUserProfile[0];
+        }
+
+        public IntPtr GetApiClient()
+        {
+            LogUsage();
+            return IntPtr.Zero;
         }
 
         private static void LogUsage()

@@ -18,6 +18,7 @@ namespace GooglePlayGames.BasicApi
 {
   using System;
   using GooglePlayGames.BasicApi.Multiplayer;
+  using UnityEngine;
   using UnityEngine.SocialPlatforms;
 
   /// <summary>
@@ -120,6 +121,10 @@ namespace GooglePlayGames.BasicApi
     /// <returns>The URL to load the avatar image. <code>null</code> if they are not logged
     /// in</returns>
     string GetUserImageUrl();
+
+    /// <summary>Gets the player stats.</summary>
+    /// <param name="callback">Callback for response.</param>
+    void GetPlayerStats(Action<CommonStatusCodes, PlayGamesLocalUser.PlayerStats> callback);
 
     /// <summary>
     /// Loads the users specified.  This is mainly used by the leaderboard
@@ -313,6 +318,12 @@ namespace GooglePlayGames.BasicApi
     void RegisterInvitationDelegate(InvitationReceivedDelegate invitationDelegate);
 
     IUserProfile[] GetFriends();
+
+    /// <summary>
+    /// Gets the Android API client.  Returns null on non-Android players.
+    /// </summary>
+    /// <returns>The API client.</returns>
+    IntPtr GetApiClient();
   }
 
   /// <summary>

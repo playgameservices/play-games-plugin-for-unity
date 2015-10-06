@@ -72,7 +72,7 @@ namespace GooglePlayGames.BasicApi
             private InvitationReceivedDelegate mInvitationDelegate = delegate
             {
             };
-            
+
             private MatchDelegate mMatchDelegate = delegate
             {
             };

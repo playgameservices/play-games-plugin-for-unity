@@ -19,7 +19,7 @@ namespace GooglePlayGames.BasicApi
 {
     /// <summary>
     /// Score page token. This holds the internal token used
-    /// to page through the score pages.  The id, collection, and 
+    /// to page through the score pages.  The id, collection, and
     /// timespan are added as a convience, and not actually part of the
     /// page token returned from the SDK.
     /// </summary>

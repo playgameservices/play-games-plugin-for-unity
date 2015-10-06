@@ -1,6 +1,7 @@
 Version 0.9.26 
     New Features:
         * #666 Expose invitation property for Real time game.
+        * Implement PlayerStats API for the local user.
     Bug Fixes:
         * #709 ShowWaitingRoom cancels match.
         * #712 Waiting room does not appear

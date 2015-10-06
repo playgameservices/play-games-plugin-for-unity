@@ -125,7 +125,6 @@ namespace GooglePlayGames
             if (!string.IsNullOrEmpty(AvatarURL))
             {
                 WWW www = new WWW(AvatarURL);
-               
                 while (!www.isDone)
                 {
                     yield return null;

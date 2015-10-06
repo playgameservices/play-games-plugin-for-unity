@@ -28,7 +28,6 @@ namespace GooglePlayGames.Native
     using System.Collections.Generic;
     using GooglePlayGames.BasicApi.Events;
     using GooglePlayGames.BasicApi.Quests;
-    using C = GooglePlayGames.Native.Cwrapper.InternalHooks;
     using Types = GooglePlayGames.Native.Cwrapper.Types;
     using Status = GooglePlayGames.Native.Cwrapper.CommonErrorStatus;
     using UnityEngine;
@@ -603,6 +602,11 @@ namespace GooglePlayGames.Native
             return mUser.AvatarURL;
         }
 
+        public void GetPlayerStats(Action<CommonStatusCodes, PlayGamesLocalUser.PlayerStats> callback)
+        {
+            clientImpl.GetPlayerStats(GetApiClient(), callback);
+        }
+
         ///<summary></summary>
         /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.LoadUsers"/>
         public void LoadUsers(string[] userIds, Action<IUserProfile[]> callback)
@@ -1015,6 +1019,19 @@ namespace GooglePlayGames.Native
                 return mTokenClient.GetAccessToken();
             }
             return null;
+        }
+
+        public IntPtr GetApiClient()
+        {
+#if UNITY_ANDROID
+            IntPtr ptr =
+                Cwrapper.InternalHooks.InternalHooks_GetApiClient(mServices.AsHandle());
+
+            return  ptr;
+#else
+            Debug.Log("GoogleAPIClient is not available on this platform");
+            return IntPtr.Zero;
+#endif
         }
     }
 }

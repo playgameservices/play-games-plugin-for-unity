@@ -15,21 +15,13 @@
 // </copyright>
 
 #if UNITY_ANDROID
-namespace GooglePlayGames.Android {
-using System;
-using System.Linq;
-using GooglePlayGames.BasicApi;
-using GooglePlayGames.Native; // Token retrieval
-using GooglePlayGames.Native.PInvoke;
-using GooglePlayGames.OurUtils;
-using System.Runtime.InteropServices;
-using System.Reflection;
-using System.Collections.Generic;
-using UnityEngine;
-
-using C = GooglePlayGames.Native.Cwrapper.InternalHooks;
-internal class AndroidTokenClient: TokenClient
+namespace GooglePlayGames.Android
 {
+    using System;
+    using UnityEngine;
+
+    internal class AndroidTokenClient: TokenClient
+    {
         public static AndroidJavaObject GetActivity()
         {
             using (var jc = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
@@ -38,34 +30,33 @@ internal class AndroidTokenClient: TokenClient
             }
         }
 
-
         /// <summary>Gets the Google API client Java object.</summary>
         /// <returns>The API client associated with the current Unity app.</returns>
         /// <param name="serverClientID">The OAuth 2.0 client ID for a backend server.</param>
-        private AndroidJavaObject GetApiClient(bool getServerAuthCode = false,
-                                               string serverClientID = null)
+        public AndroidJavaObject GetApiClient(bool getServerAuthCode = false,
+                                              string serverClientID = null)
         {
             Debug.Log("Calling GetApiClient....");
             using (var currentActivity = GetActivity())
             {
                 using (AndroidJavaClass jc_plus = new AndroidJavaClass("com.google.android.gms.plus.Plus"))
                 {
-                    using (AndroidJavaObject jc_builder = new AndroidJavaObject("com.google.android.gms.common.api.GoogleApiClient$Builder",currentActivity))
+                    using (AndroidJavaObject jc_builder = new AndroidJavaObject("com.google.android.gms.common.api.GoogleApiClient$Builder", currentActivity))
                     {
-                        jc_builder.Call<AndroidJavaObject> ("addApi", jc_plus.GetStatic<AndroidJavaObject>("API"));
-                        jc_builder.Call<AndroidJavaObject> ("addScope", jc_plus.GetStatic<AndroidJavaObject>("SCOPE_PLUS_LOGIN"));
+                        jc_builder.Call<AndroidJavaObject>("addApi", jc_plus.GetStatic<AndroidJavaObject>("API"));
+                        jc_builder.Call<AndroidJavaObject>("addScope", jc_plus.GetStatic<AndroidJavaObject>("SCOPE_PLUS_LOGIN"));
                         if (getServerAuthCode)
                         {
-                            jc_builder.Call<AndroidJavaObject> ("requestServerAuthCode", serverClientID, jc_builder);
+                            jc_builder.Call<AndroidJavaObject>("requestServerAuthCode", serverClientID, jc_builder);
                         }
-                        AndroidJavaObject client = jc_builder.Call<AndroidJavaObject> ("build");
-                        client.Call ("connect");
+                        AndroidJavaObject client = jc_builder.Call<AndroidJavaObject>("build");
+                        client.Call("connect");
 
                         // limit spinning to 100, to minimize blocking when not
                         // working as expected.
                         // TODO: Make this a callback.
                         int ct = 100;
-                        while( ( !client.Call<bool>("isConnected") ) && (ct-- != 0) )
+                        while ((!client.Call<bool>("isConnected")) && (ct-- != 0))
                         {
                             System.Threading.Thread.Sleep(100);
                         }
@@ -75,7 +66,6 @@ internal class AndroidTokenClient: TokenClient
                 }
             }
         }
-
 
         /// <summary>
         /// Gets the account name of the currently signed-in user to later use for token retrieval.
@@ -91,13 +81,12 @@ internal class AndroidTokenClient: TokenClient
                 {
                     using (var apiClient = GetApiClient())
                     {
-                        accountName  = accountService.Call<string>("getAccountName", apiClient);
+                        accountName = accountService.Call<string>("getAccountName", apiClient);
                     }
                 }
             }
             return accountName;
         }
-
 
         /// <summary>Gets the current user's email.</summary>
         /// <returns>A string representing the email.</returns>
@@ -106,15 +95,13 @@ internal class AndroidTokenClient: TokenClient
             return GetAccountName();
         }
 
-
         /// <summary>Gets the authZ token for server authorization.</summary>
-        /// <param name="serverClietnID">The client ID for the server that will exchange the one-time code.</param>
+        /// <param name="serverClientID">The client ID for the server that will exchange the one-time code.</param>
         /// <returns> An authorization code upon success.</returns>
         public string GetAuthorizationCode(string serverClientID)
         {
             throw new NotImplementedException();
         }
-
 
         /// <summary>Gets the access token currently associated with the Unity activity.</summary>
         /// <returns>The OAuth 2.0 access token.</returns>
@@ -133,7 +120,6 @@ internal class AndroidTokenClient: TokenClient
             return token;
         }
 
-
         /// <summary>Gets the OpenID Connect ID token for authentication with a server backend.</summary>
         /// <returns>The OpenID Connect ID token.</returns>
         /// <param name="serverClientID">Server client ID from console.developers.google.com or the Play Games
@@ -147,7 +133,7 @@ internal class AndroidTokenClient: TokenClient
             using (AndroidJavaClass unityActivity = new AndroidJavaClass("com.unity3d.player.UnityPlayer"),
                    googleAuthUtil = new AndroidJavaClass("com.google.android.gms.auth.GoogleAuthUtil"))
             {
-                using(AndroidJavaObject currentActivity = unityActivity.GetStatic<AndroidJavaObject>("currentActivity"))
+                using (AndroidJavaObject currentActivity = unityActivity.GetStatic<AndroidJavaObject>("currentActivity"))
                 {
                     token = googleAuthUtil.CallStatic<string>("getToken", currentActivity, accountName, scope);
                 }
