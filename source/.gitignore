@@ -1,6 +1,5 @@
 *userprefs
 *~
-*.meta
 test-results
 GPGSUtils/bin/
 PluginDev.UnitTests/bin/
@@ -13,11 +12,17 @@ PluginDev/Assets/Editor/projsettings.txt
 PluginDev/Assets/Editor/projsettings.txt.meta
 PluginDev/Assets/Plugins/.DS_Store
 PluginDev/Assets/Plugins/Android/.DS_Store
-PluginDev/Assets/Plugins/Android/MainLibProj/AndroidManifest.xml
+PluginDev/Assets/Plugins/Android/MainLibProj
 PluginDev/Assets/Plugins/Android/google-play-services_lib/
+PluginDev/Assets/Plugins/Android/libs.meta
+PluginDev/Assets/Plugins/Android/libs/
+PluginDev/Assets/Plugins/iOS.meta
+PluginDev/Assets/Settings.StyleCop.meta
+PluginDev/Assets/SmokeTest.meta
 PluginDev/Library/
 PluginDev/Temp/
 PluginDev/obj/
 SupportLib/.idea/
 SupportLib/**/*.iml
 SupportLib/PlayGamesPluginSupport/local.properties
+
