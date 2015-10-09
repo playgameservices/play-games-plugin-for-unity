@@ -170,7 +170,32 @@ namespace GooglePlayGames
 
         public static bool LooksLikeValidPackageName(string s)
         {
-            return !s.Contains(" ") && s.Split(new char[] { '.' }).Length > 1;
+            if (string.IsNullOrEmpty (s)) {
+            {
+                throw new Exception("cannot be empty");
+            }
+
+            string[] parts = s.Split(new char[] { '.' });
+            foreach (string p in parts)
+            {
+                char[] bytes = p.ToCharArray();
+                for(int i=0;i<bytes.Length;i++) {
+                    if (i == 0 && !char.IsLetter(bytes[i]))
+                    {
+                        throw new Exception("each part must start with a letter");
+                    }
+                    else if (char.IsWhiteSpace(bytes[i]))
+                    {
+                        throw new Exception("cannot contain spaces");
+                    }
+                    else if (!char.IsLetterOrDigit(bytes[i]) && bytes[i] != '_')
+                    {
+                        throw new Exception("must be alphanumeric or _");
+                    }
+                }
+            }
+            
+            return parts.Length >= 1;
         }
 
         /// <summary>

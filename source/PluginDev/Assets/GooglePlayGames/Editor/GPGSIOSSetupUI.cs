@@ -16,6 +16,7 @@
 
 namespace GooglePlayGames
 {
+    using System;
     using System.IO;
     using System.Collections;
     using UnityEngine;
@@ -114,7 +115,19 @@ namespace GooglePlayGames
             // Setup button
             if (GUILayout.Button(GPGSStrings.Setup.SetupButton))
             {
-                DoSetup();
+                // check that the classname entered is valid
+                try
+                {
+                    if (GPGSUtil.LooksLikeValidPackageName(mClassName))
+                    {
+                        DoSetup();
+                    }
+                }
+                catch (Exception e)
+                {
+                    GPGSUtil.Alert(GPGSStrings.Error,
+                        "Invalid classname: " + e.Message);
+                }
             }
 
             if (GUILayout.Button(GPGSStrings.Cancel))

@@ -1,8 +1,10 @@
-Version 0.9.26 
+Version 0.9.26
     New Features:
         * #666 Expose invitation property for Real time game.
         * Implement PlayerStats API for the local user.
+        * Requires version 8.1.5 of play services SDK
     Bug Fixes:
+        * #696 Validate constants classname during setup.
         * #709 ShowWaitingRoom cancels match.
         * #712 Waiting room does not appear
         * #719 Extra web client label in ios Setup dialog
@@ -12,8 +14,8 @@ Version 0.9.25 (codename: frengle)
     11 Sept 2015
     ** BREAKING CHANGES **
        * Cloud Save service (AppState) has been removed.
-       * The setup dialog now requires the generated resource data from 
-            Google Play Developer Console.  This reduces the number of 
+       * The setup dialog now requires the generated resource data from
+            Google Play Developer Console.  This reduces the number of
             copy & pastes needed and makes it harder to make a mistake with the
             client id.
     New Features:
