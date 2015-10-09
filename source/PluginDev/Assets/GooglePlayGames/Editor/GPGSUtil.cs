@@ -170,7 +170,7 @@ namespace GooglePlayGames
 
         public static bool LooksLikeValidPackageName(string s)
         {
-            if (string.IsNullOrEmpty (s)) {
+            if (string.IsNullOrEmpty (s))
             {
                 throw new Exception("cannot be empty");
             }
