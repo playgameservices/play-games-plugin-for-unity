@@ -536,12 +536,13 @@ additional flexibility and information when accessing the leaderboard data.
 ```
 
 The parameters for LoadScores() are:
-    1. leaderboardId
-    2. start position (top scores or player centered)
-    3. row count
-    4. leaderboard collection (social or public)
-    5. time span (daily, weekly, all-time)
-    6. callback accepting a LeaderboardScoreData object.
+
+1. leaderboardId
+2. start position (top scores or player centered)
+3. row count
+4. leaderboard collection (social or public)
+5. time span (daily, weekly, all-time)
+6. callback accepting a LeaderboardScoreData object.
 
 The `LeaderboardScoreData` class is used to return information back to the
 caller when loading scores.  The members are:
