@@ -28,7 +28,6 @@ namespace GooglePlayGames.Native
     using System.Collections.Generic;
     using GooglePlayGames.BasicApi.Events;
     using GooglePlayGames.BasicApi.Quests;
-    using C = GooglePlayGames.Native.Cwrapper.InternalHooks;
     using Types = GooglePlayGames.Native.Cwrapper.Types;
     using Status = GooglePlayGames.Native.Cwrapper.CommonErrorStatus;
     using UnityEngine;
@@ -343,9 +342,11 @@ namespace GooglePlayGames.Native
                         mFriends = players;
                          callback(true);
                     }
-                    else {
-                        mFriends = null;
+                    else
+                    {
+                        mFriends = new List<Player>();
                         Logger.e("Got " + status + " loading friends");
+                        callback(false);
                     }
                 });
         }
@@ -358,7 +359,7 @@ namespace GooglePlayGames.Native
                 friendsLoading = true;
                 LoadFriends((ok) =>
                     {
-                        Logger.d("loading: " + ok);
+                        Logger.d("loading: " + ok + " mFriends = " + mFriends);
                         friendsLoading = false;
                     });
             }
@@ -599,6 +600,11 @@ namespace GooglePlayGames.Native
             }
 
             return mUser.AvatarURL;
+        }
+
+        public void GetPlayerStats(Action<CommonStatusCodes, PlayGamesLocalUser.PlayerStats> callback)
+        {
+            clientImpl.GetPlayerStats(GetApiClient(), callback);
         }
 
         ///<summary></summary>
@@ -1013,6 +1019,19 @@ namespace GooglePlayGames.Native
                 return mTokenClient.GetAccessToken();
             }
             return null;
+        }
+
+        public IntPtr GetApiClient()
+        {
+#if UNITY_ANDROID
+            IntPtr ptr =
+                Cwrapper.InternalHooks.InternalHooks_GetApiClient(mServices.AsHandle());
+
+            return  ptr;
+#else
+            Debug.Log("GoogleAPIClient is not available on this platform");
+            return IntPtr.Zero;
+#endif
         }
     }
 }

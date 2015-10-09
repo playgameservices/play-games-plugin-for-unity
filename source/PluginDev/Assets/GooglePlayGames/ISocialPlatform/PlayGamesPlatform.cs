@@ -216,6 +216,11 @@ namespace GooglePlayGames
             }
         }
 
+        public IntPtr GetApiClient()
+        {
+            return mClient.GetApiClient();
+        }
+
         /// <summary>
         /// Activates the Play Games platform as the implementation of Social.Active.
         /// After calling this method, you can call methods on Social.Active. For
@@ -413,6 +418,20 @@ namespace GooglePlayGames
             }
 
             return null;
+        }
+
+        public void GetPlayerStats(Action<CommonStatusCodes, PlayGamesLocalUser.PlayerStats> callback)
+        {
+            if (mClient != null && mClient.IsAuthenticated())
+            {
+                mClient.GetPlayerStats(callback);
+            }
+            else
+            {
+                Logger.e("GetPlayerStats can only be called after authentication.");
+
+                callback(CommonStatusCodes.SignInRequired, null);
+            }
         }
 
         /// <summary>

@@ -69,6 +69,8 @@ namespace SmokeTest
         private volatile IQuest mQuest = null;
         private volatile IQuestMilestone mQuestMilestone = null;
 
+        private string statsMessage = string.Empty;
+
         private NearbyGUI mNearbyGui;
         private AchievementGUI mAchievementGui;
         private LeaderboardGUI mLeaderboardGui;
@@ -940,24 +942,24 @@ namespace SmokeTest
 
             GUI.Label(
                 this.CalcGrid(0, 2, 2, 1),
-                "Email: " + 
+                "Email: " +
                 ((PlayGamesLocalUser) Social.localUser).Email);
 
             GUI.Label(
                 this.CalcGrid(0, 3, 2, 1),
-                "ID Token: " + 
+                "ID Token: " +
                 ((PlayGamesLocalUser) Social.localUser).idToken);
 
             GUI.Label(
                 this.CalcGrid(0, 4,2, 1),
-                "Access Token: " + 
+                "Access Token: " +
                 ((PlayGamesLocalUser) Social.localUser).accessToken);
-                
+
             string friendString = "";
             if (Social.localUser.friends.Count() > 0) {
                 foreach(IUserProfile p in Social.localUser.friends) {
-                    friendString += p.userName + "\n";   
-                }   
+                    friendString += p.userName + "\n";
+                }
             }
             else {
                 Social.localUser.LoadFriends((ok) => Debug.Log("Friends loaded OK: " + ok));
@@ -965,7 +967,20 @@ namespace SmokeTest
             GUI.Label(
                 CalcGrid(0,5,2,2),
                 "Friends: " + friendString);
-            
+
+            if (statsMessage == string.Empty && Social.localUser.authenticated)
+            {
+                statsMessage = "loading stats....";
+                ((PlayGamesLocalUser)Social.localUser).GetStats(
+                    (result, stats) =>
+                    {
+                        statsMessage = result + " number of sessions: " +
+                        stats.NumOfSessions;
+                    });
+            }
+            GUI.Label(CalcGrid(0, 7, 2, 1), "Player Stats: " + statsMessage);
+
+
 
             if (GUI.Button(CalcGrid(1, 8), "Back"))
             {

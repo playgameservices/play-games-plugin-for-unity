@@ -21,11 +21,11 @@ namespace GooglePlayGames
     // older versions, used when upgrading to other versions
     public const string VersionKeyCPP = "00911";
     public const string VersionKeyU5 = "00915";
-    public const int VersionInt = 0x0925;
-    public const string VersionString = "0.9.25";
-    public const string VersionKey = "00925";
+    public const int VersionInt = 0x0926;
+    public const string VersionString = "0.9.26";
+    public const string VersionKey = "00926";
 
     // used to check for the correct min version or play services.
-    public const int MinGmsCoreVersionCode = 7571000;
+    public const int MinGmsCoreVersionCode = 8115000;
   }
 }

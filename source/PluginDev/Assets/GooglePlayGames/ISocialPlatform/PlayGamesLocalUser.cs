@@ -17,6 +17,7 @@
 namespace GooglePlayGames
 {
     using System;
+    using GooglePlayGames.BasicApi;
     using UnityEngine.SocialPlatforms;
 
     /// <summary>
@@ -28,11 +29,14 @@ namespace GooglePlayGames
 
         private string emailAddress;
 
-        internal PlayGamesLocalUser(PlayGamesPlatform plaf) :
-            base("localUser", null, null)
+        private PlayerStats mStats;
+
+        internal PlayGamesLocalUser(PlayGamesPlatform plaf)
+            : base("localUser", string.Empty, string.Empty)
         {
             mPlatform = plaf;
             emailAddress = null;
+            mStats = null;
         }
 
         /// <summary>
@@ -234,6 +238,107 @@ namespace GooglePlayGames
                     emailAddress = emailAddress != null ? emailAddress : string.Empty;
                 }
                 return authenticated ? emailAddress : string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// Gets the player's stats.
+        /// </summary>
+        /// <param name="callback">Callback when they are available.</param>
+        public void GetStats(Action<CommonStatusCodes, PlayerStats> callback)
+        {
+            if (mStats == null)
+            {
+                mPlatform.GetPlayerStats((rc, stats) =>
+                    {
+                        mStats = stats;
+                        callback(rc, stats);
+                    });
+            }
+            else
+            {
+                // 0 = success
+                callback(CommonStatusCodes.Success, mStats);
+            }
+        }
+
+        /// <summary>
+        /// Player stats. See https://developers.google.com/games/services/android/stats
+        /// </summary>
+        public class PlayerStats
+        {
+            /// <summary>
+            /// The number of in-app purchases.
+            /// </summary>
+            private int numberOfPurchases;
+
+            /// <summary>
+            /// The length of the avg sesson in minutes.
+            /// </summary>
+            private float avgSessonLength;
+
+            /// <summary>
+            /// The days since last played.
+            /// </summary>
+            private int daysSinceLastPlayed;
+
+            /// <summary>
+            /// The number of sessions based on sign-ins.
+            /// </summary>
+            private int numOfSessions;
+
+            /// <summary>
+            /// The approximation of sessions percentile for the player,
+            /// given as a decimal value between 0 and 1 (inclusive).
+            /// This value indicates how many sessions the current player has
+            /// played in comparison to the rest of this game's player base.
+            /// Higher numbers indicate that this player has played more sessions.
+            /// </summary>
+            private float sessPercentile;
+
+            /// <summary>
+            /// The approximate spend percentile of the player,
+            /// given as a decimal value between 0 and 1 (inclusive). This
+            /// value indicates how much the current player has spent in
+            /// comparison to the rest of this game's player base. Higher
+            /// numbers indicate that this player has spent more.
+            /// </summary>
+            private float spendPercentile;
+
+            public int NumberOfPurchases
+            {
+                get;
+                set;
+            }
+
+            public float AvgSessonLength
+            {
+                get;
+                set;
+            }
+
+            public int DaysSinceLastPlayed
+            {
+                get;
+                set;
+            }
+
+            public int NumOfSessions
+            {
+                get;
+                set;
+            }
+
+            public float SessPercentile
+            {
+                get;
+                set;
+            }
+
+            public float SpendPercentile
+            {
+                get;
+                set;
             }
         }
     }

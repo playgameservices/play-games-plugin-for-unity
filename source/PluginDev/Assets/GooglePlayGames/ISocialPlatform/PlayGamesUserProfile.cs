@@ -16,6 +16,8 @@
 
 namespace GooglePlayGames
 {
+    using System.Collections;
+    using GooglePlayGames.OurUtils;
     using UnityEngine;
     using UnityEngine.SocialPlatforms;
 
@@ -26,11 +28,11 @@ namespace GooglePlayGames
     /// </summary>
     public class PlayGamesUserProfile : IUserProfile
     {
-        private  string mDisplayName;
-        private  string mPlayerId;
-        private  string mAvatarUrl;
+        private string mDisplayName;
+        private string mPlayerId;
+        private string mAvatarUrl;
 
-        private WWW wwwImage;
+        private volatile bool mImageLoading = false;
         private Texture2D mImage;
 
         internal PlayGamesUserProfile(string displayName, string playerId,
@@ -39,6 +41,7 @@ namespace GooglePlayGames
             mDisplayName = displayName;
             mPlayerId = playerId;
             mAvatarUrl = avatarUrl;
+            mImageLoading = false;
         }
 
         protected void ResetIdentity(string displayName, string playerId,
@@ -47,6 +50,7 @@ namespace GooglePlayGames
             mDisplayName = displayName;
             mPlayerId = playerId;
             mAvatarUrl = avatarUrl;
+            mImageLoading = false;
         }
 
         #region IUserProfile implementation
@@ -87,7 +91,14 @@ namespace GooglePlayGames
         {
             get
             {
-                return LoadImage();
+                if (!mImageLoading && mImage == null && !string.IsNullOrEmpty(AvatarURL))
+                {
+                    Debug.Log("Starting to load image: " + AvatarURL);
+                    mImageLoading = true;
+                    PlayGamesHelperObject.RunCoroutine(LoadImage());
+                }
+
+                return mImage;
             }
         }
 
@@ -107,32 +118,38 @@ namespace GooglePlayGames
         /// the image is returned once it is loaded.  null is returned
         /// up to that point.
         /// </summary>
-        private Texture2D LoadImage()
+        internal IEnumerator LoadImage()
         {
             // the url can be null if the user does not have an
             // avatar configured.
             if (!string.IsNullOrEmpty(AvatarURL))
             {
-                if (wwwImage == null || wwwImage.url != AvatarURL)
+                WWW www = new WWW(AvatarURL);
+                while (!www.isDone)
                 {
-                    wwwImage = new WWW(AvatarURL);
-                    mImage = null;
+                    yield return null;
                 }
 
-                if (mImage != null) {
-                    return mImage;
+                if (www.error == null)
+                {
+                    this.mImage = www.texture;
+                }
+                else
+                {
+                    mImage = Texture2D.blackTexture;
+                    Debug.Log("Error downloading image: " + www.error);
                 }
 
-                if (wwwImage.isDone)
-                {
-                    mImage =  wwwImage.texture;
-                    return mImage;
-                }
+                mImageLoading = false;
             }
-
-            // if there is no url, always return null.
-            return null;
+            else
+            {
+                Debug.Log("No URL found.");
+                mImage = Texture2D.blackTexture;
+                mImageLoading = false;
+            }
         }
+
         public override bool Equals(object obj)
         {
             if (obj == null)

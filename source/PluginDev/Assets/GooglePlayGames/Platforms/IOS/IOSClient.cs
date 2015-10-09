@@ -18,7 +18,9 @@
 
 namespace GooglePlayGames.IOS
 {
+    using GooglePlayGames.BasicApi;
     using GooglePlayGames.Native.PInvoke;
+    using UnityEngine;
 
     internal class IOSClient : IClientImpl
     {
@@ -49,6 +51,12 @@ namespace GooglePlayGames.IOS
             return new IOSTokenClient();
         }
 
+        public void GetPlayerStats(IntPtr apiClient, System.Action<CommonStatusCodes,
+            PlayGamesLocalUser.PlayerStats> callback)
+        {
+            Debug.Log("PlayerStats is not implemented on ios");
+            callback(CommonStatusCodes.ServiceMissing, null);
+        }
     }
 }
 #endif

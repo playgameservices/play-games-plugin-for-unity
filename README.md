@@ -346,6 +346,37 @@ good practice to put up a standby screen until the callback is called, to make
 sure the user can't start playing the game until the authentication process
 completes.
 
+## Player Statistics (Android Only)
+
+The Player Stats API let you tailor game experiences to specific segments
+of players and different stages of the player lifecycle. You can build
+tailored experiences for each player segment based on how players are
+progressing, spending, and engaging. For example, you can use this API to
+take proactive actions to encourage a less active player to re-engage with
+your game, such as by displaying and promoting new in-game items when the
+player signs in.
+
+The callback takes two parameters:
+1. The result code less than or equal to zero is success.
+        See [CommonStatusCodes](https://developers.google.com/android/reference/com/google/android/gms/common/api/CommonStatusCodes) for all values.
+2. The PlayerStats object of type GooglePlayGames.PlayGamesLocalUser.PlayerStats
+
+For more information see [Player Stats](https://developers.google.com/games/services/android/stats).
+
+The player stats are available after authenticating:
+
+```csharp
+    ((PlayGamesLocalUser)Social.localUser).GetStats((rc, stats) =>
+        {
+            // -1 means cached stats, 0 is succeess
+            // see  CommonStatusCodes for all values.
+            if (rc <= 0) {
+                Debug.Log("It has been " + stats.DaysSinceLastPlayed + " days");
+            }
+        });
+```
+
+
 ## Revealing/Unlocking an Achievement
 
 To unlock an achievement, use the **Social.ReportProgress** method with a
@@ -505,12 +536,13 @@ additional flexibility and information when accessing the leaderboard data.
 ```
 
 The parameters for LoadScores() are:
-    1. leaderboardId
-    2. start position (top scores or player centered)
-    3. row count
-    4. leaderboard collection (social or public)
-    5. time span (daily, weekly, all-time)
-    6. callback accepting a LeaderboardScoreData object.
+
+1. leaderboardId
+2. start position (top scores or player centered)
+3. row count
+4. leaderboard collection (social or public)
+5. time span (daily, weekly, all-time)
+6. callback accepting a LeaderboardScoreData object.
 
 The `LeaderboardScoreData` class is used to return information back to the
 caller when loading scores.  The members are:

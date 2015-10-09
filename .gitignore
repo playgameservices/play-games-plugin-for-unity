@@ -3,6 +3,9 @@
 siteconfig-DO-NOT-COMMIT/
 
 source/build/
+source/PluginDev/ProjectSettings/ProjectVersion.txt
+source/PluginDev/ProjectSettings/UnityAdsSettings.asset
+source/PluginDev/ProjectSettings/UnityAnalyticsManager.asset
 
 StyleCop.Cache
 StyleCop.Cache.meta
@@ -23,9 +26,9 @@ samples/**/Assets/Plugins/
 samples/**/Library/
 samples/**/Library.meta
 samples/**/Source/*.csproj
-samples/**/Source/**/*.meta
 samples/**/*.apk
 samples/**/Settings.StyleCop
+samples/**/Settings.StyleCop.meta
 samples/**/Source/*.sln
 samples/**/Source/Source.userprefs
 samples/**/Source/ProjectSettings

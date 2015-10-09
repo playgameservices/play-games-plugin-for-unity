@@ -16,6 +16,7 @@
 
 namespace GooglePlayGames
 {
+    using System;
     using System.IO;
     using System.Collections;
     using UnityEngine;
@@ -45,7 +46,6 @@ namespace GooglePlayGames
             mClassName = GPGSProjectSettings.Instance.Get(GPGSUtil.CLASSNAMEKEY);
             mConfigData = GPGSProjectSettings.Instance.Get(GPGSUtil.IOSRESOURCEKEY);
 
-
             if (mBundleId.Trim().Length == 0)
             {
                 mBundleId = PlayerSettings.bundleIdentifier;
@@ -59,7 +59,7 @@ namespace GooglePlayGames
         /// <param name="clientId">Client identifier.</param>
         /// <param name="bundleId">Bundle identifier.</param>
         /// <param name="webClientId">web app clientId.</param>
-        static void Save(string clientId, string bundleId, string webClientId)
+        internal static void Save(string clientId, string bundleId, string webClientId)
         {
             GPGSProjectSettings.Instance.Set(GPGSUtil.IOSCLIENTIDKEY, clientId);
             GPGSProjectSettings.Instance.Set(GPGSUtil.IOSBUNDLEIDKEY, bundleId);
@@ -77,22 +77,18 @@ namespace GooglePlayGames
 
             // Bundle ID field
             GUILayout.Label(GPGSStrings.IOSSetup.BundleIdTitle, EditorStyles.boldLabel);
-            GUILayout.Label(GPGSStrings.IOSSetup.BundleIdBlurb);
+            GUILayout.Label(GPGSStrings.IOSSetup.BundleIdBlurb, EditorStyles.wordWrappedLabel);
             mBundleId = EditorGUILayout.TextField(GPGSStrings.IOSSetup.BundleId, mBundleId,
-                GUILayout.Width(450));
+            GUILayout.Width(450));
             
             GUILayout.Space(30);
-            // Client ID field
-            GUILayout.Label(GPGSStrings.Setup.WebClientIdTitle, EditorStyles.boldLabel);
-            GUILayout.Label(GPGSStrings.IOSSetup.ClientIdBlurb);
 
             // Client ID field
             GUILayout.Label(GPGSStrings.Setup.WebClientIdTitle, EditorStyles.boldLabel);
-            GUILayout.Label(GPGSStrings.AndroidSetup.WebClientIdBlurb);
-
+            GUILayout.Label(GPGSStrings.AndroidSetup.WebClientIdBlurb, EditorStyles.wordWrappedLabel);
+            GUILayout.Space(10);
             mWebClientId = EditorGUILayout.TextField(GPGSStrings.Setup.ClientId,
             mWebClientId, GUILayout.Width(450));
-
 
             GUILayout.Space(10);
             GUILayout.FlexibleSpace();
@@ -102,7 +98,7 @@ namespace GooglePlayGames
             GUILayout.Space(10);
 
             mClassName = EditorGUILayout.TextField("Constants class name",
-                mClassName,GUILayout.Width(480));
+                mClassName, GUILayout.Width(480));
 
             GUILayout.Label("Resources Definition", EditorStyles.boldLabel);
             GUILayout.Label("Paste in the Objective-C Resources from the Play Console");
@@ -115,10 +111,23 @@ namespace GooglePlayGames
 
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
+
             // Setup button
             if (GUILayout.Button(GPGSStrings.Setup.SetupButton))
             {
-                DoSetup();
+                // check that the classname entered is valid
+                try
+                {
+                    if (GPGSUtil.LooksLikeValidPackageName(mClassName))
+                    {
+                        DoSetup();
+                    }
+                }
+                catch (Exception e)
+                {
+                    GPGSUtil.Alert(GPGSStrings.Error,
+                        "Invalid classname: " + e.Message);
+                }
             }
 
             if (GUILayout.Button(GPGSStrings.Cancel))
@@ -135,7 +144,7 @@ namespace GooglePlayGames
         /// <summary>
         /// Called by the UI to process the configuration.
         /// </summary>
-        void DoSetup()
+        internal void DoSetup()
         {
             if (PerformSetup(mClassName, mConfigData, mWebClientId, mBundleId, null))
             {
@@ -171,6 +180,7 @@ namespace GooglePlayGames
                 return PerformSetup(GPGSProjectSettings.Instance.Get(GPGSUtil.IOSCLIENTIDKEY),
                     bundleId, webClientId, nearbySvcId);
             }
+
             return false;
         }
 
@@ -179,10 +189,10 @@ namespace GooglePlayGames
            // parse the resources, they keys are in the form of
             // #define <KEY> @"<VALUE>"
 
-            //transform the string to make it easier to parse
-            string input = res.Replace("#define ","");
-            input = input.Replace("@\"", "");
-            input = input.Replace("\"", "");
+            // transform the string to make it easier to parse
+            string input = res.Replace("#define ", string.Empty);
+            input = input.Replace("@\"", string.Empty);
+            input = input.Replace("\"", string.Empty);
 
             // now input is name value, one per line
             StringReader reader = new StringReader(input);
@@ -203,6 +213,7 @@ namespace GooglePlayGames
                 {
                     value = null;
                 }
+
                 if (!string.IsNullOrEmpty(value))
                 {
                     if (key == "CLIENT_ID")
@@ -235,16 +246,18 @@ namespace GooglePlayGames
                         resourceKeys[key] = value;
                     }
                 }
+
                 line = reader.ReadLine();
             }
+
             reader.Close();
             if (resourceKeys.Count > 0)
             {
                 GPGSUtil.WriteResourceIds(className, resourceKeys);
             }
+
             return !string.IsNullOrEmpty(clientId);
         }
-
 
         /// <summary>
         /// Performs the setup.  This is called externally to facilitate
@@ -257,12 +270,12 @@ namespace GooglePlayGames
         public static bool PerformSetup(string clientId, string bundleId,
             string webClientId, string nearbySvcId)
         {
-
             if (!GPGSUtil.LooksLikeValidClientId(clientId))
             {
                 GPGSUtil.Alert(GPGSStrings.Setup.ClientIdError);
                 return false;
             }
+
             if (!GPGSUtil.LooksLikeValidBundleId(bundleId))
             {
                 GPGSUtil.Alert(GPGSStrings.IOSSetup.BundleIdError);

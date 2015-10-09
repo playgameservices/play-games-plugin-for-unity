@@ -16,11 +16,12 @@
 
 namespace GooglePlayGames
 {
-    using System.IO;
+    using System;
     using System.Collections;
+    using System.IO;
     using System.Xml;
-    using UnityEngine;
     using UnityEditor;
+    using UnityEngine;
 
     public class GPGSAndroidSetupUI : EditorWindow
     {
@@ -34,7 +35,7 @@ namespace GooglePlayGames
         public static void MenuItemFileGPGSAndroidSetup()
         {
             EditorWindow window = EditorWindow.GetWindow(
-                typeof(GPGSAndroidSetupUI), true, GPGSStrings.AndroidSetup.Title);
+                    typeof(GPGSAndroidSetupUI), true, GPGSStrings.AndroidSetup.Title);
             window.minSize = new Vector2(500, 400);
         }
 
@@ -57,7 +58,7 @@ namespace GooglePlayGames
             GUILayout.Space(10);
 
             mClassName = EditorGUILayout.TextField("Constants class name",
-                mClassName,GUILayout.Width(480));
+                    mClassName, GUILayout.Width(480));
 
             GUILayout.Label("Resources Definition", EditorStyles.boldLabel);
             GUILayout.Label("Paste in the Android Resources from the Play Console");
@@ -80,13 +81,25 @@ namespace GooglePlayGames
             GUILayout.FlexibleSpace();
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
-            if (GUILayout.Button(GPGSStrings.Setup.SetupButton,
-                GUILayout.Width(100)))
+            if (GUILayout.Button(GPGSStrings.Setup.SetupButton, GUILayout.Width(100)))
             {
-                DoSetup();
+                // check that the classname entered is valid
+                try
+                {
+                    if (GPGSUtil.LooksLikeValidPackageName(mClassName))
+                    {
+                        DoSetup();
+                    }
+                }
+                catch (Exception e)
+                {
+                    GPGSUtil.Alert(GPGSStrings.Error,
+                        "Invalid classname: " + e.Message);
+                }
+
             }
 
-            if (GUILayout.Button("Cancel",GUILayout.Width(100)))
+            if (GUILayout.Button("Cancel", GUILayout.Width(100)))
             {
                 this.Close();
             }
@@ -192,7 +205,7 @@ namespace GooglePlayGames
         {
             bool needTokenPermissions = false;
 
-            if( !string.IsNullOrEmpty(webClientId) )
+            if (!string.IsNullOrEmpty(webClientId))
             {
                 if (!GPGSUtil.LooksLikeValidClientId(webClientId))
                 {
@@ -201,7 +214,8 @@ namespace GooglePlayGames
                 }
 
                 string serverAppId = webClientId.Split('-')[0];
-                if (!serverAppId.Equals(appId)) {
+                if (!serverAppId.Equals(appId))
+                {
                     GPGSUtil.Alert(GPGSStrings.Setup.AppIdMismatch);
                     return false;
                 }
@@ -209,7 +223,7 @@ namespace GooglePlayGames
             }
             else
             {
-                 needTokenPermissions = false;
+                needTokenPermissions = false;
             }
 
             // check for valid app id

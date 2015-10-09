@@ -14,6 +14,7 @@
 //    limitations under the License.
 // </copyright>
 
+
 #if (UNITY_ANDROID || (UNITY_IPHONE && !NO_GPGS))
 
 namespace GooglePlayGames.Native.PInvoke
@@ -21,6 +22,7 @@ namespace GooglePlayGames.Native.PInvoke
     using System;
     using System.Linq;
     using GooglePlayGames.OurUtils;
+    using GooglePlayGames.BasicApi.Multiplayer;
     using System.Collections.Generic;
     using C = GooglePlayGames.Native.Cwrapper.RealTimeMultiplayerManager;
     using Types = GooglePlayGames.Native.Cwrapper.Types;
