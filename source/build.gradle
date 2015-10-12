@@ -34,7 +34,7 @@ project.ext {
     samplesBuildSrc = file('build/sampleSrc').absolutePath
     exportPath = file('build/plugin.unitypackage').absolutePath
     currentPluginPath = file('../current-build').absolutePath
-    currentPluginName = 'GooglePlayGamesPlugin-0.9.25.unitypackage'
+    currentPluginName = 'GooglePlayGamesPlugin-0.9.26.unitypackage'
 
     sampleList = ['CubicPilot', 'Minimal',
          'QuizRacer',  'TicTacToe',

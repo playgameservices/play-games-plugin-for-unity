@@ -14,6 +14,7 @@
 //    limitations under the License.
 // </copyright>
 
+    #if UNITY_ANDROID
 //
 // ****   GENERATED FILE  DO NOT EDIT !!!  ****//
 //
@@ -47,3 +48,4 @@ namespace Com.Google.Android.Gms.Games.Stats
 //
 // ****   GENERATED FILE  DO NOT EDIT !!!  ****//
 //
+#endif
