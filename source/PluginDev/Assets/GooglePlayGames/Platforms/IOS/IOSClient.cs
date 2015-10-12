@@ -18,6 +18,7 @@
 
 namespace GooglePlayGames.IOS
 {
+    using System;
     using GooglePlayGames.BasicApi;
     using GooglePlayGames.Native.PInvoke;
     using UnityEngine;
@@ -55,7 +56,8 @@ namespace GooglePlayGames.IOS
             PlayGamesLocalUser.PlayerStats> callback)
         {
             Debug.Log("PlayerStats is not implemented on ios");
-            callback(CommonStatusCodes.ServiceMissing, null);
+            callback(CommonStatusCodes.ServiceMissing, 
+                new PlayGamesLocalUser.PlayerStats());
         }
     }
 }

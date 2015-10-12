@@ -17,6 +17,7 @@
 //
 // ****   GENERATED FILE  DO NOT EDIT !!!  ****//
 //
+#if UNITY_ANDROID
 using Google.Developers;
 using System;
 using UnityEngine;
@@ -31,3 +32,4 @@ namespace Com.Google.Android.Gms.Common.Api
 //
 // ****   GENERATED FILE  DO NOT EDIT !!!  ****//
 //
+#endif

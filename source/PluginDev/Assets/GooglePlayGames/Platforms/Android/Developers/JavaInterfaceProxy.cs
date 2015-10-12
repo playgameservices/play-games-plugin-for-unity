@@ -14,6 +14,7 @@
 //    limitations under the License.
 // </copyright>
 
+#if UNITY_ANDROID
 namespace Google.Developers
 {
     using UnityEngine;
@@ -26,3 +27,4 @@ namespace Google.Developers
         }
     }
 }
+#endif
