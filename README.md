@@ -924,6 +924,10 @@ Build Options | Debug Information Format | Debug. Select **DWARF** instead of **
 
 **URL errors while signing in.** This is often a sign that either the client ID or the Bundle Identifier is not correctly set up, or that your **Info.plist** file got corrupted. Check that your client ID and Bundle ID are correctly configured in the project and that they correspond to the data in the Developer Console.
 
+**ld: framework not found GoogleOpenSource**. In Xcode, remove the reference
+to the framework in the Pods project, then add it back.  This is a resolution for
+missing other frameworks as well.
+
 ## Building for iOS to run on the simulator (pre-Unity 5.0)
 
 **Note:** If you are using Unity 5.0 or greater, no changes to the generated project
