@@ -18,10 +18,26 @@
 namespace GooglePlayGames.Android
 {
     using System;
+    using GooglePlayGames.BasicApi;
+    using GooglePlayGames.OurUtils;
+    using Com.Google.Android.Gms.Common.Api;
     using UnityEngine;
 
     internal class AndroidTokenClient: TokenClient
     {
+        private const string TokenFragmentClass = "com.google.games.bridge.TokenFragment";
+        private const string FetchTokenSignature =
+            "(Landroid/app/Activity;ZZZLjava/lang/String;)Lcom/google/android/gms/common/api/PendingResult;";
+        private const string FetchTokenMethod = "fetchToken";
+
+        private bool fetchingEmail = false;
+        private bool fetchingAccessToken = false;
+        private bool fetchingIdToken = false;
+        private string accountName;
+        private string accessToken;
+        private string idToken;
+        private string idTokenScope;
+
         public static AndroidJavaObject GetActivity()
         {
             using (var jc = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
@@ -67,6 +83,91 @@ namespace GooglePlayGames.Android
             }
         }
 
+        internal void Fetch(string scope, bool fetchEmail, bool fetchAccessToken, bool fetchIdToken, Action<bool> doneCallback)
+        {
+            PlayGamesHelperObject.RunOnGameThread(() =>
+            FetchToken(scope, fetchEmail, fetchAccessToken, fetchIdToken, (rc, access, id, email) =>
+                {
+                    if (rc != (int)CommonStatusCodes.Success)
+                    {
+                        Logger.w("Non-success returned from fetch: " + rc);
+                        doneCallback(false);
+                    }
+
+                    if (fetchAccessToken)
+                    {
+                        Logger.d("a = " + access);
+                    }
+                    if (fetchEmail)
+                    {
+                        Logger.d("email = " + email);
+                    }
+
+                    if (fetchIdToken)
+                    {
+                        Logger.d("idt = " + id);
+                    }
+
+                    if (fetchAccessToken && !string.IsNullOrEmpty(access))
+                    {
+                        accessToken = access;
+                    }
+                    if (fetchIdToken && !string.IsNullOrEmpty(id))
+                    {
+                        idToken = id;
+                    }
+                    if (fetchEmail && !string.IsNullOrEmpty(email))
+                    {
+                        this.accountName = email;
+                    }
+                    doneCallback(true);
+                    }));
+        }
+
+
+        internal static void FetchToken(string scope, bool fetchEmail,
+                                        bool fetchAccessToken, bool fetchIdToken, Action<int, string, string, string> callback)
+        {
+            object[] objectArray = new object[5];
+            jvalue[] jArgs = AndroidJNIHelper.CreateJNIArgArray(objectArray);
+            try
+            {
+                using (var bridgeClass = new AndroidJavaClass(TokenFragmentClass))
+                {
+                    using (var currentActivity = AndroidTokenClient.GetActivity())
+                    {
+                        // Unity no longer supports constructing an AndroidJavaObject using an IntPtr,
+                        // so I have to manually munge with JNI here.
+                        IntPtr methodId = AndroidJNI.GetStaticMethodID(bridgeClass.GetRawClass(),
+                                              FetchTokenMethod,
+                                              FetchTokenSignature);
+                        jArgs[0].l = currentActivity.GetRawObject();
+                        jArgs[1].z = fetchEmail;
+                        jArgs[2].z = fetchAccessToken;
+                        jArgs[3].z = fetchIdToken;
+                        jArgs[4].l = AndroidJNI.NewStringUTF(scope);
+
+                        Logger.d("---->> Calling Fetch: " + methodId + " scope: " + scope);
+                        IntPtr ptr = 
+                            AndroidJNI.CallStaticObjectMethod(bridgeClass.GetRawClass(), methodId, jArgs);
+
+                        Logger.d("<<<-------  Got return of " + ptr);
+                        PendingResult<TokenResult> pr = new PendingResult<TokenResult>(ptr);
+                        pr.setResultCallback(new TokenResultCallback(callback));
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.e("Exception launching bridge intent: " + e.Message);
+                Logger.e(e.ToString());
+            }
+            finally
+            {
+                AndroidJNIHelper.DeleteJNIArgArray(objectArray, jArgs);
+            }            
+        }
+
         /// <summary>
         /// Gets the account name of the currently signed-in user to later use for token retrieval.
         /// </summary>
@@ -74,17 +175,15 @@ namespace GooglePlayGames.Android
         /// <returns>The current user's Google account name.</returns>
         private string GetAccountName()
         {
-            string accountName;
-            using (AndroidJavaClass plusService = new AndroidJavaClass("com.google.android.gms.plus.Plus"))
+            if (string.IsNullOrEmpty(accountName))
             {
-                using (AndroidJavaObject accountService = plusService.GetStatic<AndroidJavaObject>("AccountApi"))
+                if (!fetchingEmail)
                 {
-                    using (var apiClient = GetApiClient())
-                    {
-                        accountName = accountService.Call<string>("getAccountName", apiClient);
-                    }
+                    fetchingEmail = true;
+                    Fetch(idTokenScope, true, false, false, (ok) =>fetchingEmail = false);
                 }
             }
+
             return accountName;
         }
 
@@ -107,17 +206,15 @@ namespace GooglePlayGames.Android
         /// <returns>The OAuth 2.0 access token.</returns>
         public string GetAccessToken()
         {
-            string token = null;
-            string accountName = GetAccountName() ?? "NULL";
-            string scope = "oauth2:https://www.googleapis.com/auth/plus.me";
-
-            using (var googleAuthUtil = new AndroidJavaClass("com.google.android.gms.auth.GoogleAuthUtil"))
+            if (string.IsNullOrEmpty(accessToken))
             {
-                token = googleAuthUtil.CallStatic<string>("getToken", GetActivity(), accountName, scope);
+                if (!fetchingAccessToken)
+                {
+                    fetchingAccessToken = true;
+                    Fetch(idTokenScope, false, true, false, (rc) => fetchingAccessToken = false);
+                }
             }
-
-            Debug.Log("Access Token " + token);
-            return token;
+            return accessToken;
         }
 
         /// <summary>Gets the OpenID Connect ID token for authentication with a server backend.</summary>
@@ -126,21 +223,69 @@ namespace GooglePlayGames.Android
         /// services console.</param>
         public string GetIdToken(string serverClientID)
         {
-            string token = null;
-            string accountName = GetAccountName() ?? "NULL";
-            string scope = "audience:server:client_id:" + serverClientID;
-
-            using (AndroidJavaClass unityActivity = new AndroidJavaClass("com.unity3d.player.UnityPlayer"),
-                   googleAuthUtil = new AndroidJavaClass("com.google.android.gms.auth.GoogleAuthUtil"))
+            string newScope =  "audience:server:client_id:" + serverClientID;
+            if (string.IsNullOrEmpty(idToken) || (newScope != idTokenScope))
             {
-                using (AndroidJavaObject currentActivity = unityActivity.GetStatic<AndroidJavaObject>("currentActivity"))
+                if (!fetchingIdToken)
                 {
-                    token = googleAuthUtil.CallStatic<string>("getToken", currentActivity, accountName, scope);
+                    fetchingIdToken = true;
+                    idTokenScope = newScope;
+               
+                            Fetch(idTokenScope, false, false, true, (ok) => fetchingIdToken = false);
                 }
             }
+                
+            return idToken;
+        }
+    }
 
-            Debug.Log("ID Token " + token);
-            return token;
+    class TokenResult : Google.Developers.JavaObjWrapper , Result
+    {
+        #region Result implementation
+
+        public TokenResult(IntPtr ptr)
+            : base(ptr)
+        {
+        }
+
+        public Status getStatus()
+        {
+            IntPtr obj = InvokeCall<IntPtr>("getStatus", "()Lcom/google/android/gms/common/api/Status;");
+            return new Status(obj);
+        }
+
+        #endregion
+
+        public String getAccessToken()
+        {
+            return InvokeCall<string>("getAccessToken", "()Ljava/lang/String;");
+        }
+
+        public String getEmail()
+        {
+            return InvokeCall<string>("getEmail", "()Ljava/lang/String;");
+        }
+
+        public String getIdToken()
+        {
+            return InvokeCall<string>("getIdToken", "()Ljava/lang/String;");
+        }
+
+    }
+
+    class TokenResultCallback : ResultCallbackProxy<TokenResult>
+    {
+        private Action<int, string, string, string> callback;
+
+        public TokenResultCallback(Action<int, string, string, string> callback)
+        {
+            this.callback = callback;
+        }
+
+        public override void OnResult(TokenResult arg_Result_1)
+        {
+            callback(arg_Result_1.getStatus().getStatusCode(), arg_Result_1.getAccessToken(), arg_Result_1.getIdToken(),
+                arg_Result_1.getEmail());
         }
     }
 }

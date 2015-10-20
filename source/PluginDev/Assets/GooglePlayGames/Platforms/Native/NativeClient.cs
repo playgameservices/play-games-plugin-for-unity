@@ -207,7 +207,7 @@ namespace GooglePlayGames.Native
                         }
 
                         mAuthState = AuthState.SilentPending;
-                        mTokenClient = clientImpl.CreateTokenClient();
+                        mTokenClient = clientImpl.CreateTokenClient(false);
                     }
                 }
             }
@@ -548,6 +548,7 @@ namespace GooglePlayGames.Native
                 mFriends = null;
                 mAchievements = null;
                 mAuthState = AuthState.Unauthenticated;
+                mTokenClient = clientImpl.CreateTokenClient(true);
                 mAuthGeneration++;
             }
         }

@@ -35,6 +35,10 @@ public class TokenPendingResult extends PendingResult<TokenResult> {
     private TokenResult result;
     private ResultCallback<? super TokenResult> resultCallback;
 
+    public TokenPendingResult()
+    {
+        result = new TokenResult();
+    }
     @Override
     public TokenResult await() {
 
@@ -65,6 +69,7 @@ public class TokenPendingResult extends PendingResult<TokenResult> {
         latch.countDown();
     }
 
+    @Deprecated
     void setToken(String accessToken, String idToken, String email, int resultCode) {
         setResult(accessToken, idToken, email, resultCode);
         latch.countDown();
@@ -128,4 +133,28 @@ public class TokenPendingResult extends PendingResult<TokenResult> {
     }
 
 
+    /**
+     * Sets the result status and releases the latch and/or calls the callback.
+     * @param status - the result status.
+     */
+    public void setStatus(int status) {
+        result.setStatus(status);
+        latch.countDown();
+        if (getCallback() != null) {
+            getCallback().onResult(getResult());
+        }
+
+    }
+
+    public void setEmail(String email) {
+        result.setEmail(email);
+    }
+
+    public void setAccessToken(String accessToken) {
+        result.setAccessToken(accessToken);
+    }
+
+    public void setIdToken(String idToken) {
+       result.setIdToken(idToken);
+    }
 }

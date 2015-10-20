@@ -232,10 +232,10 @@ namespace GooglePlayGames
             {
                 // treat null as unitialized, empty as no email.  This can
                 // happen when the web client is not initialized.
-                if (authenticated && emailAddress == null)
+                if (authenticated && string.IsNullOrEmpty(emailAddress))
                 {
                     emailAddress = mPlatform.GetUserEmail();
-                    emailAddress = emailAddress != null ? emailAddress : string.Empty;
+                    emailAddress = emailAddress ?? string.Empty;
                 }
                 return authenticated ? emailAddress : string.Empty;
             }

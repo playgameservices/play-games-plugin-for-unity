@@ -336,6 +336,7 @@ namespace GooglePlayGames
             {
                 mClient.SignOut();
             }
+            mLocalUser = new PlayGamesLocalUser(this);
         }
 
         /// <summary>
