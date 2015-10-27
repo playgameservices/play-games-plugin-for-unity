@@ -1,32 +1,75 @@
+/*
+ * Copyright (C) Google Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.games.bridge;
 
-
+import android.Manifest;
 import android.app.Activity;
-import android.app.Fragment;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Configuration;
+import android.content.IntentSender;
+import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
+import android.widget.Toast;
+
+import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.plus.Plus;
+
+import java.util.HashMap;
 
 /**
  * A simple bridge activity that receives an intent from the Google Play Games
  * native SDK and forwards the result of executing the intent back to the SDK
  * via JNI.
  */
-public final class NativeBridgeActivity extends Activity {
+public final class NativeBridgeActivity extends Activity implements
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final String BRIDGED_INTENT = "BRIDGED_INTENT";
     private static final int GPG_RESPONSE_CODE = 0x475047;
+    private static final int RC_SIGN_IN = 9001;
+    private static final String TOKEN_RESULT_KEY = "token_result";
+    private static final String SCOPE_KEY = "scope_key";
+    private static final int REQUEST_ACCT_PERM = 10;
     private static final int BG_COLOR = 0x40ffffff;
     private static final String TAG = "NativeBridgeActivity";
+
+    // map of pending results used to pass back information to the caller.
+    // the key is a unique key added to the intent extras so the bridge activity
+    // can find the result to respond.
+    private static final HashMap<String, TokenPendingResult> pendingResultMap = new HashMap<>();
 
     // true indicates we are waiting for the activity to return so we can
     // forward the response.
     // if onDestroy is called with a pending result, the result is simulated and
     // forwarded to the SDK.
     private boolean pendingResult;
+
+    private GoogleApiClient mGoogleApiClient;
+    private boolean mShouldResolve = false;
+    private boolean mIsResolving = false;
 
     // This method should be implemented by invoking gpg::AndroidSupport::OnActivityResult
     private native void forwardActivityResult(int requestCode, int resultCode, Intent data);
@@ -35,7 +78,7 @@ public final class NativeBridgeActivity extends Activity {
         System.loadLibrary("gpg");
     }
 
-   public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         View v = new View(this);
         v.setBackgroundColor(BG_COLOR);
         setContentView(v);
@@ -44,10 +87,49 @@ public final class NativeBridgeActivity extends Activity {
 
     @Override
     protected void onStart() {
+
+        boolean shouldFinish = false;
+
         Intent bridgedIntent = getIntent().getParcelableExtra(BRIDGED_INTENT);
-        startActivityForResult(bridgedIntent, GPG_RESPONSE_CODE);
+        if (bridgedIntent != null) {
+            startActivityForResult(bridgedIntent, GPG_RESPONSE_CODE);
+        } else {
+            String key = getIntent().getStringExtra(TOKEN_RESULT_KEY);
+            String scope = getIntent().getStringExtra(SCOPE_KEY);
+
+            TokenPendingResult pr = pendingResultMap.get(key);
+
+            if (pr != null) {
+                if (scope == null || scope.isEmpty()) {
+                    Log.w(TAG, "Scope account empty or null");
+                }
+
+                mGoogleApiClient = new GoogleApiClient.Builder(this)
+                        .addApi(Plus.API)
+                        .addScope(Plus.SCOPE_PLUS_LOGIN)
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this)
+                        .build();
+
+                mGoogleApiClient.connect();
+
+                if (mGoogleApiClient.isConnected()) {
+                    Log.d(TAG, "  CONNECTED __ SOWWWWOEEET");
+                    doGetToken(pr, scope);
+                } else {
+                    Log.d(TAG, "not connected!");
+                }
+
+            } else {
+                Log.e(TAG, "Pending result is missing?!??");
+                shouldFinish = true;
+            }
+        }
 
         super.onStart();
+        if (shouldFinish) {
+            finish();
+        }
     }
 
     /**
@@ -67,21 +149,33 @@ public final class NativeBridgeActivity extends Activity {
         if (pendingResult) {
             Log.d(TAG, "starting GPG activity: " + intent);
         } else {
-            Log.i(TAG,"starting non-GPG activity: " + requestCode  +" " + intent);
+            Log.i(TAG, "starting non-GPG activity: " + requestCode + " " + intent);
         }
         super.startActivityForResult(intent, requestCode);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-       if (requestCode == GPG_RESPONSE_CODE) {
+
+        if (requestCode == RC_SIGN_IN) {
+            // If the error resolution was not successful we should not resolve further.
+            if (resultCode != RESULT_OK) {
+                mShouldResolve = false;
+            }
+
+            mIsResolving = false;
+            mGoogleApiClient.connect();
+            return;
+        }
+
+        if (requestCode == GPG_RESPONSE_CODE) {
             Log.d(TAG, "Forwarding activity result to native SDK.");
             forwardActivityResult(requestCode, resultCode, data);
 
             // clear the pending flag.
             pendingResult = false;
         } else {
-           Log.d(TAG, "onActivityResult for unknown request code: " + requestCode + " calling finish()");
+            Log.d(TAG, "onActivityResult for unknown request code: " + requestCode + " calling finish()");
         }
 
         finish();
@@ -96,6 +190,132 @@ public final class NativeBridgeActivity extends Activity {
         Intent bridgeIntent = new Intent(parentActivity, NativeBridgeActivity.class);
         bridgeIntent.putExtra(BRIDGED_INTENT, intent);
         parentActivity.startActivity(bridgeIntent);
+    }
+
+    public static PendingResult fetchToken(Activity parentActivity, String scope) {
+
+
+        TokenPendingResult pr = new TokenPendingResult();
+        String key = pr.toString() + Long.toHexString(System.currentTimeMillis());
+        pendingResultMap.put(key, pr);
+
+        try {
+            Intent bridgeIntent = new Intent(parentActivity, NativeBridgeActivity.class);
+            bridgeIntent.putExtra(TOKEN_RESULT_KEY, key);
+            bridgeIntent.putExtra(SCOPE_KEY, scope);
+            parentActivity.startActivity(bridgeIntent);
+        } catch (Throwable th) {
+            Log.e(TAG, "Cannot launch bridge activity", th);
+            pr.setToken(null, null, null, CommonStatusCodes.ERROR);
+            pendingResultMap.remove(key);
+        }
+
+
+        return pr;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        Log.d(TAG, "onRequestPermissionsResult: " + requestCode + "grants: " + grantResults.length);
+        if (requestCode == REQUEST_ACCT_PERM) {
+            if (grantResults.length == 1
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                String key = getIntent().getStringExtra(TOKEN_RESULT_KEY);
+                String scope = getIntent().getStringExtra(SCOPE_KEY);
+                TokenPendingResult pr = pendingResultMap.get(key);
+                doGetToken(pr, scope);
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+
+    }
+
+    private void doGetToken(final TokenPendingResult pr, final String scope) {
+        final Activity theActivity = this;
+        final GoogleApiClient googleApiClient = this.mGoogleApiClient;
+
+
+        Log.d(TAG, "Calling doGetToken");
+        AsyncTask<Object, Integer, TokenPendingResult> t =
+                new AsyncTask<Object, Integer, TokenPendingResult>() {
+                    @Override
+                    protected TokenPendingResult doInBackground(Object[] params) {
+                        String email = "";
+                        String accessToken = "";
+                        String idToken = "";
+                        try {
+
+                            Log.d(TAG, "Calling getAccountName");
+
+                            // get the email first
+                            email = Plus.AccountApi.getAccountName(googleApiClient);
+
+                            Log.d(TAG, "Calling account name == " + email);
+
+                            // now the access token
+                            String accessScope = "oauth2:https://www.googleapis.com/auth/plus.me";
+
+                            accessToken = GoogleAuthUtil.getToken(theActivity, email, accessScope);
+
+                            Log.d(TAG, "Calling accessToken is = " + accessToken);
+
+                            if (scope != null && !scope.isEmpty()) {
+                                Log.d(TAG, "Getting ID token.  Scope = " + scope);
+                                idToken = GoogleAuthUtil.getToken(theActivity, email, scope);
+                            } else {
+                                Log.w(TAG, "Skipping ID token: scope is empty");
+                            }
+
+                            pr.setToken(accessToken, idToken, email, CommonStatusCodes.SUCCESS);
+                        } catch (Throwable e) {
+                            Log.e(TAG, "Exception getting token", e);
+                            pr.setToken(accessToken, idToken, email, CommonStatusCodes.DEVELOPER_ERROR);
+                        }
+                        return pr;
+                    }
+
+                    /**
+                     * <p>Applications should preferably override {@link #onCancelled(Object)}.
+                     * This method is invoked by the default implementation of
+                     * {@link #onCancelled(Object)}.</p>
+                     * <p/>
+                     * <p>Runs on the UI thread after {@link #cancel(boolean)} is invoked and
+                     * {@link #doInBackground(Object[])} has finished.</p>
+                     *
+                     * @see #onCancelled(Object)
+                     * @see #cancel(boolean)
+                     * @see #isCancelled()
+                     */
+                    @Override
+                    protected void onCancelled() {
+                        super.onCancelled();
+                        pr.cancel();
+                        pendingResultMap.remove(getIntent().getStringExtra(TOKEN_RESULT_KEY));
+                        theActivity.finish();
+                    }
+
+                    /**
+                     * <p>Runs on the UI thread after {@link #doInBackground}. The
+                     * specified result is the value returned by {@link #doInBackground}.</p>
+                     * <p/>
+                     * <p>This method won't be invoked if the task was cancelled.</p>
+                     *
+                     * @param tokenPendingResult The result of the operation computed by {@link #doInBackground}.
+                     * @see #onPreExecute
+                     * @see #doInBackground
+                     * @see #onCancelled(Object)
+                     */
+                    @Override
+                    protected void onPostExecute(TokenPendingResult tokenPendingResult) {
+                        Log.d(TAG, "onPostEXecute for the token fetch");
+                        super.onPostExecute(tokenPendingResult);
+                        pendingResultMap.remove(getIntent().getStringExtra(TOKEN_RESULT_KEY));
+                        theActivity.finish();
+                    }
+                };
+        t.execute();
     }
 
     /**
@@ -132,16 +352,19 @@ public final class NativeBridgeActivity extends Activity {
         // if we have a pending Result and being destroyed, this most likely
         // means the activity we are waiting for is also destroyed, so cancel it out
         // with the SDK.
-         if (pendingResult) {
+        if (pendingResult) {
             Log.w(TAG, "onDestroy called with pendingResult == true.  forwarding canceled result");
-            forwardActivityResult(GPG_RESPONSE_CODE,RESULT_CANCELED, null);
+            forwardActivityResult(GPG_RESPONSE_CODE, RESULT_CANCELED, null);
             pendingResult = false;
         }
 
+        String key = getIntent().getStringExtra(TOKEN_RESULT_KEY);
+        if (key != null) {
+            Log.w(TAG, "onDestroy called during token fetching!");
+            pendingResultMap.remove(key);
+        }
         super.onDestroy();
     }
-
-
 
 
     /**
@@ -149,7 +372,7 @@ public final class NativeBridgeActivity extends Activity {
      * re-displayed to the user (the user has navigated back to it).  It will
      * be followed by {@link #onStart} and then {@link #onResume}.
      * <p/>
-     * <p>For activities that are using raw {@link Cursor} objects (instead of
+     * <p>For activities that are using raw  Cursor objects (instead of
      * creating them through
      * {@link #managedQuery(android.net.Uri, String[], String, String[], String)},
      * this is usually the place
@@ -217,7 +440,6 @@ public final class NativeBridgeActivity extends Activity {
     }
 
 
-
     /**
      * Called when you are no longer visible to the user.  You will next
      * receive either {@link #onRestart}, {@link #onDestroy}, or nothing,
@@ -240,9 +462,11 @@ public final class NativeBridgeActivity extends Activity {
     protected void onStop() {
         Log.d(TAG, "onStop");
 
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.disconnect();
+        }
         super.onStop();
     }
-
 
 
     /**
@@ -270,5 +494,105 @@ public final class NativeBridgeActivity extends Activity {
         Log.d(TAG, "onResume");
 
         super.onResume();
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        // onConnected indicates that an account was selected on the device, that the selected
+        // account has granted any requested permissions to our app and that we were able to
+        // establish a service connection to Google Play services.
+        Log.d(TAG, "onConnected:" + bundle);
+        mShouldResolve = false;
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.GET_ACCOUNTS) !=
+                PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                    this, new String[]{Manifest.permission.GET_ACCOUNTS}, REQUEST_ACCT_PERM);
+        } else {
+            TokenPendingResult pr = pendingResultMap.get(getIntent().getStringExtra(TOKEN_RESULT_KEY));
+            String scope = getIntent().getStringExtra(SCOPE_KEY);
+            doGetToken(pr, scope);
+        }
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.d(TAG, "Connection suspended");
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        // Could not connect to Google Play Services.  The user needs to select an account,
+        // grant permissions or resolve an error in order to sign in. Refer to the javadoc for
+        // ConnectionResult to see possible error codes.
+        Log.d(TAG, "onConnectionFailed:" + connectionResult);
+
+        if (!mIsResolving && mShouldResolve) {
+            if (connectionResult.hasResolution()) {
+                try {
+                    mIsResolving = true;
+                    connectionResult.startResolutionForResult(this, RC_SIGN_IN);
+                } catch (IntentSender.SendIntentException e) {
+                    Log.e(TAG, "Could not resolve ConnectionResult.", e);
+                    mIsResolving = false;
+                    mGoogleApiClient.connect();
+                }
+            } else {
+                // Could not resolve the connection result, show the user an
+                // error dialog.
+                showErrorDialog(connectionResult);
+                mIsResolving = true;
+            }
+        } else {
+            TokenPendingResult pr = pendingResultMap.remove(
+                    getIntent().getStringExtra(TOKEN_RESULT_KEY));
+            if (pr != null) {
+                pr.setToken(null, null, null, connectionResult.getErrorCode());
+            } else {
+                Log.w(TAG, "pending result is null!! when cannot connect!");
+            }
+            finish();
+        }
+    }
+
+    private void showErrorDialog(ConnectionResult connectionResult) {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        final int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this, resultCode, RC_SIGN_IN,
+                        new DialogInterface.OnCancelListener() {
+                            @Override
+                            public void onCancel(DialogInterface dialog) {
+                                mShouldResolve = false;
+                                TokenPendingResult pr =
+                                        pendingResultMap.remove(
+                                                getIntent().getStringExtra(TOKEN_RESULT_KEY));
+                                if (pr != null) {
+                                    pr.setToken(null, null, null, resultCode);
+                                } else {
+                                    Log.w(TAG, "pending result is null!! when cannot connect!");
+                                }
+                                finish();
+                            }
+                        }).show();
+            } else {
+                Log.w(TAG, "Google Play Services Error:" + connectionResult);
+                String errorString = apiAvailability.getErrorString(resultCode);
+                Toast.makeText(this, errorString, Toast.LENGTH_SHORT).show();
+
+                mShouldResolve = false;
+                TokenPendingResult pr = pendingResultMap.remove(
+                        getIntent().getStringExtra(TOKEN_RESULT_KEY));
+                if (pr != null) {
+                    pr.setToken(null, null, null, connectionResult.getErrorCode());
+                } else {
+                    Log.w(TAG, "pending result is null!! when cannot connect!");
+                }
+                finish();
+            }
+        }
     }
 }
