@@ -30,12 +30,12 @@ namespace GooglePlayGames.Android
 
     internal class AndroidClient : IClientImpl
     {
-        private const string BridgeActivityClass = "com.google.games.bridge.NativeBridgeActivity";
+        internal const string BridgeActivityClass = "com.google.games.bridge.NativeBridgeActivity";
         private const string LaunchBridgeMethod = "launchBridgeIntent";
         private const string LaunchBridgeSignature =
             "(Landroid/app/Activity;Landroid/content/Intent;)V";
-
-        private AndroidTokenClient tokenClient;
+        
+        private TokenClient tokenClient;
 
         public PlatformConfiguration CreatePlatformConfiguration()
         {
@@ -72,11 +72,11 @@ namespace GooglePlayGames.Android
         }
 
 
-        public TokenClient CreateTokenClient()
+        public TokenClient CreateTokenClient(bool reset)
         {
-            if (tokenClient == null)
+            if (tokenClient == null || reset)
             {
-                tokenClient = new AndroidTokenClient();
+                 tokenClient = new AndroidTokenClient();
             }
             return tokenClient;
         }
@@ -105,6 +105,11 @@ namespace GooglePlayGames.Android
                     }
                 }
             }
+            catch (Exception e)
+            {
+                Logger.e("Exception launching bridge intent: " + e.Message);
+                Logger.e(e.ToString());
+            }
             finally
             {
                 AndroidJNIHelper.DeleteJNIArgArray(objectArray, jArgs);
@@ -117,7 +122,8 @@ namespace GooglePlayGames.Android
             GoogleApiClient client = new GoogleApiClient(apiClient);
             StatsResultCallback resCallback;
 
-            try  {
+            try
+            {
                 resCallback = new StatsResultCallback((result, stats) =>
                 {
                     Debug.Log("Result for getStats: " + result);
@@ -135,7 +141,8 @@ namespace GooglePlayGames.Android
                     callback((CommonStatusCodes)result, s);
                 });
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 Debug.LogException(e);
                 callback(CommonStatusCodes.DeveloperError, null);
                 return;

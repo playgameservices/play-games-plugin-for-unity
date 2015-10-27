@@ -29,6 +29,10 @@ public class TokenResult implements Result {
     private String idToken;
     private String email;
 
+    public TokenResult() {
+
+    }
+
     TokenResult(String accessToken, String idToken, String email, int resultCode) {
         status = new Status(resultCode);
         this.accessToken = accessToken;
@@ -51,5 +55,21 @@ public class TokenResult implements Result {
 
     public String getEmail() {
         return email;
+    }
+
+    public void setStatus(int status) {
+        this.status = new Status(status);
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+
+    public void setIdToken(String idToken) {
+        this.idToken = idToken;
     }
 }
