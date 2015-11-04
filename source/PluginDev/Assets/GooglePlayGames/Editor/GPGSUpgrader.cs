@@ -16,13 +16,19 @@
 
 namespace GooglePlayGames
 {
-    using UnityEngine;
-    using UnityEditor;
     using System.IO;
+    using UnityEditor;
+    using UnityEngine;
 
+    /// <summary>
+    /// GPGS upgrader handles performing and upgrade tasks.
+    /// </summary>
     [InitializeOnLoad]
     public class GPGSUpgrader
     {
+        /// <summary>
+        /// Initializes static members of the <see cref="GooglePlayGames.GPGSUpgrader"/> class.
+        /// </summary>
         static GPGSUpgrader()
         {
             string prevVer = GPGSProjectSettings.Instance.Get(GPGSUtil.LASTUPGRADEKEY, "00000");
@@ -39,17 +45,94 @@ namespace GooglePlayGames
                 // there is no migration needed to 920+
                 Debug.Log("Upgrading from format version " + prevVer + " to " + PluginVersion.VersionKey);
                 prevVer = PluginVersion.VersionKey;
-                string msg = GPGSStrings.PostInstall.Text.Replace("$VERSION",
+                string msg = GPGSStrings.PostInstall.Text.Replace(
+                                 "$VERSION",
                                  PluginVersion.VersionString);
                 EditorUtility.DisplayDialog(GPGSStrings.PostInstall.Title, msg, "OK");
-
             }
 
             GPGSProjectSettings.Instance.Set(GPGSUtil.LASTUPGRADEKEY, prevVer);
             GPGSProjectSettings.Instance.Save();
+
+            // clean up duplicate scripts if Unity 5+
+            // Get the version number.
+            string majorVersion = Application.version.Split('.')[0];
+            int ver;
+            if (!int.TryParse(majorVersion, out ver))
+            {
+                ver = 0;
+            }
+
+            if (ver >= 5)
+            {
+                string[] paths =
+                    {
+                        "Assets/GooglePlayGames",
+                        "Assets/Plugins/Android"
+                    };
+                foreach (string p in paths)
+                {
+                    CleanDuplicates(p);
+                }
+
+                // remove support lib from old location.
+                string jarFile =
+                    "Assets/Plugins/Android/libs/android-support-v4.jar";
+                if (File.Exists(jarFile))
+                {
+                    File.Delete(jarFile);
+                }
+
+                // remove the massive play services client lib
+                string clientDir = "Assets/Plugins/Android/google-play-services_lib";
+                GPGSUtil.DeleteDirIfExists(clientDir);
+            }
+
+            // Check that there is a AndroidManifest.xml file
+            if (!GPGSUtil.AndroidManifestExists())
+            {
+                GPGSUtil.GenerateAndroidManifest(false);
+            }
+
             AssetDatabase.Refresh();
         }
 
+        /// <summary>
+        /// Cleans the duplicate files.  There should not be any since
+        /// we are keeping track of the .meta files.
+        /// </summary>
+        /// <param name="root">Root of the directory to clean.</param>
+        private static void CleanDuplicates(string root)
+        {
+            string[] subDirs = Directory.GetDirectories(root);
+
+            // look for .1 and .2
+            string[] dups = Directory.GetFiles(root, "* 1.*");
+            foreach (string d in dups)
+            {
+                Debug.Log("Deleting duplicate file: " + d);
+                File.Delete(d);
+            }
+
+            dups = Directory.GetFiles(root, "* 2.*");
+            foreach (string d in dups)
+            {
+                Debug.Log("Deleting duplicate file: " + d);
+                File.Delete(d);
+            }
+
+            // recurse
+            foreach (string s in subDirs)
+            {
+                CleanDuplicates(s);
+            }
+        }
+
+        /// <summary>
+        /// Upgrade to 915 from the specified prevVer.
+        /// </summary>
+        /// <param name="prevVer">Previous ver.</param>
+        /// <returns>the version string upgraded to.</returns>
         private static string Upgrade915(string prevVer)
         {
             Debug.Log("Upgrading from format version " + prevVer + " to " + PluginVersion.VersionKeyU5);
@@ -107,6 +190,11 @@ namespace GooglePlayGames
             return PluginVersion.VersionKeyU5;
         }
 
+        /// <summary>
+        /// Upgrade to 911 from the specified prevVer.
+        /// </summary>
+        /// <param name="prevVer">Previous ver.</param>
+        /// <returns>the version string upgraded to.</returns>
         private static string Upgrade911(string prevVer)
         {
             Debug.Log("Upgrading from format version " + prevVer + " to " + PluginVersion.VersionKeyCPP);
@@ -134,8 +222,8 @@ namespace GooglePlayGames
             // delete obsolete directories, if they are there
             string[] obsoleteDirectories =
                 {
-                "Assets/Plugins/Android/BaseGameUtils"
-            };
+                    "Assets/Plugins/Android/BaseGameUtils"
+                };
 
             foreach (string directory in obsoleteDirectories)
             {

@@ -28,8 +28,12 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.RequiresPermission;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.GoogleAuthUtil;
@@ -55,6 +59,7 @@ public class TokenFragment extends Fragment implements GoogleApiClient.Connectio
     private static final String FRAGMENT_TAG = "gpg.TokenSupport";
     private static final int RC_SIGN_IN = 9001;
     private static final int REQUEST_ACCT_PERM = 10;
+    private static final int OK_KEY = 0xabab;
 
     private GoogleApiClient mGoogleApiClient;
 
@@ -65,29 +70,33 @@ public class TokenFragment extends Fragment implements GoogleApiClient.Connectio
     private boolean mShouldResolve = false;
     private boolean mIsResolving = false;
 
+    private boolean mPendingPermissionRequest = false;
+    private int mPermissionResult = Integer.MIN_VALUE;
+
     /**
      * External entry point for getting tokens and email address.  This
      * creates the fragment if needed and queues up the request.  The fragment, once
      * active processes the list of requests.
      *
      * @param parentActivity   - the activity to attach the fragment to.
+     * @param rationale        - the rationale to display when requesting permission.
      * @param fetchEmail       - true indicates get the email.
      * @param fetchAccessToken - true indicates get the access token.
      * @param fetchIdToken     - true indicates get the id token.
      * @param scope            - the scope for getting the id token.
      * @return PendingResult for retrieving the results when ready.
      */
-    public static PendingResult fetchToken(Activity parentActivity, boolean fetchEmail,
+    public static PendingResult fetchToken(Activity parentActivity,
+                                           String rationale, boolean fetchEmail,
                                            boolean fetchAccessToken, boolean fetchIdToken, String scope) {
-
         TokenRequest request = new TokenRequest(fetchEmail, fetchAccessToken, fetchIdToken, scope);
+        request.setRationale(rationale);
         synchronized (pendingTokenRequests) {
             pendingTokenRequests.add(request);
         }
 
-
         TokenFragment fragment = (TokenFragment)
-                parentActivity.getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+            parentActivity.getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
 
         if (fragment == null) {
             try {
@@ -108,7 +117,6 @@ public class TokenFragment extends Fragment implements GoogleApiClient.Connectio
             fragment.processRequests(CommonStatusCodes.SUCCESS);
         }
 
-
         return request.getPendingResponse();
     }
 
@@ -117,18 +125,33 @@ public class TokenFragment extends Fragment implements GoogleApiClient.Connectio
      * First checking that the google api client is connected.
      * If the error code is not SUCCESS, then all the requests in the queue
      * are failed using the given error code.
+     *
      * @param errorCode - if not SUCCESS, all requests are failed using this code.
      */
     private void processRequests(int errorCode) {
         TokenRequest request = null;
 
-        if (mGoogleApiClient == null) {
+        if (mGoogleApiClient == null || !mGoogleApiClient.isConnected()) {
             Log.d(TAG, "mGoogleApiClient not created yet...");
+            if (mGoogleApiClient != null && !mGoogleApiClient.isConnecting()) {
+                mGoogleApiClient.connect();
+            }
             return;
+        }
+
+        if (!pendingTokenRequests.isEmpty()) {
+            if (!permissionResolved()) {
+                return;
+            }
+            else if (mPermissionResult == PackageManager.PERMISSION_DENIED) {
+                errorCode = CommonStatusCodes.AUTH_API_ACCESS_FORBIDDEN;
+            }
         }
 
         Log.d(TAG, "Pending map in processRequests is " + pendingTokenRequests.size());
         while (!pendingTokenRequests.isEmpty()) {
+
+            // check again since we can disconnect in the loop.
             if (!mGoogleApiClient.isConnected()) {
                 if (mGoogleApiClient.isConnecting()) {
                     Log.w(TAG, "Still connecting.... hold on...");
@@ -138,6 +161,7 @@ public class TokenFragment extends Fragment implements GoogleApiClient.Connectio
                 }
                 return;
             }
+
             try {
                 synchronized (pendingTokenRequests) {
                     if (!pendingTokenRequests.isEmpty()) {
@@ -160,11 +184,59 @@ public class TokenFragment extends Fragment implements GoogleApiClient.Connectio
             }
         }
         Log.d(TAG, "Done with processRequests!");
+
+    }
+
+    @RequiresPermission(Manifest.permission.GET_ACCOUNTS)
+    @TargetApi(23)
+    private boolean permissionResolved()
+    {
+        int rc = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.GET_ACCOUNTS);
+        if (rc == PackageManager.PERMISSION_GRANTED) {
+            mPermissionResult = rc;
+        } else if (!mPendingPermissionRequest && mPermissionResult == Integer.MIN_VALUE) {
+            Log.d(TAG, "GET_ACCOUNTS not granted, requesting.");
+            mPendingPermissionRequest = true;
+
+            if (shouldShowRequestPermissionRationale(Manifest.permission.GET_ACCOUNTS) &&
+                    getActivity().getCurrentFocus() != null) {
+                String rationale = pendingTokenRequests.get(0).getRationale();
+                if (rationale == null || rationale.isEmpty()) {
+                    rationale = "This application requires your email address or identity token";
+                }
+
+                Log.i(TAG, "Displaying permission rationale to provide additional context.");
+                Snackbar.make(getActivity().getCurrentFocus(),
+                        rationale,
+                        Snackbar.LENGTH_INDEFINITE)
+                        .setAction("OK", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                // Request permission
+                                ActivityCompat.requestPermissions(getActivity(),
+                                        new String[]{Manifest.permission.GET_ACCOUNTS},
+                                        REQUEST_ACCT_PERM);
+                            }
+                        })
+                        .show();
+            } else {
+                ActivityCompat.requestPermissions(
+                        getActivity(), new String[]{Manifest.permission.GET_ACCOUNTS}, REQUEST_ACCT_PERM);
+            }
+
+           return false;
+
+        } else {
+            Log.i(TAG, "Request is denied, permission for GET_ACCOUNTS is not granted: (" + mPermissionResult + ")");
+        }
+
+        return true;
     }
 
 
     /**
      * Gets the email, and/or tokens as requested.
+     *
      * @param tokenRequest - the request to process.
      */
     private void doGetToken(final TokenRequest tokenRequest) {
@@ -293,6 +365,8 @@ public class TokenFragment extends Fragment implements GoogleApiClient.Connectio
      */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        Log.d(TAG, "onActivityResult: " + requestCode + ": " + resultCode);
         if (requestCode == RC_SIGN_IN) {
             // If the error resolution was not successful we should not resolve further.
             if (resultCode != Activity.RESULT_OK) {
@@ -308,6 +382,7 @@ public class TokenFragment extends Fragment implements GoogleApiClient.Connectio
     @Override
     public void onStart() {
 
+        Log.d(TAG, "onStart");
         mGoogleApiClient = new GoogleApiClient.Builder(this.getActivity())
                 .addApi(Plus.API)
                 .addScope(Plus.SCOPE_PLUS_LOGIN)
@@ -317,6 +392,7 @@ public class TokenFragment extends Fragment implements GoogleApiClient.Connectio
 
         mShouldResolve = true;
         mGoogleApiClient.connect();
+        mPermissionResult = Integer.MIN_VALUE;
 
         super.onStart();
     }
@@ -335,6 +411,16 @@ public class TokenFragment extends Fragment implements GoogleApiClient.Connectio
         super.onResume();
     }
 
+
+    @Override
+    public void onPause() {
+        Log.d(TAG, "onPause called");
+
+        // disconnect here so if the user is changed, we'll reconnect as the different user.
+        mGoogleApiClient.disconnect();
+        super.onPause();
+    }
+
     @Override
     public void onConnected(Bundle bundle) {
         // onConnected indicates that an account was selected on the device, that the selected
@@ -342,14 +428,8 @@ public class TokenFragment extends Fragment implements GoogleApiClient.Connectio
         // establish a service connection to Google Play services.
         Log.d(TAG, "onConnected:" + bundle);
         mShouldResolve = false;
-
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.GET_ACCOUNTS) !=
-                PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                    getActivity(), new String[]{Manifest.permission.GET_ACCOUNTS}, REQUEST_ACCT_PERM);
-        } else {
-            processRequests(CommonStatusCodes.SUCCESS);
-        }
+        mPermissionResult = Integer.MIN_VALUE;
+        processRequests(CommonStatusCodes.SUCCESS);
     }
 
     @Override
@@ -363,6 +443,7 @@ public class TokenFragment extends Fragment implements GoogleApiClient.Connectio
         // grant permissions or resolve an error in order to sign in. Refer to the javadoc for
         // ConnectionResult to see possible error codes.
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
+        mPermissionResult = Integer.MIN_VALUE;
 
         if (!mIsResolving && mShouldResolve) {
             if (connectionResult.hasResolution()) {
@@ -395,17 +476,24 @@ public class TokenFragment extends Fragment implements GoogleApiClient.Connectio
         if (mGoogleApiClient != null) {
             mGoogleApiClient.disconnect();
         }
+        mPermissionResult = Integer.MIN_VALUE;
         super.onStop();
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         Log.d(TAG, "onRequestPermissionsResult: " + requestCode + "grants: " + grantResults.length);
         if (requestCode == REQUEST_ACCT_PERM) {
-            if (grantResults.length == 1
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            mPendingPermissionRequest = false;
+            if (permissions.length == 1 && permissions[0].equals(Manifest.permission.GET_ACCOUNTS)) {
+                mPermissionResult = grantResults[0];
+            }
+            if (mPermissionResult == PackageManager.PERMISSION_GRANTED) {
 
                 processRequests(CommonStatusCodes.SUCCESS);
+            } else {
+                Log.w(TAG, "Request for GET_ACCOUNTS was denied");
+                processRequests(CommonStatusCodes.AUTH_API_ACCESS_FORBIDDEN);
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -444,6 +532,7 @@ public class TokenFragment extends Fragment implements GoogleApiClient.Connectio
         private boolean doAccessToken;
         private boolean doIdToken;
         private String scope;
+        private String rationale;
 
         public TokenRequest(boolean fetchEmail, boolean fetchAccessToken, boolean fetchIdToken, String scope) {
             pendingResponse = new TokenPendingResult();
@@ -479,6 +568,14 @@ public class TokenFragment extends Fragment implements GoogleApiClient.Connectio
 
         public void setIdToken(String idToken) {
             pendingResponse.setIdToken(idToken);
+        }
+
+        public String getRationale() {
+            return rationale;
+        }
+
+        public void setRationale(String rationale) {
+            this.rationale = rationale;
         }
     }
 }

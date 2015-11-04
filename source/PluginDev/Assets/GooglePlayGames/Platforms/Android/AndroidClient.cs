@@ -34,7 +34,7 @@ namespace GooglePlayGames.Android
         private const string LaunchBridgeMethod = "launchBridgeIntent";
         private const string LaunchBridgeSignature =
             "(Landroid/app/Activity;Landroid/content/Intent;)V";
-        
+
         private TokenClient tokenClient;
 
         public PlatformConfiguration CreatePlatformConfiguration()
@@ -76,7 +76,7 @@ namespace GooglePlayGames.Android
         {
             if (tokenClient == null || reset)
             {
-                 tokenClient = new AndroidTokenClient();
+                tokenClient = new AndroidTokenClient();
             }
             return tokenClient;
         }
@@ -125,21 +125,21 @@ namespace GooglePlayGames.Android
             try
             {
                 resCallback = new StatsResultCallback((result, stats) =>
-                {
-                    Debug.Log("Result for getStats: " + result);
-                    PlayGamesLocalUser.PlayerStats s = null;
-                    if (stats != null)
                     {
-                        s = new PlayGamesLocalUser.PlayerStats();
-                        s.AvgSessonLength = stats.getAverageSessionLength();
-                        s.DaysSinceLastPlayed = stats.getDaysSinceLastPlayed();
-                        s.NumberOfPurchases = stats.getNumberOfPurchases();
-                        s.NumOfSessions = stats.getNumberOfSessions();
-                        s.SessPercentile = stats.getSessionPercentile();
-                        s.SpendPercentile = stats.getSpendPercentile();
-                    }
-                    callback((CommonStatusCodes)result, s);
-                });
+                        Debug.Log("Result for getStats: " + result);
+                        PlayGamesLocalUser.PlayerStats s = null;
+                        if (stats != null)
+                        {
+                            s = new PlayGamesLocalUser.PlayerStats();
+                            s.AvgSessonLength = stats.getAverageSessionLength();
+                            s.DaysSinceLastPlayed = stats.getDaysSinceLastPlayed();
+                            s.NumberOfPurchases = stats.getNumberOfPurchases();
+                            s.NumOfSessions = stats.getNumberOfSessions();
+                            s.SessPercentile = stats.getSessionPercentile();
+                            s.SpendPercentile = stats.getSpendPercentile();
+                        }
+                        callback((CommonStatusCodes)result, s);
+                    });
             }
             catch (Exception e)
             {

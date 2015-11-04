@@ -97,7 +97,7 @@ namespace GooglePlayGames
         {
             public const string Title = "Google Play Games - Android Configuration";
             public const string Blurb = "To configure Google Play Games in this project,\n" +
-                                        "please enter the information below and click on the Setup button.";
+                                        "go to the Play Game console, then enter the information below and click on the Setup button.";
 
             public const string WebClientIdBlurb = "The web app client ID is needed to access the user's ID token and " +
                 "call other APIs onbehalf of the user." +

@@ -27,7 +27,7 @@ namespace GooglePlayGames.Android
     {
         private const string TokenFragmentClass = "com.google.games.bridge.TokenFragment";
         private const string FetchTokenSignature =
-            "(Landroid/app/Activity;ZZZLjava/lang/String;)Lcom/google/android/gms/common/api/PendingResult;";
+            "(Landroid/app/Activity;Ljava/lang/String;ZZZLjava/lang/String;)Lcom/google/android/gms/common/api/PendingResult;";
         private const string FetchTokenMethod = "fetchToken";
 
         private bool fetchingEmail = false;
@@ -37,6 +37,7 @@ namespace GooglePlayGames.Android
         private string accessToken;
         private string idToken;
         private string idTokenScope;
+        private string rationale;
 
         public static AndroidJavaObject GetActivity()
         {
@@ -44,6 +45,11 @@ namespace GooglePlayGames.Android
             {
                 return jc.GetStatic<AndroidJavaObject>("currentActivity");
             }
+        }
+
+        public void SetRationale(string rationale)
+        {
+            this.rationale = rationale;
         }
 
         /// <summary>Gets the Google API client Java object.</summary>
@@ -83,52 +89,57 @@ namespace GooglePlayGames.Android
             }
         }
 
-        internal void Fetch(string scope, bool fetchEmail, bool fetchAccessToken, bool fetchIdToken, Action<bool> doneCallback)
+        internal void Fetch(string scope,
+                            string rationale,
+                            bool fetchEmail,
+                            bool fetchAccessToken,
+                            bool fetchIdToken,
+                            Action<bool> doneCallback)
         {
             PlayGamesHelperObject.RunOnGameThread(() =>
-            FetchToken(scope, fetchEmail, fetchAccessToken, fetchIdToken, (rc, access, id, email) =>
-                {
-                    if (rc != (int)CommonStatusCodes.Success)
+            FetchToken(scope, rationale, fetchEmail, fetchAccessToken, fetchIdToken, (rc, access, id, email) =>
                     {
-                        Logger.w("Non-success returned from fetch: " + rc);
-                        doneCallback(false);
-                    }
+                        if (rc != (int)CommonStatusCodes.Success)
+                        {
+                            Logger.w("Non-success returned from fetch: " + rc);
+                            doneCallback(false);
+                        }
 
-                    if (fetchAccessToken)
-                    {
-                        Logger.d("a = " + access);
-                    }
-                    if (fetchEmail)
-                    {
-                        Logger.d("email = " + email);
-                    }
+                        if (fetchAccessToken)
+                        {
+                            Logger.d("a = " + access);
+                        }
+                        if (fetchEmail)
+                        {
+                            Logger.d("email = " + email);
+                        }
 
-                    if (fetchIdToken)
-                    {
-                        Logger.d("idt = " + id);
-                    }
+                        if (fetchIdToken)
+                        {
+                            Logger.d("idt = " + id);
+                        }
 
-                    if (fetchAccessToken && !string.IsNullOrEmpty(access))
-                    {
-                        accessToken = access;
-                    }
-                    if (fetchIdToken && !string.IsNullOrEmpty(id))
-                    {
-                        idToken = id;
-                    }
-                    if (fetchEmail && !string.IsNullOrEmpty(email))
-                    {
-                        this.accountName = email;
-                    }
-                    doneCallback(true);
+                        if (fetchAccessToken && !string.IsNullOrEmpty(access))
+                        {
+                            accessToken = access;
+                        }
+                        if (fetchIdToken && !string.IsNullOrEmpty(id))
+                        {
+                            idToken = id;
+                        }
+                        if (fetchEmail && !string.IsNullOrEmpty(email))
+                        {
+                            this.accountName = email;
+                        }
+                        doneCallback(true);
                     }));
         }
 
 
-        internal static void FetchToken(string scope, bool fetchEmail,
+        internal static void FetchToken(string scope, string rationale, bool fetchEmail,
                                         bool fetchAccessToken, bool fetchIdToken, Action<int, string, string, string> callback)
         {
-            object[] objectArray = new object[5];
+            object[] objectArray = new object[6];
             jvalue[] jArgs = AndroidJNIHelper.CreateJNIArgArray(objectArray);
             try
             {
@@ -142,13 +153,14 @@ namespace GooglePlayGames.Android
                                               FetchTokenMethod,
                                               FetchTokenSignature);
                         jArgs[0].l = currentActivity.GetRawObject();
-                        jArgs[1].z = fetchEmail;
-                        jArgs[2].z = fetchAccessToken;
-                        jArgs[3].z = fetchIdToken;
-                        jArgs[4].l = AndroidJNI.NewStringUTF(scope);
+                        jArgs[1].l = AndroidJNI.NewStringUTF(rationale);
+                        jArgs[2].z = fetchEmail;
+                        jArgs[3].z = fetchAccessToken;
+                        jArgs[4].z = fetchIdToken;
+                        jArgs[5].l = AndroidJNI.NewStringUTF(scope);
 
                         Logger.d("---->> Calling Fetch: " + methodId + " scope: " + scope);
-                        IntPtr ptr = 
+                        IntPtr ptr =
                             AndroidJNI.CallStaticObjectMethod(bridgeClass.GetRawClass(), methodId, jArgs);
 
                         Logger.d("<<<-------  Got return of " + ptr);
@@ -159,13 +171,13 @@ namespace GooglePlayGames.Android
             }
             catch (Exception e)
             {
-                Logger.e("Exception launching bridge intent: " + e.Message);
+                Logger.e("Exception launching token request: " + e.Message);
                 Logger.e(e.ToString());
             }
             finally
             {
                 AndroidJNIHelper.DeleteJNIArgArray(objectArray, jArgs);
-            }            
+            }
         }
 
         /// <summary>
@@ -180,7 +192,7 @@ namespace GooglePlayGames.Android
                 if (!fetchingEmail)
                 {
                     fetchingEmail = true;
-                    Fetch(idTokenScope, true, false, false, (ok) =>fetchingEmail = false);
+                    Fetch(idTokenScope, rationale, true, false, false, (ok) => fetchingEmail = false);
                 }
             }
 
@@ -211,7 +223,7 @@ namespace GooglePlayGames.Android
                 if (!fetchingAccessToken)
                 {
                     fetchingAccessToken = true;
-                    Fetch(idTokenScope, false, true, false, (rc) => fetchingAccessToken = false);
+                    Fetch(idTokenScope, rationale, false, true, false, (rc) => fetchingAccessToken = false);
                 }
             }
             return accessToken;
@@ -223,18 +235,17 @@ namespace GooglePlayGames.Android
         /// services console.</param>
         public string GetIdToken(string serverClientID)
         {
-            string newScope =  "audience:server:client_id:" + serverClientID;
+            string newScope = "audience:server:client_id:" + serverClientID;
             if (string.IsNullOrEmpty(idToken) || (newScope != idTokenScope))
             {
                 if (!fetchingIdToken)
                 {
                     fetchingIdToken = true;
                     idTokenScope = newScope;
-               
-                            Fetch(idTokenScope, false, false, true, (ok) => fetchingIdToken = false);
+                    Fetch(idTokenScope, rationale, false, false, true, (ok) => fetchingIdToken = false);
                 }
             }
-                
+
             return idToken;
         }
     }

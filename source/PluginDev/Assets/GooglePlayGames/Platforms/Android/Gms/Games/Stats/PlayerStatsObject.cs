@@ -23,7 +23,6 @@ using System.Reflection;
 using UnityEngine;
 namespace Com.Google.Android.Gms.Games.Stats
 {
-    
     public class PlayerStatsObject : JavaObjWrapper , PlayerStats
     {
         const string CLASS_NAME = "com/google/android/gms/games/stats/PlayerStats";
@@ -55,6 +54,10 @@ namespace Com.Google.Android.Gms.Games.Stats
         public float getAverageSessionLength()
         {
             return InvokeCall<float>("getAverageSessionLength", "()F");
+        }
+        public float getChurnProbability()
+        {
+            return InvokeCall<float>("getChurnProbability", "()F");
         }
         public int getDaysSinceLastPlayed()
         {

@@ -582,7 +582,8 @@ namespace GooglePlayGames
                 int numSteps = targetSteps - curSteps;
                 Logger.d("Target steps: " + targetSteps + ", cur steps:" + curSteps);
                 Logger.d("Steps to increment: " + numSteps);
-                if (numSteps > 0)
+                // handle incremental achievements with 0 steps
+                if (numSteps >= 0)
                 {
                     mClient.IncrementAchievement(achievementID, numSteps, callback);
                 }

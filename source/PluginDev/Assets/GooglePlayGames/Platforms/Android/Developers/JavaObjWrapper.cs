@@ -281,6 +281,18 @@ namespace Google.Developers
             IntPtr method = AndroidJNI.GetMethodID(rawClass, name, sig);
             jvalue[] jArgs = ConstructArgArray(args);
 
+            if (rawClass == IntPtr.Zero)
+            {
+                Debug.LogError("Cannot get rawClass object!");
+                throw new Exception("Cannot get rawClass object");
+            }
+
+            if (method == IntPtr.Zero)
+            {
+                Debug.LogError("Cannot get method for " + name);
+                throw new Exception("Cannot get method for " + name);
+            }
+
             if (t == typeof(bool))
             {
                 return (T)(object)AndroidJNI.CallBooleanMethod(raw, method, jArgs);

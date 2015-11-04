@@ -40,13 +40,16 @@ Features:
 
 System requirements:
 
-* Unity&reg; 4.5 or above (4.6.8 if building for iOS).
+* Unity&reg; 5 or above. 
+
+  *Note:4.6.8 works at runtime, but some editor functionality does not work.
+  as a result, use of older version of Unity are at your own peril.*
 * To deploy on Android:
     * Android SDK
     * Android v4.0 or higher
-    * Google Play Services library, version 7.0 or above
+    * Google Play Services library, version 8.1 or above
 * To deploy on iOS:
-    * XCode 5.1 or above
+    * XCode 6 or above
     * [Cocoapods](https://cocoapods.org/)
 
 
@@ -68,20 +71,45 @@ If you intend to use real-time or turn-based multiplayer in your game, remember
 to activate those features in the Google Play Developer Console when creating
 your application instances.
 
-Please note the package name (also called bundle identifier)
-(e.g. "com.example.awesomegame") when creating your game configurations
-as it will be necessary later.
+### Copy the game resources from the console
 
 Once you configure at least one resource (event, achievement, or leaderboard),
-you can copy the resource configuration from the Google Play Developer Console, and paste it
-into the setup configuration in Unity.
+copy the resource configuration from the Google Play Developer Console, and paste it
+into the setup configuration in Unity.  To get the resources go to the the Achievements
+tab, then click on "Get resources" on the bottom of the list.
+
+![click Get Resources](source/docgen/resourcesLink.png "Show the resources data")
+
+If you are building for Android, copy the "Android resources".  If you are building
+for iOS, click "Objective-C" and copy those entries.
+
+![Android Resources](source/docgen/resources.png "Android resource data")
+
+Select all the contents of the resources window, and copy them to the clipboard.
+
+### Paste the game resources into the plugin setup dialog
+
+Back in Unity, open the setup dialog **Window > Google Play Games > Setup... > Android Setup**
+
+![Android Setup](source/docgen/AndroidSetup.png "Android setup")
+
+ * **Enter the directory to save constants** - Enter the folder for the constants file.
+ * **Constants class name** - this is the name of the C# class to create, including namespace.
+ * **Resources Definition** - paste the resource data from the Play Games console here.
+ * **Web client ID** - this is the client ID of the linked web app.  It is only needed if 
+you have a web based back-end for your game, need an access token for the player to
+make other, non-game API calls, or need to access the email address of the player.
 
 The setup process will configure your game with the client id and generate a
 C# class that contains constants for each of your resources.
 
-**Note:** Do not forget to add your test accounts (the accounts with which you
-will try signing in) to the **Testing** section of the Developer Console,
-otherwise you will not be able to sign in to your game.
+## Setup Checklist
+
+Make sure to do the following if they are relevant to your game:
+
+1. Add tester email addresses to the testing section of your game on the Play Games Console.
+2. The SHA1 fingerprint used to create the linked Android app is from the keystore
+used to sign the Unity application.
 
 ## Add Achievements and Leaderboards
 
@@ -856,6 +884,19 @@ RunOnGameThread:
                     ((PlayGamesLocalUser)Social.localUser).Email);
                 // use the email as needed
               });
+```
+
+## Loading Friends ##
+To load the friends of the current player, you can use the ISocial framework.
+This call is asynchronous, so the friends need to be processed in the callback.
+
+```csharp
+Social.localUser.LoadFriends((ok) =>  {
+    Debug.Log("Friends loaded OK: " + ok));
+    foreach(IUserProfile p in Social.localUser.friends) {
+         Debug.Log(p.userName + " is a friend");   
+    }   
+});
 ```
 
 

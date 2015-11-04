@@ -1,3 +1,20 @@
+Version 0.9.27
+    New Features:
+        * Updating Android email and token access for new permissions model.
+        * Specify directory for generated game resource constants.
+        * Improved plugin initialization and setup.
+        * Added getChurnProbability() to PlayerStats.
+    Bug Fixes:
+        * #750 AndroidJavaProxy not found when building for iOS.
+        * #757 Can only start coroutine from main thread.
+        * #771 Documentation update: what are "Android Resources"
+        * #772 Disable bitcode in podfile
+        * #777 Can not get the list of friend images.
+        * #785 Regression on reportProgress for incremental achievement.
+        * #610 Stripped version of Play Services client library.
+        * #565 Minimize client library to avoid 65k dex limit.
+        * #323 Support for split client aars.
+
 Version 0.9.26
     New Features:
         * #666 Expose invitation property for Real time game.
