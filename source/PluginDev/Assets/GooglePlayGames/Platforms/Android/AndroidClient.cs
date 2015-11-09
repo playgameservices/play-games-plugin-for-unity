@@ -40,7 +40,6 @@ namespace GooglePlayGames.Android
         public PlatformConfiguration CreatePlatformConfiguration()
         {
             var config = AndroidPlatformConfiguration.Create();
-            config.EnableAppState();
             using (var activity = AndroidTokenClient.GetActivity())
             {
                 config.SetActivity(activity.GetRawObject());
