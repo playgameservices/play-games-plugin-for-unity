@@ -294,7 +294,7 @@ namespace GooglePlayGames
         {
             bool doneSetup = true;
             #if UNITY_ANDROID
-            doneSetup = GPGSProjectSettings.Instance.GetBool(GPGSUtil.ANDROIDSETUPDONEKEY, false);
+            doneSetup = GPGSProjectSettings.Instance.GetBool(ANDROIDSETUPDONEKEY, false);
             // check gameinfo
             if (File.Exists(GameInfoPath))
             {
@@ -312,12 +312,12 @@ namespace GooglePlayGames
                 return false;
             }
             #elif (UNITY_IPHONE && !NO_GPGS)
-            doneSetup = GPGSProjectSettings.Instance.GetBool(GPGSUtil.IOSSETUPDONEKEY, false);
+            doneSetup = GPGSProjectSettings.Instance.GetBool(IOSSETUPDONEKEY, false);
             // check gameinfo
             if (File.Exists(GameInfoPath))
             {
                 string contents = ReadFile(GameInfoPath);
-                if (contents.Contains(__IOS_CLIENTID__))
+                if (contents.Contains(IOSCLIENTIDPLACEHOLDER))
                 {
                     Debug.Log("GameInfo not initialized with Client Id.  " +
                         "Run Window > Google Play Games > Setup > iOS Setup...");
@@ -416,6 +416,7 @@ namespace GooglePlayGames
         /// <returns>The unity major version.</returns>
         public static int GetUnityMajorVersion()
         {
+#if UNITY_5
             string majorVersion = Application.version.Split('.')[0];
             int ver;
             if (!int.TryParse(majorVersion, out ver))
@@ -424,6 +425,12 @@ namespace GooglePlayGames
             }
 
             return ver;
+#elif UNITY_4_6
+            return 4;
+#else
+            return 0;
+#endif
+
         }
 
         /// <summary>

@@ -33,7 +33,7 @@ namespace GooglePlayGames.IOS
         {
             if (!GameInfo.IosClientIdInitialized())
             {
-                throw new System.InvalidOperationException("Could not locate the OAuth Client ID, " +
+                throw new InvalidOperationException("Could not locate the OAuth Client ID, " +
                     "provide this by navigating to Google Play Games > iOS Setup");
             }
 
@@ -47,7 +47,12 @@ namespace GooglePlayGames.IOS
             return config;
         }
 
-        public TokenClient CreateTokenClient()
+        /// <summary>
+        /// Creates the token client.
+        /// </summary>
+        /// <returns>The token client.</returns>
+        /// <param name="reset">not used for iOS</param>
+        public TokenClient CreateTokenClient(bool reset)
         {
             return new IOSTokenClient();
         }

@@ -208,7 +208,7 @@ namespace GooglePlayGames
             GUILayout.Label(GPGSStrings.AndroidSetup.Blurb);
             if (GUILayout.Button("Open Play Games Console", link, GUILayout.ExpandWidth(false)))
             {
-                Application.OpenURL("https://play-apps-publisher-prod.corp.google.com/apps/publish");
+                Application.OpenURL("https://play.google.com/apps/publish");
             }
 
             Rect last = GUILayoutUtility.GetLastRect();

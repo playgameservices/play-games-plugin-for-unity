@@ -55,13 +55,7 @@ namespace GooglePlayGames
             GPGSProjectSettings.Instance.Save();
 
             // clean up duplicate scripts if Unity 5+
-            // Get the version number.
-            string majorVersion = Application.version.Split('.')[0];
-            int ver;
-            if (!int.TryParse(majorVersion, out ver))
-            {
-                ver = 0;
-            }
+            int ver = GPGSUtil.GetUnityMajorVersion();
 
             if (ver >= 5)
             {

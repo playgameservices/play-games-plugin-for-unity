@@ -49,7 +49,11 @@ namespace GooglePlayGames
                         "<color=red>Warning! You need to configure </color><b>Google Play Game Services</b> ",
                         s))
                 {
+                    #if UNITY_ANDROID
                     GPGSAndroidSetupUI.MenuItemFileGPGSAndroidSetup();
+                    #elif (UNITY_IPHONE && !NO_GPGS)
+                    GPGSIOSSetupUI.MenuItemGPGSIOSSetup();
+                    #endif
                 }
 
                 Handles.EndGUI();

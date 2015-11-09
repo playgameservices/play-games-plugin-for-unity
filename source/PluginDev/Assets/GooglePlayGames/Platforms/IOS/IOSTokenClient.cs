@@ -40,6 +40,14 @@ namespace GooglePlayGames.IOS {
         [System.Runtime.InteropServices.DllImport("__Internal")]
         private static extern string _GooglePlayGetUserEmail();
 
+        /// <summary>
+        /// Sets the rationale.  Not used for ios.
+        /// </summary>
+        /// <param name="rationale">Rationale.</param>
+        public void SetRationale(string rationale)
+        {
+            // not used for iOS.
+        }
 
         /// <summary>Gets the current user's email.</summary>
         /// <returns>A string representing the email.</returns>

@@ -70,6 +70,7 @@ namespace GooglePlayGames
                 "23.1.0+");
         }
 
+#if UNITY_5
         /// <summary>
         /// Resolve the dependencies.  This can added to the menu.
         /// </summary>
@@ -90,7 +91,7 @@ namespace GooglePlayGames
             EditorUtility.DisplayDialog("Android Jar Dependencies",
                 "Resolution Complete", "OK");
         }
-
+#endif
         // Called when assets have changed.
         static void OnPostprocessAllAssets(
             string[] importedAssets,
@@ -98,6 +99,7 @@ namespace GooglePlayGames
             string[] movedAssets,
             string[] movedFromAssetPaths)
         {
+#if UNITY_5
             if (GPGSUtil.GetUnityMajorVersion() >= 5)
             {
                 Dictionary<string, Dependency> deps =
@@ -107,6 +109,7 @@ namespace GooglePlayGames
                 AssetDatabase.Refresh();
                 Debug.Log("Android Jar Dependencies: Resolution Complete");
             }
+#endif
         }
 
         /// <summary>

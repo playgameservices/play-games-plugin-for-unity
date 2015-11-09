@@ -71,11 +71,29 @@ namespace GooglePlayGames
 
         public void OnGUI()
         {
+            GUIStyle link = new GUIStyle(GUI.skin.label);
+            link.normal.textColor = new Color(.7f, .7f, 1f);
+
             // Title
             GUILayout.BeginVertical();
             GUILayout.Space(10);
             GUILayout.Label(GPGSStrings.IOSSetup.Blurb);
             GUILayout.Space(10);
+
+            if (GUILayout.Button("Open Play Games Console", link, GUILayout.ExpandWidth(false)))
+            {
+                Application.OpenURL("https://play.google.com/apps/publish");
+            }
+
+            Rect last = GUILayoutUtility.GetLastRect();
+            last.y += last.height - 2;
+            last.x += 3;
+            last.width -= 6;
+            last.height = 2;
+
+            GUI.Box(last, string.Empty);
+
+            GUILayout.Space(15);
 
             // Bundle ID field
             GUILayout.Label(GPGSStrings.IOSSetup.BundleIdTitle, EditorStyles.boldLabel);
