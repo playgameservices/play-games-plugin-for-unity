@@ -136,6 +136,7 @@ namespace GooglePlayGames.Android
                             s.NumOfSessions = stats.getNumberOfSessions();
                             s.SessPercentile = stats.getSessionPercentile();
                             s.SpendPercentile = stats.getSpendPercentile();
+                            s.ChurnProbability = stats.getChurnProbability();
                         }
                         callback((CommonStatusCodes)result, s);
                     });

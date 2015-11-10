@@ -270,22 +270,38 @@ namespace GooglePlayGames
             /// <summary>
             /// The number of in-app purchases.
             /// </summary>
-            private int numberOfPurchases;
+            public int NumberOfPurchases
+            {
+                get;
+                set;
+            }
 
             /// <summary>
             /// The length of the avg sesson in minutes.
             /// </summary>
-            private float avgSessonLength;
+            public float AvgSessonLength
+            {
+                get;
+                set;
+            }
 
             /// <summary>
             /// The days since last played.
             /// </summary>
-            private int daysSinceLastPlayed;
+            public int DaysSinceLastPlayed
+            {
+                get;
+                set;
+            }
 
             /// <summary>
             /// The number of sessions based on sign-ins.
             /// </summary>
-            private int numOfSessions;
+            public int NumOfSessions
+            {
+                get;
+                set;
+            }
 
             /// <summary>
             /// The approximation of sessions percentile for the player,
@@ -293,8 +309,13 @@ namespace GooglePlayGames
             /// This value indicates how many sessions the current player has
             /// played in comparison to the rest of this game's player base.
             /// Higher numbers indicate that this player has played more sessions.
+            /// A return value  less than zero indicates this value is not available.
             /// </summary>
-            private float sessPercentile;
+            public float SessPercentile
+            {
+                get;
+                set;
+            }
 
             /// <summary>
             /// The approximate spend percentile of the player,
@@ -302,40 +323,21 @@ namespace GooglePlayGames
             /// value indicates how much the current player has spent in
             /// comparison to the rest of this game's player base. Higher
             /// numbers indicate that this player has spent more.
+            /// A return value  less than zero indicates this value is not available.
             /// </summary>
-            private float spendPercentile;
-
-            public int NumberOfPurchases
-            {
-                get;
-                set;
-            }
-
-            public float AvgSessonLength
-            {
-                get;
-                set;
-            }
-
-            public int DaysSinceLastPlayed
-            {
-                get;
-                set;
-            }
-
-            public int NumOfSessions
-            {
-                get;
-                set;
-            }
-
-            public float SessPercentile
-            {
-                get;
-                set;
-            }
-
             public float SpendPercentile
+            {
+                get;
+                set;
+            }
+
+            /// <summary>
+            /// The approximate probability of the player not returning 
+            /// to play the game. Higher values indicate that a player 
+            /// is less likely to return.
+            /// A return value  less than zero indicates this value is not available.
+            /// </summary>
+            public float ChurnProbability
             {
                 get;
                 set;
