@@ -332,8 +332,8 @@ namespace GooglePlayGames
             }
 
             /// <summary>
-            /// The approximate probability of the player not returning 
-            /// to play the game. Higher values indicate that a player 
+            /// The approximate probability of the player not returning
+            /// to play the game. Higher values indicate that a player
             /// is less likely to return.
             /// A return value  less than zero indicates this value is not available.
             /// </summary>

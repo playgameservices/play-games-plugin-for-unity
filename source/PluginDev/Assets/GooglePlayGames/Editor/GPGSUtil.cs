@@ -417,7 +417,7 @@ namespace GooglePlayGames
         public static int GetUnityMajorVersion()
         {
 #if UNITY_5
-            string majorVersion = Application.version.Split('.')[0];
+            string majorVersion = Application.unityVersion.Split('.')[0];
             int ver;
             if (!int.TryParse(majorVersion, out ver))
             {
