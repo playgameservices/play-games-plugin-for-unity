@@ -66,7 +66,7 @@ namespace GooglePlayGames
         }
 
         /// <summary>
-        /// Not implemented. Returns an empty list.
+        /// Synchronous version of friends, returns null until loaded.
         /// </summary>
         public IUserProfile[] friends
         {

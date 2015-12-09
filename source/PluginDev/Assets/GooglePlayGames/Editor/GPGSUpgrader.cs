@@ -42,6 +42,9 @@ namespace GooglePlayGames
 
                 prevVer = Upgrade915(prevVer);
 
+                // Upgrade to remove gpg version of jar resolver
+                prevVer = Upgrade928(prevVer);
+
                 // there is no migration needed to 920+
                 Debug.Log("Upgrading from format version " + prevVer + " to " + PluginVersion.VersionKey);
                 prevVer = PluginVersion.VersionKey;
@@ -182,6 +185,38 @@ namespace GooglePlayGames
             }
 
             return PluginVersion.VersionKeyU5;
+        }
+
+        private static string Upgrade928(string prevVer)
+        {
+            //remove the jar resolver and if found, then
+            // warn the user that restarting the editor is required.
+            string[] obsoleteFiles =
+                {
+                    "Assets/GooglePlayGames/Editor/JarResolverLib.dll",
+                    "Assets/GooglePlayGames/Editor/JarResolverLib.dll.meta",
+                    "Assets/GooglePlayGames/Editor/BackgroundResolution.cs",
+                    "Assets/GooglePlayGames/Editor/BackgroundResolution.cs.meta"
+                };
+
+            bool found = File.Exists(obsoleteFiles[0]);
+
+            foreach (string file in obsoleteFiles)
+            {
+                if (File.Exists(file))
+                {
+                    Debug.Log("Deleting obsolete file: " + file);
+                    File.Delete(file);
+                }
+            }
+
+            if (found)
+            {
+                GPGSUtil.Alert("This update made changes that requires that you restart the editor");
+            }
+
+            Debug.Log("Upgrading from version " + prevVer + " to " + PluginVersion.VersionKeyJarResolver);
+            return PluginVersion.VersionKeyJarResolver;
         }
 
         /// <summary>

@@ -106,8 +106,8 @@ namespace GooglePlayGames.Android
             }
             catch (Exception e)
             {
-                Logger.e("Exception launching bridge intent: " + e.Message);
-                Logger.e(e.ToString());
+                GooglePlayGames.OurUtils.Logger.e("Exception launching bridge intent: " + e.Message);
+                GooglePlayGames.OurUtils.Logger.e(e.ToString());
             }
             finally
             {
