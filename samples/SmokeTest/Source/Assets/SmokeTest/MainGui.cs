@@ -975,7 +975,7 @@ namespace SmokeTest
                     (result, stats) =>
                     {
                         statsMessage = result + " number of sessions: " +
-                        stats.NumOfSessions;
+                        stats.NumberOfSessions;
                     });
             }
             GUI.Label(CalcGrid(0, 7, 2, 1), "Player Stats: " + statsMessage);

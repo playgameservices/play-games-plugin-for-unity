@@ -21,6 +21,7 @@ namespace GooglePlayGames.Native
 {
     using System;
     using GooglePlayGames.BasicApi;
+    using UnityEngine;
     using Types = GooglePlayGames.Native.Cwrapper.Types;
     using Status = GooglePlayGames.Native.Cwrapper.CommonErrorStatus;
 
@@ -47,6 +48,30 @@ namespace GooglePlayGames.Native
                     return ResponseStatus.VersionUpdateRequired;
                 default:
                     throw new InvalidOperationException("Unknown status: " + status);
+            }
+        }
+
+        internal static CommonStatusCodes ConvertResponseStatusToCommonStatus(Status.ResponseStatus status)
+        {
+            switch (status) {
+            case Status.ResponseStatus.VALID:
+                return CommonStatusCodes.Success;
+            case Status.ResponseStatus.VALID_BUT_STALE:
+                return CommonStatusCodes.SuccessCached;
+            case Status.ResponseStatus.ERROR_INTERNAL:
+                return CommonStatusCodes.InternalError;
+            case Status.ResponseStatus.ERROR_LICENSE_CHECK_FAILED:
+                return CommonStatusCodes.LicenseCheckFailed;
+            case Status.ResponseStatus.ERROR_NOT_AUTHORIZED:
+                return CommonStatusCodes.AuthApiAccessForbidden;
+            case Status.ResponseStatus.ERROR_TIMEOUT:
+                return CommonStatusCodes.Timeout;
+            case Status.ResponseStatus.ERROR_VERSION_UPDATE_REQUIRED:
+                return CommonStatusCodes.ServiceVersionUpdateRequired;
+            default:
+                Debug.LogWarning("Unknown ResponseStatus: " + status +
+                    ", defaulting to CommonStatusCodes.Error");
+                return CommonStatusCodes.Error;
             }
         }
 

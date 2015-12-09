@@ -40,14 +40,14 @@ Features:
 
 System requirements:
 
-* Unity&reg; 5 or above. 
+* Unity&reg; 5 or above.
 
   *Note:4.6.8 works at runtime, but some editor functionality does not work.
   as a result, use of older version of Unity are at your own peril.*
 * To deploy on Android:
     * Android SDK
     * Android v4.0 or higher
-    * Google Play Services library, version 8.1 or above
+    * Google Play Services library, version 8.4 or above
 * To deploy on iOS:
     * XCode 6 or above
     * [Cocoapods](https://cocoapods.org/)
@@ -315,8 +315,9 @@ please refer to [nearby connections](NEARBY.md).
 
 ## Configuration & Initialization Play Game Services
 
-In order to save game progress or handle multiplayer invitations and
-turn notifications, the default configuration needs to be replaced with a custom configuration.
+In order to save game progress, handle multiplayer invitations and
+turn notifications, or require access to a player's Google+ social graph,
+the default configuration needs to be replaced with a custom configuration.
 To do this use the **PlayGamesClientConfiguration**.  If your game does not
 use these features, then there is no need to
 initialize the platform configuration.  Once the instance is initialized,
@@ -335,6 +336,8 @@ make it your default social platform by calling **PlayGamesPlatform.Activate**:
         // registers a callback for turn based match notifications received while the
         // game is not running.
         .WithMatchDelegate(<callback method>)
+        // require access to a player's Google+ social graph to sign in
+        .RequireGooglePlus()
         .Build();
 
     PlayGamesPlatform.InitializeInstance(config);
@@ -374,7 +377,7 @@ good practice to put up a standby screen until the callback is called, to make
 sure the user can't start playing the game until the authentication process
 completes.
 
-## Player Statistics (Android Only)
+## Player Statistics
 
 The Player Stats API let you tailor game experiences to specific segments
 of players and different stages of the player lifecycle. You can build
@@ -398,7 +401,7 @@ The player stats are available after authenticating:
         {
             // -1 means cached stats, 0 is succeess
             // see  CommonStatusCodes for all values.
-            if (rc <= 0) {
+            if (rc <= 0 && stats.HasDaysSinceLastPlayed()) {
                 Debug.Log("It has been " + stats.DaysSinceLastPlayed + " days");
             }
         });

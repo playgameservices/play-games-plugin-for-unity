@@ -470,6 +470,21 @@ namespace GooglePlayGames
             return null;
         }
 
+        public void GetServerAuthCode(string serverClientId, Action<CommonStatusCodes, string> callback)
+        {
+            if (mClient != null && mClient.IsAuthenticated())
+            {
+                mClient.GetServerAuthCode(serverClientId, callback);
+            }
+            else
+            {
+                GooglePlayGames.OurUtils.Logger.e(
+                    "GetServerAuthCode can only be called after authentication.");
+
+                callback(CommonStatusCodes.SignInRequired, "");
+            }
+        }
+
         /// <summary>
         /// Gets the email of the current user.
         /// This requires additional configuration of permissions in order
@@ -490,7 +505,7 @@ namespace GooglePlayGames
         /// Gets the player stats.
         /// </summary>
         /// <param name="callback">Callback invoked when completed.</param>
-        public void GetPlayerStats(Action<CommonStatusCodes, PlayGamesLocalUser.PlayerStats> callback)
+        public void GetPlayerStats(Action<CommonStatusCodes, PlayerStats> callback)
         {
             if (mClient != null && mClient.IsAuthenticated())
             {
@@ -501,7 +516,7 @@ namespace GooglePlayGames
                 GooglePlayGames.OurUtils.Logger.e(
                     "GetPlayerStats can only be called after authentication.");
 
-                callback(CommonStatusCodes.SignInRequired, null);
+                callback(CommonStatusCodes.SignInRequired, new PlayerStats());
             }
         }
 

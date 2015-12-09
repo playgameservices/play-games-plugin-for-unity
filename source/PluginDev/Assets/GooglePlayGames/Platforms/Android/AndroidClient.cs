@@ -21,9 +21,6 @@ namespace GooglePlayGames.Android
     using UnityEngine;
     using GooglePlayGames.BasicApi;
     using GooglePlayGames.OurUtils;
-    using Com.Google.Android.Gms.Common.Api;
-    using Com.Google.Android.Gms.Games.Stats;
-    using Com.Google.Android.Gms.Games;
     using C = GooglePlayGames.Native.Cwrapper.InternalHooks;
     using GooglePlayGames.Native.PInvoke;
 
@@ -112,60 +109,6 @@ namespace GooglePlayGames.Android
             finally
             {
                 AndroidJNIHelper.DeleteJNIArgArray(objectArray, jArgs);
-            }
-        }
-
-        public void GetPlayerStats(IntPtr apiClient, Action<CommonStatusCodes,
-            PlayGamesLocalUser.PlayerStats> callback)
-        {
-            GoogleApiClient client = new GoogleApiClient(apiClient);
-            StatsResultCallback resCallback;
-
-            try
-            {
-                resCallback = new StatsResultCallback((result, stats) =>
-                    {
-                        Debug.Log("Result for getStats: " + result);
-                        PlayGamesLocalUser.PlayerStats s = null;
-                        if (stats != null)
-                        {
-                            s = new PlayGamesLocalUser.PlayerStats();
-                            s.AvgSessonLength = stats.getAverageSessionLength();
-                            s.DaysSinceLastPlayed = stats.getDaysSinceLastPlayed();
-                            s.NumberOfPurchases = stats.getNumberOfPurchases();
-                            s.NumOfSessions = stats.getNumberOfSessions();
-                            s.SessPercentile = stats.getSessionPercentile();
-                            s.SpendPercentile = stats.getSpendPercentile();
-                            s.ChurnProbability = stats.getChurnProbability();
-                        }
-                        callback((CommonStatusCodes)result, s);
-                    });
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-                callback(CommonStatusCodes.DeveloperError, null);
-                return;
-            }
-
-            PendingResult<Stats_LoadPlayerStatsResultObject> pr =
-                Games.Stats.loadPlayerStats(client, true);
-
-            pr.setResultCallback(resCallback);
-        }
-
-        class StatsResultCallback : ResultCallbackProxy<Stats_LoadPlayerStatsResultObject>
-        {
-            private Action<int, PlayerStats> callback;
-
-            public StatsResultCallback(Action<int, PlayerStats> callback)
-            {
-                this.callback = callback;
-            }
-
-            public override void OnResult(Stats_LoadPlayerStatsResultObject arg_Result_1)
-            {
-                callback(arg_Result_1.getStatus().getStatusCode(), arg_Result_1.getPlayerStats());
             }
         }
     }
