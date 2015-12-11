@@ -132,7 +132,9 @@ namespace SmokeTest
             mConflictLocalVersion = System.Text.ASCIIEncoding.Default.GetString(local);
             mConflictServerVersion = System.Text.ASCIIEncoding.Default.GetString(server);
 
-            Logger.d(string.Format("Found conflict! local:{0}, server:{1}", mConflictLocalVersion, mConflictServerVersion));
+            GooglePlayGames.OurUtils.Logger.d(
+                string.Format("Found conflict! local:{0}, server:{1}",
+                       mConflictLocalVersion, mConflictServerVersion));
             return local;
         }
 
@@ -433,7 +435,7 @@ namespace SmokeTest
                     if (openedFile != null)
                     {
                         Status += "Successfully opened file: " + openedFile.ToString();
-                        Logger.d("Opened file: " + openedFile.ToString());
+                        GooglePlayGames.OurUtils.Logger.d("Opened file: " + openedFile.ToString());
                         mCurrentSavedGame = openedFile;
                     }
 
@@ -524,7 +526,7 @@ namespace SmokeTest
                 true,
                 (resolver, original, originalData, unmerged, unmergedData) =>
                 {
-                    Logger.d("Entering conflict callback");
+                    GooglePlayGames.OurUtils.Logger.d("Entering conflict callback");
                     mConflictResolver = resolver;
                     mConflictOriginal = original;
                     mConflictOriginalData = System.Text.ASCIIEncoding.Default.GetString(originalData);
@@ -532,7 +534,7 @@ namespace SmokeTest
                     mConflictUnmergedData = System.Text.ASCIIEncoding.Default.GetString(unmergedData);
                     mUi = Ui.ResolveSaveConflict;
                     EndStandBy();
-                    Logger.d("Encountered manual open conflict.");
+                    GooglePlayGames.OurUtils.Logger.d("Encountered manual open conflict.");
                 },
                 (status, openedFile) =>
                 {
@@ -540,7 +542,7 @@ namespace SmokeTest
                     if (openedFile != null)
                     {
                         Status += "Successfully opened file: " + openedFile.ToString();
-                        Logger.d("Opened file: " + openedFile.ToString());
+                        GooglePlayGames.OurUtils.Logger.d("Opened file: " + openedFile.ToString());
                         mCurrentSavedGame = openedFile;
                     }
 
@@ -558,7 +560,8 @@ namespace SmokeTest
                     Status = "Fetch All Status: " + status + "\n";
                     Status += "Saved Games: [" +
                     string.Join(",", savedGames.Select(g => g.Filename).ToArray()) + "]";
-                    savedGames.ForEach(g => Logger.d("Retrieved save game: " + g.ToString()));
+                    savedGames.ForEach(g => 
+                        GooglePlayGames.OurUtils.Logger.d("Retrieved save game: " + g.ToString()));
                     EndStandBy();
                 });
         }
@@ -805,7 +808,8 @@ namespace SmokeTest
                         Status = "Fetch All Status: " + status + "\n";
                         Status += "Events: [" +
                         string.Join(",", events.Select(g => g.Id).ToArray()) + "]";
-                        events.ForEach(e => Logger.d("Retrieved event: " + e.ToString()));
+                        events.ForEach(e => 
+                            GooglePlayGames.OurUtils.Logger.d("Retrieved event: " + e.ToString()));
                         EndStandBy();
                     });
             }
@@ -822,7 +826,7 @@ namespace SmokeTest
                         {
                             Status += "Event: [" + fetchedEvent.Id + ", " + fetchedEvent.Description + "]: " +
                                 fetchedEvent.CurrentCount;
-                            Logger.d("Fetched event: " + fetchedEvent);
+                            GooglePlayGames.OurUtils.Logger.d("Fetched event: " + fetchedEvent);
                         }
 
                         EndStandBy();
@@ -880,7 +884,7 @@ namespace SmokeTest
                         {
                             Status = "Fetch Quest Status: " + status + "\n";
                             mQuest = quest;
-                            Logger.d("Fetched quest " + quest);
+                            GooglePlayGames.OurUtils.Logger.d("Fetched quest " + quest);
                             EndStandBy();
                         });
                 }
@@ -900,7 +904,7 @@ namespace SmokeTest
                         {
                             Status = "Accept Quest Status: " + status + "\n";
                             mQuest = quest;
-                            Logger.d("Accepted quest " + quest);
+                            GooglePlayGames.OurUtils.Logger.d("Accepted quest " + quest);
                             EndStandBy();
                         });
                 }
@@ -921,8 +925,8 @@ namespace SmokeTest
                             Status = "Claim milestone Status: " + status + "\n";
                             mQuest = quest;
                             mQuestMilestone = milestone;
-                            Logger.d("Claim quest: " + quest);
-                            Logger.d("Claim milestone: " + milestone);
+                            GooglePlayGames.OurUtils.Logger.d("Claim quest: " + quest);
+                            GooglePlayGames.OurUtils.Logger.d("Claim milestone: " + milestone);
                             EndStandBy();
                         });
                 }
@@ -1032,7 +1036,8 @@ namespace SmokeTest
                         mQuest = quests[0];
                     }
 
-                    quests.ForEach(q => Logger.d("Retrieved quest: " + q.ToString()));
+                    quests.ForEach(q => 
+                        GooglePlayGames.OurUtils.Logger.d("Retrieved quest: " + q.ToString()));
                     EndStandBy();
                 });
         }
@@ -1040,19 +1045,19 @@ namespace SmokeTest
         internal void HandleQuestUI(QuestUiResult result, IQuest quest, IQuestMilestone milestone)
         {
             Status = "Show UI Status: " + Status + "\n";
-            Logger.d("UI Status: " + result);
+            GooglePlayGames.OurUtils.Logger.d("UI Status: " + result);
             if (quest != null)
             {
                 mQuest = quest;
                 Status += "User wanted to accept quest " + quest.Id;
-                Logger.d("User Accepted quest " + quest.ToString());
+                GooglePlayGames.OurUtils.Logger.d("User Accepted quest " + quest.ToString());
             }
             else if (milestone != null)
             {
                 mQuestMilestone = milestone;
                 Status += "User wanted to claim milestone " + milestone.Id;
-                Logger.d("Claimed milestone " + milestone.ToString());
-                Logger.d("Completion data: " +
+                GooglePlayGames.OurUtils.Logger.d("Claimed milestone " + milestone.ToString());
+                GooglePlayGames.OurUtils.Logger.d("Completion data: " +
                     System.Text.ASCIIEncoding.Default.GetString(milestone.CompletionRewardData));
             }
 

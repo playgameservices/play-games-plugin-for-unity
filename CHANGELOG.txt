@@ -1,3 +1,7 @@
+Version 0.9.27a
+    Bug Fixes: 
+        * #809 Unity 5.3 namespace conflict
+
 Version 0.9.27
     New Features:
         * Updating Android email and token access for new permissions model.

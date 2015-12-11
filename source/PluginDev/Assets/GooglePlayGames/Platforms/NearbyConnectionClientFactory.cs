@@ -32,17 +32,17 @@ namespace GooglePlayGames
         {
             if (Application.isEditor)
             {
-                Logger.d("Creating INearbyConnection in editor, using DummyClient.");
+                GooglePlayGames.OurUtils.Logger.d("Creating INearbyConnection in editor, using DummyClient.");
                 callback.Invoke(new GooglePlayGames.BasicApi.Nearby.DummyNearbyConnectionClient());
             }
 #if (UNITY_ANDROID)
-            Logger.d("Creating real INearbyConnectionClient");
+            GooglePlayGames.OurUtils.Logger.d("Creating real INearbyConnectionClient");
             GooglePlayGames.Native.NativeNearbyConnectionClientFactory.Create(callback);
 #elif (UNITY_IPHONE && !NO_GPGS)
-            Logger.e("Nearby connections not supported in iOS... Using Dummy client");
+            GooglePlayGames.OurUtils.Logger.e("Nearby connections not supported in iOS... Using Dummy client");
             callback.Invoke(new GooglePlayGames.BasicApi.Nearby.DummyNearbyConnectionClient());
 #else
-            Logger.e("Cannot create IPlayGamesClient for unknown platform, returning DummyClient");
+            GooglePlayGames.OurUtils.Logger.e("Cannot create IPlayGamesClient for unknown platform, returning DummyClient");
             return new GooglePlayGames.BasicApi.DummyClient();
 #endif
         }
@@ -58,11 +58,10 @@ namespace GooglePlayGames
                 case S.InitializationStatus.ERROR_VERSION_UPDATE_REQUIRED:
                     return InitializationStatus.VersionUpdateRequired;
                 default:
-                    Logger.w("Unknown initialization status: " + status);
+                    GooglePlayGames.OurUtils.Logger.w("Unknown initialization status: " + status);
                     return InitializationStatus.InternalError;
             }
         }
-
     }
 }
 #endif

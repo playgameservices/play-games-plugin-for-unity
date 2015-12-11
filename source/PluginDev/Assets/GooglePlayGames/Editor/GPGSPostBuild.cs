@@ -24,10 +24,12 @@ namespace GooglePlayGames
 
     // Use the included xcode support for unity 5+,
     // otherwise use the backported code.
-#if UNITY_5
-    using UnityEditor.iOS.Xcode;
-#else
-    using GooglePlayGames.xcode;
+#if (UNITY_IOS || UNITY_IPHONE)
+    #if UNITY_5
+        using UnityEditor.iOS.Xcode;
+    #else
+        using GooglePlayGames.xcode;
+    #endif
 #endif
     using GooglePlayGames;
     using GooglePlayGames.Editor.Util;
@@ -91,7 +93,7 @@ namespace GooglePlayGames
 
             File.WriteAllText(pbxprojPath, proj.WriteToString());
 
-            #else
+            #elif UNITY_IOS
 
             if (!GPGSProjectSettings.Instance.GetBool(GPGSUtil.IOSSETUPDONEKEY, false))
             {
@@ -222,6 +224,7 @@ namespace GooglePlayGames
             return revClientId;
         }
 
+#if UNITY_IOS || UNITY_IPHONE
         /// <summary>
         /// Updates the generated pbxproj to reduce manual work required by developers. Currently
         /// this adds the '-fobjc-arc' flag for the Play Games ObjC source file.
@@ -262,6 +265,7 @@ namespace GooglePlayGames
 
             File.WriteAllText(pbxprojPath, proj.WriteToString());
         }
+#endif
     }
 }
 

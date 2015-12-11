@@ -42,6 +42,8 @@ namespace GooglePlayGames
 
                 prevVer = Upgrade915(prevVer);
 
+                prevVer = Upgrade927Patch(prevVer);
+
                 // there is no migration needed to 920+
                 Debug.Log("Upgrading from format version " + prevVer + " to " + PluginVersion.VersionKey);
                 prevVer = PluginVersion.VersionKey;
@@ -120,6 +122,31 @@ namespace GooglePlayGames
             {
                 CleanDuplicates(s);
             }
+        }
+
+        /// <summary>
+        /// Upgrade to 0.9.27a.
+        /// </summary>
+        /// <remarks>This removes the GPGGizmo class, which broke the editor</remarks>
+        /// <returns>The patched version</returns>
+        /// <param name="prevVer">Previous version</param>
+        private static string Upgrade927Patch(string prevVer)
+        {
+            string[] obsoleteFiles =
+                {
+                    "Assets/GooglePlayGames/Editor/GPGGizmo.cs",
+                    "Assets/GooglePlayGames/Editor/GPGGizmo.cs.meta"
+                };
+            foreach (string file in obsoleteFiles)
+            {
+                if (File.Exists(file))
+                {
+                    Debug.Log("Deleting obsolete file: " + file);
+                    File.Delete(file);
+                }
+            }
+
+            return PluginVersion.VersionKey27Patch;
         }
 
         /// <summary>

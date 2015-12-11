@@ -18,7 +18,7 @@
 namespace GooglePlayGames
 {
     using UnityEditor;
-    using Google.JarResolver;
+    using Google.GamesJarResolver;
     using System.Collections.Generic;
     using UnityEngine;
 

@@ -101,22 +101,22 @@ namespace GooglePlayGames.Android
                     {
                         if (rc != (int)CommonStatusCodes.Success)
                         {
-                            Logger.w("Non-success returned from fetch: " + rc);
+                            GooglePlayGames.OurUtils.Logger.w("Non-success returned from fetch: " + rc);
                             doneCallback(false);
                         }
 
                         if (fetchAccessToken)
                         {
-                            Logger.d("a = " + access);
+                            GooglePlayGames.OurUtils.Logger.d("a = " + access);
                         }
                         if (fetchEmail)
                         {
-                            Logger.d("email = " + email);
+                            GooglePlayGames.OurUtils.Logger.d("email = " + email);
                         }
 
                         if (fetchIdToken)
                         {
-                            Logger.d("idt = " + id);
+                            GooglePlayGames.OurUtils.Logger.d("idt = " + id);
                         }
 
                         if (fetchAccessToken && !string.IsNullOrEmpty(access))
@@ -159,11 +159,9 @@ namespace GooglePlayGames.Android
                         jArgs[4].z = fetchIdToken;
                         jArgs[5].l = AndroidJNI.NewStringUTF(scope);
 
-                        Logger.d("---->> Calling Fetch: " + methodId + " scope: " + scope);
                         IntPtr ptr =
                             AndroidJNI.CallStaticObjectMethod(bridgeClass.GetRawClass(), methodId, jArgs);
 
-                        Logger.d("<<<-------  Got return of " + ptr);
                         PendingResult<TokenResult> pr = new PendingResult<TokenResult>(ptr);
                         pr.setResultCallback(new TokenResultCallback(callback));
                     }
@@ -171,8 +169,8 @@ namespace GooglePlayGames.Android
             }
             catch (Exception e)
             {
-                Logger.e("Exception launching token request: " + e.Message);
-                Logger.e(e.ToString());
+                GooglePlayGames.OurUtils.Logger.e("Exception launching token request: " + e.Message);
+                GooglePlayGames.OurUtils.Logger.e(e.ToString());
             }
             finally
             {

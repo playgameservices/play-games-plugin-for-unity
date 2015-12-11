@@ -34,7 +34,7 @@ project.ext {
     samplesBuildSrc = file('build/sampleSrc').absolutePath
     exportPath = file('build/plugin.unitypackage').absolutePath
     currentPluginPath = file('../current-build').absolutePath
-    currentPluginName = 'GooglePlayGamesPlugin-0.9.27.unitypackage'
+    currentPluginName = 'GooglePlayGamesPlugin-0.9.27a.unitypackage'
 
     sampleList = ['CubicPilot', 'Minimal',
          'QuizRacer',  'TicTacToe',
@@ -209,7 +209,7 @@ task export_package () {
     doLast {
         exec {
             executable "${unity_exe}"
-                args "-g.building", "-buildTarget", "android", "-batchmode", "-projectPath", "${pluginProj}", "-logFile", "build/unity.log",  "-exportPackage", "Assets/GooglePlayGames", "Assets/Plugins", "${exportPath}", "-quit"
+                args "-g.building", "-buildTarget", "android", "-batchmode", "-projectPath", "${pluginProj}", "-logFile", "build/unity.log",  "-exportPackage", "Assets/GooglePlayGames", "Assets/Plugins/Android/libs", "Assets/Plugins/Android/MainLibProj", "Assets/Plugins/iOS", "${exportPath}", "-quit"
         }
     }
 }
