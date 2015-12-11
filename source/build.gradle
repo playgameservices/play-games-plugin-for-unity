@@ -27,6 +27,15 @@ project.ext {
     if (unity_exe == null || unity_exe.isEmpty()) {
         unity_exe ='/Applications/Unity/Unity.app/Contents/MacOS/Unity'
     }
+
+    git_exe = System.getProperty("GIT_EXE")
+    if (git_exe == null || git_exe.isEmpty()) {
+        git_exe = System.getenv("GIT_EXE")
+    }
+    if (git_exe == null || git_exe.isEmpty()) {
+        git_exe = 'git'
+    }
+
     pluginSrc = file('PluginDev').absolutePath
     pluginProj = file('build/PluginSrc').absolutePath
     buildPath = file('build').absolutePath
@@ -34,13 +43,17 @@ project.ext {
     samplesBuildSrc = file('build/sampleSrc').absolutePath
     exportPath = file('build/plugin.unitypackage').absolutePath
     currentPluginPath = file('../current-build').absolutePath
-    currentPluginName = 'GooglePlayGamesPlugin-0.9.27.unitypackage'
+    currentPluginName = 'GooglePlayGamesPlugin-0.9.28.unitypackage'
+    resolverDir = new File('build/jarresolver').absolutePath
 
     sampleList = ['CubicPilot', 'Minimal',
          'QuizRacer',  'TicTacToe',
          'NearbyDroids', 'SmokeTest', 'TrivialQuest']
 
     gpg_sdk_link = 'https://developers.google.com/games/services/downloads/gpg-cpp-sdk.v2.0.zip'
+
+    sso_jarresolver_repo = 'sso://devrel/libraries/android/unity-jar-resolver'
+    https_jarresolver_repo = 'https://devrel.googlesource.com/libraries/android/unity-jar-resolver'
 }
 
 
@@ -176,6 +189,7 @@ sampleList.each { sampleName ->
         /*
                 Next, export the project
         */
+
         packageTask.doLast {
             exec {
                 executable "${unity_exe}"
@@ -199,6 +213,24 @@ sampleList.each { sampleName ->
         copySamplePackageTask.ext.remoteTaskPhase = 'postbuild'
 }
 
+task import_jarresolver() {
+    description = "Imports the jar resolver package into the plugin"
+    doFirst {
+        def tree = fileTree("${resolverDir}")
+            {
+                include '*.unitypackage'
+            }
+    def jarresolver_package = tree.getSingleFile()
+
+        exec {
+            executable "${unity_exe}"
+                args "-g.building", "-buildTarget", "android", "-batchmode", "-projectPath", "${pluginProj}", "-logFile", "build/import_resolver_unity.log",  "-importPackage", "${jarresolver_package}", "-quit"
+        }
+
+    }
+
+}
+
 task export_package () {
     description = "Creates and exports the Plugin unity package"
     doFirst {
@@ -207,13 +239,29 @@ task export_package () {
     }
 
     doLast {
+        def argv = [
+                "-g.building",
+                "-buildTarget", "android",
+                "-batchmode",
+                "-projectPath", "${pluginProj}",
+                "-logFile", "build/unity.log",
+                "-exportPackage",
+                    "Assets/GooglePlayGames",
+                    "Assets/PlayServicesResolver",
+                    "Assets/Plugins/Android/libs",
+                    "Assets/Plugins/Android/MainLibProj",
+                    "Assets/Plugins/iOS",
+                "${exportPath}",
+                "-quit"
+        ]
+
         exec {
             executable "${unity_exe}"
-                args "-g.building", "-buildTarget", "android", "-batchmode", "-projectPath", "${pluginProj}", "-logFile", "build/unity.log",  "-exportPackage", "Assets/GooglePlayGames", "Assets/Plugins", "${exportPath}", "-quit"
+                args argv
         }
     }
 }
-
+export_package.dependsOn import_jarresolver
 export_package.ext.remoteTaskPhase = 'build'
 
 /*
@@ -300,6 +348,24 @@ task copy_plugin_source << {
 copy_plugin_source.description = "Copies plugin source into build directory"
 copy_plugin_source.ext.remoteTaskPhase = 'prebuild'
 
+task copy_jarresolver (type:Exec) {
+    description = "Clones the jar resolver project and copied into the build."
+    ext.remoteTaskPhase = "prebuild"
+    dependsOn copy_plugin_source
+
+    executable "${git_exe}"
+    args "clone", "${https_jarresolver_repo}", "${resolverDir}"
+    ignoreExitValue true
+
+    doLast {
+        if (execResult.exitValue != 0) {
+            exec {
+                executable = "${git_exe}"
+                args "clone", "${sso_jarresolver_repo}", "${resolverDir}"
+            }
+        }
+    }
+}
 
 task copy_gpg_sdk << {
     copy {

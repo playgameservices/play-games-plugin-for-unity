@@ -1,3 +1,16 @@
+Version 0.9.28
+        ** BREAKING CHANGES **
+
+        The jar resolution process for importing Play Services has been
+        standardized with the other Google plugins.  If you are upgrading
+        from 0.9.27, you will need to delete the Assets/GooglePlayGames/Editor
+        directory and restart Unity, then re-import version 0.9.28.
+
+    New Features:
+        * Integrated Play-services-jar resolver plugin for improved compatibility.
+Version 0.9.27a
+    Bug Fixes:
+        * #809 Unity 5.3 namespace conflict
 Version 0.9.27
     New Features:
         * Updating Android email and token access for new permissions model.

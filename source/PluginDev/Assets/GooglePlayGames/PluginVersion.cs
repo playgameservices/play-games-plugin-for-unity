@@ -21,6 +21,9 @@ namespace GooglePlayGames
     // older versions, used when upgrading to other versions
     public const string VersionKeyCPP = "00911";
     public const string VersionKeyU5 = "00915";
+    // patched 0.9.27 version for Unity 5.3 changes.
+    public const string VersionKey27Patch = "00927a";
+ 
     public const string VersionKeyJarResolver = "00928";
 
     public const int VersionInt = 0x0928;

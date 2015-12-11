@@ -24,7 +24,7 @@ namespace GooglePlayGames
 
     // Use the included xcode support for unity 5+,
     // otherwise use the backported code.
-#if UNITY_IOS
+#if (UNITY_IOS || UNITY_IPHONE)
     #if UNITY_5
         using UnityEditor.iOS.Xcode;
     #else
@@ -223,7 +223,8 @@ namespace GooglePlayGames
             }
             return revClientId;
         }
-#if UNITY_IOS
+
+#if UNITY_IOS || UNITY_IPHONE
         /// <summary>
         /// Updates the generated pbxproj to reduce manual work required by developers. Currently
         /// this adds the '-fobjc-arc' flag for the Play Games ObjC source file.
