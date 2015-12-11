@@ -186,7 +186,7 @@ namespace GooglePlayGames.BasicApi
         /// Returns the achievement corresponding to the passed achievement identifier.
         /// </summary>
         /// <returns>The achievement.</returns>
-        /// <param name="achId">Ach identifier.</param>
+        /// <param name="achId">Achievement identifier.</param>
         public Achievement GetAchievement(string achId)
         {
             LogUsage();
@@ -196,7 +196,7 @@ namespace GooglePlayGames.BasicApi
         /// <summary>
         /// Unlocks the achievement.
         /// </summary>
-        /// <param name="achId">Ach identifier.</param>
+        /// <param name="achId">Achievement identifier.</param>
         /// <param name="callback">Callback to invoke when complete.</param>
         public void UnlockAchievement(string achId, Action<bool> callback)
         {
@@ -210,7 +210,7 @@ namespace GooglePlayGames.BasicApi
         /// <summary>
         /// Reveals the achievement.
         /// </summary>
-        /// <param name="achId">Ach identifier.</param>
+        /// <param name="achId">Achievement identifier.</param>
         /// <param name="callback">Callback to invoke when complete.</param>
         public void RevealAchievement(string achId, Action<bool> callback)
         {
@@ -224,7 +224,7 @@ namespace GooglePlayGames.BasicApi
         /// <summary>
         /// Increments the achievement.
         /// </summary>
-        /// <param name="achId">Ach identifier.</param>
+        /// <param name="achId">Achievement identifier.</param>
         /// <param name="steps">Steps to increment by..</param>
         /// <param name="callback">Callback to invoke when complete.</param>
         public void IncrementAchievement(string achId, int steps, Action<bool> callback)
@@ -245,7 +245,7 @@ namespace GooglePlayGames.BasicApi
         /// maximum number of steps, the achievement is automatically unlocked,
         /// and any further mutation operations are ignored.
         /// </remarks>
-        /// <param name="achId">Ach identifier.</param>
+        /// <param name="achId">Achievement identifier.</param>
         /// <param name="steps">Steps to increment to at least.</param>
         /// <param name="callback">Callback to invoke when complete.</param>
         public void SetStepsAtLeast(string achId, int steps, Action<bool> callback)
@@ -273,7 +273,7 @@ namespace GooglePlayGames.BasicApi
         /// <summary>
         /// Shows the leaderboard UI
         /// </summary>
-        /// <param name="leaderboardId">Lb identifier.</param>
+        /// <param name="leaderboardId">Leaderboard identifier.</param>
         /// <param name="span">Timespan to display.</param>
         /// <param name="callback">Callback to invoke when complete.</param>
         public void ShowLeaderboardUI(
@@ -330,7 +330,7 @@ namespace GooglePlayGames.BasicApi
         /// by calling LoadScores() with a positive row count.
         /// </remarks>
         /// <param name="token">Token used to start loading scores.</param>
-        /// <param name="rowCount">max number of scores to return.
+        /// <param name="rowCount">Max number of scores to return.
         ///  This can be limited by the SDK.</param>
         /// <param name="callback">Callback to invoke when complete.</param>
         public void LoadMoreScores(
@@ -350,7 +350,7 @@ namespace GooglePlayGames.BasicApi
         /// <summary>
         /// Submits the score.
         /// </summary>
-        /// <param name="leaderboardId">Lb identifier.</param>
+        /// <param name="leaderboardId">Leaderboard identifier.</param>
         /// <param name="score">Score to submit.</param>
         /// <param name="callback">Callback to invoke when complete.</param>
         public void SubmitScore(string leaderboardId, long score, Action<bool> callback)
@@ -367,9 +367,9 @@ namespace GooglePlayGames.BasicApi
         /// to the leaderboard associated with a specific id
         /// and metadata (such as something the player did to earn the score).
         /// </summary>
-        /// <param name="leaderboardId">leaderboard identifier.</param>
+        /// <param name="leaderboardId">Leaderboard identifier.</param>
         /// <param name="score">Score value to submit.</param>
-        /// <param name="metadata">metadata about the score.</param>
+        /// <param name="metadata">Metadata about the score.</param>
         /// <param name="callback">Callback upon completion.</param>
         public void SubmitScore(
             string leaderboardId,
