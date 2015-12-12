@@ -37,7 +37,8 @@ project.ext {
     }
 
     pluginSrc = file('PluginDev').absolutePath
-    pluginProj = file('build/PluginSrc').absolutePath
+    pluginBuildSrc = file('build/PluginSrc').absolutePath
+    pluginProj = file('build/PluginProject').absolutePath
     buildPath = file('build').absolutePath
     samplesPath = file('../samples').absolutePath
     samplesBuildSrc = file('build/sampleSrc').absolutePath
@@ -224,12 +225,21 @@ task import_jarresolver() {
 
         exec {
             executable "${unity_exe}"
-                args "-g.building", "-buildTarget", "android", "-batchmode", "-projectPath", "${pluginProj}", "-logFile", "build/import_resolver_unity.log",  "-importPackage", "${jarresolver_package}", "-quit"
+                args "-g.building", "-buildTarget", "android", "-batchmode", "-createProject", "${pluginProj}", "-logFile", "build/import_resolver_unity.log",  "-importPackage", "${jarresolver_package}", "-quit"
         }
 
     }
 
 }
+
+task copy_pluginProjSrc << {
+    copy {
+        from {"${pluginBuildSrc}"}
+        into {"${pluginProj}"}
+    }
+}
+copy_pluginProjSrc.dependsOn import_jarresolver
+copy_pluginProjSrc.ext.remoteTaskPhase = 'build'
 
 task export_package () {
     description = "Creates and exports the Plugin unity package"
@@ -262,8 +272,8 @@ task export_package () {
     }
 }
 export_package.dependsOn import_jarresolver
+export_package.dependsOn copy_pluginProjSrc
 export_package.ext.remoteTaskPhase = 'build'
-
 /*
     Copy the plugin to the current-build directory
 */
@@ -342,11 +352,12 @@ copy_native.ext.remoteTaskPhase = 'prebuild'
 task copy_plugin_source << {
     copy {
         from {"${pluginSrc}"}
-        into {"${pluginProj}"}
+        into {"${pluginBuildSrc}"}
     }
 }
 copy_plugin_source.description = "Copies plugin source into build directory"
 copy_plugin_source.ext.remoteTaskPhase = 'prebuild'
+
 
 task copy_jarresolver (type:Exec) {
     description = "Clones the jar resolver project and copied into the build."
