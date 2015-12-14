@@ -14,7 +14,7 @@
 //    limitations under the License.
 // </copyright>
 
-namespace GooglePlayGames
+namespace GooglePlayGames.Editor
 {
     using System.Collections.Generic;
     using System.IO;

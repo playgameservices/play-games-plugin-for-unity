@@ -22,7 +22,9 @@ namespace GooglePlayGames.BasicApi
   using UnityEngine.SocialPlatforms;
 
   /// <summary>
-  /// Defines an abstract interface for a Play Games Client. Concrete implementations
+  /// Defines an abstract interface for a Play Games Client.
+  /// </summary>
+  /// <remarks>Concrete implementations
   /// might be, for example, the client for Android or for iOS. One fundamental concept
   /// that implementors of this class must adhere to is stable authentication state.
   /// This means that once Authenticate() returns true through its callback, the user is
@@ -43,17 +45,19 @@ namespace GooglePlayGames.BasicApi
   /// <para>CALLBACKS: all callbacks must be invoked in Unity's main thread.
   /// Implementors of this interface must guarantee that (suggestion: use
   /// <see cref="GooglePlayGames.OurUtils.RunOnGameThread(System.Action action)"/>).</para>
-  /// </summary>
+  /// </remarks>
   public interface IPlayGamesClient
   {
     /// <summary>
-    /// Starts the authentication process. If silent == true, no UIs will be shown
+    /// Starts the authentication process.
+    /// </summary>
+    /// <remarks>If silent == true, no UIs will be shown
     /// (if UIs are needed, it will fail rather than show them). If silent == false,
     /// this may show UIs, consent dialogs, etc.
     /// At the end of the process, callback will be invoked to notify of the result.
     /// Once the callback returns true, the user is considered to be authenticated
     /// forever after.
-    /// </summary>
+    /// </remarks>
     /// <param name="callback">Callback.</param>
     /// <param name="silent">If set to <c>true</c> silent.</param>
     void Authenticate(System.Action<bool> callback, bool silent);
@@ -81,7 +85,7 @@ namespace GooglePlayGames.BasicApi
     string GetUserId();
 
     /// <summary>
-    /// Load friends of the authenticated user
+    /// Load friends of the authenticated user.
     /// </summary>
     /// <param name="callback">Callback invoked when complete.  bool argument
     /// indicates success.</param>
@@ -149,38 +153,44 @@ namespace GooglePlayGames.BasicApi
     void LoadAchievements(Action<Achievement[]> callback);
 
     /// <summary>
-    /// Unlocks the achievement with the passed identifier. If the operation succeeds, the callback
+    /// Unlocks the achievement with the passed identifier.
+    /// </summary>
+    /// <remarks>If the operation succeeds, the callback
     /// will be invoked on the game thread with <code>true</code>. If the operation fails, the
     /// callback will be invoked with <code>false</code>. This operation will immediately fail if
     /// the user is not authenticated (i.e. the callback will immediately be invoked with
     /// <code>false</code>). If the achievement is already unlocked, this call will
     /// succeed immediately.
-    /// </summary>
+    /// </remarks>
     /// <param name="achievementId">The ID of the achievement to unlock.</param>
     /// <param name="successOrFailureCalllback">Callback used to indicate whether the operation
     /// succeeded or failed.</param>
     void UnlockAchievement(string achievementId, Action<bool> successOrFailureCalllback);
 
     /// <summary>
-    /// Reveals the achievement with the passed identifier. If the operation succeeds, the callback
+    /// Reveals the achievement with the passed identifier.
+    /// </summary>
+    /// <remarks>If the operation succeeds, the callback
     /// will be invoked on the game thread with <code>true</code>. If the operation fails, the
     /// callback will be invoked with <code>false</code>. This operation will immediately fail if
     /// the user is not authenticated (i.e. the callback will immediately be invoked with
     /// <code>false</code>). If the achievement is already in a revealed state, this call will
     /// succeed immediately.
-    /// </summary>
+    /// </remarks>
     /// <param name="achievementId">The ID of the achievement to reveal.</param>
     /// <param name="successOrFailureCalllback">Callback used to indicate whether the operation
     /// succeeded or failed.</param>
     void RevealAchievement(string achievementId, Action<bool> successOrFailureCalllback);
 
     /// <summary>
-    /// Increments the achievement with the passed identifier. If the operation succeeds, the
+    /// Increments the achievement with the passed identifier.
+    /// </summary>
+    /// <remarks>If the operation succeeds, the
     /// callback will be invoked on the game thread with <code>true</code>. If the operation fails,
     /// the  callback will be invoked with <code>false</code>. This operation will immediately fail
     /// if the user is not authenticated (i.e. the callback will immediately be invoked with
     /// <code>false</code>).
-    /// </summary>
+    /// </remarks>
     /// <param name="achievementId">The ID of the achievement to increment.</param>
     /// <param name="steps">The number of steps to increment by.</param>
     /// <param name="successOrFailureCalllback">Callback used to indicate whether the operation
@@ -190,11 +200,13 @@ namespace GooglePlayGames.BasicApi
 
     /// <summary>
     /// Set an achievement to have at least the given number of steps completed.
+    /// </summary>
+    /// <remarks>
     /// Calling this method while the achievement already has more steps than
     /// the provided value is a no-op. Once the achievement reaches the
     /// maximum number of steps, the achievement is automatically unlocked,
     /// and any further mutation operations are ignored.
-    /// </summary>
+    /// </remarks>
     /// <param name="achId">Ach identifier.</param>
     /// <param name="steps">Steps.</param>
     /// <param name="callback">Callback.</param>
@@ -208,9 +220,10 @@ namespace GooglePlayGames.BasicApi
     void ShowAchievementsUI(Action<UIStatus> callback);
 
     /// <summary>
-    /// Shows the leaderboard UI for a specific leaderboard (if the passed ID is not
-    /// <code>null</code>) or for all leaderboards (if the ID is <code>null</code>).
+    /// Shows the leaderboard UI for a specific leaderboard.
     /// </summary>
+    /// <remarks>If the passed ID is <code>null</code>, all leaderboards are displayed.
+    /// </remarks>
     /// <param name="leaderboardId">The leaderboard to display. <code>null</code> to display
     /// all.</param>
     /// <param name="span">Timespan to display for the leaderboard</param>
@@ -240,10 +253,12 @@ namespace GooglePlayGames.BasicApi
             Action<LeaderboardScoreData> callback);
 
     /// <summary>
-    /// Loads the more scores for the leaderboard.  The token is accessed
-    /// by calling LoadScores() with a positive row count.
+    /// Loads the more scores for the leaderboard.
     /// </summary>
-    /// <param name="token">Token.</param>
+    /// <remarks>The token is accessed
+    /// by calling LoadScores() with a positive row count.
+    /// </remarks>
+    /// <param name="token">Token for tracking the score loading.</param>
     /// <param name="rowCount">max number of scores to return.
     ///    This can be limited by the SDK.</param>
     /// <param name="callback">Callback.</param>
@@ -257,10 +272,12 @@ namespace GooglePlayGames.BasicApi
     int LeaderboardMaxResults();
 
     /// <summary>
-    /// Submits the passed score to the passed leaderboard. This operation will immediately fail
+    /// Submits the passed score to the passed leaderboard.
+    /// </summary>
+    /// <remarks>This operation will immediately fail
     /// if the user is not authenticated (i.e. the callback will immediately be invoked with
     /// <code>false</code>).
-    /// </summary>
+    /// </remarks>
     /// <param name="leaderboardId">Leaderboard identifier.</param>
     /// <param name="score">Score.</param>
     /// <param name="successOrFailureCalllback">Callback used to indicate whether the operation
@@ -269,9 +286,7 @@ namespace GooglePlayGames.BasicApi
             Action<bool> successOrFailureCalllback);
 
     /// <summary>
-    /// Submits the score for the currently signed-in player
-    /// to the leaderboard associated with a specific id
-    /// and metadata (such as something the player did to earn the score).
+    /// Submits the score for the currently signed-in player.
     /// </summary>
     /// <param name="score">Score.</param>
     /// <param name="board">leaderboard id.</param>

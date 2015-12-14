@@ -14,13 +14,13 @@
 //    limitations under the License.
 // </copyright>
 
-namespace GooglePlayGames
+namespace GooglePlayGames.Editor
 {
     using UnityEngine;
     using UnityEditor;
     using System.Collections.Generic;
     using System.IO;
-     
+
     public class GPGSExportPackageUI
     {
         [MenuItem("Window/Google Play Games/Export Plugin Package...", false, 999)]
