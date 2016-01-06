@@ -28,6 +28,7 @@ namespace GooglePlayGames.Native
     using GooglePlayGames.Native.PInvoke;
     using Types = GooglePlayGames.Native.Cwrapper.Types;
     using Status = GooglePlayGames.Native.Cwrapper.CommonErrorStatus;
+    using Logger = GooglePlayGames.OurUtils.Logger;
 
     internal class NativeSavedGameClient : ISavedGameClient
     {

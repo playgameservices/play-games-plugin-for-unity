@@ -27,6 +27,7 @@ namespace GooglePlayGames.Native.PInvoke
     using Status = GooglePlayGames.Native.Cwrapper.CommonErrorStatus;
     using TBM = GooglePlayGames.BasicApi.Multiplayer.TurnBasedMatch;
     using GooglePlayGames.BasicApi.Multiplayer;
+    using Logger = GooglePlayGames.OurUtils.Logger;
 
     internal class NativeTurnBasedMatch : BaseReferenceHolder
     {

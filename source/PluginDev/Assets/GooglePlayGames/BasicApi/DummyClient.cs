@@ -20,6 +20,7 @@ namespace GooglePlayGames.BasicApi
     using GooglePlayGames.BasicApi.Multiplayer;
     using GooglePlayGames.OurUtils;
     using UnityEngine.SocialPlatforms;
+    using Logger = GooglePlayGames.OurUtils.Logger;
 
     public class DummyClient : IPlayGamesClient
     {

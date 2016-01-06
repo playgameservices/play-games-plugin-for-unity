@@ -25,6 +25,7 @@ namespace GooglePlayGames.Native
     using GooglePlayGames.Native.PInvoke;
     using GooglePlayGames.OurUtils;
     using Types = GooglePlayGames.Native.Cwrapper.Types;
+    using Logger = GooglePlayGames.OurUtils.Logger;
 
     public class NativeTurnBasedMultiplayerClient : ITurnBasedMultiplayerClient
     {

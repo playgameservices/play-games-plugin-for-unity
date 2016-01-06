@@ -24,6 +24,7 @@ namespace GooglePlayGames.Native.PInvoke
     using GooglePlayGames.Native.Cwrapper;
     using C = GooglePlayGames.Native.Cwrapper.Builder;
     using Types = GooglePlayGames.Native.Cwrapper.Types;
+    using Logger = GooglePlayGames.OurUtils.Logger;
 
     internal class GameServicesBuilder : BaseReferenceHolder
     {

@@ -17,6 +17,7 @@
 namespace GooglePlayGames.BasicApi.Nearby
 {
     using GooglePlayGames.OurUtils;
+    using Logger = GooglePlayGames.OurUtils.Logger;
 
     public struct ConnectionRequest
     {

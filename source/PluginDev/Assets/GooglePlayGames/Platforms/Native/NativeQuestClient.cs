@@ -25,8 +25,9 @@ namespace GooglePlayGames.Native
     using GooglePlayGames.OurUtils;
     using GooglePlayGames.BasicApi.Quests;
     using GooglePlayGames.Native.PInvoke;
-using Types = GooglePlayGames.Native.Cwrapper.Types;
+    using Types = GooglePlayGames.Native.Cwrapper.Types;
     using Status = GooglePlayGames.Native.Cwrapper.CommonErrorStatus;
+    using Logger = GooglePlayGames.OurUtils.Logger;
 
     internal class NativeQuestClient : IQuestsClient
     {

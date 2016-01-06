@@ -24,6 +24,7 @@ namespace GooglePlayGames.Native.PInvoke
     using System.Runtime.InteropServices;
     using C = GooglePlayGames.Native.Cwrapper.MessageListenerHelper;
     using Types = GooglePlayGames.Native.Cwrapper.Types;
+    using Logger = GooglePlayGames.OurUtils.Logger;
 
     internal class NativeMessageListenerHelper : BaseReferenceHolder
     {

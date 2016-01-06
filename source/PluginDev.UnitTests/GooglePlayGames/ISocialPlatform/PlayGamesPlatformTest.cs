@@ -18,6 +18,7 @@ using NUnit.Framework;
 using GooglePlayGames.BasicApi;
 using GooglePlayGames.BasicApi.Multiplayer;
 using GooglePlayGames.OurUtils;
+using Logger = GooglePlayGames.OurUtils.Logger;
 
 namespace GooglePlayGames.UnitTests {
     [TestFixture]

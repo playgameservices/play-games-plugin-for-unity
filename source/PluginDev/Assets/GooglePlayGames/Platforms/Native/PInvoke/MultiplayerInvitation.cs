@@ -25,6 +25,7 @@ namespace GooglePlayGames.Native.PInvoke
     using Types = GooglePlayGames.Native.Cwrapper.Types;
     using Status = GooglePlayGames.Native.Cwrapper.CommonErrorStatus;
     using GooglePlayGames.BasicApi.Multiplayer;
+    using Logger = GooglePlayGames.OurUtils.Logger;
 
     internal class MultiplayerInvitation : BaseReferenceHolder
     {
