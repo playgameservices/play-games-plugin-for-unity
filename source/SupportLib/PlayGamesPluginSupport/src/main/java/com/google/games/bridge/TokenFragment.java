@@ -198,7 +198,7 @@ public class TokenFragment extends Fragment implements GoogleApiClient.Connectio
             Log.d(TAG, "GET_ACCOUNTS not granted, requesting.");
             mPendingPermissionRequest = true;
 
-            if (shouldShowRequestPermissionRationale(Manifest.permission.GET_ACCOUNTS) &&
+            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.GET_ACCOUNTS) &&
                     getActivity().getCurrentFocus() != null) {
                 String rationale = pendingTokenRequests.get(0).getRationale();
                 if (rationale == null || rationale.isEmpty()) {
