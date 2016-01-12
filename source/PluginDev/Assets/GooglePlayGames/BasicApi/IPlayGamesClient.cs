@@ -95,18 +95,18 @@ namespace GooglePlayGames.BasicApi
     string GetUserDisplayName();
 
     /// <summary>
-    /// Gets an access token.
+    /// Returns an id token, which can be verified server side, if they are logged in.
     /// </summary>
     /// <param name="idTokenCallback"> A callback to be invoked after token is retrieved. Will be passed null value
     /// on failure. </param>
     void GetIdToken(Action<string> idTokenCallback);
         
     /// <summary>
-    /// Returns an id token, which can be verified server side, if they are logged in.
+    /// Gets an access token.
     /// </summary>
     /// <returns>An it token. <code>null</code> if they are not logged
     /// in</returns>
-    string GetIdToken();
+    string GetAccessToken();
 
     /// <summary>
     /// Gets the user email.

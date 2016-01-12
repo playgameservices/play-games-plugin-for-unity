@@ -84,7 +84,10 @@ namespace GooglePlayGames
         /// on failure. </param>
         public void GetIdToken(Action<string> idTokenCallback)
         {
-            authenticated ? mPlatform.GetIdToken(idTokenCallback) : idTokenCallback(null);  
+            if(authenticated) 
+                mPlatform.GetIdToken(idTokenCallback);
+            else
+                idTokenCallback(null);  
         }
 
         /// <summary>

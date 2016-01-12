@@ -236,7 +236,7 @@ namespace GooglePlayGames.Android
         /// on failure. </param>
         public void GetIdToken(string serverClientId, Action<string> idTokenCallback)
         {
-            string newScope = "audience:server:client_id:" + serverClientID;
+            string newScope = "audience:server:client_id:" + serverClientId;
             if (string.IsNullOrEmpty(idToken) || (newScope != idTokenScope))
             {
                 if (!fetchingIdToken)
@@ -251,7 +251,7 @@ namespace GooglePlayGames.Android
                         
                         if(!ok) idTokenCb(null);
                         idTokenCb = null;
-                    };
+                    });
                 }
             }
         }

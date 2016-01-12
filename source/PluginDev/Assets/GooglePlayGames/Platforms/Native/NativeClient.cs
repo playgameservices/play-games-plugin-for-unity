@@ -319,7 +319,7 @@ namespace GooglePlayGames.Native
             }
             mTokenClient.SetRationale(rationale);
             
-            idTokenCallback(mTokenClient.GetIdToken(GameInfo.WebClientId));
+            mTokenClient.GetIdToken(GameInfo.WebClientId,idTokenCallback);
         }
 
         ///<summary></summary>
