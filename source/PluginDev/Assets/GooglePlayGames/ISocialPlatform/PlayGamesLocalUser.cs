@@ -75,6 +75,17 @@ namespace GooglePlayGames
                 return mPlatform.GetFriends();
             }
         }
+        
+        /// <summary>
+        /// Gets an id token for the user.
+        /// NOTE: This property can only be accessed using the main Unity thread.
+        /// </summary>
+        /// <param name="idTokenCallback"> A callback to be invoked after token is retrieved. Will be passed null value
+        /// on failure. </param>
+        public void GetIdToken(Action<string> idTokenCallback)
+        {
+            authenticated ? mPlatform.GetIdToken(idTokenCallback) : idTokenCallback(null);  
+        }
 
         /// <summary>
         /// Returns whether or not the local user is authenticated to Google Play Games.
@@ -144,21 +155,6 @@ namespace GooglePlayGames
                     }
                 }
                 return retval;
-            }
-        }
-
-        /// <summary>
-        /// Gets an id token for the user.
-        /// NOTE: This property can only be accessed using the main Unity thread.
-        /// </summary>
-        /// <returns>
-        /// An id token for the user.
-        /// </returns>
-        public string idToken
-        {
-            get
-            {
-                return authenticated ? mPlatform.GetIdToken() : string.Empty;
             }
         }
 

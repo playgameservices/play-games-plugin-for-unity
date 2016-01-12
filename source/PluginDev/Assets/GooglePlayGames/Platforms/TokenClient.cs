@@ -23,7 +23,7 @@ namespace GooglePlayGames
 
         string GetAccessToken();
         string GetAuthorizationCode(string serverClientId);
-        string GetIdToken(string serverClientId);
+        void GetIdToken(string serverClientId, Action<string> idTokenCallback);
         void SetRationale(string rationale);
     }
 }
