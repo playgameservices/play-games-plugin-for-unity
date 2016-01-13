@@ -254,6 +254,10 @@ namespace GooglePlayGames.Android
                     });
                 }
             }
+            else
+            {
+                idTokenCallback(idToken);
+            }
         }
     }
 
