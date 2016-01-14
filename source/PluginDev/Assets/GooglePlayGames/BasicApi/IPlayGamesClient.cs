@@ -113,6 +113,16 @@ namespace GooglePlayGames.BasicApi
     string GetIdToken();
 
     /// <summary>
+    /// Asynchronously retrieves the server auth code for this client.
+    /// </summary>
+    /// <remarks>
+    /// Note: This function is currently only implemented for Android.
+    /// </remarks>
+    /// <param name="serverClientId">The Client ID.</param>
+    /// <param name="callback">Callback for response.</param>
+    void GetServerAuthCode(string serverClientId, Action<CommonStatusCodes, string> callback);
+
+    /// <summary>
     /// Gets the user email.
     /// </summary>
     /// <returns>The user email or null if not authenticated or the permission is
@@ -128,7 +138,7 @@ namespace GooglePlayGames.BasicApi
 
     /// <summary>Gets the player stats.</summary>
     /// <param name="callback">Callback for response.</param>
-    void GetPlayerStats(Action<CommonStatusCodes, PlayGamesLocalUser.PlayerStats> callback);
+    void GetPlayerStats(Action<CommonStatusCodes, PlayerStats> callback);
 
     /// <summary>
     /// Loads the users specified.  This is mainly used by the leaderboard

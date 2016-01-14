@@ -56,14 +56,6 @@ namespace GooglePlayGames.IOS
         {
             return new IOSTokenClient();
         }
-
-        public void GetPlayerStats(IntPtr apiClient, System.Action<CommonStatusCodes,
-            PlayGamesLocalUser.PlayerStats> callback)
-        {
-            Debug.Log("PlayerStats is not implemented on ios");
-            callback(CommonStatusCodes.ServiceMissing, 
-                new PlayGamesLocalUser.PlayerStats());
-        }
     }
 }
 #endif

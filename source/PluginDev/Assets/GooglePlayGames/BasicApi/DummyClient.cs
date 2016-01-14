@@ -110,6 +110,23 @@ namespace GooglePlayGames.BasicApi
         }
 
         /// <summary>
+        /// Asynchronously retrieves the server auth code for this client.
+        /// </summary>
+        /// <remarks>
+        /// Note: This function is only implemented for Android.
+        /// </remarks>
+        /// <param name="serverClientId">The Client ID.</param>
+        /// <param name="callback">Callback for response.</param>
+        public void GetServerAuthCode(string serverClientId, Action<CommonStatusCodes, string> callback)
+        {
+            LogUsage();
+            if (callback != null)
+            {
+                callback(CommonStatusCodes.ApiNotConnected, "DummyServerAuthCode");
+            }
+        }
+
+        /// <summary>
         /// Gets the user email.
         /// </summary>
         /// <returns>The user email or null if not authenticated or the permission is
@@ -123,13 +140,10 @@ namespace GooglePlayGames.BasicApi
         /// Gets the player stats.
         /// </summary>
         /// <param name="callback">Callback for response.</param>
-        public void GetPlayerStats(
-            Action<CommonStatusCodes, PlayGamesLocalUser.PlayerStats> callback)
+        public void GetPlayerStats(Action<CommonStatusCodes, PlayerStats> callback)
         {
             LogUsage();
-            callback(
-                CommonStatusCodes.ApiNotConnected,
-                new PlayGamesLocalUser.PlayerStats());
+            callback(CommonStatusCodes.ApiNotConnected, new PlayerStats());
         }
 
         /// <summary>

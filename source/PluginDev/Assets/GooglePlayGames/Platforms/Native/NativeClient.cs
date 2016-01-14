@@ -184,6 +184,10 @@ namespace GooglePlayGames.Native
                         {
                             builder.EnableSnapshots();
                         }
+                        if (mConfiguration.RequireGooglePlus)
+                        {
+                            builder.RequireGooglePlus();
+                        }
                         Debug.Log("Building GPG services, implicitly attempts silent auth");
                         mAuthState = AuthState.SilentPending;
                         mServices = builder.Build(config);
@@ -317,6 +321,26 @@ namespace GooglePlayGames.Native
             }
             mTokenClient.SetRationale(rationale);
             return mTokenClient.GetIdToken(GameInfo.WebClientId);
+        }
+
+        public void GetServerAuthCode(string serverClientId, Action<CommonStatusCodes, string> callback)
+        {
+            mServices.FetchServerAuthCode(serverClientId, (serverAuthCodeResponse) => {
+                // Translate native errors into CommonStatusCodes.
+                CommonStatusCodes responseCode =
+                    ConversionUtils.ConvertResponseStatusToCommonStatus(serverAuthCodeResponse.Status());
+                // Log errors.
+                if (responseCode != CommonStatusCodes.Success &&
+                    responseCode != CommonStatusCodes.SuccessCached)
+                {
+                    OurUtils.Logger.e("Error loading server auth code: " + serverAuthCodeResponse.Status().ToString());
+                }
+                // Fill in the code & call the callback.
+                if (callback != null)
+                {
+                    callback(responseCode, serverAuthCodeResponse.Code());
+                }
+            });
         }
 
         ///<summary></summary>
@@ -607,9 +631,33 @@ namespace GooglePlayGames.Native
             return mUser.AvatarURL;
         }
 
-        public void GetPlayerStats(Action<CommonStatusCodes, PlayGamesLocalUser.PlayerStats> callback)
+        ///<summary></summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.GetPlayerStats"/>
+        public void GetPlayerStats(Action<CommonStatusCodes, PlayerStats> callback)
         {
-            clientImpl.GetPlayerStats(GetApiClient(), callback);
+            mServices.StatsManager().FetchForPlayer((playerStatsResponse) => {
+                // Translate native errors into CommonStatusCodes.
+                CommonStatusCodes responseCode =
+                    ConversionUtils.ConvertResponseStatusToCommonStatus(playerStatsResponse.Status());
+                // Log errors.
+                if (responseCode != CommonStatusCodes.Success &&
+                responseCode != CommonStatusCodes.SuccessCached)
+                {
+                    GooglePlayGames.OurUtils.Logger.e("Error loading PlayerStats: " + playerStatsResponse.Status().ToString());
+                }
+                // Fill in the stats & call the callback.
+                if (callback != null)
+                {
+                    if (playerStatsResponse.PlayerStats() != null)
+                    {
+                        callback(responseCode, playerStatsResponse.PlayerStats().AsPlayerStats());
+                    }
+                    else
+                    {
+                        callback(responseCode, new PlayerStats());
+                    }
+                }
+            });
         }
 
         ///<summary></summary>

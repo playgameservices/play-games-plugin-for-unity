@@ -247,7 +247,7 @@ namespace GooglePlayGames
         /// <param name="callback">Callback when they are available.</param>
         public void GetStats(Action<CommonStatusCodes, PlayerStats> callback)
         {
-            if (mStats == null)
+            if (mStats == null || !mStats.Valid)
             {
                 mPlatform.GetPlayerStats((rc, stats) =>
                     {
@@ -259,88 +259,6 @@ namespace GooglePlayGames
             {
                 // 0 = success
                 callback(CommonStatusCodes.Success, mStats);
-            }
-        }
-
-        /// <summary>
-        /// Player stats. See https://developers.google.com/games/services/android/stats
-        /// </summary>
-        public class PlayerStats
-        {
-            /// <summary>
-            /// The number of in-app purchases.
-            /// </summary>
-            public int NumberOfPurchases
-            {
-                get;
-                set;
-            }
-
-            /// <summary>
-            /// The length of the avg sesson in minutes.
-            /// </summary>
-            public float AvgSessonLength
-            {
-                get;
-                set;
-            }
-
-            /// <summary>
-            /// The days since last played.
-            /// </summary>
-            public int DaysSinceLastPlayed
-            {
-                get;
-                set;
-            }
-
-            /// <summary>
-            /// The number of sessions based on sign-ins.
-            /// </summary>
-            public int NumOfSessions
-            {
-                get;
-                set;
-            }
-
-            /// <summary>
-            /// The approximation of sessions percentile for the player,
-            /// given as a decimal value between 0 and 1 (inclusive).
-            /// This value indicates how many sessions the current player has
-            /// played in comparison to the rest of this game's player base.
-            /// Higher numbers indicate that this player has played more sessions.
-            /// A return value  less than zero indicates this value is not available.
-            /// </summary>
-            public float SessPercentile
-            {
-                get;
-                set;
-            }
-
-            /// <summary>
-            /// The approximate spend percentile of the player,
-            /// given as a decimal value between 0 and 1 (inclusive). This
-            /// value indicates how much the current player has spent in
-            /// comparison to the rest of this game's player base. Higher
-            /// numbers indicate that this player has spent more.
-            /// A return value  less than zero indicates this value is not available.
-            /// </summary>
-            public float SpendPercentile
-            {
-                get;
-                set;
-            }
-
-            /// <summary>
-            /// The approximate probability of the player not returning
-            /// to play the game. Higher values indicate that a player
-            /// is less likely to return.
-            /// A return value  less than zero indicates this value is not available.
-            /// </summary>
-            public float ChurnProbability
-            {
-                get;
-                set;
             }
         }
     }

@@ -39,6 +39,11 @@ namespace GooglePlayGames.BasicApi
         private readonly bool mEnableSavedGames;
 
         /// <summary>
+        /// Flag indicating to request use of a player's Google+ social graph.
+        /// </summary>
+        private readonly bool mRequireGooglePlus;
+
+        /// <summary>
         /// The invitation delegate.
         /// </summary>
         private readonly InvitationReceivedDelegate mInvitationDelegate;
@@ -64,6 +69,7 @@ namespace GooglePlayGames.BasicApi
             this.mInvitationDelegate = builder.GetInvitationDelegate();
             this.mMatchDelegate = builder.GetMatchDelegate();
             this.mPermissionRationale = builder.GetPermissionRationale();
+            this.mRequireGooglePlus = builder.HasRequireGooglePlus();
         }
 
         /// <summary>
@@ -76,6 +82,19 @@ namespace GooglePlayGames.BasicApi
             get
             {
                 return mEnableSavedGames;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="GooglePlayGames.BasicApi.PlayGamesClientConfiguration"/>
+        /// requests a player's Google+ social graph.
+        /// </summary>
+        /// <value><c>true</c> if requests Google+ social graph; otherwise, <c>false</c>.</value>
+        public bool RequireGooglePlus
+        {
+            get
+            {
+                return mRequireGooglePlus;
             }
         }
 
@@ -126,6 +145,11 @@ namespace GooglePlayGames.BasicApi
             private bool mEnableSaveGames = false;
 
             /// <summary>
+            /// The flag to request Google+. Default is false.
+            /// </summary>
+            private bool mRequireGooglePlus = false;
+
+            /// <summary>
             /// The invitation delegate.  Default is a no-op;
             /// </summary>
             private InvitationReceivedDelegate mInvitationDelegate = delegate
@@ -152,6 +176,21 @@ namespace GooglePlayGames.BasicApi
             public Builder EnableSavedGames()
             {
                 mEnableSaveGames = true;
+                return this;
+            }
+
+            /// <summary>
+            /// Requests use of the player's Google+ social graph.
+            /// </summary>
+            /// <remarks>
+            /// Set this to request use of the player's Google+ social graph. Setting
+            /// this will require Android users to have a Google+ profile in order
+            /// to be able to sign in (on iOS, users must always have one).
+            /// </remarks>
+            /// <returns>The builder.</returns>
+            public Builder RequireGooglePlus()
+            {
+                mRequireGooglePlus = true;
                 return this;
             }
 
@@ -208,6 +247,15 @@ namespace GooglePlayGames.BasicApi
             internal bool HasEnableSaveGames()
             {
                 return mEnableSaveGames;
+            }
+
+            /// <summary>
+            /// Determines whether this instance has Google+ required.
+            /// </summary>
+            /// <returns><c>true</c> if this instance has Google+ required; otherwise, <c>false</c>.</returns>
+            internal bool HasRequireGooglePlus()
+            {
+                return mRequireGooglePlus;
             }
 
             /// <summary>
