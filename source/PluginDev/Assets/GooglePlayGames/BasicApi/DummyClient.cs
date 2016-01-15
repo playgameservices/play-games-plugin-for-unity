@@ -49,10 +49,10 @@ namespace GooglePlayGames.BasicApi
             return "DummyAccessToken";
         }
 
-        public string GetIdToken()
+        public void GetIdToken(Action<string> idTokenCallback)
         {
             LogUsage();
-            return "DummyIdToken";
+            idTokenCallback("DummyIdToken");
         }
 
         public string GetUserId()

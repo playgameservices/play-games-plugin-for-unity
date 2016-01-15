@@ -295,13 +295,15 @@ namespace GooglePlayGames.Native
         /// <summary>
         /// Returns an id token, which can be verified server side, if they are logged in.
         /// </summary>
+        /// <param name="idTokenCallback"> A callback to be invoked after token is retrieved. Will be passed null value
+        /// on failure. </param>
         /// <returns>The identifier token.</returns>
-        public string GetIdToken()
+        public void GetIdToken(Action<string> idTokenCallback)
         {
             if (!this.IsAuthenticated())
             {
                 Debug.Log("Cannot get API client - not authenticated");
-                return null;
+                idTokenCallback(null);
             }
 
             if(!GameInfo.WebClientIdInitialized())
@@ -313,10 +315,11 @@ namespace GooglePlayGames.Native
                     // avoid int overflow
                     noWebClientIdWarningCount = (noWebClientIdWarningCount/ webclientWarningFreq) + 1;
                 }
-                return null;
+                idTokenCallback(null);
             }
             mTokenClient.SetRationale(rationale);
-            return mTokenClient.GetIdToken(GameInfo.WebClientId);
+            
+            mTokenClient.GetIdToken(GameInfo.WebClientId,idTokenCallback);
         }
 
         ///<summary></summary>

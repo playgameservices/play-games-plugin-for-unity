@@ -13,6 +13,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 // </copyright>
+using System;
 
 #if (UNITY_ANDROID || (UNITY_IPHONE && !NO_GPGS))
 namespace GooglePlayGames
@@ -23,7 +24,7 @@ namespace GooglePlayGames
 
         string GetAccessToken();
         string GetAuthorizationCode(string serverClientId);
-        string GetIdToken(string serverClientId);
+        void GetIdToken(string serverClientId, Action<string> idTokenCallback);
         void SetRationale(string rationale);
     }
 }
