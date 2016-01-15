@@ -80,13 +80,16 @@ namespace GooglePlayGames.BasicApi
         }
 
         /// <summary>
-        /// Returns an id token, which can be verified server side, if they are logged in.
+        /// Retrieves an id token, which can be verified server side, if they are logged in.
         /// </summary>
+        /// <param name="idTokenCallback">The callback invoked with the token</param>
         /// <returns>The identifier token.</returns>
-        public string GetIdToken()
+        public void GetIdToken(Action<string> idTokenCallback)
         {
             LogUsage();
-            return "DummyIdToken";
+            if (idTokenCallback != null) {
+                idTokenCallback("DummyIdToken");
+            }
         }
 
         /// <summary>

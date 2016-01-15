@@ -37,8 +37,9 @@ namespace GooglePlayGames.Android
         private string accessToken;
         private string idToken;
         private string idTokenScope;
+        private Action<string> idTokenCb;
         private string rationale;
-
+        
         public static AndroidJavaObject GetActivity()
         {
             using (var jc = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
@@ -126,6 +127,7 @@ namespace GooglePlayGames.Android
                         if (fetchIdToken && !string.IsNullOrEmpty(id))
                         {
                             idToken = id;
+                            idTokenCb(idToken);
                         }
                         if (fetchEmail && !string.IsNullOrEmpty(email))
                         {
@@ -227,24 +229,35 @@ namespace GooglePlayGames.Android
             return accessToken;
         }
 
-        /// <summary>Gets the OpenID Connect ID token for authentication with a server backend.</summary>
-        /// <returns>The OpenID Connect ID token.</returns>
+        /// <summary>Gets the OpenID Connect ID token for authentication with a server backend.</summary>        
         /// <param name="serverClientID">Server client ID from console.developers.google.com or the Play Games
         /// services console.</param>
-        public string GetIdToken(string serverClientID)
+        /// <param name="idTokenCallback"> A callback to be invoked after token is retrieved. Will be passed null value
+        /// on failure. </param>
+        public void GetIdToken(string serverClientId, Action<string> idTokenCallback)
         {
-            string newScope = "audience:server:client_id:" + serverClientID;
+            string newScope = "audience:server:client_id:" + serverClientId;
             if (string.IsNullOrEmpty(idToken) || (newScope != idTokenScope))
             {
                 if (!fetchingIdToken)
                 {
+                    
                     fetchingIdToken = true;
                     idTokenScope = newScope;
-                    Fetch(idTokenScope, rationale, false, false, true, (ok) => fetchingIdToken = false);
+                    idTokenCb = idTokenCallback;
+                    
+                    Fetch(idTokenScope, rationale, false, false, true, (ok) => {
+                        fetchingIdToken = false;
+                        
+                        if(!ok) idTokenCb(null);
+                        idTokenCb = null;
+                    });
                 }
             }
-
-            return idToken;
+            else
+            {
+                idTokenCallback(idToken);
+            }
         }
     }
 

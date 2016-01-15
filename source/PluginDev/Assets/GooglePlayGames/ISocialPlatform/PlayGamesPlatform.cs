@@ -439,19 +439,16 @@ namespace GooglePlayGames
         }
 
         /// <summary>
-        /// Returns an id token for the user.
+        /// Get an id token for the user.
         /// </summary>
-        /// <returns>
-        /// An id token for the user.
-        /// </returns>
-        public string GetIdToken()
+        /// <param name="idTokenCallback"> A callback to be invoked after token is retrieved. Will be passed null value
+        /// on failure. </param>
+        public void GetIdToken(Action<string> idTokenCallback)
         {
             if (mClient != null)
             {
-                return mClient.GetIdToken();
-            }
-
-            return null;
+                mClient.GetIdToken(idTokenCallback);
+            }            
         }
 
         /// <summary>
