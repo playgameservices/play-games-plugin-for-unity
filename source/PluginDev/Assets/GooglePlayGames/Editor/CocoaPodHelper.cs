@@ -22,12 +22,24 @@ namespace GooglePlayGames.Editor
 
     public class CocoaPodHelper
     {
-        private const string podPath = "/usr/bin/pod";
-
+        // pod can be in 2 places. El Capitain does not allow
+        // installs into /usr/bin, so pod ends up in /usr/local/bin
+        private static string[] podPaths = {
+                "/usr/bin/pod",
+                "/usr/local/bin/pod"
+        };
 
         public static bool Update(string projDir)
         {
-            if (!File.Exists(podPath))
+            string podPath = null;
+            foreach (string p in podPaths)
+            {
+                if (File.Exists(p))
+                {
+                    podPath = p;
+                }
+            }
+            if (podPath == null || !File.Exists(podPath))
             {
                 UnityEngine.Debug.LogError("pod executable not found: " + podPath);
                 return false;
@@ -43,6 +55,20 @@ namespace GooglePlayGames.Editor
 
         private static bool ExecuteCommand(string command, string projDir)
         {
+            string podPath = null;
+            foreach (string p in podPaths)
+            {
+                if (File.Exists(p))
+                {
+                    podPath = p;
+                }
+            }
+            if (podPath == null || !File.Exists(podPath))
+            {
+                UnityEngine.Debug.LogError("pod executable not found: " + podPath);
+                return false;
+            }
+
             using (var process = new Process())
             {
                 if (!process.StartInfo.EnvironmentVariables.ContainsKey("LANG"))
