@@ -328,7 +328,7 @@ namespace GooglePlayGames.Editor
         /// if the player settings is not the default, then prompt before
         /// overwriting.
         /// </remarks>
-        public void CheckBundleId()
+        public static void CheckBundleId()
         {
             string packageName = GPGSProjectSettings.Instance.Get(
                 GPGSUtil.ANDROIDBUNDLEIDKEY, string.Empty);
