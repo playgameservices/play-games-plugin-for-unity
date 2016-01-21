@@ -75,7 +75,7 @@ namespace GooglePlayGames.Editor
         /// <param name="resourceXmlData">Resource xml data.</param>
         /// <param name="nearbySvcId">Nearby svc identifier.</param>
         public static bool PerformSetup(
-            string clientId, 
+            string clientId,
             string classDirectory,
             string className,
             string resourceXmlData,
@@ -95,6 +95,10 @@ namespace GooglePlayGames.Editor
                 GPGSProjectSettings.Instance.Set(GPGSUtil.CLASSDIRECTORYKEY, classDirectory);
                 GPGSProjectSettings.Instance.Set(GPGSUtil.CLASSNAMEKEY, className);
                 GPGSProjectSettings.Instance.Set(GPGSUtil.ANDROIDRESOURCEKEY, resourceXmlData);
+
+                // check the bundle id and set it if needed.
+                CheckBundleId();
+
                 return PerformSetup(
                     clientId,
                     GPGSProjectSettings.Instance.Get(GPGSUtil.APPIDKEY),
@@ -203,7 +207,7 @@ namespace GooglePlayGames.Editor
 
             GUIStyle link = new GUIStyle(GUI.skin.label);
             link.normal.textColor = new Color(.7f, .7f, 1f);
-           
+
             GUILayout.Space(10);
             GUILayout.Label(GPGSStrings.AndroidSetup.Blurb);
             if (GUILayout.Button("Open Play Games Console", link, GUILayout.ExpandWidth(false)))
@@ -228,7 +232,7 @@ namespace GooglePlayGames.Editor
                 "Directory to save constants",
                 mConstantDirectory,
                 GUILayout.Width(480));
-            
+
             mClassName = EditorGUILayout.TextField(
                 "Constants class name",
                 mClassName,
@@ -296,45 +300,13 @@ namespace GooglePlayGames.Editor
         {
             if (PerformSetup(mWebClientId, mConstantDirectory, mClassName, mConfigData, null))
             {
-                // Check the package id.  If one is set the gpgs properties,
-                // and the player settings are the default or empty, set it.
-                // if the player settings is not the default, then prompt before
-                // overwriting.
-                string packageName = GPGSProjectSettings.Instance.Get(
-                                         GPGSUtil.ANDROIDBUNDLEIDKEY, string.Empty);
-                string currentId = PlayerSettings.bundleIdentifier;
-                if (!string.IsNullOrEmpty(packageName))
-                {
-                    if (string.IsNullOrEmpty(currentId) ||
-                        currentId == "com.Company.ProductName")
-                    {
-                        PlayerSettings.bundleIdentifier = packageName;
-                    }
-                    else if (currentId != packageName)
-                    {
-                        if (EditorUtility.DisplayDialog(
-                                "Set Bundle Identifier?",
-                                "The server configuration is using " +
-                                packageName + ", but the player settings is set to " +
-                                currentId + ".\nSet the Bundle Identifier to " +
-                                packageName + "?",
-                                "OK",
-                                "Cancel"))
-                        {
-                            PlayerSettings.bundleIdentifier = packageName;
-                        }
-                    }
-                }
-                else
-                {
-                    Debug.Log("NULL package!!");
-                }
+                CheckBundleId();
 
                 EditorUtility.DisplayDialog(
                     GPGSStrings.Success,
                     GPGSStrings.AndroidSetup.SetupComplete,
                     GPGSStrings.Ok);
-                
+
                 GPGSProjectSettings.Instance.Set(GPGSUtil.ANDROIDSETUPDONEKEY, true);
                 this.Close();
             }
@@ -348,7 +320,49 @@ namespace GooglePlayGames.Editor
         }
 
         /// <summary>
-        /// Parses the resources xml and set the properties.  Also generates the 
+        /// Checks the bundle identifier.
+        /// </summary>
+        /// <remarks>
+        /// Check the package id.  If one is set the gpgs properties,
+        /// and the player settings are the default or empty, set it.
+        /// if the player settings is not the default, then prompt before
+        /// overwriting.
+        /// </remarks>
+        public void CheckBundleId()
+        {
+            string packageName = GPGSProjectSettings.Instance.Get(
+                GPGSUtil.ANDROIDBUNDLEIDKEY, string.Empty);
+            string currentId = PlayerSettings.bundleIdentifier;
+            if (!string.IsNullOrEmpty(packageName))
+            {
+                if (string.IsNullOrEmpty(currentId) ||
+                    currentId == "com.Company.ProductName")
+                {
+                    PlayerSettings.bundleIdentifier = packageName;
+                }
+                else if (currentId != packageName)
+                {
+                    if (EditorUtility.DisplayDialog(
+                        "Set Bundle Identifier?",
+                        "The server configuration is using " +
+                        packageName + ", but the player settings is set to " +
+                        currentId + ".\nSet the Bundle Identifier to " +
+                        packageName + "?",
+                        "OK",
+                        "Cancel"))
+                    {
+                        PlayerSettings.bundleIdentifier = packageName;
+                    }
+                }
+            }
+            else
+            {
+                Debug.Log("NULL package!!");
+            }
+        }
+
+        /// <summary>
+        /// Parses the resources xml and set the properties.  Also generates the
         /// constants file.
         /// </summary>
         /// <returns><c>true</c>, if resources was parsed, <c>false</c> otherwise.</returns>
