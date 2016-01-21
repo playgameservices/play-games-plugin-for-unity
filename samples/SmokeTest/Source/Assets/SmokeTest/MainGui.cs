@@ -65,6 +65,8 @@ namespace SmokeTest
         private string mConflictServerVersion = null;
         private bool mHadCloudConflict = false;
 
+        private string idToken = "";
+
         private volatile TurnBasedMatch mMatch = null;
         private volatile IQuest mQuest = null;
         private volatile IQuestMilestone mQuestMilestone = null;
@@ -953,8 +955,7 @@ namespace SmokeTest
 
             GUI.Label(
                 this.CalcGrid(0, 3, 2, 1),
-                "ID Token: " +
-                ((PlayGamesLocalUser) Social.localUser).idToken);
+                "ID Token: " + idToken);
 
             GUI.Label(
                 this.CalcGrid(0, 4,2, 1),
@@ -1139,6 +1140,9 @@ namespace SmokeTest
                         mNearbyGui.OnGUI();
                         break;
                     case Ui.UserInfo:
+                        // start loading the id token:
+                        ((PlayGamesLocalUser)Social.localUser).GetIdToken(
+                            token => this.idToken = token);
                         ShowUserInfoUi();
                     break;
                     default:
