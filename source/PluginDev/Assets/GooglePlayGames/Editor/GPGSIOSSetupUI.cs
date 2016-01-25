@@ -247,6 +247,10 @@ namespace GooglePlayGames.Editor
                         clientId = value;
                         GPGSProjectSettings.Instance.Set(GPGSUtil.IOSCLIENTIDKEY, clientId);
                     }
+                    else if (key == "BUNDLE_ID")
+                    {
+                        GPGSProjectSettings.Instance.Set(GPGSUtil.IOSBUNDLEIDKEY, value);
+                    }
                     else if (key.StartsWith("ACH_"))
                     {
                         string prop = "achievement_" + key.Substring(4).ToLower();
