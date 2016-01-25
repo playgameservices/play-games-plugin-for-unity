@@ -282,6 +282,7 @@ namespace GooglePlayGames.Editor
                 GPGSUtil.WriteResourceIds(classDirectory, className, resourceKeys);
             }
 
+            GPGSProjectSettings.Instance.Save();
             return !string.IsNullOrEmpty(clientId);
         }
 
