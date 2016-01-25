@@ -100,7 +100,7 @@ namespace GooglePlayGames.Editor
             GUILayout.Label(GPGSStrings.IOSSetup.BundleIdBlurb, EditorStyles.wordWrappedLabel);
             mBundleId = EditorGUILayout.TextField(GPGSStrings.IOSSetup.BundleId, mBundleId,
             GUILayout.Width(450));
-            
+
             GUILayout.Space(30);
 
             // Client ID field
@@ -190,7 +190,7 @@ namespace GooglePlayGames.Editor
         /// <param name="bundleId">Bundle identifier.</param>
         /// <param name="nearbySvcId">Nearby svc identifier.</param>
         public static bool PerformSetup(
-            string classDirectory, string className, string resourceXmlData, 
+            string classDirectory, string className, string resourceXmlData,
             string webClientId, string bundleId,  string nearbySvcId)
         {
             if (ParseResources(classDirectory, className, resourceXmlData))
@@ -198,6 +198,11 @@ namespace GooglePlayGames.Editor
                 GPGSProjectSettings.Instance.Set(GPGSUtil.CLASSNAMEKEY, className);
                 GPGSProjectSettings.Instance.Set(GPGSUtil.IOSRESOURCEKEY, resourceXmlData);
                 GPGSProjectSettings.Instance.Set(GPGSUtil.WEBCLIENTIDKEY, webClientId);
+                if (string.IsNullOrEmpty(bundleId))
+                {
+                    // get from settings
+                    bundleId = GPGSProjectSettings.Instance.Get(GPGSUtil.IOSBUNDLEIDKEY);
+                }
                 return PerformSetup(GPGSProjectSettings.Instance.Get(GPGSUtil.IOSCLIENTIDKEY),
                     bundleId, webClientId, nearbySvcId);
             }
