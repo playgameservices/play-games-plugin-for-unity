@@ -202,6 +202,7 @@ namespace GooglePlayGames.Editor
                 {
                     // get from settings
                     bundleId = GPGSProjectSettings.Instance.Get(GPGSUtil.IOSBUNDLEIDKEY);
+                    PlayerSettings.bundleIdentifier = bundleId;
                 }
                 return PerformSetup(GPGSProjectSettings.Instance.Get(GPGSUtil.IOSCLIENTIDKEY),
                     bundleId, webClientId, nearbySvcId);
