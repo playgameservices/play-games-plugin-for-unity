@@ -1,12 +1,21 @@
 Version 0.9.30
     ** BREAKING CHANGES **
-        * `PlayerStats` is now a standalone class, rather than a subclass of `PlayGamesLocalUser`. All existing references to `PlayGamesLocalUser.PlayerStats` should now directly refer to `PlayerStats`.
-        * The `NumOfSessions` property in `PlayerStats` has been renamed `NumberOfSessions` to be consistent with other properties.
+        * `PlayerStats` is now a standalone class,
+            rather than a subclass of `PlayGamesLocalUser`.
+            All existing references to `PlayGamesLocalUser.PlayerStats`
+            should now directly refer to `PlayerStats`.
+        * The `NumOfSessions` property in `PlayerStats` has been renamed
+            `NumberOfSessions` to be consistent with other properties.
     New Features:
         * Rebase PlayerStats API to use the Play Games C++ SDK.
         * PlayerStats API now supported on iOS.
         * Added an option to PlayGamesClientConfiguration to require Google+.
-
+        * Updated to use GPGS C++ SDK version 2.1.
+    Bug Fixes:
+        * #917 iOS 9, game freeze after closing authentication window.
+        * #919 Resolves Android jars even when target is not Android.
+        * #868 Avoid memory allocations in the PlayGamesHelperObject.
+        * #865 GetIdToken needs to be asynchronous.
 Version 0.9.28
         ** BREAKING CHANGES **
 
