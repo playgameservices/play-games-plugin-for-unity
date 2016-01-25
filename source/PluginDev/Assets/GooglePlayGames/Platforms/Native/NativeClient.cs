@@ -553,6 +553,10 @@ namespace GooglePlayGames.Native
                             else
                             {
                                 Debug.Log("AuthState == " + mAuthState + " calling auth callbacks with failure");
+
+                                // make sure we are not paused
+                                UnpauseUnityPlayer();
+
                                 // Noisy sign-in failed - report failure.
                                 Action<bool> localCallbacks = mPendingAuthCallbacks;
                                 mPendingAuthCallbacks = null;
@@ -569,6 +573,16 @@ namespace GooglePlayGames.Native
                 }
             }
         }
+
+		#if UNITY_IOS || UNITY_IPHONE
+				[System.Runtime.InteropServices.DllImport("__Internal")]
+				internal static extern void UnpauseUnityPlayer();
+		#else
+		private void UnpauseUnityPlayer()
+		{
+			// don't do anything.
+		}
+		#endif
 
         private void ToUnauthenticated()
         {

@@ -146,6 +146,15 @@ char* __MakeStringCopy(NSString* nstring)
 #endif
 
 extern "C" {
+
+  void UnpauseUnityPlayer() {
+    dispatch_async(dispatch_get_main_queue(), ^{
+      if (UnityIsPaused() > 0) {
+        UnityPause(0);
+      }
+    });
+  }
+
   const char* _GooglePlayGetIdToken() {
     const char* idToken = nil;
     GIDGoogleUser* guser = [GIDSignIn sharedInstance].currentUser;
