@@ -11,6 +11,15 @@ Version 0.9.30
         * PlayerStats API now supported on iOS.
         * Added an option to PlayGamesClientConfiguration to require Google+.
         * Updated to use GPGS C++ SDK version 2.1.
+        * Deprecated GetIdToken and GetAccessToken.  Applications should use
+            `PlayGamesPlatform.GetServerAuthCode()` to use the player's identity
+            on the server side.
+        * Updated configuration dialogs exposing the **Require Google Plus** property.
+            This property should be false if possible, reducing the number of
+            scopes and permissions the player has to allow.  Game developers should
+            use PlayGamesPlatform.GetServerAuthCode() to pass the player's OAuth
+            credentials to the server, and use Player.Id when possible for a persistent,
+            unique identifier for the player rather than email address.
     Bug Fixes:
         * #917 iOS 9, game freeze after closing authentication window.
         * #919 Resolves Android jars even when target is not Android.

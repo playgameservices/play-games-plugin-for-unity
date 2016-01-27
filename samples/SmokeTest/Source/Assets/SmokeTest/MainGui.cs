@@ -66,6 +66,8 @@ namespace SmokeTest
         private bool mHadCloudConflict = false;
 
         private string idToken = "";
+        private string authCode = "";
+        private bool loadedFriends = false;
 
         private volatile TurnBasedMatch mMatch = null;
         private volatile IQuest mQuest = null;
@@ -105,10 +107,14 @@ namespace SmokeTest
             this.mNearbyGui = new NearbyGUI(this);
             this.mAchievementGui = new AchievementGUI(this);
             this.mLeaderboardGui = new LeaderboardGUI(this);
+
+            loadedFriends = false;
         }
 
         public void SetUI(Ui page)
         {
+            idToken = null;
+            authCode = null;
             this.mUi = page;
         }
 
@@ -159,7 +165,7 @@ namespace SmokeTest
 
         public void OnRoomSetupProgress(float progress)
         {
-            mUi = Ui.RtmpWaiting;
+            SetUI(Ui.RtmpWaiting);
             EndStandBy();
             Status = "Setting up room (" + ((int)progress) + "%)";
         }
@@ -177,7 +183,7 @@ namespace SmokeTest
                 Status += " Room setup failed!";
             }
             EndStandBy();
-            mUi = Ui.Rtmp;
+            SetUI(Ui.Rtmp);
         }
 
         public void OnParticipantLeft(Participant participant)
@@ -269,7 +275,7 @@ namespace SmokeTest
 
             if (GUI.Button(this.CalcGrid(1, 1), "Nearby Connections"))
             {
-                this.mUi = Ui.NearbyConnections;
+                SetUI(Ui.NearbyConnections);
             }
         }
 
@@ -280,31 +286,31 @@ namespace SmokeTest
 
             if (GUI.Button(this.CalcGrid(0, 1), "Achievements"))
             {
-                this.mUi = Ui.Achievements;
+                SetUI(Ui.Achievements);
             }
             if (GUI.Button(this.CalcGrid(1, 1), "Quests / Events"))
             {
-                this.mUi = Ui.QuestsAndEvents;
+                SetUI(Ui.QuestsAndEvents);
             }
             else if (GUI.Button(CalcGrid(0, 2), "Leaderboards"))
             {
-                this.mUi = Ui.Leaderboards;
+                SetUI(Ui.Leaderboards);
             }
             else if (GUI.Button(CalcGrid(1, 2), "User Info"))
             {
-                this.mUi = Ui.UserInfo;
+                SetUI(Ui.UserInfo);
             }
             else if (GUI.Button(this.CalcGrid(0, 4), "Multiplayer"))
             {
-                this.mUi = Ui.Multiplayer;
+                SetUI(Ui.Multiplayer);
             }
             else if (GUI.Button(this.CalcGrid(1, 4), "Saved Game"))
             {
-                this.mUi = Ui.SavedGame;
+                SetUI(Ui.SavedGame);
             }
             else if (GUI.Button(this.CalcGrid(1, 6), "Nearby Connections"))
             {
-                this.mUi = Ui.NearbyConnections;
+                SetUI(Ui.NearbyConnections);
             }
             else if (GUI.Button(this.CalcGrid(0, 6), "Sign Out"))
             {
@@ -319,15 +325,15 @@ namespace SmokeTest
 
             if (GUI.Button(this.CalcGrid(0, 1), "RTMP"))
             {
-                this.mUi = Ui.Rtmp;
+                SetUI(Ui.Rtmp);
             }
             else if (GUI.Button(this.CalcGrid(1, 1), "TBMP"))
             {
-                this.mUi = Ui.Tbmp;
+                SetUI(Ui.Tbmp);
             }
             else if (GUI.Button(this.CalcGrid(1, 5), "Back"))
             {
-                this.mUi = Ui.Main;
+                SetUI(Ui.Main);
                 ShowEffect(true);
             }
         }
@@ -341,7 +347,7 @@ namespace SmokeTest
 
             if (GUI.Button(this.CalcGrid(1, 7), "Back"))
             {
-                this.mUi = Ui.SavedGame;
+                SetUI(Ui.SavedGame);
                 ShowEffect(true);
             }
         }
@@ -354,7 +360,7 @@ namespace SmokeTest
             if (this.mConflictResolver == null)
             {
                 Status = "No pending conflict";
-                mUi = Ui.SavedGame;
+                SetUI(Ui.SavedGame);
                 return;
             }
 
@@ -370,18 +376,18 @@ namespace SmokeTest
             {
                 mConflictResolver.ChooseMetadata(mConflictOriginal);
                 SetStandBy("Choosing original, retrying open");
-                mUi = Ui.SavedGame;
+                SetUI(Ui.SavedGame);
             }
             else if (GUI.Button(CalcGrid(1, 3), "Use Unmerged"))
             {
                 mConflictResolver.ChooseMetadata(mConflictUnmerged);
                 SetStandBy("Choosing unmerged, retrying open");
-                mUi = Ui.SavedGame;
+                SetUI(Ui.SavedGame);
             }
 
             if (GUI.Button(CalcGrid(1, 7), "Back"))
             {
-                mUi = Ui.SavedGame;
+                SetUI(Ui.SavedGame);
                 ShowEffect(true);
             }
         }
@@ -396,7 +402,7 @@ namespace SmokeTest
             if (mCurrentSavedGame == null || !mCurrentSavedGame.IsOpen)
             {
                 Status = "No opened saved game selected.";
-                mUi = Ui.SavedGame;
+                SetUI(Ui.SavedGame);
                 return;
             }
 
@@ -415,14 +421,14 @@ namespace SmokeTest
                     (status, updated) =>
                     {
                         Status = "Write status was: " + status;
-                        mUi = Ui.SavedGame;
+                        SetUI(Ui.SavedGame);
                         EndStandBy();
                     });
                 mCurrentSavedGame = null;
             }
             else if (GUI.Button(CalcGrid(1, 7), "Cancel"))
             {
-                mUi = Ui.SavedGame;
+                SetUI(Ui.SavedGame);
             }
         }
 
@@ -536,7 +542,7 @@ namespace SmokeTest
                     mConflictOriginalData = System.Text.ASCIIEncoding.Default.GetString(originalData);
                     mConflictUnmerged = unmerged;
                     mConflictUnmergedData = System.Text.ASCIIEncoding.Default.GetString(unmergedData);
-                    mUi = Ui.ResolveSaveConflict;
+                    SetUI(Ui.ResolveSaveConflict);
                     EndStandBy();
                     GooglePlayGames.OurUtils.Logger.d("Encountered manual open conflict.");
                 },
@@ -597,7 +603,7 @@ namespace SmokeTest
             }
             else if (GUI.Button(CalcGrid(1, 3), "Write"))
             {
-                mUi = Ui.WriteSavedGame;
+                SetUI(Ui.WriteSavedGame);
             }
             else if (GUI.Button(CalcGrid(0, 4), "Fetch All"))
             {
@@ -605,7 +611,7 @@ namespace SmokeTest
             }
             else if (GUI.Button(CalcGrid(1, 4), "Edit Filename"))
             {
-                mUi = Ui.EditSavedGameName;
+                SetUI(Ui.EditSavedGameName);
             }
             else if (GUI.Button(CalcGrid(0, 5), "Delete"))
             {
@@ -613,7 +619,7 @@ namespace SmokeTest
             }
             else if (GUI.Button(CalcGrid(1, 6), "Back"))
             {
-                mUi = Ui.Main;
+                SetUI(Ui.Main);
                 ShowEffect(true);
             }
         }
@@ -625,12 +631,12 @@ namespace SmokeTest
             if (GUI.Button(CalcGrid(0, 4), "Leave Room"))
             {
                 DoLeaveRoom();
-                mUi = Ui.Rtmp;
+                SetUI(Ui.Rtmp);
             }
             if (GUI.Button(CalcGrid(1, 4), "Show Waiting UI"))
             {
                 DoWaitingRoom();
-                mUi = Ui.Rtmp;
+                SetUI(Ui.Rtmp);
             }
         }
 
@@ -685,7 +691,7 @@ namespace SmokeTest
             }
             else if (GUI.Button(CalcGrid(1, 6), "Back"))
             {
-                mUi = Ui.Multiplayer;
+                SetUI(Ui.Multiplayer);
                 ShowEffect(true);
             }
         }
@@ -731,12 +737,12 @@ namespace SmokeTest
                 }
                 else
                 {
-                    mUi = Ui.TbmpMatch;
+                    SetUI(Ui.TbmpMatch);
                 }
             }
             else if (GUI.Button(CalcGrid(1, 5), "Back"))
             {
-                mUi = Ui.Multiplayer;
+                SetUI(Ui.Multiplayer);
             }
         }
 
@@ -783,7 +789,7 @@ namespace SmokeTest
             }
             else if (GUI.Button(CalcGrid(1, 5), "Back"))
             {
-                mUi = Ui.Tbmp;
+                SetUI(Ui.Tbmp);
             }
         }
 
@@ -938,7 +944,7 @@ namespace SmokeTest
 
             if (GUI.Button(CalcGrid(1, 6), "Back"))
             {
-                mUi = Ui.Main;
+                SetUI(Ui.Main);
             }
         }
 
@@ -959,17 +965,25 @@ namespace SmokeTest
 
             GUI.Label(
                 this.CalcGrid(0, 4,2, 1),
-                "Access Token: " +
-                ((PlayGamesLocalUser) Social.localUser).accessToken);
+                "Server Auth Code: " + authCode
+                );
 
             string friendString = "";
-            if (Social.localUser.friends.Count() > 0) {
+            if (Social.localUser.friends.Any() || loadedFriends) {
                 foreach(IUserProfile p in Social.localUser.friends) {
                     friendString += p.userName + "\n";
                 }
+                if (friendString == "")
+                {
+                    friendString = "No Friends found!";
+                }
             }
             else {
-                Social.localUser.LoadFriends((ok) => Debug.Log("Friends loaded OK: " + ok));
+                Social.localUser.LoadFriends((ok) =>
+                    {
+                        loadedFriends = ok;
+                        Debug.Log("Friends loaded OK: " + ok);
+                    });
             }
             GUI.Label(
                 CalcGrid(0,5,2,2),
@@ -1089,6 +1103,8 @@ namespace SmokeTest
 
             if (mStandby)
             {
+                idToken = null;
+                authCode = null;
                 ShowStandbyUi();
             }
             else if (mUi == Ui.NearbyConnections)
@@ -1141,8 +1157,27 @@ namespace SmokeTest
                         break;
                     case Ui.UserInfo:
                         // start loading the id token:
-                        ((PlayGamesLocalUser)Social.localUser).GetIdToken(
-                            token => this.idToken = token);
+                        if (idToken == null)
+                        {
+                            idToken = "loading...";
+                            ((PlayGamesLocalUser)Social.localUser).GetIdToken(
+                                token => this.idToken = token);
+                        }
+                        if (authCode == null)
+                        {
+                            authCode = "loading...";
+                            PlayGamesPlatform.Instance.GetServerAuthCode((authStatus, code) =>
+                                {
+                                    if (authStatus == CommonStatusCodes.Success)
+                                    {
+                                        authCode = code;
+                                    }
+                                    else
+                                    {
+                                        authCode = authStatus.ToString();
+                                    }
+                                });
+                        }
                         ShowUserInfoUi();
                     break;
                     default:
@@ -1358,7 +1393,7 @@ namespace SmokeTest
                 " match: " + match);
             if (fromNotification)
             {
-                mUi = Ui.TbmpMatch;
+                SetUI(Ui.TbmpMatch);
                 mMatch = match;
                 Status = "Got match from notification! " + match;
                 Debug.Log("Got match from notification! " + match);
@@ -1371,11 +1406,11 @@ namespace SmokeTest
                 if (mMatch.Status == TurnBasedMatch.MatchStatus.Complete ||
                     mMatch.Status == TurnBasedMatch.MatchStatus.Cancelled)
                 {
-                    mUi = Ui.Tbmp;
+                    SetUI(Ui.Tbmp);
                 }
                 else
                     {
-                    mUi = Ui.TbmpMatch;
+                    SetUI(Ui.TbmpMatch);
                     }
 
                 Status = "Got match a update not from notification: " + mMatch;
@@ -1397,7 +1432,7 @@ namespace SmokeTest
                     Status = success ? "Match created" : "Match creation failed";
                     if (success)
                     {
-                        mUi = Ui.TbmpMatch;
+                        SetUI(Ui.TbmpMatch);
                     }
                 });
         }
@@ -1417,7 +1452,7 @@ namespace SmokeTest
                     Status = success ? "Match created" : "Match creation failed";
                     if (success)
                     {
-                        mUi = Ui.TbmpMatch;
+                        SetUI(Ui.TbmpMatch);
                     }
                 });
         }
@@ -1463,7 +1498,7 @@ namespace SmokeTest
                     Status = success ? "Successfully accepted from inbox!" : "Failed to accept from inbox";
                     if (success)
                     {
-                        mUi = Ui.TbmpMatch;
+                        SetUI(Ui.TbmpMatch);
                     }
                 });
         }
@@ -1488,7 +1523,7 @@ namespace SmokeTest
                     "Failed to accept invitation";
                     if (success)
                     {
-                        mUi = Ui.TbmpMatch;
+                        SetUI(Ui.TbmpMatch);
                     }
                 });
         }
@@ -1624,7 +1659,7 @@ namespace SmokeTest
                     if (success)
                     {
                         mMatch = null;
-                        mUi = Ui.Tbmp;
+                        SetUI(Ui.Tbmp);
                     }
                 });
         }
@@ -1670,7 +1705,7 @@ namespace SmokeTest
                     if (success)
                     {
                         mMatch = null;
-                        mUi = Ui.Tbmp;
+                        SetUI(Ui.Tbmp);
                     }
                 });
         }
@@ -1700,7 +1735,7 @@ namespace SmokeTest
                     if (success)
                     {
                         mMatch = null;
-                        mUi = Ui.Tbmp;
+                        SetUI(Ui.Tbmp);
                     }
                 });
         }
@@ -1730,7 +1765,7 @@ namespace SmokeTest
                     if (success)
                     {
                         mMatch = null;
-                        mUi = Ui.Tbmp;
+                        SetUI(Ui.Tbmp);
                     }
                 });
         }
@@ -1762,7 +1797,7 @@ namespace SmokeTest
                     if (success)
                     {
                         mMatch = null;
-                        mUi = Ui.Tbmp;
+                        SetUI(Ui.Tbmp);
                     }
                 });
         }
@@ -1792,7 +1827,7 @@ namespace SmokeTest
                     if (success)
                     {
                         mMatch = null;
-                        mUi = Ui.Tbmp;
+                        SetUI(Ui.Tbmp);
                     }
                 });
         }
@@ -1823,7 +1858,7 @@ namespace SmokeTest
                     if (success)
                     {
                         // if we succeed, it will be our turn, so go to the appropriate UI
-                        mUi = Ui.TbmpMatch;
+                        SetUI(Ui.TbmpMatch);
                     }
                 });
         }

@@ -75,19 +75,20 @@ namespace GooglePlayGames
                 return mPlatform.GetFriends();
             }
         }
-        
+
         /// <summary>
         /// Gets an id token for the user.
         /// NOTE: This property can only be accessed using the main Unity thread.
         /// </summary>
         /// <param name="idTokenCallback"> A callback to be invoked after token is retrieved. Will be passed null value
         /// on failure. </param>
+        [Obsolete("Use PlayGamesPlatform.GetServerAuthCode()")]
         public void GetIdToken(Action<string> idTokenCallback)
         {
-            if(authenticated) 
+            if(authenticated)
                 mPlatform.GetIdToken(idTokenCallback);
             else
-                idTokenCallback(null);  
+                idTokenCallback(null);
         }
 
         /// <summary>
@@ -168,6 +169,7 @@ namespace GooglePlayGames
         /// <returns>
         /// An id token for the user.
         /// </returns>
+        [Obsolete("Use PlayGamesPlatform.GetServerAuthCode()")]
         public string accessToken
         {
             get
@@ -218,12 +220,15 @@ namespace GooglePlayGames
             }
         }
 
-        /// <summary>
-        /// Gets the email of the signed in player.  This is only available
-        /// if the web client id is added to the setup (which enables additional
+        /// <summary>Gets the email of the signed in player.</summary>
+        /// <remarks>If your game requires a persistent, unique id for the
+        /// player, the use of PlayerId is recommendend since it does not
+        /// require extra permission consent from the user.
+        /// This is only available if the Requires Google Plus option
+        /// is added to the setup (which enables additional
         /// permissions for the application).
         /// NOTE: This property can only be accessed using the main Unity thread.
-        /// </summary>
+        /// </remarks>
         /// <value>The email.</value>
         public string Email
         {

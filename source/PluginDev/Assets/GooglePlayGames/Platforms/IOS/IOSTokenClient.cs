@@ -56,23 +56,12 @@ namespace GooglePlayGames.IOS {
             return _GooglePlayGetUserEmail();;
         }
 
-
-        /// <summary>Gets the authZ token for server authorization.</summary>
-        /// <param name="serverClietnID">The client ID for the server that will exchange the one-time code.</param>
-        /// <returns> An authorization code upon success.</returns>
-        public string GetAuthorizationCode(string serverClientID)
-        {
-            throw new NotImplementedException();
-        }
-
-
         /// <summary>Gets the access token currently associated with the Unity activity.</summary>
         /// <returns>The OAuth 2.0 access token.</returns>
         public string GetAccessToken()
         {
             return _GooglePlayGetAccessToken();
         }
-
 
         /// <summary>
         /// Gets the OpenID Connect ID token for authentication with a server backend.

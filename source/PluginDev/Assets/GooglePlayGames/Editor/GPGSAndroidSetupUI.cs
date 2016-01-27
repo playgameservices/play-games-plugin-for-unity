@@ -38,6 +38,9 @@ namespace GooglePlayGames.Editor
         /// </summary>
         private string mClassName = "GPGSIds";
 
+        /// <summary>True if G+ is needed for this application.</summary>
+        private bool mRequiresGooglePlus = false;
+
         /// <summary>
         /// The scroll position
         /// </summary>
@@ -74,12 +77,14 @@ namespace GooglePlayGames.Editor
         /// <param name="className">Fully qualified class name for the resource Ids.</param>
         /// <param name="resourceXmlData">Resource xml data.</param>
         /// <param name="nearbySvcId">Nearby svc identifier.</param>
+        /// <param name="requiresGooglePlus">Indicates this app requires G+</param>
         public static bool PerformSetup(
             string clientId,
             string classDirectory,
             string className,
             string resourceXmlData,
-            string nearbySvcId)
+            string nearbySvcId,
+            bool requiresGooglePlus)
         {
             if (string.IsNullOrEmpty(resourceXmlData) &&
                 !string.IsNullOrEmpty(nearbySvcId))
@@ -87,7 +92,8 @@ namespace GooglePlayGames.Editor
                 return PerformSetup(
                     clientId,
                     GPGSProjectSettings.Instance.Get(GPGSUtil.APPIDKEY),
-                    nearbySvcId);
+                    nearbySvcId,
+                    requiresGooglePlus);
             }
 
             if (ParseResources(classDirectory, className, resourceXmlData))
@@ -102,7 +108,8 @@ namespace GooglePlayGames.Editor
                 return PerformSetup(
                     clientId,
                     GPGSProjectSettings.Instance.Get(GPGSUtil.APPIDKEY),
-                    nearbySvcId);
+                    nearbySvcId,
+                    requiresGooglePlus);
             }
 
             return false;
@@ -115,11 +122,12 @@ namespace GooglePlayGames.Editor
         /// needed if the ID Token or access token are needed.</param>
         /// <param name="appId">App identifier.</param>
         /// <param name="nearbySvcId">Optional nearby connection serviceId</param>
+        /// <param name="requiresGooglePlus">Indicates that GooglePlus should be enabled</param>
         /// <returns>true if successful</returns>
-        public static bool PerformSetup(string webClientId, string appId, string nearbySvcId)
+        public static bool PerformSetup(string webClientId, string appId,
+            string nearbySvcId,
+            bool requiresGooglePlus)
         {
-            bool needTokenPermissions = false;
-
             if (!string.IsNullOrEmpty(webClientId))
             {
                 if (!GPGSUtil.LooksLikeValidClientId(webClientId))
@@ -134,12 +142,6 @@ namespace GooglePlayGames.Editor
                     GPGSUtil.Alert(GPGSStrings.Setup.AppIdMismatch);
                     return false;
                 }
-
-                needTokenPermissions = true;
-            }
-            else
-            {
-                needTokenPermissions = false;
             }
 
             // check for valid app id
@@ -159,6 +161,7 @@ namespace GooglePlayGames.Editor
 
             GPGSProjectSettings.Instance.Set(GPGSUtil.APPIDKEY, appId);
             GPGSProjectSettings.Instance.Set(GPGSUtil.WEBCLIENTIDKEY, webClientId);
+            GPGSProjectSettings.Instance.Set(GPGSUtil.REQUIREGOOGLEPLUSKKEY, requiresGooglePlus);
             GPGSProjectSettings.Instance.Save();
             GPGSUtil.UpdateGameInfo();
 
@@ -173,10 +176,8 @@ namespace GooglePlayGames.Editor
                 return false;
             }
 
-            GPGSUtil.CopySupportLibs();
-
             // Generate AndroidManifest.xml
-            GPGSUtil.GenerateAndroidManifest(needTokenPermissions);
+            GPGSUtil.GenerateAndroidManifest(requiresGooglePlus);
 
             // refresh assets, and we're done
             AssetDatabase.Refresh();
@@ -191,10 +192,12 @@ namespace GooglePlayGames.Editor
         /// </summary>
         public void OnEnable()
         {
-            mConstantDirectory = GPGSProjectSettings.Instance.Get("ConstDir", mConstantDirectory);
-            mClassName = GPGSProjectSettings.Instance.Get(GPGSUtil.CLASSNAMEKEY);
-            mConfigData = GPGSProjectSettings.Instance.Get(GPGSUtil.ANDROIDRESOURCEKEY);
-            mWebClientId = GPGSProjectSettings.Instance.Get(GPGSUtil.WEBCLIENTIDKEY);
+            GPGSProjectSettings settings = GPGSProjectSettings.Instance;
+            mConstantDirectory = settings.Get("ConstDir", mConstantDirectory);
+            mClassName = settings.Get(GPGSUtil.CLASSNAMEKEY);
+            mConfigData = settings.Get(GPGSUtil.ANDROIDRESOURCEKEY);
+            mWebClientId = settings.Get(GPGSUtil.WEBCLIENTIDKEY);
+            mRequiresGooglePlus = settings.GetBool(GPGSUtil.REQUIREGOOGLEPLUSKKEY, false);
         }
 
         /// <summary>
@@ -250,6 +253,13 @@ namespace GooglePlayGames.Editor
             GUILayout.EndScrollView();
             GUILayout.Space(10);
 
+            // Requires G+ field
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(GPGSStrings.Setup.RequiresGPlusTitle, EditorStyles.boldLabel);
+            mRequiresGooglePlus = EditorGUILayout.Toggle(mRequiresGooglePlus);
+            GUILayout.EndHorizontal();
+            GUILayout.Label(GPGSStrings.Setup.RequiresGPlusBlurb);
+
             // Client ID field
             GUILayout.Label(GPGSStrings.Setup.WebClientIdTitle, EditorStyles.boldLabel);
             GUILayout.Label(GPGSStrings.AndroidSetup.WebClientIdBlurb);
@@ -298,7 +308,7 @@ namespace GooglePlayGames.Editor
         /// </summary>
         public void DoSetup()
         {
-            if (PerformSetup(mWebClientId, mConstantDirectory, mClassName, mConfigData, null))
+            if (PerformSetup(mWebClientId, mConstantDirectory, mClassName, mConfigData, null, mRequiresGooglePlus))
             {
                 CheckBundleId();
 

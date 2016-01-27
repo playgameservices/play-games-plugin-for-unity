@@ -237,6 +237,7 @@ namespace GooglePlayGames.BasicApi
             /// <returns>the client configuration instance</returns>
             public PlayGamesClientConfiguration Build()
             {
+                mRequireGooglePlus = GameInfo.RequireGooglePlus();
                 return new PlayGamesClientConfiguration(this);
             }
 

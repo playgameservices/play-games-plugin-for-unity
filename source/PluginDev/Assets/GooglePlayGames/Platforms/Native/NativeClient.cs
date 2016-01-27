@@ -69,6 +69,8 @@ namespace GooglePlayGames.Native
 
         private string rationale;
 
+        private int needGPlusWarningFreq = 100000;
+        private int needGPlusWarningCount = 0;
         private int webclientWarningFreq = 100000;
         private int noWebClientIdWarningCount = 0;
 
@@ -126,6 +128,9 @@ namespace GooglePlayGames.Native
 
             // If game services are uninitialized, creating them will start a silent auth attempt.
             InitializeGameServices();
+
+            // reset friends loading flag
+            friendsLoading = false;
 
             if (!silent)
             {
@@ -256,14 +261,14 @@ namespace GooglePlayGames.Native
                 return null;
             }
 
-            if(!GameInfo.WebClientIdInitialized())
+            if(!GameInfo.RequireGooglePlus())
             {
                 //don't spam the log, only do this every so often
-                if (noWebClientIdWarningCount++ % webclientWarningFreq == 0)
+                if (needGPlusWarningCount++ % needGPlusWarningFreq == 0)
                 {
-                    Debug.LogError("Web client ID has not been set, cannot request email.");
+                    Debug.LogError("RequiresGooglePlus not set, cannot request email.");
                     // avoid int overflow
-                    noWebClientIdWarningCount = (noWebClientIdWarningCount/ webclientWarningFreq) + 1;
+                    needGPlusWarningCount = (needGPlusWarningCount/ needGPlusWarningFreq) + 1;
                 }
                 return null;
             }
@@ -273,6 +278,7 @@ namespace GooglePlayGames.Native
 
         /// <summary>Gets the access token currently associated with the Unity activity.</summary>
         /// <returns>The OAuth 2.0 access token.</returns>
+        [Obsolete("Use GetServerAuthCode() then exchange it for a token")]
         public string GetAccessToken()
         {
             if (!this.IsAuthenticated())
@@ -302,6 +308,8 @@ namespace GooglePlayGames.Native
         /// <param name="idTokenCallback"> A callback to be invoked after token is retrieved. Will be passed null value
         /// on failure. </param>
         /// <returns>The identifier token.</returns>
+
+        [Obsolete("Use GetServerAuthCode() then exchange it for a token")]
         public void GetIdToken(Action<string> idTokenCallback)
         {
             if (!this.IsAuthenticated())
@@ -325,6 +333,12 @@ namespace GooglePlayGames.Native
             mTokenClient.GetIdToken(GameInfo.WebClientId,idTokenCallback);
         }
 
+        /// <summary>
+        /// Asynchronously retrieves the server auth code for this client.
+        /// </summary>
+        /// <remarks>Note: This function is currently only implemented for Android.</remarks>
+        /// <param name="serverClientId">The Client ID.</param>
+        /// <param name="callback">Callback for response.</param>
         public void GetServerAuthCode(string serverClientId, Action<CommonStatusCodes, string> callback)
         {
             mServices.FetchServerAuthCode(serverClientId, (serverAuthCodeResponse) => {
@@ -364,6 +378,14 @@ namespace GooglePlayGames.Native
                 callback(false);
                 return;
             }
+
+            // avoid calling excessively
+            if (mFriends != null)
+            {
+                callback(true);
+                return;
+            }
+
             mServices.PlayerManager().FetchFriends((status, players) =>
                 {
                     if (status == ResponseStatus.Success ||
@@ -390,7 +412,12 @@ namespace GooglePlayGames.Native
                 LoadFriends((ok) =>
                     {
                         GooglePlayGames.OurUtils.Logger.d("loading: " + ok + " mFriends = " + mFriends);
-                        friendsLoading = false;
+                        if (!ok)
+                        {
+                            GooglePlayGames.OurUtils.Logger.e("Friends list did not load successfully." +
+                                "  Disabling loading until re-authenticated");
+                        }
+                        friendsLoading = !ok;
                     });
             }
             return (mFriends == null) ? new IUserProfile[0] : mFriends.ToArray();

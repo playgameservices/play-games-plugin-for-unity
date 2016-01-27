@@ -227,6 +227,7 @@ public class TokenFragment extends Fragment implements GoogleApiClient.Connectio
            return false;
 
         } else {
+            mPermissionResult = PackageManager.PERMISSION_DENIED;
             Log.i(TAG, "Request is denied, permission for GET_ACCOUNTS is not granted: (" + mPermissionResult + ")");
         }
 

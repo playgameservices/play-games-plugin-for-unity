@@ -39,7 +39,13 @@ namespace GooglePlayGames.Android
         private string idTokenScope;
         private Action<string> idTokenCb;
         private string rationale;
-        
+
+        private bool apiAccessDenied = false;
+        private int apiWarningFreq = 100000;
+        private int apiWarningCount = 0;
+        private int webClientWarningFreq = 100000;
+        private int webClientWarningCount = 0;
+
         public static AndroidJavaObject GetActivity()
         {
             using (var jc = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
@@ -53,57 +59,34 @@ namespace GooglePlayGames.Android
             this.rationale = rationale;
         }
 
-        /// <summary>Gets the Google API client Java object.</summary>
-        /// <returns>The API client associated with the current Unity app.</returns>
-        /// <param name="serverClientID">The OAuth 2.0 client ID for a backend server.</param>
-        public AndroidJavaObject GetApiClient(bool getServerAuthCode = false,
-                                              string serverClientID = null)
-        {
-            Debug.Log("Calling GetApiClient....");
-            using (var currentActivity = GetActivity())
-            {
-                using (AndroidJavaClass jc_plus = new AndroidJavaClass("com.google.android.gms.plus.Plus"))
-                {
-                    using (AndroidJavaObject jc_builder = new AndroidJavaObject("com.google.android.gms.common.api.GoogleApiClient$Builder", currentActivity))
-                    {
-                        jc_builder.Call<AndroidJavaObject>("addApi", jc_plus.GetStatic<AndroidJavaObject>("API"));
-                        jc_builder.Call<AndroidJavaObject>("addScope", jc_plus.GetStatic<AndroidJavaObject>("SCOPE_PLUS_LOGIN"));
-                        if (getServerAuthCode)
-                        {
-                            jc_builder.Call<AndroidJavaObject>("requestServerAuthCode", serverClientID, jc_builder);
-                        }
-                        AndroidJavaObject client = jc_builder.Call<AndroidJavaObject>("build");
-                        client.Call("connect");
-
-                        // limit spinning to 100, to minimize blocking when not
-                        // working as expected.
-                        // TODO: Make this a callback.
-                        int ct = 100;
-                        while ((!client.Call<bool>("isConnected")) && (ct-- != 0))
-                        {
-                            System.Threading.Thread.Sleep(100);
-                        }
-                        Debug.Log("Done GetApiClient is " + client);
-                        return client;
-                    }
-                }
-            }
-        }
-
         internal void Fetch(string scope,
-                            string rationale,
                             bool fetchEmail,
                             bool fetchAccessToken,
                             bool fetchIdToken,
                             Action<bool> doneCallback)
         {
+            if (apiAccessDenied)
+            {
+                //don't spam the log, only do this every so often
+                if (apiWarningCount++ % apiWarningFreq == 0)
+                {
+                    GooglePlayGames.OurUtils.Logger.w("Access to API denied");
+                    // avoid int overflow
+                    apiWarningCount = (apiWarningCount/ apiWarningFreq) + 1;
+                }
+
+                doneCallback(false);
+                return;
+            }
             PlayGamesHelperObject.RunOnGameThread(() =>
             FetchToken(scope, rationale, fetchEmail, fetchAccessToken, fetchIdToken, (rc, access, id, email) =>
                     {
                         if (rc != (int)CommonStatusCodes.Success)
                         {
+                            apiAccessDenied = rc == (int)CommonStatusCodes.AuthApiAccessForbidden;
                             GooglePlayGames.OurUtils.Logger.w("Non-success returned from fetch: " + rc);
                             doneCallback(false);
+                            return;
                         }
 
                         if (fetchAccessToken)
@@ -192,7 +175,7 @@ namespace GooglePlayGames.Android
                 if (!fetchingEmail)
                 {
                     fetchingEmail = true;
-                    Fetch(idTokenScope, rationale, true, false, false, (ok) => fetchingEmail = false);
+                    Fetch(idTokenScope, true, false, false, (ok) => fetchingEmail = false);
                 }
             }
 
@@ -206,14 +189,6 @@ namespace GooglePlayGames.Android
             return GetAccountName();
         }
 
-        /// <summary>Gets the authZ token for server authorization.</summary>
-        /// <param name="serverClientID">The client ID for the server that will exchange the one-time code.</param>
-        /// <returns> An authorization code upon success.</returns>
-        public string GetAuthorizationCode(string serverClientID)
-        {
-            throw new NotImplementedException();
-        }
-
         /// <summary>Gets the access token currently associated with the Unity activity.</summary>
         /// <returns>The OAuth 2.0 access token.</returns>
         public string GetAccessToken()
@@ -223,34 +198,49 @@ namespace GooglePlayGames.Android
                 if (!fetchingAccessToken)
                 {
                     fetchingAccessToken = true;
-                    Fetch(idTokenScope, rationale, false, true, false, (rc) => fetchingAccessToken = false);
+                    Fetch(idTokenScope, false, true, false, (rc) => fetchingAccessToken = false);
                 }
             }
             return accessToken;
         }
 
-        /// <summary>Gets the OpenID Connect ID token for authentication with a server backend.</summary>        
-        /// <param name="serverClientID">Server client ID from console.developers.google.com or the Play Games
+        /// <summary>Gets the OpenID Connect ID token for authentication with a server backend.</summary>
+        /// <param name="serverClientId">Server client ID from console.developers.google.com or the Play Games
         /// services console.</param>
         /// <param name="idTokenCallback"> A callback to be invoked after token is retrieved. Will be passed null value
         /// on failure. </param>
+        [Obsolete("Use PlayGamesPlatform.GetServerAuthCode()")]
         public void GetIdToken(string serverClientId, Action<string> idTokenCallback)
         {
+            if (string.IsNullOrEmpty(serverClientId))
+            {
+                if (webClientWarningCount++ % webClientWarningFreq == 0)
+                {
+                    GooglePlayGames.OurUtils.Logger.w("serverClientId is empty, cannot get Id Token");
+                    webClientWarningCount = webClientWarningCount / webClientWarningFreq + 1;
+                }
+                idTokenCallback(null);
+                return;
+            }
             string newScope = "audience:server:client_id:" + serverClientId;
             if (string.IsNullOrEmpty(idToken) || (newScope != idTokenScope))
             {
                 if (!fetchingIdToken)
                 {
-                    
                     fetchingIdToken = true;
                     idTokenScope = newScope;
                     idTokenCb = idTokenCallback;
-                    
-                    Fetch(idTokenScope, rationale, false, false, true, (ok) => {
+                    Fetch(idTokenScope, false, false, true, (ok) => {
                         fetchingIdToken = false;
-                        
-                        if(!ok) idTokenCb(null);
-                        idTokenCb = null;
+
+                        if(!ok)
+                        {
+                            idTokenCb(null);
+                        }
+                        else
+                        {
+                            idTokenCb(idToken);
+                        }
                     });
                 }
             }

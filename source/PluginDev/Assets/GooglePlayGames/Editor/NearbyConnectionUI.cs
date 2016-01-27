@@ -99,14 +99,15 @@ namespace GooglePlayGames.Editor
                 // create needed directories
                 GPGSUtil.EnsureDirExists("Assets/Plugins");
                 GPGSUtil.EnsureDirExists("Assets/Plugins/Android");
-                GPGSUtil.CopySupportLibs();
 
                 // Generate AndroidManifest.xml
-                GPGSUtil.GenerateAndroidManifest(false);
+                GPGSUtil.GenerateAndroidManifest(
+                    GPGSProjectSettings.Instance.GetBool(GPGSUtil.REQUIREGOOGLEPLUSKKEY)
+                );
 
                 // refresh assets, and we're done
                 AssetDatabase.Refresh();
-                GPGSProjectSettings.Instance.Set("android.NearbySetupDone", true);
+                GPGSProjectSettings.Instance.Set(GPGSUtil.NEARBYSETUPDONEKEY, true);
                 GPGSProjectSettings.Instance.Save();
             }
             return true;

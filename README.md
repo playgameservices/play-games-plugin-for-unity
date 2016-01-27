@@ -844,40 +844,42 @@ Once the saved game file is opened, it can be read to load the game state.  This
     }
 ```
 
-## Retrieving player's email or access token ##
+## Retrieving server authentication codes ##
+In order to access Google APIs on a backend web server on behalf of the current
+player, you need to get an authentication code from the client application and
+pass this to your web server application.  This code can then be exchanged for
+an access token to make calls to the various APIs.
+For more details on this flow see: [Google Sign-In for Websites](https://developers.google.com/identity/sign-in/web/server-side-flow).
 
-In order to access the player's email or access token, you need to configure
-a web app associated with your game in the Play Game Console.  If your game
-does not use a custom back-end application, you can set the launch URL to be
-`https://localhost`.
+To get the Auth code:
+1. Configure the web client Id of the web application linked to your game in the
+Play Game Console.
+2. Call `PlayGamesPlatform.GetServerAuthCode()` to get the code.
+3. Pass this code to your server application.
 
-Copy the client id from the web application and enter it in the setup dialog for
-this plugin.  This will configure the correct permissions and settings needed
-to access the email address and access token.
 
-To get the email:
+## Retrieving player's email or a unique identifier##
+In order to access the player's email address, the plugin uses the Google Plus API.
+This API requires the player consent to additional permissions when installing the
+game.  This extra consent step is a burden and slows down game usage, so it should be
+used only when absolutely necessary.
+
+If all that is needed is a persistent unique identifier for the player, then you
+should use the player's id.  This is a unique ID specific to that player and
+is the same value all the time.
+
+If you still need the email address:
+1. In the setup dialog, check the box next to "Requires Google Plus API".
+2. Once the user is authenticated, you can get the email.
+
+__Note:__ The email address is populated asynchronously, and is only available
+on the UI thread.
 
 ```csharp
     Debug.Log("Local user's email is " +
         ((PlayGamesLocalUser)Social.localUser).Email);
 ```
 
-To get the access token:
-
-```charp
-    Debug.Log("AccessToken is " +
-        ((PlayGamesLocalUser)Social.localUser).accessToken);
-```
-
-
-To get the id token:
-
-```charp
-    Debug.Log("IdToken is " +
-        ((PlayGamesLocalUser)Social.localUser).idToken);
-```
-
-__NOTE:__ The email and access tokens are only available on the UI Thread.
 If you need to get these from the non-UI thread, you can use the helper function
 RunOnGameThread:
 
