@@ -161,7 +161,7 @@ namespace GooglePlayGames.Editor
 
             GPGSProjectSettings.Instance.Set(GPGSUtil.APPIDKEY, appId);
             GPGSProjectSettings.Instance.Set(GPGSUtil.WEBCLIENTIDKEY, webClientId);
-            GPGSProjectSettings.Instance.Set(GPGSUtil.REQUIREGOOGLEPLUSKKEY, requiresGooglePlus);
+            GPGSProjectSettings.Instance.Set(GPGSUtil.REQUIREGOOGLEPLUSKEY, requiresGooglePlus);
             GPGSProjectSettings.Instance.Save();
             GPGSUtil.UpdateGameInfo();
 
@@ -197,7 +197,7 @@ namespace GooglePlayGames.Editor
             mClassName = settings.Get(GPGSUtil.CLASSNAMEKEY);
             mConfigData = settings.Get(GPGSUtil.ANDROIDRESOURCEKEY);
             mWebClientId = settings.Get(GPGSUtil.WEBCLIENTIDKEY);
-            mRequiresGooglePlus = settings.GetBool(GPGSUtil.REQUIREGOOGLEPLUSKKEY, false);
+            mRequiresGooglePlus = settings.GetBool(GPGSUtil.REQUIREGOOGLEPLUSKEY, false);
         }
 
         /// <summary>
