@@ -1,3 +1,10 @@
+Version 0.9.xx
+    New Features:
+        * PlayGamesAchievement (the object returned by
+            PlayGamesPlatform.LoadAchievements) now includes the current number
+            of steps and the total number of steps for the corresponding
+            achievement.
+
 Version 0.9.30
     ** BREAKING CHANGES **
         * `PlayerStats` is now a standalone class,
