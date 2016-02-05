@@ -127,7 +127,8 @@ namespace GooglePlayGames.Native.PInvoke
                 achievement.TotalSteps = (int)TotalSteps();
             }
 
-            achievement.IsRevealed = State() == Cwrapper.Types.AchievementState.REVEALED;
+            achievement.IsRevealed = State() == Cwrapper.Types.AchievementState.REVEALED ||
+                State() == Cwrapper.Types.AchievementState.UNLOCKED;
             achievement.IsUnlocked = State() == Cwrapper.Types.AchievementState.UNLOCKED;
 
             return achievement;
