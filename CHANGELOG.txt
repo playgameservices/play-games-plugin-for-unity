@@ -1,10 +1,11 @@
-Version 0.9.xx
+Version 0.9.31
     New Features:
         * PlayGamesAchievement (the object returned by
             PlayGamesPlatform.LoadAchievements) now includes the current number
             of steps and the total number of steps for the corresponding
             achievement.
-
+    Bug Fixes:
+        * #935 include IFDEF to allow editing in unsupported platforms.
 Version 0.9.30
     ** BREAKING CHANGES **
         * `PlayerStats` is now a standalone class,

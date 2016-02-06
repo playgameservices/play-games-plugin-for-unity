@@ -13,6 +13,7 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
+#if (UNITY_ANDROID || (UNITY_IPHONE && !NO_GPGS))
 
 namespace GooglePlayGames
 {
@@ -142,6 +143,11 @@ namespace GooglePlayGames
         /// <summary>
         /// Gets the user's Google id.
         /// </summary>
+        /// <remarks> This id is persistent and uniquely identifies the user
+        ///     across all games that use Google Play Game Services.  It is
+        ///     the preferred method of uniquely identifying a player instead
+        ///     of email address.
+        /// </remarks>
         /// <returns>
         /// The user's Google id.
         /// </returns>
@@ -267,3 +273,4 @@ namespace GooglePlayGames
         }
     }
 }
+#endif

@@ -13,11 +13,11 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
+#if (UNITY_ANDROID || (UNITY_IPHONE && !NO_GPGS))
 
 namespace GooglePlayGames.BasicApi.Events
 {
     using System;
-    using GooglePlayGames.OurUtils;
     using System.Collections.Generic;
 
     /// <summary>
@@ -58,3 +58,4 @@ namespace GooglePlayGames.BasicApi.Events
         void IncrementEvent(string eventId, uint stepsToIncrement);
     }
 }
+#endif

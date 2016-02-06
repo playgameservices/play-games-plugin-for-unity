@@ -13,11 +13,12 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
-using GooglePlayGames.BasicApi;
+#if (UNITY_ANDROID || (UNITY_IPHONE && !NO_GPGS))
 
 namespace GooglePlayGames
 {
     using System.Collections.Generic;
+    using GooglePlayGames.BasicApi;
     using UnityEngine;
     using UnityEngine.SocialPlatforms;
 
@@ -215,3 +216,4 @@ namespace GooglePlayGames
         }
     }
 }
+#endif
