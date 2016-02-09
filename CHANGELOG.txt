@@ -4,6 +4,9 @@ Version 0.9.31
             PlayGamesPlatform.LoadAchievements) now includes the current number
             of steps and the total number of steps for the corresponding
             achievement.
+        * Play-services-jar-resolver updated to 1.1.  This fixes the
+            problem of include play-services-measurement which has a variable
+            in the AndroidManifest.xml file.
     Bug Fixes:
         * #935 include IFDEF to allow editing in unsupported platforms.
 Version 0.9.30
