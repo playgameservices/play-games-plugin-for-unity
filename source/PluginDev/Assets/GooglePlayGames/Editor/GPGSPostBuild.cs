@@ -31,9 +31,6 @@ namespace GooglePlayGames.Editor
         using GooglePlayGames.xcode;
     #endif
 #endif
-    using GooglePlayGames;
-    using GooglePlayGames.Editor.Util;
-    using UnityEngine;
 
     public static class GPGSPostBuild
     {
@@ -135,6 +132,7 @@ namespace GooglePlayGames.Editor
 #endif
         }
 
+#if UNITY_IPHONE && !NO_GPGS
         /// <summary>
         /// Updates the new project's Info.plist file to include an entry for the Url scheme mandated
         /// by the Google+ login. This means that the plist file needs to have an entry in the for
@@ -200,7 +198,7 @@ namespace GooglePlayGames.Editor
             buddy.AddString (PlistBuddyHelper.ToEntryName (UrlTypes, index, UrlScheme, 0),
                 value);
         }
-
+#endif
 
         private static string GetBundleId()
         {
