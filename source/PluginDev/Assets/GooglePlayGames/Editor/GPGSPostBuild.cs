@@ -120,7 +120,7 @@ namespace GooglePlayGames.Editor
                 true,
                 "Building for IOS",
                 true);
-            w.minSize = new Vector2(400, 300);
+            w.minSize = new UnityEngine.Vector2(400, 300);
             w.UsingCocoaPod = CocoaPodHelper.Update(pathToBuiltProject);
 
             UnityEngine.Debug.Log("Adding URL Types for authentication using PlistBuddy.");
