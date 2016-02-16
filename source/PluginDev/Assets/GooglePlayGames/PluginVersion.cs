@@ -28,7 +28,7 @@ namespace GooglePlayGames
     public const string VersionKeyJarResolver = "00928";
     public const string VersionKeyNativeCRM = "00930";
     public const int VersionInt = 0x0931;
-    public const string VersionString = "0.9.31";
+    public const string VersionString = "0.9.31a";
     public const string VersionKey = "00931";
 
     // used to check for the correct min version or play services.

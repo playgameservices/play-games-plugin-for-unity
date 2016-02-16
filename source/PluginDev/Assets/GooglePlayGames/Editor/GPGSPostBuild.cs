@@ -13,7 +13,9 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
-#if (UNITY_ANDROID || (UNITY_IPHONE && !NO_GPGS))
+
+// Keep this file if NO_GPGS so we can clean up the xcode project
+#if (UNITY_ANDROID || UNITY_IPHONE )
 
 namespace GooglePlayGames.Editor
 {
@@ -21,6 +23,7 @@ namespace GooglePlayGames.Editor
     using System.IO;
     using UnityEditor.Callbacks;
     using UnityEditor;
+    using UnityEngine;
 
     // Use the included xcode support for unity 5+,
     // otherwise use the backported code.
@@ -55,7 +58,7 @@ namespace GooglePlayGames.Editor
                 return;
             }
 #else
-            if (target != BuildTarget.iPhone)
+            if (target != BuildTarget.iOS)
             {
                 return;
             }

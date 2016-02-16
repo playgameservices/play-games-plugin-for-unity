@@ -55,7 +55,9 @@ namespace GooglePlayGames.Native.PInvoke
 
         internal bool IsConnectedToRoom()
         {
-            return C.MultiplayerParticipant_IsConnectedToRoom(SelfPtr());
+            // This is a bug - it always returns false!
+            //return C.MultiplayerParticipant_IsConnectedToRoom(SelfPtr());
+            return Status() == Types.ParticipantStatus.JOINED;
         }
 
         internal string DisplayName()
