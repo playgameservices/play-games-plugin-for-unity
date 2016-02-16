@@ -1,3 +1,8 @@
+Version 0.9.31a
+    Bug Fixes:
+        * #977 - IsConnectedToRoom always returned false, causing local player
+                to be removed from real time multiplayer room.
+        * #971 - NO_GPGS did not remove the Cocoapod dependencies corrrectly.
 Version 0.9.31
     New Features:
         * PlayGamesAchievement (the object returned by
