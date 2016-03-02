@@ -50,6 +50,8 @@ namespace GooglePlayGames.Editor
 
                 prevVer = Upgrade930(prevVer);
 
+                prevVer = Upgrade931(prevVer);
+
                 // there is no migration needed to 930+
                 if (prevVer != PluginVersion.VersionKey) {
                     Debug.Log("Upgrading from format version " + prevVer + " to " + PluginVersion.VersionKey);
@@ -134,6 +136,32 @@ namespace GooglePlayGames.Editor
         }
 
         /// <summary>
+        /// Upgrade to 0.9.31
+        /// </summary>
+        /// <remarks>
+        /// This cleans up some unused files.
+        /// </remarks>
+        /// <param name="prevVer">Previous ver.</param>
+        private static string Upgrade931(string prevVer)
+        {
+            string[] obsoleteFiles =
+                {
+                    "Assets/GooglePlayGames/Editor/GPGSExportPackageUI.cs",
+                    "Assets/GooglePlayGames/Editor/GPGSExportPackageUI.cs.meta"
+                };
+            foreach (string file in obsoleteFiles)
+            {
+                if (File.Exists(file))
+                {
+                    Debug.Log("Deleting obsolete file: " + file);
+                    File.Delete(file);
+                }
+            }
+
+            return PluginVersion.VersionKey;
+        }
+
+        /// <summary>
         /// Upgrade to 930 from the specified prevVer.
         /// </summary>
         /// <param name="prevVer">Previous ver.</param>
@@ -214,7 +242,13 @@ namespace GooglePlayGames.Editor
             string[] obsoleteFiles =
                 {
                     "Assets/GooglePlayGames/Editor/GPGGizmo.cs",
-                    "Assets/GooglePlayGames/Editor/GPGGizmo.cs.meta"
+                    "Assets/GooglePlayGames/Editor/GPGGizmo.cs.meta",
+                    "Assets/GooglePlayGames/BasicApi/OnStateLoadedListener.cs",
+                    "Assets/GooglePlayGames/BasicApi/OnStateLoadedListener.cs.meta",
+                    "Assets/GooglePlayGames/Platforms/Native/AndroidAppStateClient.cs",
+                    "Assets/GooglePlayGames/Platforms/Native/AndroidAppStateClient.cs.meta",
+                    "Assets/GooglePlayGames/Platforms/Native/UnsupportedAppStateClient.cs",
+                    "Assets/GooglePlayGames/Platforms/Native/UnsupportedAppStateClient.cs.meta"
                 };
             foreach (string file in obsoleteFiles)
             {

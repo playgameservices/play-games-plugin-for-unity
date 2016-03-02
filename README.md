@@ -55,7 +55,9 @@ System requirements:
 
 ## Upgrading
 
-If you have already integrated your project with a previous version of the plugin and wish to upgrade to a new version, please refer to the [upgrade instructions](UPGRADING.txt).
+If you have already integrated your project with a previous version of the
+plugin and wish to upgrade to a new version, please refer to the
+[upgrade instructions](UPGRADING.txt).
 
 ## Configure Your Game
 
@@ -96,7 +98,7 @@ Back in Unity, open the setup dialog **Window > Google Play Games > Setup... > A
  * **Enter the directory to save constants** - Enter the folder for the constants file.
  * **Constants class name** - this is the name of the C# class to create, including namespace.
  * **Resources Definition** - paste the resource data from the Play Games console here.
- * **Web client ID** - this is the client ID of the linked web app.  It is only needed if 
+ * **Web client ID** - this is the client ID of the linked web app.  It is only needed if
 you have a web based back-end for your game, need an access token for the player to
 make other, non-game API calls, or need to access the email address of the player.
 
@@ -118,8 +120,8 @@ Add
 and
 [leaderboards](https://developers.google.com/games/services/common/concepts/leaderboards)
 to your game in the Google Play Developer Console. For each achievement and
-leaderboard you configure, make sure to note 
-the corresponding **achievement ID** or **leaderboard ID**, 
+leaderboard you configure, make sure to note
+the corresponding **achievement ID** or **leaderboard ID**,
 as those will be needed when making the API calls.
 Achievement and leaderboard IDs are alphanumeric strings (e.g.  "Cgkx9eiuwi8_AQ").
 
@@ -160,16 +162,18 @@ clicking **Assets | Refresh** and try again.
 
 ## Android Setup
 
-To configure your Unity game to run with Google Play Games on Android, first
-open the Android SDK manager and verify that you have downloaded the **Google
-Play Services** package. The Android SDK manager is usually available in your
-SDK installation directory, under the "tools" subdirectory, and is called
-**android** (or **android.exe** on Windows). The **Google Play Services**
-package is available under the **Extras** folder. If it is not installed
-or is out of date, install or update it before proceeding.
-
 Next, set up the path to your Android SDK installation in Unity. This is located in the
 preferences menu, under the **External Tools** section.
+
+To configure your Unity game to run with Google Play Games on Android, first
+open the Android SDK manager and verify that you have downloaded the following
+packages.  Depending on if you are using the SDK manager from Android Studio,
+or using the standalone SDK manager, the name of the components may be different.
+- Google Play Services
+- Android Support Library
+- Local Maven repository for Support Libraries (Also known as Android Support Repository)
+- Google Repository
+- Android 6.0 (API 23) (this does not affect the min SDK version).
 
 Next, configure your game's package name. To do this, click **File | Build Settings**,
 select the **Android** platform and click **Player Settings** to show Unity's
@@ -899,8 +903,8 @@ This call is asynchronous, so the friends need to be processed in the callback.
 Social.localUser.LoadFriends((ok) =>  {
     Debug.Log("Friends loaded OK: " + ok));
     foreach(IUserProfile p in Social.localUser.friends) {
-         Debug.Log(p.userName + " is a friend");   
-    }   
+         Debug.Log(p.userName + " is a friend");
+    }
 });
 ```
 

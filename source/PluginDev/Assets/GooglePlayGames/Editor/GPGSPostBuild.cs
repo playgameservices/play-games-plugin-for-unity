@@ -58,7 +58,7 @@ namespace GooglePlayGames.Editor
                 return;
             }
 #else
-            if (target != BuildTarget.iOS)
+            if (target != BuildTarget.iPhone)
             {
                 return;
             }
