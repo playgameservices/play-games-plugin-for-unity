@@ -65,6 +65,8 @@ namespace GooglePlayGames.Editor
             }
 
             GPGSProjectSettings.Instance.Set(GPGSUtil.LASTUPGRADEKEY, prevVer);
+            GPGSProjectSettings.Instance.Set(GPGSUtil.PLUGINVERSIONKEY,
+                PluginVersion.VersionString);
             GPGSProjectSettings.Instance.Save();
 
             // clean up duplicate scripts if Unity 5+
@@ -75,7 +77,8 @@ namespace GooglePlayGames.Editor
                 string[] paths =
                     {
                         "Assets/GooglePlayGames",
-                        "Assets/Plugins/Android"
+                        "Assets/Plugins/Android",
+                        "Assets/PlayServicesResolver"
                     };
                 foreach (string p in paths)
                 {

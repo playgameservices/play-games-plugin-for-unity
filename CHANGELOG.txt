@@ -7,9 +7,10 @@ Version 0.9.32
             are needed.
         * Updated dependency pattern for android-support-v4 to be 23.1+.
     New Features:
-        Play-services-jar resolver update to 1.1.1.
+        * Play-services-jar resolver update to 1.1.1.
             See https://github.com/googlesamples/unity-jar-resolver/blob/master/CHANGELOG.md
             for details on the changes.
+        * Added plugin version to manifest.
 Version 0.9.31a
     Bug Fixes:
         * #977 - IsConnectedToRoom always returned false, causing local player
