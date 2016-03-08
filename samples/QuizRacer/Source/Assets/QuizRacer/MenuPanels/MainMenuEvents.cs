@@ -151,16 +151,16 @@ namespace QuizRacer.MenuPanels
                 txt.text = msg;
                 if (error)
                 {
-                    Color c = statusText.GetComponent<Image>().color;
+                    Color c = statusText.GetComponent<Text>().color;
                     c.a = 1.0f;
-                    statusText.GetComponent<Image>().color = c;
+                    statusText.GetComponent<Text>().color = c;
                     mStatusCountdown = ERROR_STATUS_TIMEOUT;
                 }
                 else
                 {
-                    Color c = statusText.GetComponent<Image>().color;
+                    Color c = statusText.GetComponent<Text>().color;
                     c.a = 0.0f;
-                    statusText.GetComponent<Image>().color = c;
+                    statusText.GetComponent<Text>().color = c;
                     mStatusCountdown = INFO_STATUS_TIMEOUT;
                 }
             }
