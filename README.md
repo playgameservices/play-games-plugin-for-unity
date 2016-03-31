@@ -154,11 +154,14 @@ the **current-build** directory:
 
 To install the plugin, simply open your game project in Unity and import that file into
 your project's assets, as you would any other Unity package. This is accomplished through
-the **Assets | Import Package | Custom Package** menu item (you can also reach this menu it
-by right-clicking the **Assets** folder). After importing, you should see that
-a new menu item was added to the Window menu: **"Google Play Games"**.
+the **Assets > Import Package > Custom Package** menu item (you can also reach this menu it
+by right-clicking the **Assets** folder).
+
+Next, make sure your current build platform is set to **Android**. From
+**File > Build Settings…** select **Android** and click **Switch Platform**.
+You should now see a new menu item was added under **Window > Google Play Games**.
 If you don't see the new menu items, refresh the assets by
-clicking **Assets | Refresh** and try again.
+clicking **Assets > Refresh** and try again.
 
 ## Android Setup
 
@@ -175,7 +178,7 @@ or using the standalone SDK manager, the name of the components may be different
 - Google Repository
 - Android 6.0 (API 23) (this does not affect the min SDK version).
 
-Next, configure your game's package name. To do this, click **File | Build Settings**,
+Next, configure your game's package name. To do this, click **File > Build Settings**,
 select the **Android** platform and click **Player Settings** to show Unity's
 Player Settings window. In that window, look for the **Bundle Identifier** setting
 under **Other Settings**. Enter your package name there (for example
@@ -243,11 +246,11 @@ a linker error when building the Xcode application.  If you see the error:
 Then open the project tree, expand Frameworks, and delete libPods-Unity-iPhone.a
 and rebuild.
 
-Next, open the iOS build settings dialog. To do so, click **File | Build Settings**,
+Next, open the iOS build settings dialog. To do so, click **File > Build Settings**,
 select the **iOS** platform, and click **Player Settings**. Find the **Bundle Identifier**
 setting and enter your bundle identifier there.
 
-Next, click the **Window | Google Play Games | Setup  - iOS setup menu item.
+Next, click the **Window > Google Play Games > Setup  - iOS setup** menu item.
 
 Enter the Constants class name.  This is the name of the fully qualified class
 that will be updated (or created) which contains the IDs of the game resources.
@@ -277,10 +280,10 @@ and run the project at this point. You will see a screen with an **Authenticate*
 and you should be able to sign in when you click it.
 
 To build and run on Android, click
-**File | Build Settings**, select the **Android** platform, then
+**File > Build Settings**, select the **Android** platform, then
 **Switch to Platform**, then **Build and Run**.
 
-To build and run on iOS, click **File | Build Settings**, select the **iOS** platform,
+To build and run on iOS, click **File > Build Settings**, select the **iOS** platform,
 then **Switch to Platform**, then **Build**. This will export an XCode project and
 will display additional instructions on completing the build.
 
@@ -304,7 +307,7 @@ available.
 ## Nearby Connections Configuration
 In order to use nearby connections, a service id which uniquely identifies the
 set of applications that can interact needs to be configured.
-This is done by clicking the **Window | Google Play Games | Nearby Connections setup...**
+This is done by clicking the **Window > Google Play Games > Nearby Connections setup...**
 menu item. This will display the
 nearby conections setup screen.  On this screen enter the service ID you want to use.
 It should be something that identifies your application, and  follows the
@@ -936,7 +939,7 @@ After signing out, no further API calls can be made until the user authenticates
 
 ## Building for iOS
 
-To build your game for iOS, do as you would normally do in Unity. Select **File | Build Settings**, then select the **iOS** platform.
+To build your game for iOS, do as you would normally do in Unity. Select **File > Build Settings**, then select the **iOS** platform.
 Click **Player Settings** and make sure that the target iOS platform is 7.0 or above.
 
 Then, click **Build** and select an output directory to save the XCode project. Do not use
@@ -969,8 +972,9 @@ panel, find the entry named "Scripting Define Symbol" and add a symbol named: NO
 
 **"The current deployment target does not support automated _weak references"**. Make sure your target iOS platform is 7.0 or above. If the target platform is below 7.0, this error will occur during build.
 
-**"Dsymutil error"**. Depending on your version of XCode, you may need to disable dSYM file generation. To do this, go to Build Settings |
-Build Options | Debug Information Format | Debug. Select **DWARF** instead of **DWARF with dSYM**.
+**"Dsymutil error"**. Depending on your version of XCode, you may need to disable dSYM file generation.
+To do this, go to **File > Build Settings > Build Options > Debug Information Format > Debug**.
+Select **DWARF** instead of **DWARF with dSYM**.
 
 **URL errors while signing in.** This is often a sign that either the client ID or the Bundle Identifier is not correctly set up, or that your **Info.plist** file got corrupted. Check that your client ID and Bundle ID are correctly configured in the project and that they correspond to the data in the Developer Console.
 
@@ -985,7 +989,7 @@ is needed.
 
 To run your game in the simulator as opposed to a real device, you must export
 it from Unity with the "Simulator SDK" instead of the "Device SDK". To do this,
-open your game project in Unity, select **File | Build Settings**, select iOS,
+open your game project in Unity, select **File > Build Settings**, select iOS,
 then click on **Player Settings**. Scroll down to find the **"SDK Version"**
 option, and change it to **"Simulator SDK".**
 
