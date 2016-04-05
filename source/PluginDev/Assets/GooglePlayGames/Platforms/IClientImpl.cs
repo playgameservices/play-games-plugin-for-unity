@@ -29,7 +29,7 @@ namespace GooglePlayGames
     {
         PlatformConfiguration CreatePlatformConfiguration ();
 
-        TokenClient CreateTokenClient (bool reset);
+        TokenClient CreateTokenClient (string playerId, bool reset);
     }
 }
 

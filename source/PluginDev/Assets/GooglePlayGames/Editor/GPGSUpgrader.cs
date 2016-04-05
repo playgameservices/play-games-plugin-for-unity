@@ -101,7 +101,7 @@ namespace GooglePlayGames.Editor
             // Check that there is a AndroidManifest.xml file
             if (!GPGSUtil.AndroidManifestExists())
             {
-                GPGSUtil.GenerateAndroidManifest(false);
+                GPGSUtil.GenerateAndroidManifest();
             }
 
             AssetDatabase.Refresh();

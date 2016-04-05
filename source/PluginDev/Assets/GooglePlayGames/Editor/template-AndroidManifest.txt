@@ -8,9 +8,6 @@
 
     <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="16" />
 
-    <!-- replaced during setup -->
-    __TOKEN_PERMISSIONS__
-
     <application>
 
      <!-- Required for Nearby Connections API -->

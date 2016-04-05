@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 public class TokenPendingResult extends PendingResult<TokenResult> {
 
     private CountDownLatch latch = new CountDownLatch(1);
-    private TokenResult result;
+    /* package local */ TokenResult result;
     private ResultCallback<? super TokenResult> resultCallback;
 
     public TokenPendingResult()
@@ -85,7 +85,14 @@ public class TokenPendingResult extends PendingResult<TokenResult> {
 
     @Override
     public void setResultCallback(ResultCallback<? super TokenResult> resultCallback) {
-        setCallback(resultCallback);
+
+        // Handle adding the callback when the latch has already counted down.  This
+        // can happen if there is an error right away.
+        if (latch.getCount() == 0) {
+            resultCallback.onResult(getResult());
+        } else {
+            setCallback(resultCallback);
+        }
     }
 
     @Override

@@ -343,7 +343,7 @@ make it your default social platform by calling **PlayGamesPlatform.Activate**:
         // registers a callback for turn based match notifications received while the
         // game is not running.
         .WithMatchDelegate(<callback method>)
-        // require access to a player's Google+ social graph to sign in
+        // require access to a player's Google+ social graph (usually not needed)
         .RequireGooglePlus()
         .Build();
 
@@ -866,38 +866,39 @@ Play Game Console.
 
 
 ## Retrieving player's email or a unique identifier##
-In order to access the player's email address, the plugin uses the Google Plus API.
-This API requires the player consent to additional permissions when installing the
-game.  This extra consent step is a burden and slows down game usage, so it should be
-used only when absolutely necessary.
+In order to access the player's email address, the plugin uses the account picker
+standard UI from Android.  This API presents an account picker to the player.  The
+account the player selects does not necessarily correspond to gamer account the user
+authenticated with.  The user can also select "Cancel" and not select any email.
+In this case, null is returned as the email address. __Note__: This also means the
+email address is not a reliable unique identifier.
 
 If all that is needed is a persistent unique identifier for the player, then you
 should use the player's id.  This is a unique ID specific to that player and
 is the same value all the time.
 
-If you still need the email address:
-1. In the setup dialog, check the box next to "Requires Google Plus API".
-2. Once the user is authenticated, you can get the email.
-
-__Note:__ The email address is populated asynchronously, and is only available
+Once the user is authenticated, you can get the email via polling:
+The email address is populated asynchronously, and is only available
 on the UI thread.
 
 ```csharp
+    // call this from Update()
     Debug.Log("Local user's email is " +
         ((PlayGamesLocalUser)Social.localUser).Email);
 ```
 
-If you need to get these from the non-UI thread, you can use the helper function
-RunOnGameThread:
+You can also get the email address asynchrously:
 
-```csharp
-    GooglePlayGames.OurUtils.PlayGamesHelperObject.RunOnGameThread(
-        () => { Debug.Log("Local user's email is " +
-                    ((PlayGamesLocalUser)Social.localUser).Email);
-                // use the email as needed
-              });
+``csharp
+    PlayGamesPlatform.Instance.GetEmail((status, email) => {
+            if (status == CommonStatusCodes.Success) {
+                Debug.Log("The address is " + email");
+            }
+            else {
+                Debug.Log("Error getting email: " + status);
+            }
+        });
 ```
-
 ## Loading Friends ##
 To load the friends of the current player, you can use the ISocial framework.
 This call is asynchronous, so the friends need to be processed in the callback.

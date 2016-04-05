@@ -69,8 +69,6 @@ namespace GooglePlayGames.Native
 
         private string rationale;
 
-        private int needGPlusWarningFreq = 100000;
-        private int needGPlusWarningCount = 0;
         private int webclientWarningFreq = 100000;
         private int noWebClientIdWarningCount = 0;
 
@@ -81,6 +79,10 @@ namespace GooglePlayGames.Native
             this.mConfiguration = Misc.CheckNotNull(configuration);
             this.clientImpl = clientImpl;
             this.rationale = configuration.PermissionRationale;
+            if (string.IsNullOrEmpty(this.rationale))
+            {
+                this.rationale = "Select email address to send to this game or hit cancel to not share.";
+            }
         }
 
         private GameServices GameServices()
@@ -219,7 +221,8 @@ namespace GooglePlayGames.Native
                         }
 
                         mAuthState = AuthState.SilentPending;
-                        mTokenClient = clientImpl.CreateTokenClient(false);
+                        mTokenClient = clientImpl.CreateTokenClient(
+                            (mUser == null) ? null : mUser.id, false);
                     }
                 }
             }
@@ -250,7 +253,14 @@ namespace GooglePlayGames.Native
             currentHandler(invitation.AsInvitation(), shouldAutolaunch);
         }
 
-        /// <summary>Gets the user email.</summary>
+        /// <summary>
+        /// Gets the user's email.
+        /// </summary>
+        /// <remarks>The email address returned is selected by the user from the accounts present
+        /// on the device. There is no guarantee this uniquely identifies the player.
+        /// For unique identification use the id property of the local player.
+        /// The user can also choose to not select any email address, meaning it is not
+        /// available.</remarks>
         /// <returns>The user email or null if not authenticated or the permission is
         /// not available.</returns>
         public string GetUserEmail()
@@ -261,19 +271,33 @@ namespace GooglePlayGames.Native
                 return null;
             }
 
-            if(!GameInfo.RequireGooglePlus())
-            {
-                //don't spam the log, only do this every so often
-                if (needGPlusWarningCount++ % needGPlusWarningFreq == 0)
-                {
-                    Debug.LogError("RequiresGooglePlus not set, cannot request email.");
-                    // avoid int overflow
-                    needGPlusWarningCount = (needGPlusWarningCount/ needGPlusWarningFreq) + 1;
-                }
-                return null;
-            }
             mTokenClient.SetRationale(rationale);
             return mTokenClient.GetEmail();
+        }
+
+        /// <summary>
+        /// Gets the user's email with a callback.
+        /// </summary>
+        /// <remarks>The email address returned is selected by the user from the accounts present
+        /// on the device. There is no guarantee this uniquely identifies the player.
+        /// For unique identification use the id property of the local player.
+        /// The user can also choose to not select any email address, meaning it is not
+        /// available.</remarks>
+        /// <param name="callback">The callback with a status code of the request,
+        /// and string which is the email. It can be null.</param>
+        public void GetUserEmail(Action<CommonStatusCodes, string> callback)
+        {
+            if (!this.IsAuthenticated())
+            {
+                Debug.Log("Cannot get API client - not authenticated");
+                if (callback != null)
+                {
+                    callback(CommonStatusCodes.SignInRequired, null);
+                    return;
+                }
+            }
+            mTokenClient.SetRationale(rationale);
+            mTokenClient.GetEmail(callback);
         }
 
         /// <summary>Gets the access token currently associated with the Unity activity.</summary>
@@ -308,7 +332,6 @@ namespace GooglePlayGames.Native
         /// <param name="idTokenCallback"> A callback to be invoked after token is retrieved. Will be passed null value
         /// on failure. </param>
         /// <returns>The identifier token.</returns>
-
         [Obsolete("Use GetServerAuthCode() then exchange it for a token")]
         public void GetIdToken(Action<string> idTokenCallback)
         {
@@ -525,6 +548,7 @@ namespace GooglePlayGames.Native
 
                 mUser = response.Self().AsPlayer();
                 mFriends = null;
+                mTokenClient = clientImpl.CreateTokenClient(mUser.id, true);
             }
             GooglePlayGames.OurUtils.Logger.d("Found User: " + mUser);
             GooglePlayGames.OurUtils.Logger.d("Maybe finish for User");
@@ -619,7 +643,7 @@ namespace GooglePlayGames.Native
                 mFriends = null;
                 mAchievements = null;
                 mAuthState = AuthState.Unauthenticated;
-                mTokenClient = clientImpl.CreateTokenClient(true);
+                mTokenClient = clientImpl.CreateTokenClient(null, true);
                 mAuthGeneration++;
             }
         }

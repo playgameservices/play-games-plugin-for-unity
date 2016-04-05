@@ -68,11 +68,11 @@ namespace GooglePlayGames.Android
         }
 
 
-        public TokenClient CreateTokenClient(bool reset)
+        public TokenClient CreateTokenClient(string playerId, bool reset)
         {
             if (tokenClient == null || reset)
             {
-                tokenClient = new AndroidTokenClient();
+                tokenClient = new AndroidTokenClient(playerId);
             }
             return tokenClient;
         }

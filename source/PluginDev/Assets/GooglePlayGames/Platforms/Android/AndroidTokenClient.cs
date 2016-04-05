@@ -27,12 +27,13 @@ namespace GooglePlayGames.Android
     {
         private const string TokenFragmentClass = "com.google.games.bridge.TokenFragment";
         private const string FetchTokenSignature =
-            "(Landroid/app/Activity;Ljava/lang/String;ZZZLjava/lang/String;)Lcom/google/android/gms/common/api/PendingResult;";
+            "(Landroid/app/Activity;Ljava/lang/String;Ljava/lang/String;ZZZLjava/lang/String;)Lcom/google/android/gms/common/api/PendingResult;";
         private const string FetchTokenMethod = "fetchToken";
 
-        private bool fetchingEmail = false;
-        private bool fetchingAccessToken = false;
-        private bool fetchingIdToken = false;
+        private string playerId;
+        private bool fetchingEmail;
+        private bool fetchingAccessToken;
+        private bool fetchingIdToken;
         private string accountName;
         private string accessToken;
         private string idToken;
@@ -54,16 +55,47 @@ namespace GooglePlayGames.Android
             }
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GooglePlayGames.Android.AndroidTokenClient"/> class.
+        /// </summary>
+        /// <remarks>The playerId is used to detect when the player switches and
+        /// the token and email should be re-fetched.
+        /// </remarks>
+        /// <param name="playerId">Player identifier.</param>
+        public AndroidTokenClient(string playerId)
+        {
+            this.playerId = playerId;
+        }
+
+        /// <summary>
+        /// Sets the rationale for the email address selector.
+        /// </summary>
+        /// <remarks>This is shown in the account picker when selecting the
+        /// account to use as the email address.
+        /// </remarks>
+        /// <param name="rationale">Rationale.</param>
         public void SetRationale(string rationale)
         {
             this.rationale = rationale;
         }
 
+        /// <summary>
+        /// Fetches the user specific information.
+        /// </summary>
+        /// <remarks>Fetches the email or tokens as needed.  This is one
+        /// method in the Java support library to make the JNI more simple.
+        /// </remarks>
+        /// <param name="scope">Scope for the id token.</param>
+        /// <param name="fetchEmail">If set to <c>true</c> fetch email.</param>
+        /// <param name="fetchAccessToken">If set to <c>true</c> fetch access token.</param>
+        /// <param name="fetchIdToken">If set to <c>true</c> fetch identifier token.</param>
+        /// <param name="doneCallback">Invoked when the call is complete
+        /// passing back the status code of the request.</param>
         internal void Fetch(string scope,
                             bool fetchEmail,
                             bool fetchAccessToken,
                             bool fetchIdToken,
-                            Action<bool> doneCallback)
+                            Action<CommonStatusCodes> doneCallback)
         {
             if (apiAccessDenied)
             {
@@ -75,17 +107,20 @@ namespace GooglePlayGames.Android
                     apiWarningCount = (apiWarningCount/ apiWarningFreq) + 1;
                 }
 
-                doneCallback(false);
+                doneCallback(CommonStatusCodes.AuthApiAccessForbidden);
                 return;
             }
+
+            // Java needs to be called from the game thread.
             PlayGamesHelperObject.RunOnGameThread(() =>
-            FetchToken(scope, rationale, fetchEmail, fetchAccessToken, fetchIdToken, (rc, access, id, email) =>
+            FetchToken(scope, playerId, rationale, fetchEmail, fetchAccessToken, fetchIdToken, (rc, access, id, email) =>
                     {
                         if (rc != (int)CommonStatusCodes.Success)
                         {
-                            apiAccessDenied = rc == (int)CommonStatusCodes.AuthApiAccessForbidden;
+                            apiAccessDenied = rc == (int)CommonStatusCodes.AuthApiAccessForbidden ||
+                                rc == (int)CommonStatusCodes.Canceled;
                             GooglePlayGames.OurUtils.Logger.w("Non-success returned from fetch: " + rc);
-                            doneCallback(false);
+                            doneCallback(CommonStatusCodes.AuthApiAccessForbidden);
                             return;
                         }
 
@@ -116,15 +151,15 @@ namespace GooglePlayGames.Android
                         {
                             this.accountName = email;
                         }
-                        doneCallback(true);
+                        doneCallback(CommonStatusCodes.Success);
                     }));
         }
 
 
-        internal static void FetchToken(string scope, string rationale, bool fetchEmail,
+        internal static void FetchToken(string scope, string playerId, string rationale, bool fetchEmail,
                                         bool fetchAccessToken, bool fetchIdToken, Action<int, string, string, string> callback)
         {
-            object[] objectArray = new object[6];
+            object[] objectArray = new object[7];
             jvalue[] jArgs = AndroidJNIHelper.CreateJNIArgArray(objectArray);
             try
             {
@@ -138,11 +173,12 @@ namespace GooglePlayGames.Android
                                               FetchTokenMethod,
                                               FetchTokenSignature);
                         jArgs[0].l = currentActivity.GetRawObject();
-                        jArgs[1].l = AndroidJNI.NewStringUTF(rationale);
-                        jArgs[2].z = fetchEmail;
-                        jArgs[3].z = fetchAccessToken;
-                        jArgs[4].z = fetchIdToken;
-                        jArgs[5].l = AndroidJNI.NewStringUTF(scope);
+                        jArgs[1].l = AndroidJNI.NewStringUTF(playerId);
+                        jArgs[2].l = AndroidJNI.NewStringUTF(rationale);
+                        jArgs[3].z = fetchEmail;
+                        jArgs[4].z = fetchAccessToken;
+                        jArgs[5].z = fetchIdToken;
+                        jArgs[6].l = AndroidJNI.NewStringUTF(scope);
 
                         IntPtr ptr =
                             AndroidJNI.CallStaticObjectMethod(bridgeClass.GetRawClass(), methodId, jArgs);
@@ -164,33 +200,68 @@ namespace GooglePlayGames.Android
         }
 
         /// <summary>
-        /// Gets the account name of the currently signed-in user to later use for token retrieval.
+        /// Gets the account name selected by the currently signed-in user.
         /// </summary>
-        /// <remarks>Currently only used internally to encourage using the unique player ID instead.</remarks>
-        /// <returns>The current user's Google account name.</returns>
-        private string GetAccountName()
+        /// <remarks>Currently only used internally to encourage using the unique player ID instead.
+        /// There is no guarantee that this is actually the account name of the current player.
+        /// The player selects the account from the accounts present on the device. </remarks>
+        /// <returns>The Google account name.</returns>
+        /// <param name="callback">The callback to invoke when complete.</param>
+        private string GetAccountName(Action<CommonStatusCodes, string> callback)
         {
             if (string.IsNullOrEmpty(accountName))
             {
                 if (!fetchingEmail)
                 {
                     fetchingEmail = true;
-                    Fetch(idTokenScope, true, false, false, (ok) => fetchingEmail = false);
+                    Fetch(idTokenScope, true, false, false, (status) =>  {
+                        fetchingEmail = false;
+                        if (callback != null) {
+                            callback(status, accountName);
+                        }
+                    });
+                }
+            }
+            else
+            {
+                if (callback != null)
+                {
+                    callback(CommonStatusCodes.Success, accountName);
                 }
             }
 
             return accountName;
         }
 
-        /// <summary>Gets the current user's email.</summary>
+        /// <summary>Gets the email selected by the current player.</summary>
+        /// <remarks>This is not necessarily the email address of the player.  It
+        /// is just the account selected by the player from a list of accounts
+        /// present on the device.
+        /// </remarks>
         /// <returns>A string representing the email.</returns>
         public string GetEmail()
         {
-            return GetAccountName();
+            return GetAccountName(null);
+        }
+
+        /// <summary>
+        /// Gets the user's email with a callback.
+        /// </summary>
+        /// <remarks>The email address returned is selected by the user from the accounts present
+        /// on the device. There is no guarantee this uniquely identifies the player.
+        /// For unique identification use the id property of the local player.
+        /// The user can also choose to not select any email address, meaning it is not
+        /// available.</remarks>
+        /// <param name="callback">The callback with a status code of the request,
+        /// and string which is the email. It can be null.</param>
+        public void GetEmail(Action<CommonStatusCodes, string> callback)
+        {
+            GetAccountName(callback);
         }
 
         /// <summary>Gets the access token currently associated with the Unity activity.</summary>
         /// <returns>The OAuth 2.0 access token.</returns>
+        [Obsolete("Use PlayGamesPlatform.GetServerAuthCode()")]
         public string GetAccessToken()
         {
             if (string.IsNullOrEmpty(accessToken))
@@ -230,10 +301,10 @@ namespace GooglePlayGames.Android
                     fetchingIdToken = true;
                     idTokenScope = newScope;
                     idTokenCb = idTokenCallback;
-                    Fetch(idTokenScope, false, false, true, (ok) => {
+                    Fetch(idTokenScope, false, false, true, (status) => {
                         fetchingIdToken = false;
 
-                        if(!ok)
+                        if(status == CommonStatusCodes.Success)
                         {
                             idTokenCb(null);
                         }
