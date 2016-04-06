@@ -2,6 +2,7 @@ Version 0.9.XX
     Bug Fixes:
         * #1032 - Not able to get user's email.
         * #1040 - Cannot parse PBX project for iOS
+        * #1068 - CreateWithInvitationScreen callback called twice on cancel.
         * #1088 - Disable BITCODE for iOS build
     New Features:
         * #990 - Support callback for getting email address.
