@@ -43,7 +43,7 @@ namespace GooglePlayGames.Editor
         private const string BundleSchemeKey = "com.google.BundleId";
         private const string ReverseClientIdSchemeKey = "com.google.ReverseClientId";
 
-        [PostProcessBuild]
+        [PostProcessBuild (99999)]
         public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
         {
 #if UNITY_5
@@ -119,6 +119,9 @@ namespace GooglePlayGames.Editor
                 FileUtil.CopyFileOrDirectory(podfile, destpodfile);
             }
 
+            UpdateGeneratedInfoPlistFile(pathToBuiltProject + "/Info.plist");
+            UpdateGeneratedPbxproj(pathToBuiltProject + "/Unity-iPhone.xcodeproj/project.pbxproj");
+
             GPGSInstructionWindow w = EditorWindow.GetWindow<GPGSInstructionWindow>(
                 true,
                 "Building for IOS",
@@ -127,10 +130,6 @@ namespace GooglePlayGames.Editor
             w.UsingCocoaPod = CocoaPodHelper.Update(pathToBuiltProject);
 
             UnityEngine.Debug.Log("Adding URL Types for authentication using PlistBuddy.");
-
-            UpdateGeneratedInfoPlistFile(pathToBuiltProject + "/Info.plist");
-            UpdateGeneratedPbxproj(pathToBuiltProject + "/Unity-iPhone.xcodeproj/project.pbxproj");
-
         #endif
 #endif
         }
@@ -249,6 +248,8 @@ namespace GooglePlayGames.Editor
             proj.AddBuildProperty(testTarget, "HEADER_SEARCH_PATHS", "$(inherited)");
             proj.AddBuildProperty(target, "OTHER_CFLAGS", "$(inherited)");
             proj.AddBuildProperty(testTarget, "OTHER_CFLAGS", "$(inherited)");
+            proj.SetBuildProperty(target, "ENABLE_BITCODE", "NO");
+            proj.SetBuildProperty(testTarget, "ENABLE_BITCODE", "NO");
 
             string fileGuid =
                  proj.FindFileGuidByProjectPath("Libraries/Plugins/iOS/GPGSAppController.mm");
