@@ -21,7 +21,8 @@ The nearby connections API is only available on Android.  The UI in this game us
 so Unity 5.0 or higher is recommended.  For more details and how to build and configure the sample, 
 see [Nearby Connections documentation](https://github.com/playgameservices/play-games-plugin-for-unity/blob/master/NEARBY.md).
 
-Note: this text assumes you have already read and are familiar with the
+> **Note:**
+> This text assumes you have already read and are familiar with the
 contents of the [Getting Started Guide](https://github.com/playgameservices/play-games-plugin-for-unity/blob/master/README.md)
 (which is in the README.md file that exists in the root of this Github
 repository). Make sure to read that file first!
@@ -38,16 +39,16 @@ All the samples follow the same basic steps, see the section for the the specifi
 sample for what resources need to be configured in the play console.
 
  1. Create a new Unity Project
- 2. Import the Google Play Games plugin
- 3. Import the <sampleName>.unitypackage
- 4. Create the linked application remembering to use the
+ 2. [Import the Google Play Games plugin](https://github.com/playgameservices/play-games-plugin-for-unity#plugin-installation)
+ 3. Import the &lt;sampleName&gt;.unitypackage (Assets &gt; Import Package)
+ 4. In the Play Games developer web app, create the linked application remembering to use the
     same configuration information when configuring your game in Unity.
  5. Create the resource configuration needed for the sample in the play console.
  6. Then at the bottom of the Achievement (or Leaderboards, or Events) list,
      click "Get Resources", and copy
     the resource definitions to the clipboard.
  7. Back in the Unity editor, open the Google Play Games setup dialog
-    4.1 Enter the constants class name for the sample
+    4.1 Enter the constants class name for the sample (listed below for each sample)
     4.2 Paste the resource definitions from the Play Console into the text box.
  8. Click Setup
  9. Build and run!
@@ -84,41 +85,41 @@ Minimal lives up to its name and needs the minimum configuration to test.
 These are incremental achievements that have counts to be met to unlock the
 achievement.
 
-1. Name: "1 Dozen Stars"
-    Description: "Earn 12 stars"
-    Incremental: Yes
+1. Name: "1 Dozen Stars"<br/>
+    Description: "Earn 12 stars"<br/>
+    Incremental: Yes<br/>
     Steps needed: 12
-2. Name: "Two Dozen Stars"
-    Description: "Earn 24 stars"
-    Incremental: Yes
+2. Name: "Two Dozen Stars"<br/>
+    Description: "Earn 24 stars"<br/>
+    Incremental: Yes<br/>
     Steps needed: 24
-3. Name: "3 Dozen Stars"
-    Description: "Earn 36 stars"
-    Incremental: Yes
+3. Name: "3 Dozen Stars"<br/>
+    Description: "Earn 36 stars"<br/>
+    Incremental: Yes<br/>
     Steps needed: 36
-4. Name: "Five Minute Master"
-    Description: "Play for a total of 5 minutes."
-    Incremental: Yes
+4. Name: "Five Minute Master"<br/>
+    Description: "Play for a total of 5 minutes."<br/>
+    Incremental: Yes<br/>
     Steps needed: 300
-5. Name: "30 Minutes of Excitement"
-    Description: "Play for a total of 30 minutes."
-    Incremental: Yes
+5. Name: "30 Minutes of Excitement"<br/>
+    Description: "Play for a total of 30 minutes."<br/>
+    Incremental: Yes<br/>
     Steps needed: 1800
-6. Name: "Procrastinate Much?"
-    Description: "Play for a total of 1 hour."
-    Incremental: Yes
+6. Name: "Procrastinate Much?"<br/>
+    Description: "Play for a total of 1 hour."<br/>
+    Incremental: Yes<br/>
     Steps needed: 3600
-7. Name: "Play 2 rounds"
-    Description: "Played 2 rounds"
+7. Name: "Played 2 rounds"<br/>
+    Description: "Play 2 rounds"<br/>
     Incremental: Yes
     Steps needed: 2
-8. Name: "Play 10 rounds"
-    Description: "Played 10 rounds"
+8. Name: "Played 10 rounds"
+    Description: "Play 10 rounds"
     Incremental: Yes
     Steps needed: 10
-9. Name: "Played 25 rounds"
-    Description: "Play 25 rounds"
-    Incremental: Yes
+9. Name: "Played 25 rounds"<br/>
+    Description: "Play 25 rounds"<br/>
+    Incremental: Yes<br/>
     Steps needed: 25
 
 
@@ -128,20 +129,23 @@ Create 1 leaderboard:
 
 Use `CubicPilot.GPGSIds` as the name of the constants class when setting up the game.
 
+> **Note:**
+> If the game loads with just a background and no menu, then Unity didn't properly detect the game's scenes. These are located in CubicPilot/Scenes and should be dragged into the Android Build Settings (File &gt; Build Settings &gt; Android).
+
 ## Configuration for QuizRacer
 This is a real-time multi-player game.  Create the achievements:
 
 Make sure real-time multiplayer is enabled.
 
-1. Name: "Play"
+1. Name: "Play"<br/>
     Description:  "Play Quiz Racer"
-2. Name: "Score"
+2. Name: "Score"<br/>
     Description: "Score at least 1 point"
-3. Name: "Win"
+3. Name: "Win"<br/>
     Description: "Win a match"
-4. Name: "Lose"
+4. Name: "Lose"<br/>
     Description: "Lose a match"
-5. Name: "Don't play"
+5. Name: "Don't play"<br/>
     Description: "Don't play a match"
 
 Use `QuizRacer.GPGSIds` for the constants class when setting up the game.
@@ -157,21 +161,21 @@ Events:
 
 Achievements:
 
-1. Name: "AchievementToReveal"
-    Description: "A hidden achievement to be revealed later"
+1. Name: "AchievementToReveal"<br/>
+    Description: "A hidden achievement to be revealed later"<br/>
     Initial State: "Hidden"
-2. Name: "AchievementToUnlock"
-    Description: "A normal achievement"
+2. Name: "AchievementToUnlock"<br/>
+    Description: "A normal achievement"<br/>
 3. Name: "AchievementToIncrement"
-    Description: "Incremental achievement to unlock - 25 times"
-    Incremental: yes
+    Description: "Incremental achievement to unlock - 25 times"<br/>
+    Incremental: yes<br/>
     Steps needed: 25
-4. Name: "Achievement hidden incremental"
-    Description: "Initially hidden, incremental achievement"
-    Incremental: yes
-    Steps needed: 25
+4. Name: "Achievement hidden incremental"<br/>
+    Description: "Initially hidden, incremental achievement"<br/>
+    Incremental: yes<br/>
+    Steps needed: 25<br/>
     Initial State: Hidden
-5. Name: "Lucky5"
+5. Name: "Lucky5"<br/>
     Description: "You need 5 achievements to publish"
 
 Leaderboards:
