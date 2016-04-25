@@ -61,9 +61,10 @@ Minimal lives up to its name and needs the minimum configuration to test.
  2. Use the constants class name: `Minimal.GPGSIds`
 
 ## Configuration for CubicPilot
- There are several achievements for CubicPilot:
 
  Make sure Saved Games is enabled.
+
+ There are several achievements for CubicPilot:
 
 1. Name: "Not a Disaster..."<br/>
     Description: "Get 1 point without dying."
@@ -127,10 +128,16 @@ Create 1 leaderboard:
 
 1. Name: Cubic Pilot Hall of Fame"
 
-Use `CubicPilot.GPGSIds` as the name of the constants class when setting up the game.
+Use `CubicPilot.GPGSIds` as the name of the constants class when setting up the
+game. Also, open the
+`File &gt; Build Settings &gt; Player Settings &gt; Resolution &amp; Presentation`
+and disable `Portrait` and `Portrait Upside Down` rotations by unchecking them.
 
 > **Note:**
-> If the game loads with just a background and no menu, then Unity didn't properly detect the game's scenes. These are located in CubicPilot/Scenes and should be dragged into the Android Build Settings (File &gt; Build Settings &gt; Android).
+> If the game loads with just a background and no menu, then Unity didn't
+> properly detect the game's scenes. These are located in CubicPilot/Scenes and
+> should be dragged into the Android Build Settings
+> (`File &gt; Build Settings &gt; Android`).
 
 ## Configuration for QuizRacer
 This is a real-time multi-player game.  Create the achievements:

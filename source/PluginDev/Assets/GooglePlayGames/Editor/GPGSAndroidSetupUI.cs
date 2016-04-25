@@ -210,7 +210,7 @@ namespace GooglePlayGames.Editor
             GUILayout.BeginVertical();
 
             GUIStyle link = new GUIStyle(GUI.skin.label);
-            link.normal.textColor = new Color(.7f, .7f, 1f);
+            link.normal.textColor = new Color(0f, 0f, 1f);
 
             GUILayout.Space(10);
             GUILayout.Label(GPGSStrings.AndroidSetup.Blurb);

@@ -53,3 +53,11 @@ To test the plugin before exporting it, you can use the PluginDev project itself
 Simply configure it (by clicking File | Play Games Android Setup), and set up
 your test achievement/leaderboard IDs in Assets/Settings.cs.
 
+[ KNOWN ISSUES]
+
+1. The plugin will not build on a case-sensitive drive.
+
+2. The plugin will not build if the directory structure contains spaces in any directory name.
+
+3. The ./build directory should be removed before each build or gpg_cpp_sdk.zip will fail to unpack.
+
