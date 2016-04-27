@@ -111,11 +111,11 @@ achievement.
     Steps needed: 3600
 7. Name: "Played 2 rounds"<br/>
     Description: "Play 2 rounds"<br/>
-    Incremental: Yes
+    Incremental: Yes<br/>
     Steps needed: 2
-8. Name: "Played 10 rounds"
-    Description: "Play 10 rounds"
-    Incremental: Yes
+8. Name: "Played 10 rounds"<br/>
+    Description: "Play 10 rounds"<br/>
+    Incremental: Yes<br/>
     Steps needed: 10
 9. Name: "Played 25 rounds"<br/>
     Description: "Play 25 rounds"<br/>
