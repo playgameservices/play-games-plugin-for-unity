@@ -250,7 +250,8 @@ namespace GooglePlayGames.Native
 
             bool shouldAutolaunch = eventType == Types.MultiplayerEvent.UPDATED_FROM_APP_LAUNCH;
 
-            currentHandler(invitation.AsInvitation(), shouldAutolaunch);
+            PlayGamesHelperObject.RunOnGameThread(() =>
+                currentHandler(invitation.AsInvitation(), shouldAutolaunch));
         }
 
         /// <summary>
@@ -292,12 +293,14 @@ namespace GooglePlayGames.Native
                 Debug.Log("Cannot get API client - not authenticated");
                 if (callback != null)
                 {
-                    callback(CommonStatusCodes.SignInRequired, null);
+                    PlayGamesHelperObject.RunOnGameThread(() =>
+                        callback(CommonStatusCodes.SignInRequired, null));
                     return;
                 }
             }
             mTokenClient.SetRationale(rationale);
-            mTokenClient.GetEmail(callback);
+            mTokenClient.GetEmail((status, email) =>
+                PlayGamesHelperObject.RunOnGameThread(()=>callback(status,email)));
         }
 
         /// <summary>Gets the access token currently associated with the Unity activity.</summary>
@@ -338,7 +341,8 @@ namespace GooglePlayGames.Native
             if (!this.IsAuthenticated())
             {
                 Debug.Log("Cannot get API client - not authenticated");
-                idTokenCallback(null);
+                PlayGamesHelperObject.RunOnGameThread(() =>
+                    idTokenCallback(null));
             }
 
             if(!GameInfo.WebClientIdInitialized())
@@ -350,10 +354,12 @@ namespace GooglePlayGames.Native
                     // avoid int overflow
                     noWebClientIdWarningCount = (noWebClientIdWarningCount/ webclientWarningFreq) + 1;
                 }
-                idTokenCallback(null);
+                PlayGamesHelperObject.RunOnGameThread(() =>
+                    idTokenCallback(null));
             }
             mTokenClient.SetRationale(rationale);
-            mTokenClient.GetIdToken(GameInfo.WebClientId,idTokenCallback);
+            mTokenClient.GetIdToken(GameInfo.WebClientId,
+                AsOnGameThreadCallback(idTokenCallback));
         }
 
         /// <summary>
@@ -377,7 +383,8 @@ namespace GooglePlayGames.Native
                 // Fill in the code & call the callback.
                 if (callback != null)
                 {
-                    callback(responseCode, serverAuthCodeResponse.Code());
+                    PlayGamesHelperObject.RunOnGameThread(() =>
+                        callback(responseCode, serverAuthCodeResponse.Code()));
                 }
             });
         }
@@ -398,14 +405,16 @@ namespace GooglePlayGames.Native
             if (!IsAuthenticated())
             {
                 GooglePlayGames.OurUtils.Logger.d("Cannot loadFriends when not authenticated");
-                callback(false);
+                PlayGamesHelperObject.RunOnGameThread(() =>
+                    callback(false));
                 return;
             }
 
             // avoid calling excessively
             if (mFriends != null)
             {
-                callback(true);
+                PlayGamesHelperObject.RunOnGameThread(() =>
+                    callback(true));
                 return;
             }
 
@@ -415,13 +424,16 @@ namespace GooglePlayGames.Native
                         status == ResponseStatus.SuccessWithStale)
                     {
                         mFriends = players;
-                         callback(true);
+                        PlayGamesHelperObject.RunOnGameThread(() =>
+                            callback(true));
                     }
                     else
                     {
                         mFriends = new List<Player>();
-                        GooglePlayGames.OurUtils.Logger.e("Got " + status + " loading friends");
-                        callback(false);
+                        GooglePlayGames.OurUtils.Logger.e(
+                            "Got " + status + " loading friends");
+                        PlayGamesHelperObject.RunOnGameThread(() =>
+                            callback(false));
                     }
                 });
         }
@@ -625,15 +637,15 @@ namespace GooglePlayGames.Native
             }
         }
 
-		#if UNITY_IOS || UNITY_IPHONE
-				[System.Runtime.InteropServices.DllImport("__Internal")]
-				internal static extern void UnpauseUnityPlayer();
-		#else
-		private void UnpauseUnityPlayer()
-		{
-			// don't do anything.
-		}
-		#endif
+#if UNITY_IOS || UNITY_IPHONE
+    [System.Runtime.InteropServices.DllImport("__Internal")]
+    internal static extern void UnpauseUnityPlayer();
+#else
+    private void UnpauseUnityPlayer()
+    {
+        // don't do anything.
+    }
+#endif
 
         private void ToUnauthenticated()
         {
@@ -717,11 +729,14 @@ namespace GooglePlayGames.Native
                 {
                     if (playerStatsResponse.PlayerStats() != null)
                     {
-                        callback(responseCode, playerStatsResponse.PlayerStats().AsPlayerStats());
+                        PlayGamesHelperObject.RunOnGameThread(() =>
+                            callback(responseCode,
+                                playerStatsResponse.PlayerStats().AsPlayerStats()));
                     }
                     else
                     {
-                        callback(responseCode, new PlayerStats());
+                        PlayGamesHelperObject.RunOnGameThread(() =>
+                            callback(responseCode, new PlayerStats()));
                     }
                 }
             });
@@ -739,7 +754,8 @@ namespace GooglePlayGames.Native
                     {
                         users[i] = nativeUsers[i].AsPlayer();
                     }
-                    callback(users);
+                    PlayGamesHelperObject.RunOnGameThread(() =>
+                        callback(users));
                 });
         }
 
@@ -761,7 +777,8 @@ namespace GooglePlayGames.Native
         {
             Achievement[] data = new Achievement[mAchievements.Count];
             mAchievements.Values.CopyTo (data, 0);
-            callback.Invoke (data);
+            PlayGamesHelperObject.RunOnGameThread(() =>
+                callback.Invoke (data));
         }
 
         ///<summary></summary>
@@ -997,6 +1014,7 @@ namespace GooglePlayGames.Native
             LeaderboardTimeSpan timeSpan,
             Action<LeaderboardScoreData> callback)
         {
+            callback = AsOnGameThreadCallback(callback);
             GameServices().LeaderboardManager().LoadLeaderboardData(
                 leaderboardId, start, rowCount, collection, timeSpan,
                 this.mUser.id, callback
@@ -1008,6 +1026,7 @@ namespace GooglePlayGames.Native
         public void LoadMoreScores(ScorePageToken token, int rowCount,
             Action<LeaderboardScoreData> callback)
         {
+            callback = AsOnGameThreadCallback(callback);
             GameServices().LeaderboardManager().LoadScorePage(null,
                 rowCount, token, callback);
         }

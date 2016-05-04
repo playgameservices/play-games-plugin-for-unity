@@ -1,9 +1,11 @@
-Version 0.9.XX
+Version 0.9.33
     Bug Fixes:
         * #1032 - Not able to get user's email.
         * #1040 - Cannot parse PBX project for iOS
         * #1068 - CreateWithInvitationScreen callback called twice on cancel.
+        * #1082 - Changed postbuild order to avoid Invalid PBX project.
         * #1088 - Disable BITCODE for iOS build
+        * #1105 - GetServerAuthCode callback should be on game thread.
     New Features:
         * #990 - Support callback for getting email address.
         * Removed dependency on Google+.

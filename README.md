@@ -851,6 +851,29 @@ Once the saved game file is opened, it can be read to load the game state.  This
     }
 ```
 
+### Deleting a saved game ###
+
+Once the saved game file is opened, it can be deleted. This is done by calling **Delete**.
+
+
+```csharp
+    void DeleteGameData (string filename) {
+        // Open the file to get the metadata.
+        ISavedGameClient savedGameClient = PlayGamesPlatform.Instance.SavedGame;
+        savedGameClient.OpenWithAutomaticConflictResolution(filename, DataSource.ReadCacheOrNetwork,
+            ConflictResolutionStrategy.UseLongestPlaytime, DeleteSavedGame);
+    }
+
+    public void DeleteSavedGame(SavedGameRequestStatus status, ISavedGameMetadata game) {
+        if (status == SavedGameRequestStatus.Success) {
+            ISavedGameClient savedGameClient = PlayGamesPlatform.Instance.SavedGame;
+            savedGameClient.Delete(game);
+        } else {
+            // handle error
+        }
+    }
+```
+
 ## Retrieving server authentication codes ##
 In order to access Google APIs on a backend web server on behalf of the current
 player, you need to get an authentication code from the client application and
