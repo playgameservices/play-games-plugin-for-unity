@@ -13,6 +13,7 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
+
 #if UNITY_ANDROID
 
 namespace GooglePlayGames.Editor
@@ -21,6 +22,7 @@ namespace GooglePlayGames.Editor
     using System.Collections;
     using System.IO;
     using System.Xml;
+    using GooglePlayServices;
     using UnityEditor;
     using UnityEngine;
 
@@ -105,6 +107,11 @@ namespace GooglePlayGames.Editor
 
                 // check the bundle id and set it if needed.
                 CheckBundleId();
+
+                PlayServicesResolver.Resolver.DoResolution(
+                    GPGSDependencies.svcSupport,
+                    "Assets/Plugins/Android",
+                    PlayServicesResolver.HandleOverwriteConfirmation);
 
                 return PerformSetup(
                     clientId,
@@ -295,7 +302,7 @@ namespace GooglePlayGames.Editor
 
             if (GUILayout.Button("Cancel", GUILayout.Width(100)))
             {
-                this.Close();
+                Close();
             }
 
             GUILayout.FlexibleSpace();
@@ -319,7 +326,7 @@ namespace GooglePlayGames.Editor
                     GPGSStrings.Ok);
 
                 GPGSProjectSettings.Instance.Set(GPGSUtil.ANDROIDSETUPDONEKEY, true);
-                this.Close();
+                Close();
             }
             else
             {

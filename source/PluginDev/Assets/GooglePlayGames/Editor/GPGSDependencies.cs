@@ -33,12 +33,15 @@ namespace GooglePlayGames.Editor
         /// </summary>
         private static readonly string PluginName = "GooglePlayGames";
 
+        /// <summary>Instance of the PlayServicesSupport resolver</summary>
+        public static PlayServicesSupport svcSupport;
+
         /// <summary>
         /// Initializes static members of the <see cref="SampleDependencies"/> class.
         /// </summary>
         static GPGSDependencies()
         {
-            PlayServicesSupport svcSupport = PlayServicesSupport.CreateInstance(
+            svcSupport = PlayServicesSupport.CreateInstance(
                                              PluginName,
                                              EditorPrefs.GetString("AndroidSdkRoot"),
                                              "ProjectSettings");

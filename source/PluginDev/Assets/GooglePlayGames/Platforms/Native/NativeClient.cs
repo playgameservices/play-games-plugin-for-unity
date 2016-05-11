@@ -250,8 +250,10 @@ namespace GooglePlayGames.Native
 
             bool shouldAutolaunch = eventType == Types.MultiplayerEvent.UPDATED_FROM_APP_LAUNCH;
 
-            PlayGamesHelperObject.RunOnGameThread(() =>
-                currentHandler(invitation.AsInvitation(), shouldAutolaunch));
+            // Copy the invitation into managed memory.
+            Invitation invite = invitation.AsInvitation();
+            PlayGamesHelperObject.RunOnGameThread(() =>  
+                currentHandler(invite, shouldAutolaunch));
         }
 
         /// <summary>
@@ -293,13 +295,13 @@ namespace GooglePlayGames.Native
                 Debug.Log("Cannot get API client - not authenticated");
                 if (callback != null)
                 {
-                    PlayGamesHelperObject.RunOnGameThread(() =>
+                    PlayGamesHelperObject.RunOnGameThread(() => 
                         callback(CommonStatusCodes.SignInRequired, null));
                     return;
                 }
             }
             mTokenClient.SetRationale(rationale);
-            mTokenClient.GetEmail((status, email) =>
+            mTokenClient.GetEmail((status, email) => 
                 PlayGamesHelperObject.RunOnGameThread(()=>callback(status,email)));
         }
 
@@ -383,8 +385,11 @@ namespace GooglePlayGames.Native
                 // Fill in the code & call the callback.
                 if (callback != null)
                 {
+                    // copy the auth code into managed memory before posting
+                    // the callback.
+                    string authCode = serverAuthCodeResponse.Code();
                     PlayGamesHelperObject.RunOnGameThread(() =>
-                        callback(responseCode, serverAuthCodeResponse.Code()));
+                        callback(responseCode, authCode));
                 }
             });
         }
@@ -729,9 +734,13 @@ namespace GooglePlayGames.Native
                 {
                     if (playerStatsResponse.PlayerStats() != null)
                     {
+                        // Copy the object out of the native interface so
+                        // it will not be deleted before the callback is
+                        // executed on the UI thread.
+                        PlayerStats stats = 
+                            playerStatsResponse.PlayerStats().AsPlayerStats();
                         PlayGamesHelperObject.RunOnGameThread(() =>
-                            callback(responseCode,
-                                playerStatsResponse.PlayerStats().AsPlayerStats()));
+                            callback(responseCode,stats));
                     }
                     else
                     {
