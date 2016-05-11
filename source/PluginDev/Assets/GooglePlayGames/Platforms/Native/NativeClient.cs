@@ -252,7 +252,7 @@ namespace GooglePlayGames.Native
 
             // Copy the invitation into managed memory.
             Invitation invite = invitation.AsInvitation();
-            PlayGamesHelperObject.RunOnGameThread(() =>  
+            PlayGamesHelperObject.RunOnGameThread(() =>
                 currentHandler(invite, shouldAutolaunch));
         }
 
@@ -295,13 +295,13 @@ namespace GooglePlayGames.Native
                 Debug.Log("Cannot get API client - not authenticated");
                 if (callback != null)
                 {
-                    PlayGamesHelperObject.RunOnGameThread(() => 
+                    PlayGamesHelperObject.RunOnGameThread(() =>
                         callback(CommonStatusCodes.SignInRequired, null));
                     return;
                 }
             }
             mTokenClient.SetRationale(rationale);
-            mTokenClient.GetEmail((status, email) => 
+            mTokenClient.GetEmail((status, email) =>
                 PlayGamesHelperObject.RunOnGameThread(()=>callback(status,email)));
         }
 
@@ -737,7 +737,7 @@ namespace GooglePlayGames.Native
                         // Copy the object out of the native interface so
                         // it will not be deleted before the callback is
                         // executed on the UI thread.
-                        PlayerStats stats = 
+                        PlayerStats stats =
                             playerStatsResponse.PlayerStats().AsPlayerStats();
                         PlayGamesHelperObject.RunOnGameThread(() =>
                             callback(responseCode,stats));

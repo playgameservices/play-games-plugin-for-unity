@@ -943,12 +943,14 @@ namespace GooglePlayGames
         }
 
         /// <summary>
-        /// Loads the scores relative the player.  This returns the 25
+        /// Loads the scores relative the player.
+        /// </summary>
+        /// <remarks>This returns the 25
         /// (which is the max results returned by the SDK per call) scores
-        /// that are around the player's score on the Social, all time leaderboard.
+        /// that are around the player's score on the Public, all time leaderboard.
         /// Use the overloaded methods which are specific to GPGS to modify these
         /// parameters.
-        /// </summary>
+        /// </remarks>
         /// <param name="leaderboardId">Leaderboard Id</param>
         /// <param name="callback">Callback to invoke when completed.</param>
         public void LoadScores(string leaderboardId, Action<IScore[]> callback)
