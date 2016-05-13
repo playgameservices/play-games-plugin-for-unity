@@ -6,6 +6,7 @@ Version 0.9.33
         * #1082 - Changed postbuild order to avoid Invalid PBX project.
         * #1088 - Disable BITCODE for iOS build
         * #1105 - GetServerAuthCode callback should be on game thread.
+                    (also moved other callbacks to be on game thread).
         * Improved jar resolver logic during setup.
     New Features:
         * #990 - Support callback for getting email address.
