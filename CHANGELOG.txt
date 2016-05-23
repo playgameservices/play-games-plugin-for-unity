@@ -1,3 +1,8 @@
+Version 0.9.34
+    Bug Fixes:
+        * #1162 - Cannot build from source
+    New Features:
+        * #1085 - Add SpendProbability player stat.
 Version 0.9.33
     Bug Fixes:
         * #1032 - Not able to get user's email.
