@@ -829,7 +829,11 @@ namespace GooglePlayGames
             {
                 GooglePlayGames.OurUtils.Logger.e(
                     "LoadAchievementDescriptions can only be called after authentication.");
-                callback.Invoke(null);
+                if (callback != null)
+                {
+                    callback.Invoke(null);
+                }
+                return;
             }
 
             mClient.LoadAchievements(ach =>
