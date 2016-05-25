@@ -108,6 +108,8 @@ namespace GooglePlayGames.Editor
                 // check the bundle id and set it if needed.
                 CheckBundleId();
 
+                GPGSDependencies.svcSupport.ClearDependencies();
+                GPGSDependencies.RegisterDependencies();
                 PlayServicesResolver.Resolver.DoResolution(
                     GPGSDependencies.svcSupport,
                     "Assets/Plugins/Android",

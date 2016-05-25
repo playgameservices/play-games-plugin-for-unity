@@ -46,6 +46,14 @@ namespace GooglePlayGames.Editor
                                              EditorPrefs.GetString("AndroidSdkRoot"),
                                              "ProjectSettings");
 
+            RegisterDependencies();
+        }
+
+        /// <summary>
+        /// Registers the dependencies.
+        /// </summary>
+        public static void RegisterDependencies()
+        {
             svcSupport.DependOn("com.google.android.gms",
                 "play-services-games",
                 PluginVersion.PlayServicesVersionConstraint);
