@@ -719,6 +719,12 @@ namespace GooglePlayGames.Native
         /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.GetPlayerStats"/>
         public void GetPlayerStats(Action<CommonStatusCodes, PlayerStats> callback)
         {
+#if UNITY_ANDROID
+            // Temporary fix to get SpendProbability until the
+            // C++ SDK supports it.
+            PlayGamesHelperObject.RunOnGameThread(() =>
+                clientImpl.GetPlayerStats(GetApiClient(), callback));
+#else
             mServices.StatsManager().FetchForPlayer((playerStatsResponse) => {
                 // Translate native errors into CommonStatusCodes.
                 CommonStatusCodes responseCode =
@@ -749,6 +755,7 @@ namespace GooglePlayGames.Native
                     }
                 }
             });
+#endif
         }
 
         ///<summary></summary>

@@ -190,12 +190,15 @@ namespace GooglePlayGames.Editor
                 "Assets/GooglePlayGames/Platforms/Android/Gms/Games/Stats/StatsObject.cs.meta"
             };
 
-            foreach (string file in obsoleteFiles)
-            {
-                if (File.Exists(file))
+            // only delete these if we are not version 0.9.34
+            if (PluginVersion.VersionKey !=  PluginVersion.VersionKeyJNIStats) {
+                foreach (string file in obsoleteFiles)
                 {
-                    Debug.Log("Deleting obsolete file: " + file);
-                    File.Delete(file);
+                    if (File.Exists(file))
+                    {
+                        Debug.Log("Deleting obsolete file: " + file);
+                        File.Delete(file);
+                    }
                 }
             }
 

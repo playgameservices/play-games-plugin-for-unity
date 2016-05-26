@@ -100,6 +100,19 @@ namespace GooglePlayGames.BasicApi
         }
 
         /// <summary>
+        /// The approximate probability of the player choosing to spend in this game.
+        /// </summary>
+        /// <remarks>
+        /// This value is given as a decimal value between 0 and 1 (inclusive).
+        ///  Higher values indicate that a player is more likely to spend.
+        /// A return value less than zero indicates this value is not available.
+        /// </remarks>
+        public float SpendProbability {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// The approximate probability of the player not returning to play the game.
         /// </summary>
         /// <remarks>

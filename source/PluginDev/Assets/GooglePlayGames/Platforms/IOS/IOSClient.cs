@@ -57,6 +57,12 @@ namespace GooglePlayGames.IOS
         {
             return new IOSTokenClient();
         }
+
+        public void GetPlayerStats(IntPtr apiClientPtr,
+            Action<CommonStatusCodes, PlayerStats> callback) {
+            throw new InvalidOperationException(
+                "The native API should be called for iOS");
+        }
     }
 }
 #endif

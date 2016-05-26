@@ -55,6 +55,7 @@ project.ext {
 
     sso_jarresolver_repo = 'sso://devrel/libraries/android/unity-jar-resolver'
     https_jarresolver_repo = 'https://devrel.googlesource.com/libraries/android/unity-jar-resolver'
+    github_jarresolver_repo = 'https://github.com/googlesamples/unity-jar-resolver.git'
 }
 
 
@@ -217,15 +218,27 @@ sampleList.each { sampleName ->
 task import_jarresolver() {
     description = "Imports the jar resolver package into the plugin"
     doFirst {
+        if (file(pluginProj).exists()) {
+            delete pluginProj
+        }
+    }
+    doLast {
         def tree = fileTree("${resolverDir}")
             {
                 include '*.unitypackage'
             }
     def jarresolver_package = tree.getSingleFile()
 
-        exec {
+        ext.execResult = exec {
             executable "${unity_exe}"
                 args "-g.building", "-buildTarget", "android", "-batchmode", "-createProject", "${pluginProj}", "-logFile", "build/import_resolver_unity.log",  "-importPackage", "${jarresolver_package}", "-quit"
+                        ignoreExitValue true
+        }
+        if (ext.execResult.exitValue != 0) {
+            println "***Error Running Unity:"
+            def src = file('build/import_resolver_unity.log').text
+            print src
+            throw new GradleException('error exporting plugin')
         }
 
     }
@@ -235,6 +248,8 @@ task import_jarresolver() {
 task copy_pluginProjSrc << {
     copy {
         from {"${pluginBuildSrc}"}
+        includes ["**/*"]
+        duplicatesStrategy DuplicatesStrategy.INCLUDE
         into {"${pluginProj}"}
     }
 }
@@ -265,9 +280,16 @@ task export_package () {
                 "-quit"
         ]
 
-        exec {
+        ext.execResult = exec {
             executable "${unity_exe}"
                 args argv
+                ignoreExitValue true
+        }
+        if (ext.execResult.exitValue != 0) {
+            println "***Error Running Unity:"
+            def src = file('build/unity.log').text
+            print src
+            throw new GradleException('error exporting plugin')
         }
     }
 }
@@ -364,25 +386,51 @@ task copy_jarresolver (type:Exec) {
     ext.remoteTaskPhase = "prebuild"
     dependsOn copy_plugin_source
 
+    doFirst {
+        if (file(resolverDir).exists()) {
+            delete resolverDir
+        }
+    }
+
+
     executable "${git_exe}"
     args "clone", "${https_jarresolver_repo}", "${resolverDir}"
     ignoreExitValue true
 
+
     doLast {
         if (execResult.exitValue != 0) {
-            exec {
+            ext.sso = exec {
                 executable = "${git_exe}"
                 args "clone", "${sso_jarresolver_repo}", "${resolverDir}"
+                ignoreExitValue true
+            }
+
+            if (ext.sso.exitValue != 0) {
+                exec {
+                    // try github
+                    executable = "${git_exe}"
+                    args "clone", "${github_jarresolver_repo}", "${resolverDir}"
+                }
+            } else {
+                print " -- SSO was successful!"
             }
         }
     }
 }
 
-task copy_gpg_sdk << {
-    copy {
-        from zipTree('gpg_cpp_sdk.zip')
-        // Determine the destination directory later
-        into {'build/jni' }
+task copy_gpg_sdk {
+    doFirst {
+        if (file('build/jni/gpg-cpp-sdk').exists()) {
+            delete 'build/jni/gpg-cpp-sdk'
+        }
+    }
+    doLast {
+        copy {
+            from zipTree('gpg_cpp_sdk.zip')
+            // Determine the destination directory later
+            into {'build/jni' }
+        }
     }
 }
 copy_gpg_sdk.description = "Unzips the GPG SDK into the correct dir for NDK"

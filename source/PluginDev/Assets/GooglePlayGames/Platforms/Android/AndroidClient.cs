@@ -18,6 +18,9 @@
 namespace GooglePlayGames.Android
 {
     using System;
+    using Com.Google.Android.Gms.Common.Api;
+    using Com.Google.Android.Gms.Games.Stats;
+    using Com.Google.Android.Gms.Games;
     using UnityEngine;
     using GooglePlayGames.BasicApi;
     using GooglePlayGames.OurUtils;
@@ -109,6 +112,62 @@ namespace GooglePlayGames.Android
             finally
             {
                 AndroidJNIHelper.DeleteJNIArgArray(objectArray, jArgs);
+            }
+        }
+
+        public void GetPlayerStats(IntPtr apiClient,
+                                    Action<CommonStatusCodes,
+                                    GooglePlayGames.BasicApi.PlayerStats> callback)
+        {
+            GoogleApiClient client = new GoogleApiClient(apiClient);
+            StatsResultCallback resCallback;
+
+            try
+            {
+                resCallback = new StatsResultCallback((result, stats) =>
+                        {
+                            Debug.Log("Result for getStats: " + result);
+                            GooglePlayGames.BasicApi.PlayerStats s = null;
+                            if (stats != null)
+                            {
+                                s = new GooglePlayGames.BasicApi.PlayerStats();
+                                s.AvgSessonLength = stats.getAverageSessionLength();
+                                s.DaysSinceLastPlayed = stats.getDaysSinceLastPlayed();
+                                s.NumberOfPurchases = stats.getNumberOfPurchases();
+                                s.NumberOfSessions = stats.getNumberOfSessions();
+                                s.SessPercentile = stats.getSessionPercentile();
+                                s.SpendPercentile = stats.getSpendPercentile();
+                                s.ChurnProbability = stats.getChurnProbability();
+                                s.SpendProbability = stats.getSpendProbability();
+                            }
+                            callback((CommonStatusCodes)result, s);
+                         });
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                callback(CommonStatusCodes.DeveloperError, null);
+                return;
+            }
+
+            PendingResult<Stats_LoadPlayerStatsResultObject> pr =
+                    Games.Stats.loadPlayerStats(client, true);
+
+            pr.setResultCallback(resCallback);
+        }
+
+        class StatsResultCallback : ResultCallbackProxy<Stats_LoadPlayerStatsResultObject>
+        {
+            private Action<int, Com.Google.Android.Gms.Games.Stats.PlayerStats> callback;
+
+            public StatsResultCallback(Action<int, Com.Google.Android.Gms.Games.Stats.PlayerStats> callback)
+            {
+                this.callback = callback;
+            }
+
+            public override void OnResult(Stats_LoadPlayerStatsResultObject arg_Result_1)
+            {
+                callback(arg_Result_1.getStatus().getStatusCode(), arg_Result_1.getPlayerStats());
             }
         }
     }
