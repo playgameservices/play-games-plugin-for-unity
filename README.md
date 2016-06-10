@@ -40,14 +40,14 @@ Features:
 
 System requirements:
 
-* Unity&reg; 5 or above. 
+* Unity&reg; 5 or above.
 
   *Note:4.6.8 works at runtime, but some editor functionality does not work.
   as a result, use of older version of Unity are at your own peril.*
 * To deploy on Android:
     * Android SDK
     * Android v4.0 or higher
-    * Google Play Services library, version 8.1 or above
+    * Google Play Services library, version 8.4 or above
 * To deploy on iOS:
     * XCode 6 or above
     * [Cocoapods](https://cocoapods.org/)
@@ -55,7 +55,9 @@ System requirements:
 
 ## Upgrading
 
-If you have already integrated your project with a previous version of the plugin and wish to upgrade to a new version, please refer to the [upgrade instructions](UPGRADING.txt).
+If you have already integrated your project with a previous version of the
+plugin and wish to upgrade to a new version, please refer to the
+[upgrade instructions](UPGRADING.txt).
 
 ## Configure Your Game
 
@@ -96,7 +98,7 @@ Back in Unity, open the setup dialog **Window > Google Play Games > Setup... > A
  * **Enter the directory to save constants** - Enter the folder for the constants file.
  * **Constants class name** - this is the name of the C# class to create, including namespace.
  * **Resources Definition** - paste the resource data from the Play Games console here.
- * **Web client ID** - this is the client ID of the linked web app.  It is only needed if 
+ * **Web client ID** - this is the client ID of the linked web app.  It is only needed if
 you have a web based back-end for your game, need an access token for the player to
 make other, non-game API calls, or need to access the email address of the player.
 
@@ -118,8 +120,8 @@ Add
 and
 [leaderboards](https://developers.google.com/games/services/common/concepts/leaderboards)
 to your game in the Google Play Developer Console. For each achievement and
-leaderboard you configure, make sure to note 
-the corresponding **achievement ID** or **leaderboard ID**, 
+leaderboard you configure, make sure to note
+the corresponding **achievement ID** or **leaderboard ID**,
 as those will be needed when making the API calls.
 Achievement and leaderboard IDs are alphanumeric strings (e.g.  "Cgkx9eiuwi8_AQ").
 
@@ -152,26 +154,31 @@ the **current-build** directory:
 
 To install the plugin, simply open your game project in Unity and import that file into
 your project's assets, as you would any other Unity package. This is accomplished through
-the **Assets | Import Package | Custom Package** menu item (you can also reach this menu it
-by right-clicking the **Assets** folder). After importing, you should see that
-a new menu item was added to the Window menu: **"Google Play Games"**.
+the **Assets > Import Package > Custom Package** menu item (you can also reach this menu it
+by right-clicking the **Assets** folder).
+
+Next, make sure your current build platform is set to **Android**. From
+**File > Build Settings…** select **Android** and click **Switch Platform**.
+You should now see a new menu item was added under **Window > Google Play Games**.
 If you don't see the new menu items, refresh the assets by
-clicking **Assets | Refresh** and try again.
+clicking **Assets > Refresh** and try again.
 
 ## Android Setup
-
-To configure your Unity game to run with Google Play Games on Android, first
-open the Android SDK manager and verify that you have downloaded the **Google
-Play Services** package. The Android SDK manager is usually available in your
-SDK installation directory, under the "tools" subdirectory, and is called
-**android** (or **android.exe** on Windows). The **Google Play Services**
-package is available under the **Extras** folder. If it is not installed
-or is out of date, install or update it before proceeding.
 
 Next, set up the path to your Android SDK installation in Unity. This is located in the
 preferences menu, under the **External Tools** section.
 
-Next, configure your game's package name. To do this, click **File | Build Settings**,
+To configure your Unity game to run with Google Play Games on Android, first
+open the Android SDK manager and verify that you have downloaded the following
+packages.  Depending on if you are using the SDK manager from Android Studio,
+or using the standalone SDK manager, the name of the components may be different.
+- Google Play Services
+- Android Support Library
+- Local Maven repository for Support Libraries (Also known as Android Support Repository)
+- Google Repository
+- Android 6.0 (API 23) (this does not affect the min SDK version).
+
+Next, configure your game's package name. To do this, click **File > Build Settings**,
 select the **Android** platform and click **Player Settings** to show Unity's
 Player Settings window. In that window, look for the **Bundle Identifier** setting
 under **Other Settings**. Enter your package name there (for example
@@ -239,11 +246,11 @@ a linker error when building the Xcode application.  If you see the error:
 Then open the project tree, expand Frameworks, and delete libPods-Unity-iPhone.a
 and rebuild.
 
-Next, open the iOS build settings dialog. To do so, click **File | Build Settings**,
+Next, open the iOS build settings dialog. To do so, click **File > Build Settings**,
 select the **iOS** platform, and click **Player Settings**. Find the **Bundle Identifier**
 setting and enter your bundle identifier there.
 
-Next, click the **Window | Google Play Games | Setup  - iOS setup menu item.
+Next, click the **Window > Google Play Games > Setup  - iOS setup** menu item.
 
 Enter the Constants class name.  This is the name of the fully qualified class
 that will be updated (or created) which contains the IDs of the game resources.
@@ -273,10 +280,10 @@ and run the project at this point. You will see a screen with an **Authenticate*
 and you should be able to sign in when you click it.
 
 To build and run on Android, click
-**File | Build Settings**, select the **Android** platform, then
+**File > Build Settings**, select the **Android** platform, then
 **Switch to Platform**, then **Build and Run**.
 
-To build and run on iOS, click **File | Build Settings**, select the **iOS** platform,
+To build and run on iOS, click **File > Build Settings**, select the **iOS** platform,
 then **Switch to Platform**, then **Build**. This will export an XCode project and
 will display additional instructions on completing the build.
 
@@ -300,7 +307,7 @@ available.
 ## Nearby Connections Configuration
 In order to use nearby connections, a service id which uniquely identifies the
 set of applications that can interact needs to be configured.
-This is done by clicking the **Window | Google Play Games | Nearby Connections setup...**
+This is done by clicking the **Window > Google Play Games > Nearby Connections setup...**
 menu item. This will display the
 nearby conections setup screen.  On this screen enter the service ID you want to use.
 It should be something that identifies your application, and  follows the
@@ -315,8 +322,9 @@ please refer to [nearby connections](NEARBY.md).
 
 ## Configuration & Initialization Play Game Services
 
-In order to save game progress or handle multiplayer invitations and
-turn notifications, the default configuration needs to be replaced with a custom configuration.
+In order to save game progress, handle multiplayer invitations and
+turn notifications, or require access to a player's Google+ social graph,
+the default configuration needs to be replaced with a custom configuration.
 To do this use the **PlayGamesClientConfiguration**.  If your game does not
 use these features, then there is no need to
 initialize the platform configuration.  Once the instance is initialized,
@@ -335,6 +343,8 @@ make it your default social platform by calling **PlayGamesPlatform.Activate**:
         // registers a callback for turn based match notifications received while the
         // game is not running.
         .WithMatchDelegate(<callback method>)
+        // require access to a player's Google+ social graph (usually not needed)
+        .RequireGooglePlus()
         .Build();
 
     PlayGamesPlatform.InitializeInstance(config);
@@ -374,7 +384,7 @@ good practice to put up a standby screen until the callback is called, to make
 sure the user can't start playing the game until the authentication process
 completes.
 
-## Player Statistics (Android Only)
+## Player Statistics
 
 The Player Stats API let you tailor game experiences to specific segments
 of players and different stages of the player lifecycle. You can build
@@ -398,7 +408,7 @@ The player stats are available after authenticating:
         {
             // -1 means cached stats, 0 is succeess
             // see  CommonStatusCodes for all values.
-            if (rc <= 0) {
+            if (rc <= 0 && stats.HasDaysSinceLastPlayed()) {
                 Debug.Log("It has been " + stats.DaysSinceLastPlayed + " days");
             }
         });
@@ -841,51 +851,77 @@ Once the saved game file is opened, it can be read to load the game state.  This
     }
 ```
 
-## Retrieving player's email or access token ##
+### Deleting a saved game ###
 
-In order to access the player's email or access token, you need to configure
-a web app associated with your game in the Play Game Console.  If your game
-does not use a custom back-end application, you can set the launch URL to be
-`https://localhost`.
+Once the saved game file is opened, it can be deleted. This is done by calling **Delete**.
 
-Copy the client id from the web application and enter it in the setup dialog for
-this plugin.  This will configure the correct permissions and settings needed
-to access the email address and access token.
-
-To get the email:
 
 ```csharp
+    void DeleteGameData (string filename) {
+        // Open the file to get the metadata.
+        ISavedGameClient savedGameClient = PlayGamesPlatform.Instance.SavedGame;
+        savedGameClient.OpenWithAutomaticConflictResolution(filename, DataSource.ReadCacheOrNetwork,
+            ConflictResolutionStrategy.UseLongestPlaytime, DeleteSavedGame);
+    }
+
+    public void DeleteSavedGame(SavedGameRequestStatus status, ISavedGameMetadata game) {
+        if (status == SavedGameRequestStatus.Success) {
+            ISavedGameClient savedGameClient = PlayGamesPlatform.Instance.SavedGame;
+            savedGameClient.Delete(game);
+        } else {
+            // handle error
+        }
+    }
+```
+
+## Retrieving server authentication codes ##
+In order to access Google APIs on a backend web server on behalf of the current
+player, you need to get an authentication code from the client application and
+pass this to your web server application.  This code can then be exchanged for
+an access token to make calls to the various APIs.
+For more details on this flow see: [Google Sign-In for Websites](https://developers.google.com/identity/sign-in/web/server-side-flow).
+
+To get the Auth code:
+1. Configure the web client Id of the web application linked to your game in the
+Play Game Console.
+2. Call `PlayGamesPlatform.GetServerAuthCode()` to get the code.
+3. Pass this code to your server application.
+
+
+## Retrieving player's email or a unique identifier##
+In order to access the player's email address, the plugin uses the account picker
+standard UI from Android.  This API presents an account picker to the player.  The
+account the player selects does not necessarily correspond to gamer account the user
+authenticated with.  The user can also select "Cancel" and not select any email.
+In this case, null is returned as the email address. __Note__: This also means the
+email address is not a reliable unique identifier.
+
+If all that is needed is a persistent unique identifier for the player, then you
+should use the player's id.  This is a unique ID specific to that player and
+is the same value all the time.
+
+Once the user is authenticated, you can get the email via polling:
+The email address is populated asynchronously, and is only available
+on the UI thread.
+
+```csharp
+    // call this from Update()
     Debug.Log("Local user's email is " +
         ((PlayGamesLocalUser)Social.localUser).Email);
 ```
 
-To get the access token:
+You can also get the email address asynchrously:
 
-```charp
-    Debug.Log("AccessToken is " +
-        ((PlayGamesLocalUser)Social.localUser).accessToken);
+``csharp
+    PlayGamesPlatform.Instance.GetEmail((status, email) => {
+            if (status == CommonStatusCodes.Success) {
+                Debug.Log("The address is " + email");
+            }
+            else {
+                Debug.Log("Error getting email: " + status);
+            }
+        });
 ```
-
-
-To get the id token:
-
-```charp
-    Debug.Log("IdToken is " +
-        ((PlayGamesLocalUser)Social.localUser).idToken);
-```
-
-__NOTE:__ The email and access tokens are only available on the UI Thread.
-If you need to get these from the non-UI thread, you can use the helper function
-RunOnGameThread:
-
-```csharp
-    GooglePlayGames.OurUtils.PlayGamesHelperObject.RunOnGameThread(
-        () => { Debug.Log("Local user's email is " +
-                    ((PlayGamesLocalUser)Social.localUser).Email);
-                // use the email as needed
-              });
-```
-
 ## Loading Friends ##
 To load the friends of the current player, you can use the ISocial framework.
 This call is asynchronous, so the friends need to be processed in the callback.
@@ -894,8 +930,8 @@ This call is asynchronous, so the friends need to be processed in the callback.
 Social.localUser.LoadFriends((ok) =>  {
     Debug.Log("Friends loaded OK: " + ok));
     foreach(IUserProfile p in Social.localUser.friends) {
-         Debug.Log(p.userName + " is a friend");   
-    }   
+         Debug.Log(p.userName + " is a friend");
+    }
 });
 ```
 
@@ -927,7 +963,7 @@ After signing out, no further API calls can be made until the user authenticates
 
 ## Building for iOS
 
-To build your game for iOS, do as you would normally do in Unity. Select **File | Build Settings**, then select the **iOS** platform.
+To build your game for iOS, do as you would normally do in Unity. Select **File > Build Settings**, then select the **iOS** platform.
 Click **Player Settings** and make sure that the target iOS platform is 7.0 or above.
 
 Then, click **Build** and select an output directory to save the XCode project. Do not use
@@ -960,8 +996,9 @@ panel, find the entry named "Scripting Define Symbol" and add a symbol named: NO
 
 **"The current deployment target does not support automated _weak references"**. Make sure your target iOS platform is 7.0 or above. If the target platform is below 7.0, this error will occur during build.
 
-**"Dsymutil error"**. Depending on your version of XCode, you may need to disable dSYM file generation. To do this, go to Build Settings |
-Build Options | Debug Information Format | Debug. Select **DWARF** instead of **DWARF with dSYM**.
+**"Dsymutil error"**. Depending on your version of XCode, you may need to disable dSYM file generation.
+To do this, go to **File > Build Settings > Build Options > Debug Information Format > Debug**.
+Select **DWARF** instead of **DWARF with dSYM**.
 
 **URL errors while signing in.** This is often a sign that either the client ID or the Bundle Identifier is not correctly set up, or that your **Info.plist** file got corrupted. Check that your client ID and Bundle ID are correctly configured in the project and that they correspond to the data in the Developer Console.
 
@@ -976,7 +1013,7 @@ is needed.
 
 To run your game in the simulator as opposed to a real device, you must export
 it from Unity with the "Simulator SDK" instead of the "Device SDK". To do this,
-open your game project in Unity, select **File | Build Settings**, select iOS,
+open your game project in Unity, select **File > Build Settings**, select iOS,
 then click on **Player Settings**. Scroll down to find the **"SDK Version"**
 option, and change it to **"Simulator SDK".**
 

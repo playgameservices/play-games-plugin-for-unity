@@ -13,15 +13,15 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
+#if (UNITY_ANDROID || (UNITY_IPHONE && !NO_GPGS))
 
 namespace GooglePlayGames.BasicApi.Multiplayer
 {
-    using UnityEngine;
 
     /// <summary>
     /// Represents a player. A player is different from a participant! The participant is
     /// an entity that takes part in a particular match; a Player is a real-world person
-    /// (tied to a Google account). The player exists across matches, the Participant
+    /// (tied to a Games account). The player exists across matches, the Participant
     /// only exists in the context of a particular match.
     /// </summary>
     public class Player : PlayGamesUserProfile
@@ -32,3 +32,4 @@ namespace GooglePlayGames.BasicApi.Multiplayer
         }
     }
 }
+#endif

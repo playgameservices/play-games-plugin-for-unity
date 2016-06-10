@@ -16,19 +16,25 @@
 
 namespace GooglePlayGames.BasicApi.Multiplayer
 {
+// move inside the namespace so the namespace is declared if not using GPGS
+#if (UNITY_ANDROID || (UNITY_IPHONE && !NO_GPGS))
   using System;
   using System.Collections.Generic;
   using GooglePlayGames.BasicApi.Multiplayer;
 
   /// <summary>
-  /// API entry point for Real-Time multiplayer. To know more about multiplayer,
+  /// API entry point for Real-Time multiplayer.
+  /// </summary>
+  /// <remarks> To know more about multiplayer,
   /// terminology, etc, please refer to the online guide at:
   /// https://github.com/playgameservices/play-games-plugin-for-unity
-  /// </summary>
+  /// </remarks>
   public interface IRealTimeMultiplayerClient
   {
     /// <summary>
     /// Creates a game with random automatch opponents. No UI will be shown.
+    /// </summary>
+    /// <remarks>
     /// The participants will be automatically selected among users who are currently
     /// looking for opponents.
     /// After calling this method, your listener's
@@ -38,7 +44,7 @@ namespace GooglePlayGames.BasicApi.Multiplayer
     /// will be called to indicate that the room setup is either complete or has failed
     /// (check the <b>success</b> parameter of the callback). If you wish to
     /// cancel room setup, call <see cref="LeaveRoom"/>.
-    /// </summary>
+    /// </remarks>
     /// <param name="minOpponents">Minimum number of opponents (not counting the
     /// current player -- so for a 2-player game, pass 1).</param>
     /// <param name="maxOpponents">Max number of opponents (not counting the current
@@ -49,7 +55,9 @@ namespace GooglePlayGames.BasicApi.Multiplayer
                          RealTimeMultiplayerListener listener);
 
     /// <summary>
-    /// Creates a game with random automatch opponents using exclusiveBitMask No UI will be shown.
+    /// Creates a game with random automatch opponents using exclusiveBitMask.
+    /// </summary>
+    /// <remarks> No UI will be shown.
     /// The participants will be automatically selected among users who are currently
     /// looking for opponents.
     /// After calling this method, your listener's
@@ -59,7 +67,7 @@ namespace GooglePlayGames.BasicApi.Multiplayer
     /// will be called to indicate that the room setup is either complete or has failed
     /// (check the <b>success</b> parameter of the callback). If you wish to
     /// cancel room setup, call <see cref="LeaveRoom"/>.
-    /// </summary>
+    /// </remarks>
     /// <param name="minOpponents">Minimum number of opponents (not counting the
     /// current player -- so for a 2-player game, pass 1).</param>
     /// <param name="maxOpponents">Max number of opponents (not counting the current
@@ -72,7 +80,9 @@ namespace GooglePlayGames.BasicApi.Multiplayer
         RealTimeMultiplayerListener listener);
 
     /// <summary>
-    /// Creates a game with an invitation screen. An invitation screen will be shown
+    /// Creates a game with an invitation screen.
+    /// </summary>
+    /// <remarks> An invitation screen will be shown
     /// where the user can select who to invite to a multiplayer game. The invitation
     /// screen also allows the user to add random automatch opponents. After the invitation
     /// screen is dismissed, the room connection process will begin. The listener's
@@ -81,7 +91,7 @@ namespace GooglePlayGames.BasicApi.Multiplayer
     /// <see cref="RealTimeMultiplayerListener.OnRoomConnected"/> will be called to
     /// indicate that the room setup is either complete or has failed (check the
     /// <b>success</b> parameter of the callback).
-    /// </summary>
+    /// </remarks>
     /// <param name="minOpponents">Minimum number of opponents, not including the
     /// current player.</param>
     /// <param name="maxOppponents">Maximum number of oppponents, not including the
@@ -102,7 +112,9 @@ namespace GooglePlayGames.BasicApi.Multiplayer
     void GetAllInvitations(Action<Invitation[]> callback);
 
     /// <summary>
-    /// Creates a real-time game starting with the inbox screen. On the inbox screen,
+    /// Creates a real-time game starting with the inbox screen.
+    /// </summary>
+    /// <remarks>On the inbox screen,
     /// the player can select an invitation to accept, in which case the room setup
     /// process will start. The listener's
     /// <see cref="RealTimeMultiplayerListener.OnRoomSetupProgress"/> will be called
@@ -110,18 +122,20 @@ namespace GooglePlayGames.BasicApi.Multiplayer
     /// <see cref="RealTimeMultiplayerListener.OnRoomConnected"/> will be called to
     /// indicate that the room setup is either complete or has failed (check the
     /// <b>success</b> parameter of the callback).
-    /// </summary>
+    /// </remarks>
     /// <param name="listener">Listener. The listener to notify of relevant events.</param>
     void AcceptFromInbox(Multiplayer.RealTimeMultiplayerListener listener);
 
     /// <summary>
-    /// Accepts an invitation, given its ID. This will not show any UI. The listener's
+    /// Accepts an invitation, given its ID.
+    /// </summary>
+    /// <remarks>This will not show any UI. The listener's
     /// <see cref="RealTimeMultiplayerListener.OnRoomSetupProgress"/> will be called
     /// to report room setup progress, and eventually
     /// <see cref="RealTimeMultiplayerListener.OnRoomConnected"/> will be called to
     /// indicate that the room setup is either complete or has failed (check the
     /// <b>success</b> parameter of the callback).
-    /// </summary>
+    /// </remarks>
     /// <param name="invitationId">Invitation id to accept.</param>
     /// <param name="listener">Listener. Listener to notify of relevant events.</param>
     void AcceptInvitation(string invitationId, RealTimeMultiplayerListener listener);
@@ -180,7 +194,9 @@ namespace GooglePlayGames.BasicApi.Multiplayer
     Invitation GetInvitation();
 
     /// <summary>
-    /// Leaves the room. Call this method to leave the room after you have
+    /// Leaves the room.
+    /// </summary>
+    /// <remarks>Call this method to leave the room after you have
     /// started room setup. Leaving the room is not an immediate operation -- you
     /// must wait for <see cref="RealTimeMultplayerListener.OnLeftRoom"/>
     /// to be called. If you leave a room before setup is complete, you will get
@@ -189,7 +205,7 @@ namespace GooglePlayGames.BasicApi.Multiplayer
     /// parameter instead. If you attempt to leave a room that is shutting down or
     /// has shutdown already, you will immediately receive the
     /// <see cref="RealTimeMultiplayerListener.OnLeftRoom"/> callback.
-    /// </summary>
+    /// </remarks>
     void LeaveRoom();
 
     /// <summary>
@@ -202,4 +218,5 @@ namespace GooglePlayGames.BasicApi.Multiplayer
     /// <param name="invitationId">Invitation id to decline.</param>
     void DeclineInvitation(string invitationId);
   }
+    #endif
 }

@@ -59,7 +59,7 @@ internal static class JavaUtils {
                 // expected -- means method returned null
                 return null;
             } else {
-                Logger.w("CallObjectMethod exception: " + ex);
+                GooglePlayGames.OurUtils.Logger.w("CallObjectMethod exception: " + ex);
                 return null;
             }
         }

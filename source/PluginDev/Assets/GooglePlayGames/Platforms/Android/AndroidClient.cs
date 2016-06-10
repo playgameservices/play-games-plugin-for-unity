@@ -18,12 +18,12 @@
 namespace GooglePlayGames.Android
 {
     using System;
-    using UnityEngine;
-    using GooglePlayGames.BasicApi;
-    using GooglePlayGames.OurUtils;
     using Com.Google.Android.Gms.Common.Api;
     using Com.Google.Android.Gms.Games.Stats;
     using Com.Google.Android.Gms.Games;
+    using UnityEngine;
+    using GooglePlayGames.BasicApi;
+    using GooglePlayGames.OurUtils;
     using C = GooglePlayGames.Native.Cwrapper.InternalHooks;
     using GooglePlayGames.Native.PInvoke;
 
@@ -71,11 +71,11 @@ namespace GooglePlayGames.Android
         }
 
 
-        public TokenClient CreateTokenClient(bool reset)
+        public TokenClient CreateTokenClient(string playerId, bool reset)
         {
             if (tokenClient == null || reset)
             {
-                tokenClient = new AndroidTokenClient();
+                tokenClient = new AndroidTokenClient(playerId);
             }
             return tokenClient;
         }
@@ -106,8 +106,8 @@ namespace GooglePlayGames.Android
             }
             catch (Exception e)
             {
-                Logger.e("Exception launching bridge intent: " + e.Message);
-                Logger.e(e.ToString());
+                GooglePlayGames.OurUtils.Logger.e("Exception launching bridge intent: " + e.Message);
+                GooglePlayGames.OurUtils.Logger.e(e.ToString());
             }
             finally
             {
@@ -115,8 +115,9 @@ namespace GooglePlayGames.Android
             }
         }
 
-        public void GetPlayerStats(IntPtr apiClient, Action<CommonStatusCodes,
-            PlayGamesLocalUser.PlayerStats> callback)
+        public void GetPlayerStats(IntPtr apiClient,
+                                    Action<CommonStatusCodes,
+                                    GooglePlayGames.BasicApi.PlayerStats> callback)
         {
             GoogleApiClient client = new GoogleApiClient(apiClient);
             StatsResultCallback resCallback;
@@ -124,22 +125,23 @@ namespace GooglePlayGames.Android
             try
             {
                 resCallback = new StatsResultCallback((result, stats) =>
-                    {
-                        Debug.Log("Result for getStats: " + result);
-                        PlayGamesLocalUser.PlayerStats s = null;
-                        if (stats != null)
                         {
-                            s = new PlayGamesLocalUser.PlayerStats();
-                            s.AvgSessonLength = stats.getAverageSessionLength();
-                            s.DaysSinceLastPlayed = stats.getDaysSinceLastPlayed();
-                            s.NumberOfPurchases = stats.getNumberOfPurchases();
-                            s.NumOfSessions = stats.getNumberOfSessions();
-                            s.SessPercentile = stats.getSessionPercentile();
-                            s.SpendPercentile = stats.getSpendPercentile();
-                            s.ChurnProbability = stats.getChurnProbability();
-                        }
-                        callback((CommonStatusCodes)result, s);
-                    });
+                            Debug.Log("Result for getStats: " + result);
+                            GooglePlayGames.BasicApi.PlayerStats s = null;
+                            if (stats != null)
+                            {
+                                s = new GooglePlayGames.BasicApi.PlayerStats();
+                                s.AvgSessonLength = stats.getAverageSessionLength();
+                                s.DaysSinceLastPlayed = stats.getDaysSinceLastPlayed();
+                                s.NumberOfPurchases = stats.getNumberOfPurchases();
+                                s.NumberOfSessions = stats.getNumberOfSessions();
+                                s.SessPercentile = stats.getSessionPercentile();
+                                s.SpendPercentile = stats.getSpendPercentile();
+                                s.ChurnProbability = stats.getChurnProbability();
+                                s.SpendProbability = stats.getSpendProbability();
+                            }
+                            callback((CommonStatusCodes)result, s);
+                         });
             }
             catch (Exception e)
             {
@@ -149,16 +151,16 @@ namespace GooglePlayGames.Android
             }
 
             PendingResult<Stats_LoadPlayerStatsResultObject> pr =
-                Games.Stats.loadPlayerStats(client, true);
+                    Games.Stats.loadPlayerStats(client, true);
 
             pr.setResultCallback(resCallback);
         }
 
         class StatsResultCallback : ResultCallbackProxy<Stats_LoadPlayerStatsResultObject>
         {
-            private Action<int, PlayerStats> callback;
+            private Action<int, Com.Google.Android.Gms.Games.Stats.PlayerStats> callback;
 
-            public StatsResultCallback(Action<int, PlayerStats> callback)
+            public StatsResultCallback(Action<int, Com.Google.Android.Gms.Games.Stats.PlayerStats> callback)
             {
                 this.callback = callback;
             }

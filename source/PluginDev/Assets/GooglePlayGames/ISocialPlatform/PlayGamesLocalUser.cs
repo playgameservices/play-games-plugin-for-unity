@@ -13,6 +13,7 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
+#if (UNITY_ANDROID || (UNITY_IPHONE && !NO_GPGS))
 
 namespace GooglePlayGames
 {
@@ -66,7 +67,7 @@ namespace GooglePlayGames
         }
 
         /// <summary>
-        /// Not implemented. Returns an empty list.
+        /// Synchronous version of friends, returns null until loaded.
         /// </summary>
         public IUserProfile[] friends
         {
@@ -74,6 +75,21 @@ namespace GooglePlayGames
             {
                 return mPlatform.GetFriends();
             }
+        }
+
+        /// <summary>
+        /// Gets an id token for the user.
+        /// NOTE: This property can only be accessed using the main Unity thread.
+        /// </summary>
+        /// <param name="idTokenCallback"> A callback to be invoked after token is retrieved. Will be passed null value
+        /// on failure. </param>
+        [Obsolete("Use PlayGamesPlatform.GetServerAuthCode()")]
+        public void GetIdToken(Action<string> idTokenCallback)
+        {
+            if(authenticated)
+                mPlatform.GetIdToken(idTokenCallback);
+            else
+                idTokenCallback(null);
         }
 
         /// <summary>
@@ -127,6 +143,11 @@ namespace GooglePlayGames
         /// <summary>
         /// Gets the user's Google id.
         /// </summary>
+        /// <remarks> This id is persistent and uniquely identifies the user
+        ///     across all games that use Google Play Game Services.  It is
+        ///     the preferred method of uniquely identifying a player instead
+        ///     of email address.
+        /// </remarks>
         /// <returns>
         /// The user's Google id.
         /// </returns>
@@ -148,27 +169,13 @@ namespace GooglePlayGames
         }
 
         /// <summary>
-        /// Gets an id token for the user.
-        /// NOTE: This property can only be accessed using the main Unity thread.
-        /// </summary>
-        /// <returns>
-        /// An id token for the user.
-        /// </returns>
-        public string idToken
-        {
-            get
-            {
-                return authenticated ? mPlatform.GetIdToken() : string.Empty;
-            }
-        }
-
-        /// <summary>
         /// Gets an access token for the user.
         /// NOTE: This property can only be accessed using the main Unity thread.
         /// </summary>
         /// <returns>
         /// An id token for the user.
         /// </returns>
+        [Obsolete("Use PlayGamesPlatform.GetServerAuthCode()")]
         public string accessToken
         {
             get
@@ -219,12 +226,15 @@ namespace GooglePlayGames
             }
         }
 
-        /// <summary>
-        /// Gets the email of the signed in player.  This is only available
-        /// if the web client id is added to the setup (which enables additional
+        /// <summary>Gets the email of the signed in player.</summary>
+        /// <remarks>If your game requires a persistent, unique id for the
+        /// player, the use of PlayerId is recommendend since it does not
+        /// require extra permission consent from the user.
+        /// This is only available if the Requires Google Plus option
+        /// is added to the setup (which enables additional
         /// permissions for the application).
         /// NOTE: This property can only be accessed using the main Unity thread.
-        /// </summary>
+        /// </remarks>
         /// <value>The email.</value>
         public string Email
         {
@@ -247,7 +257,7 @@ namespace GooglePlayGames
         /// <param name="callback">Callback when they are available.</param>
         public void GetStats(Action<CommonStatusCodes, PlayerStats> callback)
         {
-            if (mStats == null)
+            if (mStats == null || !mStats.Valid)
             {
                 mPlatform.GetPlayerStats((rc, stats) =>
                     {
@@ -261,87 +271,6 @@ namespace GooglePlayGames
                 callback(CommonStatusCodes.Success, mStats);
             }
         }
-
-        /// <summary>
-        /// Player stats. See https://developers.google.com/games/services/android/stats
-        /// </summary>
-        public class PlayerStats
-        {
-            /// <summary>
-            /// The number of in-app purchases.
-            /// </summary>
-            public int NumberOfPurchases
-            {
-                get;
-                set;
-            }
-
-            /// <summary>
-            /// The length of the avg sesson in minutes.
-            /// </summary>
-            public float AvgSessonLength
-            {
-                get;
-                set;
-            }
-
-            /// <summary>
-            /// The days since last played.
-            /// </summary>
-            public int DaysSinceLastPlayed
-            {
-                get;
-                set;
-            }
-
-            /// <summary>
-            /// The number of sessions based on sign-ins.
-            /// </summary>
-            public int NumOfSessions
-            {
-                get;
-                set;
-            }
-
-            /// <summary>
-            /// The approximation of sessions percentile for the player,
-            /// given as a decimal value between 0 and 1 (inclusive).
-            /// This value indicates how many sessions the current player has
-            /// played in comparison to the rest of this game's player base.
-            /// Higher numbers indicate that this player has played more sessions.
-            /// A return value  less than zero indicates this value is not available.
-            /// </summary>
-            public float SessPercentile
-            {
-                get;
-                set;
-            }
-
-            /// <summary>
-            /// The approximate spend percentile of the player,
-            /// given as a decimal value between 0 and 1 (inclusive). This
-            /// value indicates how much the current player has spent in
-            /// comparison to the rest of this game's player base. Higher
-            /// numbers indicate that this player has spent more.
-            /// A return value  less than zero indicates this value is not available.
-            /// </summary>
-            public float SpendPercentile
-            {
-                get;
-                set;
-            }
-
-            /// <summary>
-            /// The approximate probability of the player not returning
-            /// to play the game. Higher values indicate that a player
-            /// is less likely to return.
-            /// A return value  less than zero indicates this value is not available.
-            /// </summary>
-            public float ChurnProbability
-            {
-                get;
-                set;
-            }
-        }
     }
 }
+#endif

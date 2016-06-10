@@ -1,3 +1,93 @@
+Version 0.9.34
+    Bug Fixes:
+        * #1162 - Cannot build from source
+        * #1179 - Interfaces should not be under `#if`
+        * #1175 - Play-services version needs to be updated to 9.0.0
+        * #1180 - PlayGamesUserProfile.Equals(object obj)` implemented incorrectly
+    New Features:
+        * #1085 - Add SpendProbability player stat.
+Version 0.9.33
+    Bug Fixes:
+        * #1032 - Not able to get user's email.
+        * #1040 - Cannot parse PBX project for iOS
+        * #1068 - CreateWithInvitationScreen callback called twice on cancel.
+        * #1082 - Changed postbuild order to avoid Invalid PBX project.
+        * #1088 - Disable BITCODE for iOS build
+        * #1105 - GetServerAuthCode callback should be on game thread.
+                    (also moved other callbacks to be on game thread).
+        * Improved jar resolver logic during setup.
+    New Features:
+        * #990 - Support callback for getting email address.
+        * Removed dependency on Google+.
+Version 0.9.32
+    Bug Fixes:
+        * #989 - Fixed misleading messages about RTMP when authenticating.
+        * #999 - Fixed BuildTarget.iOS reference when using Unity 4.x.
+        * #1004 - Upgrading from older version of plugin did not remove unused files.
+        * #1010 - Updated documentation about which Android SDK components
+            are needed.
+        * Updated dependency pattern for android-support-v4 to be 23.1+.
+    New Features:
+        * Play-services-jar resolver update to 1.1.1.
+            See https://github.com/googlesamples/unity-jar-resolver/blob/master/CHANGELOG.md
+            for details on the changes.
+        * Added plugin version to manifest.
+Version 0.9.31a
+    Bug Fixes:
+        * #977 - IsConnectedToRoom always returned false, causing local player
+                to be removed from real time multiplayer room.
+        * #971 - NO_GPGS did not remove the Cocoapod dependencies corrrectly.
+Version 0.9.31
+    New Features:
+        * PlayGamesAchievement (the object returned by
+            PlayGamesPlatform.LoadAchievements) now includes the current number
+            of steps and the total number of steps for the corresponding
+            achievement.
+        * Play-services-jar-resolver updated to 1.1.  This fixes the
+            problem of include play-services-measurement which has a variable
+            in the AndroidManifest.xml file.
+    Bug Fixes:
+        * #935 include IFDEF to allow editing in unsupported platforms.
+Version 0.9.30
+    ** BREAKING CHANGES **
+        * `PlayerStats` is now a standalone class,
+            rather than a subclass of `PlayGamesLocalUser`.
+            All existing references to `PlayGamesLocalUser.PlayerStats`
+            should now directly refer to `PlayerStats`.
+        * The `NumOfSessions` property in `PlayerStats` has been renamed
+            `NumberOfSessions` to be consistent with other properties.
+    New Features:
+        * Rebase PlayerStats API to use the Play Games C++ SDK.
+        * PlayerStats API now supported on iOS.
+        * Added an option to PlayGamesClientConfiguration to require Google+.
+        * Updated to use GPGS C++ SDK version 2.1.
+        * Deprecated GetIdToken and GetAccessToken.  Applications should use
+            `PlayGamesPlatform.GetServerAuthCode()` to use the player's identity
+            on the server side.
+        * Updated configuration dialogs exposing the **Require Google Plus** property.
+            This property should be false if possible, reducing the number of
+            scopes and permissions the player has to allow.  Game developers should
+            use PlayGamesPlatform.GetServerAuthCode() to pass the player's OAuth
+            credentials to the server, and use Player.Id when possible for a persistent,
+            unique identifier for the player rather than email address.
+    Bug Fixes:
+        * #917 iOS 9, game freeze after closing authentication window.
+        * #919 Resolves Android jars even when target is not Android.
+        * #868 Avoid memory allocations in the PlayGamesHelperObject.
+        * #865 GetIdToken needs to be asynchronous.
+Version 0.9.28
+        ** BREAKING CHANGES **
+
+        The jar resolution process for importing Play Services has been
+        standardized with the other Google plugins.  If you are upgrading
+        from 0.9.27, you will need to delete the Assets/GooglePlayGames/Editor
+        directory and restart Unity, then re-import version 0.9.28.
+
+    New Features:
+        * Integrated Play-services-jar resolver plugin for improved compatibility.
+Version 0.9.27a
+    Bug Fixes:
+        * #809 Unity 5.3 namespace conflict
 Version 0.9.27
     New Features:
         * Updating Android email and token access for new permissions model.
@@ -14,7 +104,6 @@ Version 0.9.27
         * #610 Stripped version of Play Services client library.
         * #565 Minimize client library to avoid 65k dex limit.
         * #323 Support for split client aars.
-
 Version 0.9.26
     New Features:
         * #666 Expose invitation property for Real time game.

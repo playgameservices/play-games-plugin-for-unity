@@ -20,6 +20,7 @@ namespace GooglePlayGames.Native.Cwrapper
 {
     using System;
     using System.Runtime.InteropServices;
+    using System.Text;
 
     internal static class GameServices
     {
@@ -32,6 +33,17 @@ namespace GooglePlayGames.Native.Cwrapper
             HandleRef self,
          /* from(GameServices_FlushCallback_t) */FlushCallback callback,
          /* from(void *) */IntPtr callback_arg);
+
+        internal delegate void FetchServerAuthCodeCallback(
+            /* from(FetchServerAuthCodeResponse_t) */ IntPtr arg0,
+            /* from(void *) */ IntPtr arg1);
+
+        [DllImport(SymbolLocation.NativeSymbolLocation)]
+        internal static extern void GameServices_FetchServerAuthCode(
+            HandleRef self,
+            /* from(char const *) */string server_client_id,
+            /* from(GameServices_FetchServerAuthCodeCallback_t) */FetchServerAuthCodeCallback callback,
+            /* from(void *) */IntPtr callback_arg);
 
         [DllImport(SymbolLocation.NativeSymbolLocation)]
         [return: MarshalAs(UnmanagedType.I1)]
@@ -49,6 +61,20 @@ namespace GooglePlayGames.Native.Cwrapper
         [DllImport(SymbolLocation.NativeSymbolLocation)]
         internal static extern void GameServices_StartAuthorizationUI(
             HandleRef self);
+
+        [DllImport(SymbolLocation.NativeSymbolLocation)]
+        internal static extern void GameServices_FetchServerAuthCodeResponse_Dispose (
+            HandleRef self);
+
+        [DllImport(SymbolLocation.NativeSymbolLocation)]
+        internal static extern /* from(ResponseStatus_t) */ CommonErrorStatus.ResponseStatus GameServices_FetchServerAuthCodeResponse_GetStatus (
+            HandleRef self);
+
+        [DllImport(SymbolLocation.NativeSymbolLocation)]
+        internal static extern /* from(size_t) */ UIntPtr GameServices_FetchServerAuthCodeResponse_GetCode (
+            HandleRef self,
+            /* from(char *) */StringBuilder out_arg,
+            /* from(size_t) */UIntPtr out_size);
     }
 }
 #endif // (UNITY_ANDROID || UNITY_IPHONE)

@@ -27,12 +27,11 @@ namespace GooglePlayGames
     /// </summary>
     internal interface IClientImpl
     {
-
         PlatformConfiguration CreatePlatformConfiguration ();
 
-        TokenClient CreateTokenClient (bool reset);
+        TokenClient CreateTokenClient (string playerId, bool reset);
 
-        void GetPlayerStats(IntPtr apiClient, Action<CommonStatusCodes, PlayGamesLocalUser.PlayerStats> callback);
+        void GetPlayerStats(IntPtr apiClientPtr, Action<CommonStatusCodes, PlayerStats> callback);
     }
 }
 

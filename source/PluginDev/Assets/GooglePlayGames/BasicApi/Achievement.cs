@@ -13,15 +13,27 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
+#if (UNITY_ANDROID || (UNITY_IPHONE && !NO_GPGS))
 
 namespace GooglePlayGames.BasicApi
 {
     using System;
 
-    /// <summary>
-    /// Achievement.
-    /// Represents an achievement that can be unlocked at once or incrementally.
-    /// </summary>
+    /// <summary>Data interface for retrieving achievement information.</summary>
+    /// <remarks>
+    /// There are 3 states an achievement can be in:
+    /// <para>
+    ///    Hidden - indicating the name and description of the achievement is
+    ///     not visible to the player.
+    /// </para><para>
+    ///    Revealed - indicating the name and description of the achievement is
+    ///     visible to the player.
+    ///    Unlocked - indicating the player has unlocked, or achieved, the achievment.
+    /// </para><para>
+    /// Achievements has two types, standard which is unlocked in one step,
+    /// and incremental, which require multiple steps to unlock.
+    /// </para>
+    /// </remarks>
     public class Achievement
     {
         static readonly DateTime UnixEpoch =
@@ -56,6 +68,9 @@ namespace GooglePlayGames.BasicApi
         {
         }
 
+        /// <summary>
+        /// Indicates whether this achievement is incremental.
+        /// </summary>
         public bool IsIncremental
         {
             get
@@ -69,6 +84,9 @@ namespace GooglePlayGames.BasicApi
             }
         }
 
+        /// <summary>
+        /// The number of steps the user has gone towards unlocking this achievement.
+        /// </summary>
         public int CurrentSteps
         {
             get
@@ -82,6 +100,9 @@ namespace GooglePlayGames.BasicApi
             }
         }
 
+        /// <summary>
+        /// The total number of steps needed to unlock this achievement.
+        /// </summary>
         public int TotalSteps
         {
             get
@@ -95,6 +116,9 @@ namespace GooglePlayGames.BasicApi
             }
         }
 
+        /// <summary>
+        /// Indicates whether the achievement is unlocked or not.
+        /// </summary>
         public bool IsUnlocked
         {
             get
@@ -108,6 +132,9 @@ namespace GooglePlayGames.BasicApi
             }
         }
 
+        /// <summary>
+        /// Indicates whether the achievement is revealed or not (hidden).
+        /// </summary>
         public bool IsRevealed
         {
             get
@@ -121,6 +148,9 @@ namespace GooglePlayGames.BasicApi
             }
         }
 
+        /// <summary>
+        /// The ID string of this achievement.
+        /// </summary>
         public string Id
         {
             get
@@ -134,6 +164,9 @@ namespace GooglePlayGames.BasicApi
             }
         }
 
+        /// <summary>
+        /// The description of this achievement.
+        /// </summary>
         public string Description
         {
             get
@@ -147,6 +180,9 @@ namespace GooglePlayGames.BasicApi
             }
         }
 
+        /// <summary>
+        /// The name of this achievement.
+        /// </summary>
         public string Name
         {
             get
@@ -160,6 +196,13 @@ namespace GooglePlayGames.BasicApi
             }
         }
 
+        /// <summary>
+        /// The date and time the state of the achievement was modified.
+        /// </summary>
+        /// <remarks>
+        /// The value is invalid (-1 long) if the achievement state has
+        /// never been updated.
+        /// </remarks>
         public DateTime LastModifiedTime
         {
             get
@@ -174,6 +217,9 @@ namespace GooglePlayGames.BasicApi
             }
         }
 
+        /// <summary>
+        /// The number of experience points earned for unlocking this Achievement.
+        /// </summary>
         public ulong Points
         {
             get
@@ -187,6 +233,9 @@ namespace GooglePlayGames.BasicApi
             }
         }
 
+        /// <summary>
+        /// The URL to the image to display when the achievement is revealed.
+        /// </summary>
         public string RevealedImageUrl
         {
             get
@@ -200,6 +249,9 @@ namespace GooglePlayGames.BasicApi
             }
         }
 
+        /// <summary>
+        /// The URL to the image to display when the achievement is unlocked.
+        /// </summary>
         public string UnlockedImageUrl
         {
             get
@@ -214,3 +266,4 @@ namespace GooglePlayGames.BasicApi
         }
     }
 }
+#endif

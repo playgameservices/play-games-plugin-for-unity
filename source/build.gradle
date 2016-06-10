@@ -27,20 +27,35 @@ project.ext {
     if (unity_exe == null || unity_exe.isEmpty()) {
         unity_exe ='/Applications/Unity/Unity.app/Contents/MacOS/Unity'
     }
+
+    git_exe = System.getProperty("GIT_EXE")
+    if (git_exe == null || git_exe.isEmpty()) {
+        git_exe = System.getenv("GIT_EXE")
+    }
+    if (git_exe == null || git_exe.isEmpty()) {
+        git_exe = 'git'
+    }
+
     pluginSrc = file('PluginDev').absolutePath
-    pluginProj = file('build/PluginSrc').absolutePath
+    pluginBuildSrc = file('build/PluginSrc').absolutePath
+    pluginProj = file('build/PluginProject').absolutePath
     buildPath = file('build').absolutePath
     samplesPath = file('../samples').absolutePath
     samplesBuildSrc = file('build/sampleSrc').absolutePath
     exportPath = file('build/plugin.unitypackage').absolutePath
     currentPluginPath = file('../current-build').absolutePath
-    currentPluginName = 'GooglePlayGamesPlugin-0.9.27.unitypackage'
+    currentPluginName = 'GooglePlayGamesPlugin-0.9.34.unitypackage'
+    resolverDir = new File('build/jarresolver').absolutePath
 
     sampleList = ['CubicPilot', 'Minimal',
          'QuizRacer',  'TicTacToe',
          'NearbyDroids', 'SmokeTest', 'TrivialQuest']
 
-    gpg_sdk_link = 'https://developers.google.com/games/services/downloads/gpg-cpp-sdk.v2.0.zip'
+    gpg_sdk_link = 'https://developers.google.com/games/services/downloads/gpg-cpp-sdk.v2.1.zip'
+
+    sso_jarresolver_repo = 'sso://devrel/libraries/android/unity-jar-resolver'
+    https_jarresolver_repo = 'https://devrel.googlesource.com/libraries/android/unity-jar-resolver'
+    github_jarresolver_repo = 'https://github.com/googlesamples/unity-jar-resolver.git'
 }
 
 
@@ -176,6 +191,7 @@ sampleList.each { sampleName ->
         /*
                 Next, export the project
         */
+
         packageTask.doLast {
             exec {
                 executable "${unity_exe}"
@@ -199,6 +215,47 @@ sampleList.each { sampleName ->
         copySamplePackageTask.ext.remoteTaskPhase = 'postbuild'
 }
 
+task import_jarresolver() {
+    description = "Imports the jar resolver package into the plugin"
+    doFirst {
+        if (file(pluginProj).exists()) {
+            delete pluginProj
+        }
+    }
+    doLast {
+        def tree = fileTree("${resolverDir}")
+            {
+                include '*.unitypackage'
+            }
+    def jarresolver_package = tree.getSingleFile()
+
+        ext.execResult = exec {
+            executable "${unity_exe}"
+                args "-g.building", "-buildTarget", "android", "-batchmode", "-createProject", "${pluginProj}", "-logFile", "build/import_resolver_unity.log",  "-importPackage", "${jarresolver_package}", "-quit"
+                        ignoreExitValue true
+        }
+        if (ext.execResult.exitValue != 0) {
+            println "***Error Running Unity:"
+            def src = file('build/import_resolver_unity.log').text
+            print src
+            throw new GradleException('error exporting plugin')
+        }
+
+    }
+
+}
+
+task copy_pluginProjSrc << {
+    copy {
+        from {"${pluginBuildSrc}"}
+        includes ["**/*"]
+        duplicatesStrategy DuplicatesStrategy.INCLUDE
+        into {"${pluginProj}"}
+    }
+}
+copy_pluginProjSrc.dependsOn import_jarresolver
+copy_pluginProjSrc.ext.remoteTaskPhase = 'build'
+
 task export_package () {
     description = "Creates and exports the Plugin unity package"
     doFirst {
@@ -207,15 +264,38 @@ task export_package () {
     }
 
     doLast {
-        exec {
+        def argv = [
+                "-g.building",
+                "-buildTarget", "android",
+                "-batchmode",
+                "-projectPath", "${pluginProj}",
+                "-logFile", "build/unity.log",
+                "-exportPackage",
+                    "Assets/GooglePlayGames",
+                    "Assets/PlayServicesResolver",
+                    "Assets/Plugins/Android/libs",
+                    "Assets/Plugins/Android/MainLibProj",
+                    "Assets/Plugins/iOS",
+                "${exportPath}",
+                "-quit"
+        ]
+
+        ext.execResult = exec {
             executable "${unity_exe}"
-                args "-g.building", "-buildTarget", "android", "-batchmode", "-projectPath", "${pluginProj}", "-logFile", "build/unity.log",  "-exportPackage", "Assets/GooglePlayGames", "Assets/Plugins", "${exportPath}", "-quit"
+                args argv
+                ignoreExitValue true
+        }
+        if (ext.execResult.exitValue != 0) {
+            println "***Error Running Unity:"
+            def src = file('build/unity.log').text
+            print src
+            throw new GradleException('error exporting plugin')
         }
     }
 }
-
+export_package.dependsOn import_jarresolver
+export_package.dependsOn copy_pluginProjSrc
 export_package.ext.remoteTaskPhase = 'build'
-
 /*
     Copy the plugin to the current-build directory
 */
@@ -294,18 +374,63 @@ copy_native.ext.remoteTaskPhase = 'prebuild'
 task copy_plugin_source << {
     copy {
         from {"${pluginSrc}"}
-        into {"${pluginProj}"}
+        into {"${pluginBuildSrc}"}
     }
 }
 copy_plugin_source.description = "Copies plugin source into build directory"
 copy_plugin_source.ext.remoteTaskPhase = 'prebuild'
 
 
-task copy_gpg_sdk << {
-    copy {
-        from zipTree('gpg_cpp_sdk.zip')
-        // Determine the destination directory later
-        into {'build/jni' }
+task copy_jarresolver (type:Exec) {
+    description = "Clones the jar resolver project and copied into the build."
+    ext.remoteTaskPhase = "prebuild"
+    dependsOn copy_plugin_source
+
+    doFirst {
+        if (file(resolverDir).exists()) {
+            delete resolverDir
+        }
+    }
+
+
+    executable "${git_exe}"
+    args "clone", "${https_jarresolver_repo}", "${resolverDir}"
+    ignoreExitValue true
+
+
+    doLast {
+        if (execResult.exitValue != 0) {
+            ext.sso = exec {
+                executable = "${git_exe}"
+                args "clone", "${sso_jarresolver_repo}", "${resolverDir}"
+                ignoreExitValue true
+            }
+
+            if (ext.sso.exitValue != 0) {
+                exec {
+                    // try github
+                    executable = "${git_exe}"
+                    args "clone", "${github_jarresolver_repo}", "${resolverDir}"
+                }
+            } else {
+                print " -- SSO was successful!"
+            }
+        }
+    }
+}
+
+task copy_gpg_sdk {
+    doFirst {
+        if (file('build/jni/gpg-cpp-sdk').exists()) {
+            delete 'build/jni/gpg-cpp-sdk'
+        }
+    }
+    doLast {
+        copy {
+            from zipTree('gpg_cpp_sdk.zip')
+            // Determine the destination directory later
+            into {'build/jni' }
+        }
     }
 }
 copy_gpg_sdk.description = "Unzips the GPG SDK into the correct dir for NDK"

@@ -49,20 +49,40 @@ namespace GooglePlayGames.IOS {
             // not used for iOS.
         }
 
-        /// <summary>Gets the current user's email.</summary>
-        /// <returns>A string representing the email.</returns>
+
+        /// <summary>
+        /// Gets the user's email.
+        /// </summary>
+        /// <remarks>The email address returned is selected by the user from the accounts present
+        /// on the device. There is no guarantee this uniquely identifies the player.
+        /// For unique identification use the id property of the local player.
+        /// The user can also choose to not select any email address, meaning it is not
+        /// available.</remarks>
+        /// <returns>The user email or null if not authenticated or the permission is
+        /// not available.</returns>
         public string GetEmail()
         {
-            return _GooglePlayGetUserEmail();;
+            return _GooglePlayGetUserEmail();
         }
 
-
-        /// <summary>Gets the authZ token for server authorization.</summary>
-        /// <param name="serverClietnID">The client ID for the server that will exchange the one-time code.</param>
-        /// <returns> An authorization code upon success.</returns>
-        public string GetAuthorizationCode(string serverClientID)
+        /// <summary>
+        /// Gets the user's email with a callback.
+        /// </summary>
+        /// <remarks>The email address returned is selected by the user from the accounts present
+        /// on the device. There is no guarantee this uniquely identifies the player.
+        /// For unique identification use the id property of the local player.
+        /// The user can also choose to not select any email address, meaning it is not
+        /// available.</remarks>
+        /// <param name="callback">The callback with a status code of the request,
+        /// and string which is the email. It can be null.</param>
+        public void GetEmail(Action<CommonStatusCodes, string> callback)
         {
-            throw new NotImplementedException();
+            string email = GetEmail();
+            CommonStatusCodes status =
+                string.IsNullOrEmpty(email) ? CommonStatusCodes.Error : CommonStatusCodes.Success;
+            if (callback != null) {
+                callback(status, email);
+            }
         }
 
 
@@ -73,16 +93,24 @@ namespace GooglePlayGames.IOS {
             return _GooglePlayGetAccessToken();
         }
 
-
         /// <summary>
         /// Gets the OpenID Connect ID token for authentication with a server backend.
         /// </summary>
-        /// <returns>The OpenID Connect ID token.</returns>
+        /// <param name="idTokenCallback"> A callback to be invoked after token is retrieved. Will be passed null value
+        /// on failure. </param>
         /// <param name="serverClientID">Server client ID from console.developers.google.com or the Play Games
         /// services console.</param>
-        public string GetIdToken(string serverClientID)
+        public void GetIdToken(string serverClientID, Action<string> idTokenCallback)
         {
-            return _GooglePlayGetIdToken();
+            var token =  _GooglePlayGetIdToken();
+            if(String.IsNullOrEmpty(token))
+            {
+                idTokenCallback(null);
+            }
+            else
+            {
+                idTokenCallback(token);
+            }
         }
     }
 }

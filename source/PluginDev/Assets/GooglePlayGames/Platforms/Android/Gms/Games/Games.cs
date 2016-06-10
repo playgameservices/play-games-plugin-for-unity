@@ -25,7 +25,6 @@ using Com.Google.Android.Gms.Common.Api;
 using UnityEngine;
 namespace Com.Google.Android.Gms.Games
 {
-    
     public class Games : JavaObjWrapper
     {
         public Games (IntPtr ptr) : base(ptr)
