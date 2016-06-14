@@ -33,10 +33,10 @@ namespace GooglePlayGames.Editor
         static GPGSUpgrader()
         {
             string prevVer = GPGSProjectSettings.Instance.Get(GPGSUtil.LASTUPGRADEKEY, "00000");
-            if (prevVer != PluginVersion.VersionKey)
+            if (!prevVer.Equals (PluginVersion.VersionKey))
             {
                 // if this is a really old version, upgrade to 911 first, then 915
-                if (prevVer != PluginVersion.VersionKeyCPP)
+                if (!prevVer.Equals (PluginVersion.VersionKeyCPP))
                 {
                     prevVer = Upgrade911(prevVer);
                 }
@@ -53,7 +53,7 @@ namespace GooglePlayGames.Editor
                 prevVer = Upgrade931(prevVer);
 
                 // there is no migration needed to 930+
-                if (prevVer != PluginVersion.VersionKey) {
+                if (!prevVer.Equals (PluginVersion.VersionKey)) {
                     Debug.Log("Upgrading from format version " + prevVer + " to " + PluginVersion.VersionKey);
                     prevVer = PluginVersion.VersionKey;
                 }
@@ -191,7 +191,7 @@ namespace GooglePlayGames.Editor
             };
 
             // only delete these if we are not version 0.9.34
-            if (PluginVersion.VersionKey !=  PluginVersion.VersionKeyJNIStats) {
+            if (!PluginVersion.VersionKey.Equals (PluginVersion.VersionKeyJNIStats)) {
                 foreach (string file in obsoleteFiles)
                 {
                     if (File.Exists(file))
