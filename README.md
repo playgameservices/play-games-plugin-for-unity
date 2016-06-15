@@ -912,7 +912,7 @@ on the UI thread.
 
 You can also get the email address asynchrously:
 
-``csharp
+```csharp
     PlayGamesPlatform.Instance.GetEmail((status, email) => {
             if (status == CommonStatusCodes.Success) {
                 Debug.Log("The address is " + email");
@@ -922,7 +922,8 @@ You can also get the email address asynchrously:
             }
         });
 ```
-## Loading Friends ##
+## Loading Friends
+
 To load the friends of the current player, you can use the ISocial framework.
 This call is asynchronous, so the friends need to be processed in the callback.
 
