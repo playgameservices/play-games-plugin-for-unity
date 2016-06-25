@@ -37,19 +37,21 @@ GOOGLE PLAY GAMES PLUGIN FOR UNITY
 
 [ HOW TO BUILD THE PLUGIN ]
 
-1. If you've modified something in the support library (SupportLib), rebuild the support
-   library to generate the JAR (run ./update_support_lib.sh).
+Gradle is used to coordinate the build process.
 
-2. Open the PluginDev project in Unity
+1. Remove any old build directory.  It is named `./build`.
+2. Make sure you have the environment variables set correctly:
+   2.1 ANDROID_NDK_ROOT - points to the Android NDK
+   2.2 ANDROID_HOME - points to the Android SDK
+   2.3 UNITY_EXE - points to the unity executable.
+   2.4 GIT_EXE - points to the git executable.
+3. Run the gradle wrapper: `./gradlew`
+4. Get a cup of coffee, or tea, or learn a haiku while it builds.
+5. It will update the unitypackage in ../current-build and all the unitypackages
+    for the samples.
 
-3. Export a Unity package through the "Google Play Games | Export Plugin Package"
-   option.
+[ KNOWN ISSUES]
 
-Note: If you need to manually generate the plugin for whatever reason, the
-directories to export and files to exclude can be seen in the source code
-for the exporter (Assets/Editor/GPGSExportPackageUI.cs).
+1. The plugin will not build on a case-sensitive drive.
 
-To test the plugin before exporting it, you can use the PluginDev project itself.
-Simply configure it (by clicking File | Play Games Android Setup), and set up
-your test achievement/leaderboard IDs in Assets/Settings.cs.
-
+2. The plugin will not build if the directory structure contains spaces in any directory name.

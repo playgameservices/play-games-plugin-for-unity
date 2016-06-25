@@ -125,6 +125,7 @@ namespace GooglePlayGames.Native.PInvoke
                 playerStats.NumberOfSessions = NumberOfSessions();
                 playerStats.SessPercentile = SessionPercentile();
                 playerStats.SpendPercentile = SpendPercentile();
+                playerStats.SpendProbability = -1.0f;
             }
 
             return playerStats;

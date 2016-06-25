@@ -24,7 +24,7 @@ namespace NearbyDroids
     using GooglePlayGames.BasicApi.Nearby;
     using UnityEngine;
     using UnityEngine.UI;
-
+    using UnityEngine.SceneManagement;
     /// <summary>
     /// Game manager manages the game play and players.
     /// Heavily inspired by http://unity3d.com/learn/tutorials/projects/2d-roguelike
@@ -405,7 +405,7 @@ namespace NearbyDroids
             }
 
             // 1 is the game, 0 is the main menu
-            Application.LoadLevel(1);
+            SceneManager.LoadScene(1);
         }
 
         /// <summary>
@@ -424,7 +424,7 @@ namespace NearbyDroids
             }
 
             // 0 is the main menu scene.
-            Application.LoadLevel(0);
+            SceneManager.LoadScene(0);
         }
 
         /// <summary>
@@ -437,7 +437,7 @@ namespace NearbyDroids
             if (gameType == GameType.MultiplayerLocal ||
                 gameType == GameType.SinglePlayer)
             {
-                Application.LoadLevel(Application.loadedLevel);
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
             }
         }
 
@@ -642,7 +642,7 @@ namespace NearbyDroids
         internal void Update()
         {
             // if we are on the main menu, don't update.
-            if (Application.loadedLevel == 0)
+            if (SceneManager.GetActiveScene().buildIndex == 0)
             {
                 return;
             }

@@ -102,9 +102,7 @@ namespace GooglePlayGames.Editor
                 GPGSUtil.EnsureDirExists("Assets/Plugins/Android");
 
                 // Generate AndroidManifest.xml
-                GPGSUtil.GenerateAndroidManifest(
-                    GPGSProjectSettings.Instance.GetBool(GPGSUtil.REQUIREGOOGLEPLUSKEY)
-                );
+                GPGSUtil.GenerateAndroidManifest();
 
                 // refresh assets, and we're done
                 AssetDatabase.Refresh();

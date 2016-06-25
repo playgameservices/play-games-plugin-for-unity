@@ -105,7 +105,7 @@ namespace GooglePlayGames.BasicApi
     /// <param name="idTokenCallback"> A callback to be invoked after token is retrieved. Will be passed null value
     /// on failure. </param>
     void GetIdToken(Action<string> idTokenCallback);
-        
+
     /// <summary>
     /// Gets an access token.
     /// </summary>
@@ -124,11 +124,30 @@ namespace GooglePlayGames.BasicApi
     void GetServerAuthCode(string serverClientId, Action<CommonStatusCodes, string> callback);
 
     /// <summary>
-    /// Gets the user email.
+    /// Gets the user's email.
     /// </summary>
+    /// <remarks>The email address returned is selected by the user from the accounts present
+    /// on the device.  There is no guarantee this uniquely identifies the player.
+    /// For unique identification use the id property of the local player.
+    /// The user can also choose to not select any email address, meaning it is not
+    /// available.
+    /// </remarks>
     /// <returns>The user email or null if not authenticated or the permission is
     /// not available.</returns>
     string GetUserEmail();
+
+    /// <summary>
+    /// Gets the user's email with a callback.
+    /// </summary>
+    /// <remarks>The email address returned is selected by the user from the accounts present
+    /// on the device.  There is no guarantee this uniquely identifies the player.
+    /// For unique identification use the id property of the local player.
+    /// The user can also choose to not select any email address, meaning it is not
+    /// available.
+    /// </remarks>
+    /// <param name="callback">The callback with a status code of the request,
+    /// and string which is the email.  It can be null.</param>
+    void GetUserEmail(Action<CommonStatusCodes, string> callback);
 
     /// <summary>
     /// Returns the user's avatar url, if they are logged in and have an avatar.

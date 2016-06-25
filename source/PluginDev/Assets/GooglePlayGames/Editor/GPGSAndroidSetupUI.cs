@@ -13,6 +13,7 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
+
 #if UNITY_ANDROID
 
 namespace GooglePlayGames.Editor
@@ -21,6 +22,7 @@ namespace GooglePlayGames.Editor
     using System.Collections;
     using System.IO;
     using System.Xml;
+    using GooglePlayServices;
     using UnityEditor;
     using UnityEngine;
 
@@ -106,6 +108,13 @@ namespace GooglePlayGames.Editor
                 // check the bundle id and set it if needed.
                 CheckBundleId();
 
+                GPGSDependencies.svcSupport.ClearDependencies();
+                GPGSDependencies.RegisterDependencies();
+                PlayServicesResolver.Resolver.DoResolution(
+                    GPGSDependencies.svcSupport,
+                    "Assets/Plugins/Android",
+                    PlayServicesResolver.HandleOverwriteConfirmation);
+
                 return PerformSetup(
                     clientId,
                     GPGSProjectSettings.Instance.Get(GPGSUtil.APPIDKEY),
@@ -178,7 +187,7 @@ namespace GooglePlayGames.Editor
             }
 
             // Generate AndroidManifest.xml
-            GPGSUtil.GenerateAndroidManifest(requiresGooglePlus);
+            GPGSUtil.GenerateAndroidManifest();
 
             // refresh assets, and we're done
             AssetDatabase.Refresh();
@@ -210,7 +219,7 @@ namespace GooglePlayGames.Editor
             GUILayout.BeginVertical();
 
             GUIStyle link = new GUIStyle(GUI.skin.label);
-            link.normal.textColor = new Color(.7f, .7f, 1f);
+            link.normal.textColor = new Color(0f, 0f, 1f);
 
             GUILayout.Space(10);
             GUILayout.Label(GPGSStrings.AndroidSetup.Blurb);
@@ -295,7 +304,7 @@ namespace GooglePlayGames.Editor
 
             if (GUILayout.Button("Cancel", GUILayout.Width(100)))
             {
-                this.Close();
+                Close();
             }
 
             GUILayout.FlexibleSpace();
@@ -319,7 +328,7 @@ namespace GooglePlayGames.Editor
                     GPGSStrings.Ok);
 
                 GPGSProjectSettings.Instance.Set(GPGSUtil.ANDROIDSETUPDONEKEY, true);
-                this.Close();
+                Close();
             }
             else
             {

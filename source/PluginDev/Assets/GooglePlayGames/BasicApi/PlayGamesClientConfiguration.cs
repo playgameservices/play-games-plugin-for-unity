@@ -32,8 +32,9 @@ namespace GooglePlayGames.BasicApi
         /// The default configuration.
         /// </summary>
         public static readonly PlayGamesClientConfiguration DefaultConfiguration =
-            new Builder().Build();
-
+            new Builder()
+           .WithPermissionRationale("Select email address to send to this game or hit cancel to not share.")
+           .Build();
         /// <summary>
         /// Flag indicating to enable saved games API.
         /// </summary>

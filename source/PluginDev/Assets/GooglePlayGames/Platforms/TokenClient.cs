@@ -13,14 +13,38 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 // </copyright>
-using System;
 
 #if (UNITY_ANDROID || (UNITY_IPHONE && !NO_GPGS))
 namespace GooglePlayGames
 {
+    using System;
+    using GooglePlayGames.BasicApi;
+
     internal interface TokenClient
     {
+        /// <summary>
+        /// Gets the user's email.
+        /// </summary>
+        /// <remarks>The email address returned is selected by the user from the accounts present
+        /// on the device. There is no guarantee this uniquely identifies the player.
+        /// For unique identification use the id property of the local player.
+        /// The user can also choose to not select any email address, meaning it is not
+        /// available.</remarks>
+        /// <returns>The user email or null if not authenticated or the permission is
+        /// not available.</returns>
         string GetEmail();
+
+        /// <summary>
+        /// Gets the user's email with a callback.
+        /// </summary>
+        /// <remarks>The email address returned is selected by the user from the accounts present
+        /// on the device. There is no guarantee this uniquely identifies the player.
+        /// For unique identification use the id property of the local player.
+        /// The user can also choose to not select any email address, meaning it is not
+        /// available.</remarks>
+        /// <param name="callback">The callback with a status code of the request,
+        /// and string which is the email. It can be null.</param>
+        void GetEmail(Action<CommonStatusCodes, string> callback);
 
         string GetAccessToken();
         void GetIdToken(string serverClientId, Action<string> idTokenCallback);

@@ -33,10 +33,10 @@ namespace GooglePlayGames.Editor
         static GPGSUpgrader()
         {
             string prevVer = GPGSProjectSettings.Instance.Get(GPGSUtil.LASTUPGRADEKEY, "00000");
-            if (prevVer != PluginVersion.VersionKey)
+            if (!prevVer.Equals (PluginVersion.VersionKey))
             {
                 // if this is a really old version, upgrade to 911 first, then 915
-                if (prevVer != PluginVersion.VersionKeyCPP)
+                if (!prevVer.Equals (PluginVersion.VersionKeyCPP))
                 {
                     prevVer = Upgrade911(prevVer);
                 }
@@ -50,8 +50,10 @@ namespace GooglePlayGames.Editor
 
                 prevVer = Upgrade930(prevVer);
 
+                prevVer = Upgrade931(prevVer);
+
                 // there is no migration needed to 930+
-                if (prevVer != PluginVersion.VersionKey) {
+                if (!prevVer.Equals (PluginVersion.VersionKey)) {
                     Debug.Log("Upgrading from format version " + prevVer + " to " + PluginVersion.VersionKey);
                     prevVer = PluginVersion.VersionKey;
                 }
@@ -63,6 +65,8 @@ namespace GooglePlayGames.Editor
             }
 
             GPGSProjectSettings.Instance.Set(GPGSUtil.LASTUPGRADEKEY, prevVer);
+            GPGSProjectSettings.Instance.Set(GPGSUtil.PLUGINVERSIONKEY,
+                PluginVersion.VersionString);
             GPGSProjectSettings.Instance.Save();
 
             // clean up duplicate scripts if Unity 5+
@@ -73,7 +77,8 @@ namespace GooglePlayGames.Editor
                 string[] paths =
                     {
                         "Assets/GooglePlayGames",
-                        "Assets/Plugins/Android"
+                        "Assets/Plugins/Android",
+                        "Assets/PlayServicesResolver"
                     };
                 foreach (string p in paths)
                 {
@@ -96,7 +101,7 @@ namespace GooglePlayGames.Editor
             // Check that there is a AndroidManifest.xml file
             if (!GPGSUtil.AndroidManifestExists())
             {
-                GPGSUtil.GenerateAndroidManifest(false);
+                GPGSUtil.GenerateAndroidManifest();
             }
 
             AssetDatabase.Refresh();
@@ -134,6 +139,32 @@ namespace GooglePlayGames.Editor
         }
 
         /// <summary>
+        /// Upgrade to 0.9.31
+        /// </summary>
+        /// <remarks>
+        /// This cleans up some unused files.
+        /// </remarks>
+        /// <param name="prevVer">Previous ver.</param>
+        private static string Upgrade931(string prevVer)
+        {
+            string[] obsoleteFiles =
+                {
+                    "Assets/GooglePlayGames/Editor/GPGSExportPackageUI.cs",
+                    "Assets/GooglePlayGames/Editor/GPGSExportPackageUI.cs.meta"
+                };
+            foreach (string file in obsoleteFiles)
+            {
+                if (File.Exists(file))
+                {
+                    Debug.Log("Deleting obsolete file: " + file);
+                    File.Delete(file);
+                }
+            }
+
+            return PluginVersion.VersionKey;
+        }
+
+        /// <summary>
         /// Upgrade to 930 from the specified prevVer.
         /// </summary>
         /// <param name="prevVer">Previous ver.</param>
@@ -159,12 +190,15 @@ namespace GooglePlayGames.Editor
                 "Assets/GooglePlayGames/Platforms/Android/Gms/Games/Stats/StatsObject.cs.meta"
             };
 
-            foreach (string file in obsoleteFiles)
-            {
-                if (File.Exists(file))
+            // only delete these if we are not version 0.9.34
+            if (!PluginVersion.VersionKey.Equals (PluginVersion.VersionKeyJNIStats)) {
+                foreach (string file in obsoleteFiles)
                 {
-                    Debug.Log("Deleting obsolete file: " + file);
-                    File.Delete(file);
+                    if (File.Exists(file))
+                    {
+                        Debug.Log("Deleting obsolete file: " + file);
+                        File.Delete(file);
+                    }
                 }
             }
 
@@ -214,7 +248,13 @@ namespace GooglePlayGames.Editor
             string[] obsoleteFiles =
                 {
                     "Assets/GooglePlayGames/Editor/GPGGizmo.cs",
-                    "Assets/GooglePlayGames/Editor/GPGGizmo.cs.meta"
+                    "Assets/GooglePlayGames/Editor/GPGGizmo.cs.meta",
+                    "Assets/GooglePlayGames/BasicApi/OnStateLoadedListener.cs",
+                    "Assets/GooglePlayGames/BasicApi/OnStateLoadedListener.cs.meta",
+                    "Assets/GooglePlayGames/Platforms/Native/AndroidAppStateClient.cs",
+                    "Assets/GooglePlayGames/Platforms/Native/AndroidAppStateClient.cs.meta",
+                    "Assets/GooglePlayGames/Platforms/Native/UnsupportedAppStateClient.cs",
+                    "Assets/GooglePlayGames/Platforms/Native/UnsupportedAppStateClient.cs.meta"
                 };
             foreach (string file in obsoleteFiles)
             {

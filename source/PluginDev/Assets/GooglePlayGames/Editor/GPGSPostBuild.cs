@@ -13,7 +13,9 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
-#if (UNITY_ANDROID || (UNITY_IPHONE && !NO_GPGS))
+
+// Keep this file if NO_GPGS so we can clean up the xcode project
+#if (UNITY_ANDROID || UNITY_IPHONE )
 
 namespace GooglePlayGames.Editor
 {
@@ -21,6 +23,7 @@ namespace GooglePlayGames.Editor
     using System.IO;
     using UnityEditor.Callbacks;
     using UnityEditor;
+    using UnityEngine;
 
     // Use the included xcode support for unity 5+,
     // otherwise use the backported code.
@@ -40,7 +43,7 @@ namespace GooglePlayGames.Editor
         private const string BundleSchemeKey = "com.google.BundleId";
         private const string ReverseClientIdSchemeKey = "com.google.ReverseClientId";
 
-        [PostProcessBuild]
+        [PostProcessBuild (99999)]
         public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
         {
 #if UNITY_5
@@ -116,6 +119,9 @@ namespace GooglePlayGames.Editor
                 FileUtil.CopyFileOrDirectory(podfile, destpodfile);
             }
 
+            UpdateGeneratedInfoPlistFile(pathToBuiltProject + "/Info.plist");
+            UpdateGeneratedPbxproj(pathToBuiltProject + "/Unity-iPhone.xcodeproj/project.pbxproj");
+
             GPGSInstructionWindow w = EditorWindow.GetWindow<GPGSInstructionWindow>(
                 true,
                 "Building for IOS",
@@ -124,10 +130,6 @@ namespace GooglePlayGames.Editor
             w.UsingCocoaPod = CocoaPodHelper.Update(pathToBuiltProject);
 
             UnityEngine.Debug.Log("Adding URL Types for authentication using PlistBuddy.");
-
-            UpdateGeneratedInfoPlistFile(pathToBuiltProject + "/Info.plist");
-            UpdateGeneratedPbxproj(pathToBuiltProject + "/Unity-iPhone.xcodeproj/project.pbxproj");
-
         #endif
 #endif
         }
@@ -246,6 +248,8 @@ namespace GooglePlayGames.Editor
             proj.AddBuildProperty(testTarget, "HEADER_SEARCH_PATHS", "$(inherited)");
             proj.AddBuildProperty(target, "OTHER_CFLAGS", "$(inherited)");
             proj.AddBuildProperty(testTarget, "OTHER_CFLAGS", "$(inherited)");
+            proj.SetBuildProperty(target, "ENABLE_BITCODE", "NO");
+            proj.SetBuildProperty(testTarget, "ENABLE_BITCODE", "NO");
 
             string fileGuid =
                  proj.FindFileGuidByProjectPath("Libraries/Plugins/iOS/GPGSAppController.mm");

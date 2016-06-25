@@ -33,16 +33,27 @@ namespace GooglePlayGames.Editor
         /// </summary>
         private static readonly string PluginName = "GooglePlayGames";
 
+        /// <summary>Instance of the PlayServicesSupport resolver</summary>
+        public static PlayServicesSupport svcSupport;
+
         /// <summary>
         /// Initializes static members of the <see cref="SampleDependencies"/> class.
         /// </summary>
         static GPGSDependencies()
         {
-            PlayServicesSupport svcSupport = PlayServicesSupport.CreateInstance(
+            svcSupport = PlayServicesSupport.CreateInstance(
                                              PluginName,
                                              EditorPrefs.GetString("AndroidSdkRoot"),
                                              "ProjectSettings");
 
+            RegisterDependencies();
+        }
+
+        /// <summary>
+        /// Registers the dependencies.
+        /// </summary>
+        public static void RegisterDependencies()
+        {
             svcSupport.DependOn("com.google.android.gms",
                 "play-services-games",
                 PluginVersion.PlayServicesVersionConstraint);
@@ -52,15 +63,10 @@ namespace GooglePlayGames.Editor
                 "play-services-nearby",
                 PluginVersion.PlayServicesVersionConstraint);
 
-            // Plus is needed if Token support is enabled.
-            svcSupport.DependOn("com.google.android.gms",
-                "play-services-plus",
-                PluginVersion.PlayServicesVersionConstraint);
-
             // Marshmallow permissions requires app-compat
             svcSupport.DependOn("com.android.support",
                 "support-v4",
-                "23.1.0+");
+                "23.1+");
         }
     }
 }
