@@ -204,7 +204,7 @@ namespace GooglePlayGames.BasicApi
                 mEnableSaveGames = true;
                 return this;
             }
-            
+
             /// <summary>
             /// Requests use of the player's Google+ social graph.
             /// </summary>
@@ -293,7 +293,7 @@ namespace GooglePlayGames.BasicApi
             {
                 return mEnableSaveGames;
             }
-            
+
             /// <summary>
             /// Determines whether this instance has Google+ required.
             /// </summary>
