@@ -203,8 +203,8 @@ namespace GooglePlayGames.Editor
         public void OnEnable()
         {
             GPGSProjectSettings settings = GPGSProjectSettings.Instance;
-            mConstantDirectory = settings.Get("ConstDir", mConstantDirectory);
-            mClassName = settings.Get(GPGSUtil.CLASSNAMEKEY);
+            mConstantDirectory = settings.Get(GPGSUtil.CLASSDIRECTORYKEY, mConstantDirectory);
+            mClassName = settings.Get(GPGSUtil.CLASSNAMEKEY, mClassName);
             mConfigData = settings.Get(GPGSUtil.ANDROIDRESOURCEKEY);
             mWebClientId = settings.Get(GPGSUtil.WEBCLIENTIDKEY);
             mRequiresGooglePlus = settings.GetBool(GPGSUtil.REQUIREGOOGLEPLUSKEY, false);

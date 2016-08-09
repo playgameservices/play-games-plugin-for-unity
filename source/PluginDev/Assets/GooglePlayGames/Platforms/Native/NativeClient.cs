@@ -195,6 +195,10 @@ namespace GooglePlayGames.Native
                         {
                             builder.RequireGooglePlus();
                         }
+                        string[] scopes = mConfiguration.Scopes;
+                        for (int i = 0; i < scopes.Length; i++) {
+                            builder.AddOauthScope(scopes[i]);
+                        }
                         Debug.Log("Building GPG services, implicitly attempts silent auth");
                         mAuthState = AuthState.SilentPending;
                         mServices = builder.Build(config);
