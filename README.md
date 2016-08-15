@@ -359,6 +359,15 @@ After activated, you can access the Play Games platform through
 your application. Making this call will not display anything on the screen and
 will not interact with the user in any way.
 
+
+## Adding additional Scopes
+
+You can add additional scopes to the authentication process by calling
+`PlayGamesClientConfiguration.Builder().AddOauthScope(scope)`.
+
+  __Note: adding additional scopes with most likely require user consent when
+starting your game__.
+
 ## Sign in
 
 To sign in, call **Social.localUser.Authenticate**, which is part of the
@@ -471,6 +480,20 @@ To post a score to a leaderboard, call **Social.ReportScore**.
         // handle success or failure
     });
 ```
+
+To post a score and include a metadata tag use the Play Game Services instance
+directly:
+
+```csharp
+    using GooglePlayGames;
+    using UnityEngine.SocialPlatforms;
+    ...
+    // post score 12345 to leaderboard ID "Cfji293fjsie_QA" and tag "FirstDaily")
+    Social.ReportScore(12345, "Cfji293fjsie_QA", "FirstDaily", (bool success) => {
+        // handle success or failure
+    });
+```
+
 
 Note that the platform and the server will automatically discard scores that are
 lower than the player's existing high score, so you can submit scores freely
