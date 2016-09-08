@@ -147,6 +147,41 @@ namespace GooglePlayGames
             }
         }
 
+        /// <summary>
+        /// Check if the Google Play Games platform is supported at runtime.
+        /// </summary>
+        /// <value>If the platform is supported.</value>
+        public static bool Supported
+        {
+            get
+            {
+    #if UNITY_EDITOR
+                return false;
+    #elif UNITY_IOS
+                // TODO: Implement this method for the iOS platform
+                // for now this is just a placeholder
+                return true;
+    #else
+                var up = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+                var ca = up.GetStatic<AndroidJavaObject>("currentActivity");
+                var packageManager = ca.Call<AndroidJavaObject>("getPackageManager");
+
+                AndroidJavaObject launchIntent = null;
+                //if the app is installed, no errors. Else, doesn't get past next line
+                try
+                {
+                    launchIntent = packageManager.Call<AndroidJavaObject>("getLaunchIntentForPackage", "com.google.android.play.games");
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+
+                return launchIntent != null;
+    #endif
+            }
+        }
+
         /// <summary> Gets the real time multiplayer API object</summary>
         public IRealTimeMultiplayerClient RealTime
         {
