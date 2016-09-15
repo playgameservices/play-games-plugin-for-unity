@@ -52,7 +52,11 @@ namespace GooglePlayGames
         {
             mDisplayName = displayName;
             mPlayerId = playerId;
-            mAvatarUrl = avatarUrl;
+            if (mAvatarUrl != avatarUrl)
+            {
+                mImage = null;
+                mAvatarUrl = avatarUrl;
+            }
             mImageLoading = false;
         }
 
