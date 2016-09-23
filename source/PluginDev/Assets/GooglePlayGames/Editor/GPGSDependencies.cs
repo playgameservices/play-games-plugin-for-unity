@@ -13,12 +13,9 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
-#if UNITY_ANDROID
 
 namespace GooglePlayGames.Editor
 {
-
-    using Google.JarResolver;
     using UnityEditor;
 
     /// <summary>
@@ -27,6 +24,7 @@ namespace GooglePlayGames.Editor
     [InitializeOnLoad]
     public static class GPGSDependencies
     {
+#if UNITY_ANDROID
         /// <summary>
         /// The name of your plugin.  This is used to create a settings file
         /// which contains the dependencies specific to your plugin.
@@ -34,18 +32,21 @@ namespace GooglePlayGames.Editor
         private static readonly string PluginName = "GooglePlayGames";
 
         /// <summary>Instance of the PlayServicesSupport resolver</summary>
-        public static PlayServicesSupport svcSupport;
+        public static Google.JarResolver.PlayServicesSupport svcSupport;
+#endif  // UNITY_ANDROID
 
         /// <summary>
         /// Initializes static members of the <see cref="SampleDependencies"/> class.
         /// </summary>
         static GPGSDependencies()
         {
-            svcSupport = PlayServicesSupport.CreateInstance(
+#if UNITY_ANDROID
+            svcSupport = Google.JarResolver.PlayServicesSupport.CreateInstance(
                                              PluginName,
                                              EditorPrefs.GetString("AndroidSdkRoot"),
                                              "ProjectSettings");
 
+#endif  // UNITY_ANDROID
             RegisterDependencies();
         }
 
@@ -54,20 +55,29 @@ namespace GooglePlayGames.Editor
         /// </summary>
         public static void RegisterDependencies()
         {
+#if UNITY_ANDROID
             svcSupport.DependOn("com.google.android.gms",
                 "play-services-games",
-                PluginVersion.PlayServicesVersionConstraint);
+                PluginVersion.PlayServicesVersionConstraint,
+                packageIds: new string[] { "extra-google-m2repository" });
 
             // need nearby too, even if it is not used.
             svcSupport.DependOn("com.google.android.gms",
                 "play-services-nearby",
-                PluginVersion.PlayServicesVersionConstraint);
+                PluginVersion.PlayServicesVersionConstraint,
+                packageIds: new string[] { "extra-google-m2repository" });
 
             // Marshmallow permissions requires app-compat
             svcSupport.DependOn("com.android.support",
                 "support-v4",
-                "23.1+");
+                "23.1+",
+                packageIds: new string[] { "extra-android-m2repository" });
+#elif UNITY_IOS
+            Google.IOSResolver.AddPod("GooglePlayGames", "5.0+",
+                                      bitcodeEnabled: false,
+                                      minTargetSdk: "7.0");
+#endif
         }
     }
 }
-#endif
+

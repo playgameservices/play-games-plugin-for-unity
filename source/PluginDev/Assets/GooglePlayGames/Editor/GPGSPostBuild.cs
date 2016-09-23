@@ -111,23 +111,8 @@ namespace GooglePlayGames.Editor
                 return;
             }
 
-            //Copy the podfile into the project.
-            string podfile = "Assets/GooglePlayGames/Editor/Podfile.txt";
-            string destpodfile = pathToBuiltProject + "/Podfile";
-            if (!System.IO.File.Exists(destpodfile))
-            {
-                FileUtil.CopyFileOrDirectory(podfile, destpodfile);
-            }
-
             UpdateGeneratedInfoPlistFile(pathToBuiltProject + "/Info.plist");
             UpdateGeneratedPbxproj(pathToBuiltProject + "/Unity-iPhone.xcodeproj/project.pbxproj");
-
-            GPGSInstructionWindow w = EditorWindow.GetWindow<GPGSInstructionWindow>(
-                true,
-                "Building for IOS",
-                true);
-            w.minSize = new UnityEngine.Vector2(400, 300);
-            w.UsingCocoaPod = CocoaPodHelper.Update(pathToBuiltProject);
 
             UnityEngine.Debug.Log("Adding URL Types for authentication using PlistBuddy.");
         #endif
@@ -239,17 +224,6 @@ namespace GooglePlayGames.Editor
 
             string target =
                 proj.TargetGuidByName(PBXProject.GetUnityTargetName());
-            string testTarget =
-                proj.TargetGuidByName(PBXProject.GetUnityTestTargetName());
-
-            proj.AddBuildProperty(target, "OTHER_LDFLAGS", "$(inherited)");
-            proj.AddBuildProperty(testTarget, "OTHER_LDFLAGS", "$(inherited)");
-            proj.AddBuildProperty(target, "HEADER_SEARCH_PATHS", "$(inherited)");
-            proj.AddBuildProperty(testTarget, "HEADER_SEARCH_PATHS", "$(inherited)");
-            proj.AddBuildProperty(target, "OTHER_CFLAGS", "$(inherited)");
-            proj.AddBuildProperty(testTarget, "OTHER_CFLAGS", "$(inherited)");
-            proj.SetBuildProperty(target, "ENABLE_BITCODE", "NO");
-            proj.SetBuildProperty(testTarget, "ENABLE_BITCODE", "NO");
 
             string fileGuid =
                  proj.FindFileGuidByProjectPath("Libraries/Plugins/iOS/GPGSAppController.mm");
