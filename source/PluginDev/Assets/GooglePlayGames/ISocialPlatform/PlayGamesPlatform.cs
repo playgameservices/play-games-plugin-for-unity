@@ -415,6 +415,8 @@ namespace GooglePlayGames
                 GooglePlayGames.OurUtils.Logger.e(
                     "GetUserId() can only be called after authentication.");
                 callback(new IUserProfile[0]);
+
+                return;
             }
 
             mClient.LoadUsers(userIds, callback);
@@ -858,6 +860,8 @@ namespace GooglePlayGames
             {
                 GooglePlayGames.OurUtils.Logger.e("LoadAchievements can only be called after authentication.");
                 callback.Invoke(null);
+
+                return;
             }
 
             mClient.LoadAchievements(ach =>
@@ -1176,6 +1180,8 @@ namespace GooglePlayGames
                 {
                     callback(false);
                 }
+
+                return;
             }
 
             mClient.LoadFriends(callback);
@@ -1197,6 +1203,8 @@ namespace GooglePlayGames
                 {
                     callback(false);
                 }
+
+                return;
             }
 
             LeaderboardTimeSpan timeSpan;
