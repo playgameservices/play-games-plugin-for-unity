@@ -22,7 +22,6 @@ namespace GooglePlayGames.Editor
     using System.Collections;
     using System.IO;
     using System.Xml;
-    using GooglePlayServices;
     using UnityEditor;
     using UnityEngine;
 
@@ -108,12 +107,11 @@ namespace GooglePlayGames.Editor
                 // check the bundle id and set it if needed.
                 CheckBundleId();
 
-                GPGSDependencies.svcSupport.ClearDependencies();
+                Google.VersionHandler.InvokeInstanceMethod(
+                    GPGSDependencies.svcSupport, "ClearDependencies", null);
                 GPGSDependencies.RegisterDependencies();
-                PlayServicesResolver.Resolver.DoResolution(
-                    GPGSDependencies.svcSupport,
-                    "Assets/Plugins/Android",
-                    PlayServicesResolver.HandleOverwriteConfirmation);
+                Google.VersionHandler.InvokeInstanceMethod(
+                   GPGSDependencies.svcSupport, "Resolve", null);
 
                 return PerformSetup(
                     clientId,
