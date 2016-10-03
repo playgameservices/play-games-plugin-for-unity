@@ -143,12 +143,9 @@ sampleList.each { sampleName ->
     createTask.doFirst {
         delete "${buildPath}/Samples/${sampleName}"
 
-        // Import the GPG plugin in desktop mode so there are no dependencies
-        // upon the resolver.
         exec {
             executable "${unity_exe}"
-            args "-buildTarget", "win64",
-                 "-batchmode",
+            args "-batchmode",
                  "-createProject", "${buildPath}/Samples/${sampleName}",
                  "-logFile", "${buildPath}/CreateSample${sampleName}.1.log",
                  "-importPackage", "${exportPath}",
@@ -157,8 +154,7 @@ sampleList.each { sampleName ->
         // Activate the resolver.
         exec {
             executable "${unity_exe}"
-            args "-buildTarget", "win64",
-                 "-batchmode",
+             args "-batchmode",
                  "-projectPath", "${buildPath}/Samples/${sampleName}",
                  "-logFile", "${buildPath}/CreateSample${sampleName}.2.log",
                  "-executeMethod", "Google.VersionHandler.UpdateNow",
@@ -220,8 +216,7 @@ sampleList.each { sampleName ->
            // above.
             exec {
                 executable "${unity_exe}"
-                args "-buildTarget", "android",
-                     "-batchmode",
+                args "-batchmode",
                      "-projectPath", "${buildPath}/Samples/${sampleName}",
                      "-logFile", "${buildPath}/ExportSample${sampleName}.log",
                      "-exportPackage", "${sampleAssets}",
@@ -248,6 +243,7 @@ sampleList.each { sampleName ->
 
 task import_jarresolver() {
     description = "Imports the jar resolver package into the plugin"
+    ext.remoteTaskPhase = 'build'
     doFirst {
         if (file(pluginProj).exists()) {
             delete pluginProj
@@ -263,7 +259,6 @@ task import_jarresolver() {
         ext.execResult = exec {
               executable "${unity_exe}"
               args "-g.building",
-                   "-buildTarget", "android",
                    "-batchmode",
                    "-createProject", "${pluginProj}",
                    "-logFile", "build/import_resolver_unity.log",
@@ -280,7 +275,10 @@ task import_jarresolver() {
     }
 
 }
-import_jarresolver.dependsOn "copy_jarresolver"
+// don't explicitly depend on copy_jarresolver here since it is run
+// as a prebuild step, and import_jarresolver is a build step which can happen
+// on a machine with limited network connectivity.
+// import_jarresolver.dependsOn "copy_jarresolver"
 
 task copy_pluginProjSrc << {
     copy {
@@ -308,7 +306,6 @@ task export_package () {
                 // be enabled during the build process which would break the
                 // versioning process.  Compilation is verified when exporting
                 // the sample projects.
-                "-buildTarget", "win64",
                 "-batchmode",
                 "-projectPath", "${pluginProj}",
                 "-logFile", "build/unity.log",
@@ -507,3 +504,8 @@ support_jar.dependsOn 'copy_plugin_source'
 
 support_jar.ext.remoteTaskPhase = 'prebuild'
 
+task clean() {
+    doFirst {
+        delete 'build'
+        }
+}
