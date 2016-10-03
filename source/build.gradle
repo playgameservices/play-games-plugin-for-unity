@@ -208,15 +208,16 @@ sampleList.each { sampleName ->
         packageTask.dependsOn createTask, copySrcTask
         /*
                 Next, export the project
+                Target Android here since the plugin only works for
+                android or ios, otherwise the sample won't compile
+                and then can't be exported.
         */
 
         packageTask.doLast {
-           // NOTE: Android is the selected build target here as the
-           // Jar Resolver has already been activated by the createTask
-           // above.
             exec {
                 executable "${unity_exe}"
                 args "-batchmode",
+                     "-buildTarget", "android",
                      "-projectPath", "${buildPath}/Samples/${sampleName}",
                      "-logFile", "${buildPath}/ExportSample${sampleName}.log",
                      "-exportPackage", "${sampleAssets}",
