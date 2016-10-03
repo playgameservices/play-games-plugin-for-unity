@@ -339,7 +339,7 @@ export_package.ext.remoteTaskPhase = 'build'
 /*
     Copy the plugin to the current-build directory
 */
-task copy_plugin(dependsOn: export_package) {
+task copy_plugin() {
     description = 'Copy plugin to the current-build directory'
     doFirst {
             copy {
