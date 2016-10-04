@@ -110,6 +110,10 @@ namespace GooglePlayGames.Editor
                 Google.VersionHandler.InvokeInstanceMethod(
                     GPGSDependencies.svcSupport, "ClearDependencies", null);
                 GPGSDependencies.RegisterDependencies();
+                Google.VersionHandler.InvokeStaticMethod(
+                    Google.VersionHandler.FindClass(
+                        "Google.JarResolver", "GooglePlayServices.PlayServicesResolver"),
+                    "MenuResolve", null);
                 Google.VersionHandler.InvokeInstanceMethod(
                    GPGSDependencies.svcSupport, "Resolve", null);
 
