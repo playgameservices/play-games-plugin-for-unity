@@ -114,8 +114,6 @@ namespace GooglePlayGames.Editor
                     Google.VersionHandler.FindClass(
                         "Google.JarResolver", "GooglePlayServices.PlayServicesResolver"),
                     "MenuResolve", null);
-                Google.VersionHandler.InvokeInstanceMethod(
-                   GPGSDependencies.svcSupport, "Resolve", null);
 
                 return PerformSetup(
                     clientId,
