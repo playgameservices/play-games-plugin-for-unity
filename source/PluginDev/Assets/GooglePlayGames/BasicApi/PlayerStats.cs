@@ -32,7 +32,8 @@ namespace GooglePlayGames.BasicApi
         /// <remarks>
         /// Note that a PlayerStats with all stats unset may still be valid.
         /// </remarks>
-        public bool Valid {
+        public bool Valid
+        {
             get;
             set;
         }
@@ -40,7 +41,8 @@ namespace GooglePlayGames.BasicApi
         /// <summary>
         /// The number of in-app purchases.
         /// </summary>
-        public int NumberOfPurchases {
+        public int NumberOfPurchases
+        {
             get;
             set;
         }
@@ -48,7 +50,8 @@ namespace GooglePlayGames.BasicApi
         /// <summary>
         /// The length of the avg sesson in minutes.
         /// </summary>
-        public float AvgSessonLength {
+        public float AvgSessonLength
+        {
             get;
             set;
         }
@@ -56,7 +59,8 @@ namespace GooglePlayGames.BasicApi
         /// <summary>
         /// The days since last played.
         /// </summary>
-        public int DaysSinceLastPlayed {
+        public int DaysSinceLastPlayed
+        {
             get;
             set;
         }
@@ -64,7 +68,8 @@ namespace GooglePlayGames.BasicApi
         /// <summary>
         /// The number of sessions based on sign-ins.
         /// </summary>
-        public int NumberOfSessions {
+        public int NumberOfSessions
+        {
             get;
             set;
         }
@@ -79,7 +84,8 @@ namespace GooglePlayGames.BasicApi
         /// Higher numbers indicate that this player has played more sessions.
         /// A return value less than zero indicates this value is not available.
         /// </remarks>
-        public float SessPercentile {
+        public float SessPercentile
+        {
             get;
             set;
         }
@@ -94,7 +100,8 @@ namespace GooglePlayGames.BasicApi
         /// numbers indicate that this player has spent more.
         /// A return value less than zero indicates this value is not available.
         /// </remarks>
-        public float SpendPercentile {
+        public float SpendPercentile
+        {
             get;
             set;
         }
@@ -107,7 +114,8 @@ namespace GooglePlayGames.BasicApi
         ///  Higher values indicate that a player is more likely to spend.
         /// A return value less than zero indicates this value is not available.
         /// </remarks>
-        public float SpendProbability {
+        public float SpendProbability
+        {
             get;
             set;
         }
@@ -119,7 +127,26 @@ namespace GooglePlayGames.BasicApi
         /// Higher values indicate that a player is less likely to return.
         /// A return value less than zero indicates this value is not available.
         /// </remarks>
-        public float ChurnProbability {
+        public float ChurnProbability
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// The high spender probability of this player.
+        /// </summary>
+        public float HighSpenderProbability
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// The predicted total spend of this player over the next 28 days.
+        /// </summary>
+        public float TotalSpendNext28Days
+        {
             get;
             set;
         }
@@ -194,6 +221,25 @@ namespace GooglePlayGames.BasicApi
         {
             return ChurnProbability != UNSET_VALUE;
         }
+
+        /// <summary>
+        /// Determines whether this instance has HighSpenderProbability.
+        /// </summary>
+        /// <returns><c>true</c> if this instance has HighSpenderProbability; otherwise, <c>false</c>.</returns>
+        public bool HasHighSpenderProbability()
+        {
+            return HighSpenderProbability != UNSET_VALUE;
+        }
+
+        /// <summary>
+        /// Determines whether this instance has TotalSpendNext28Days.
+        /// </summary>
+        /// <returns><c>true</c> if this instance has TotalSpendNext28Days; otherwise, <c>false</c>.</returns>
+        public bool HasTotalSpendNext28Days()
+        {
+            return TotalSpendNext28Days != UNSET_VALUE;
+        }
+
     }
 }
 #endif

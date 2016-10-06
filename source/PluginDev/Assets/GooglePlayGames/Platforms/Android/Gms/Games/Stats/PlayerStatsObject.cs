@@ -83,6 +83,14 @@ namespace Com.Google.Android.Gms.Games.Stats
         {
             return InvokeCall<float>("getSpendProbability", "()F");
         }
+        public float getHighSpenderProbability()
+        {
+            return InvokeCall<float>("getHighSpenderProbability", "()F");
+        }
+        public float getTotalSpendNext28Days()
+        {
+            return InvokeCall<float>("getTotalSpendNext28Days", "()F");
+        }
     }
 }
 //

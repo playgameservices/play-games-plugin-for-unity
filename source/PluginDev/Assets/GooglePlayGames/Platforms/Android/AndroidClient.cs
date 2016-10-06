@@ -139,6 +139,8 @@ namespace GooglePlayGames.Android
                                 s.SpendPercentile = stats.getSpendPercentile();
                                 s.ChurnProbability = stats.getChurnProbability();
                                 s.SpendProbability = stats.getSpendProbability();
+                                s.HighSpenderProbability = stats.getHighSpenderProbability();
+                                s.TotalSpendNext28Days = stats.getTotalSpendNext28Days();
                             }
                             callback((CommonStatusCodes)result, s);
                          });
