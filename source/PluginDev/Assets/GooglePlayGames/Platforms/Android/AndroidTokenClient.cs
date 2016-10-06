@@ -367,8 +367,13 @@ namespace GooglePlayGames.Android
 
         public override void OnResult(TokenResult arg_Result_1)
         {
-            callback(arg_Result_1.getStatus().getStatusCode(), arg_Result_1.getAccessToken(), arg_Result_1.getIdToken(),
-                arg_Result_1.getEmail());
+            if (callback != null) {
+                PlayGamesHelperObject.RunOnGameThread(() =>
+                    callback(arg_Result_1.getStatus().getStatusCode(),
+                            arg_Result_1.getAccessToken(),
+                            arg_Result_1.getIdToken(),
+                            arg_Result_1.getEmail()));
+            }
         }
     }
 }

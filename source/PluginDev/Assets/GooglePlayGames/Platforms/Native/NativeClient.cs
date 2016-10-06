@@ -613,18 +613,23 @@ namespace GooglePlayGames.Native
                                 mAuthState = AuthState.Unauthenticated;
                                 var silentCallbacks = mSilentAuthCallbacks;
                                 mSilentAuthCallbacks = null;
-                                Debug.Log("Invoking callbacks, AuthState changed from silentPending to Unauthenticated.");
+                                GooglePlayGames.OurUtils.Logger.d(
+                                    "Invoking callbacks, AuthState changed " +
+                                    "from silentPending to Unauthenticated.");
 
                                 InvokeCallbackOnGameThread(silentCallbacks, false);
                                 if (mPendingAuthCallbacks != null)
                                 {
-                                    Debug.Log("there are pending auth callbacks - starting AuthUI");
+                                    GooglePlayGames.OurUtils.Logger.d(
+                                        "there are pending auth callbacks - starting AuthUI");
                                     GameServices().StartAuthorizationUI();
                                 }
                             }
                             else
                             {
-                                Debug.Log("AuthState == " + mAuthState + " calling auth callbacks with failure");
+                                GooglePlayGames.OurUtils.Logger.d(
+                                        "AuthState == " + mAuthState +
+                                          " calling auth callbacks with failure");
 
                                 // make sure we are not paused
                                 UnpauseUnityPlayer();
