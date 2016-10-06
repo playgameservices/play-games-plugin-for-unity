@@ -80,11 +80,19 @@ namespace CubicPilot.GameLogic
             AutoSave();
         }
 
+        internal void GoToScene(string scene) {
+#if UNITY_5_3_OR_NEWER
+          UnityEngine.SceneManagement.SceneManager.LoadScene(scene);
+#else
+          Application.LoadLevel("2_GameplayScene");
+#endif
+        }
+
         public void RestartLevel()
         {
             AutoSave();
             ReportAllProgress();
-            Application.LoadLevel("2_GameplayScene");
+            GoToScene("2_GameplayScene");
         }
 
         public void FinishLevelAndGoToNext(int score, int stars)
@@ -95,11 +103,11 @@ namespace CubicPilot.GameLogic
             if (mLevel < GameConsts.MaxLevel)
             {
                 mLevel++;
-                Application.LoadLevel("2_GameplayScene");
+                GoToScene("2_GameplayScene");
             }
             else
             {
-                Application.LoadLevel("3_FinaleScene");
+               GoToScene("3_FinaleScene");
             }
         }
 
@@ -107,14 +115,14 @@ namespace CubicPilot.GameLogic
         {
             AutoSave();
             ReportAllProgress();
-            Application.LoadLevel("1_MenuScene");
+            GoToScene("1_MenuScene");
         }
 
         public void GoToLevel(int level)
         {
             ReportAllProgress();
             mLevel = level;
-            Application.LoadLevel("2_GameplayScene");
+            GoToScene("2_GameplayScene");
         }
 
         public bool HasNextLevel()
