@@ -40,21 +40,43 @@ public class TokenResult implements Result {
         this.email = email;
     }
 
+    /**
+     * Returns a string containing a concise, human-readable description of this
+     * object. Subclasses are encouraged to override this method and provide an
+     * implementation that takes into account the object's type and data. The
+     * default implementation is equivalent to the following expression:
+     * <pre>
+     *   getClass().getName() + '@' + Integer.toHexString(hashCode())</pre>
+     * <p>See <a href="{@docRoot}reference/java/lang/Object.html#writing_toString">Writing a useful
+     * {@code toString} method</a>
+     * if you intend implementing your own {@code toString} method.
+     *
+     * @return a printable representation of this object.
+     */
+    @Override
+    public String toString() {
+        return "Status: " + status + " email: " + (email==null?"<null>":email) + " id:" +
+                (idToken==null?"<null>":idToken) + " access: " +
+                (accessToken==null?"<null>":accessToken);
+    }
+
     @Override
     public Status getStatus() {
         return status;
     }
 
+    public int getStatusCode() { return status.getStatusCode();}
+
     public String getAccessToken() {
-        return accessToken;
+        return accessToken == null ? "" : accessToken;
     }
 
     public String getIdToken() {
-        return idToken;
+        return idToken == null ? "" : idToken;
     }
 
     public String getEmail() {
-        return email;
+        return email == null ? "" : email;
     }
 
     public void setStatus(int status) {

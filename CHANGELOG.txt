@@ -1,8 +1,17 @@
 Version 0.9.35
     Bug Fixes:
+        * #1194 - OnPostprocessAllAssets called before Resolver is registered.
         * #1209 - Stuck incremental achievements due to lost precision (via PR #1258).
+        * #1313 - NSInvalidArgumentException in iOS didRegisterForRemoteNotificationsWithDeviceToken.
+        * #1360 - Fixed Object not set to instance in PlayServicesResolver.
+        * #1361 - Removed multiple Resolver version log messages.
+        * #1371 - Removed warning about unreachable code in GPGSUpgrader.
+        * #1396 - Logging calls on non-game thread crash in IL2CPP for Android.
+        Updated CubicPilot to use SceneManager in Unity 5.3+
     New Features:
         * #1134 - No API for setting OAuth scopes (via PR #1296)
+        * Added HighSpenderProbability, TotalSpendNext28Days to PlayerStats for Android.
+        * Improved Jar Resolver - see README.
 Version 0.9.34
     Bug Fixes:
         * #1162 - Cannot build from source

@@ -66,6 +66,15 @@ public class GPGSDependencies : AssetPostprocessor
                     {"packageIds", new string[] { "extra-google-m2repository" } }
                 });
 
+            // Auth is needed for getting the token and email.
+            Google.VersionHandler.InvokeInstanceMethod(
+                    svcSupport, "DependOn",
+                    new object[] { "com.google.android.gms", "play-services-auth",
+                         PluginVersion.PlayServicesVersionConstraint },
+                    namedArgs: new Dictionary<string, object>() {
+                        {"packageIds", new string[] { "extra-google-m2repository" } }
+            });
+
             Google.VersionHandler.InvokeInstanceMethod(
                 svcSupport, "DependOn",
                 new object[] { "com.android.support", "support-v4", "23.1+" },

@@ -234,11 +234,12 @@ For more information, consult the documentation for your version of Windows.
 
 Install Cocoapods
 
-Once Cocoapods is installed, the plugin will add a Podfile to the xcode project to manage
-the framework dependencies.
 
-Since Cocoapods uses workspaces to manage the project and the dependent pods, you need to
-open Unity-iPhone.xcworkspace to build the project.
+This plugin uses another plugin called the Unity Jar Resolver, which handles 
+resolving the dependencies needed for this plugin.  When building for iOS in
+Unity, a post build step is executed that runs Cocoapods and then adds the required
+libraries and frameworks directly to the XCode project.  This is different from
+previous versions; you no longer need to open the workspace in XCode.
 
 **Note:** If you are using a version of Unity less than 5.0, you may encounter
 a linker error when building the Xcode application.  If you see the error:

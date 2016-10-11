@@ -16,6 +16,8 @@
 
 package com.google.games.bridge;
 
+import android.util.Log;
+
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -30,6 +32,8 @@ import java.util.concurrent.TimeUnit;
  * handling of callbacks.
  */
 public class TokenPendingResult extends PendingResult<TokenResult> {
+
+    private static final String TAG = "TokenPendingResult";
 
     private CountDownLatch latch = new CountDownLatch(1);
     /* package local */ TokenResult result;
@@ -147,8 +151,11 @@ public class TokenPendingResult extends PendingResult<TokenResult> {
     public void setStatus(int status) {
         result.setStatus(status);
         latch.countDown();
-        if (getCallback() != null) {
-            getCallback().onResult(getResult());
+        ResultCallback<? super TokenResult> cb = getCallback();
+        TokenResult res = getResult();
+        if (cb != null) {
+            Log.d(TAG," Calling onResult for callback: " + cb + " result: " + res);
+            getCallback().onResult(res);
         }
 
     }
