@@ -30,9 +30,12 @@ namespace GooglePlayGames
 
     // Using JNI to get spendprobability - so don't delete the Games.cs files.
     public const string VersionKeyJNIStats = "00934";
-    public const int VersionInt = 0x0934;
-    public const string VersionString = "0.9.34";
-    public const string VersionKey = "00934";
+
+    // New and improved jar resolver
+    public const string VersionKeyJarResolverDLL = "00935";
+    public const int VersionInt = 0x0935;
+    public const string VersionString = "0.9.35";
+    public const string VersionKey = "00935";
 
     // used to check for the correct min version or play services.
     public const int MinGmsCoreVersionCode = 8487000;

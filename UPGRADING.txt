@@ -1,14 +1,19 @@
 NOTES ON UPGRADING
 
+Note for 0.9.35
+
+The Play Services Jar Resolver has changed to be a DLL, in order to import this
+correctly, you need to delete the Assets/PlayServicesResolver folder in your
+project *BEFORE* importing this plugin.  You may also need to restart Unity
+to correctly initialize the DLLs in the editor.
+
+IF YOU STILL HAVE PROBLEMS:
+
 If you have already integrated the plugin and want to upgrade it to a newer version,
 you must delete the Assets/GooglePlayGames folder, then import the new package.
 
-SPECIAL NOTICE:  Some of the files in this release were moved from Assets/Editor to
-Assets/GooglePlayGames/Editor.  Unity sometimes does not detect these files as changed files.
-To fix this, import the package a second time if you have compiliation errors in scripts located in
-Assets/GooglePlayGames/Editor.
 
-After upgrading, redo setup (click "Google Play Games | Android Setup" and/or 
+After upgrading, redo setup (click "Google Play Games | Android Setup" and/or
 "Google Play Games | iOS Setup" on the menu). Do this even if you had already done
 this before on this project.
 

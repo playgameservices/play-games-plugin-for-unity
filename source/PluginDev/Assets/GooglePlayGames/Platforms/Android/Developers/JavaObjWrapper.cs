@@ -279,7 +279,6 @@ namespace Google.Developers
         /// <param name="args">Arguments.</param>
         public void InvokeCallVoid(string name, string sig, params object[] args)
         {
-            IntPtr rawClass = AndroidJNI.GetObjectClass(raw);
             IntPtr method = AndroidJNI.GetMethodID(RawClass, name, sig);
 
             jvalue[] jArgs = ConstructArgArray(args);
