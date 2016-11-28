@@ -93,7 +93,7 @@ public class GPGSDependencies : AssetPostprocessor
                 namedArgs: new Dictionary<string, object>() {
                     {"packageIds", new string[] { "extra-android-m2repository" } }
                 });
-#elif UNITY_IOS
+#elif UNITY_IOS && !NO_GPGS
             Type iosResolver = Google.VersionHandler.FindClass(
                 "Google.IOSResolver", "Google.IOSResolver");
             if (iosResolver == null) {
