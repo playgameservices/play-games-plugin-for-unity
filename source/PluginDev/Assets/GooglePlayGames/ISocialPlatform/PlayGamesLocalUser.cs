@@ -59,6 +59,44 @@ namespace GooglePlayGames
         }
 
         /// <summary>
+        /// Authenticates the local user. Equivalent to calling
+        /// <see cref="PlayGamesPlatform.Authenticate" />.
+        /// </summary>
+        /// <param name="callback"></param>
+        public void Authenticate(Action<bool, string> callback)
+        {
+            callback = delegate (bool arg1, string arg2) {
+                Action<bool> newBool = new Action<bool>(DummyBoolDelegate);
+                newBool.Invoke(arg1);
+                mPlatform.Authenticate(newBool);
+            };
+        }
+
+        /// <summary>
+        /// Authenticates the local user. Equivalent to calling
+        /// <see cref="PlayGamesPlatform.Authenticate" />.
+        /// </summary>
+        /// <param name="callback"></param>
+        /// <param name="silent"></param>
+        public void Authenticate(Action<bool, string> callback, bool silent)
+        {
+            callback = delegate (bool arg1, string arg2) {
+                Action<bool> newBool = new Action<bool>(DummyBoolDelegate);
+                newBool.Invoke(arg1);
+                mPlatform.Authenticate(newBool, silent);
+            };
+        }
+
+        /// <summary>
+        /// Dummy delegate method for unity 5.5 support.
+        /// </summary>
+        /// <param name="boolean"></param>
+        static void DummyBoolDelegate(bool boolean)
+        {
+            //
+        }
+
+        /// <summary>
         /// Loads all friends of the authenticated user.
         /// </summary>
         public void LoadFriends(Action<bool> callback)

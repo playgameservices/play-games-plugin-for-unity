@@ -380,6 +380,31 @@ namespace GooglePlayGames
         }
 
         /// <summary>
+        ///  Provided for compatibility with ISocialPlatform.
+        /// </summary>
+        /// <seealso cref="Authenticate(Action&lt;bool&gt;,bool)"/>
+        /// <param name="unused"></param>
+        /// <param name="callback"></param>
+        public void Authenticate(ILocalUser unused, Action<bool, string> callback)
+        {
+            callback = delegate (bool arg1, string arg2) {
+                Action<bool> newBool = new Action<bool>(DummyBoolDelegate);
+                newBool.Invoke(arg1);
+                Authenticate(newBool, false);
+            };
+        }
+
+
+        /// <summary>
+        /// Dummy delegate method for unity 5.5 support.
+        /// </summary>
+        /// <param name="boolean"></param>
+        static void DummyBoolDelegate(bool boolean)
+        {
+            //
+        }
+
+        /// <summary>
         /// Determines whether the user is authenticated.
         /// </summary>
         /// <returns>
