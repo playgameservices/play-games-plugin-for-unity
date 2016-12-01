@@ -53,6 +53,15 @@ namespace GooglePlayGames
         /// Authenticates the local user. Equivalent to calling
         /// <see cref="PlayGamesPlatform.Authenticate" />.
         /// </summary>
+        public void Authenticate(Action<bool, string> callback)
+        {
+            mPlatform.Authenticate(callback);
+        }
+
+        /// <summary>
+        /// Authenticates the local user. Equivalent to calling
+        /// <see cref="PlayGamesPlatform.Authenticate" />.
+        /// </summary>
         public void Authenticate(Action<bool> callback, bool silent)
         {
             mPlatform.Authenticate(callback, silent);
@@ -62,38 +71,9 @@ namespace GooglePlayGames
         /// Authenticates the local user. Equivalent to calling
         /// <see cref="PlayGamesPlatform.Authenticate" />.
         /// </summary>
-        /// <param name="callback"></param>
-        public void Authenticate(Action<bool, string> callback)
-        {
-            callback = delegate (bool arg1, string arg2) {
-                Action<bool> newBool = new Action<bool>(DummyBoolDelegate);
-                newBool.Invoke(arg1);
-                mPlatform.Authenticate(newBool);
-            };
-        }
-
-        /// <summary>
-        /// Authenticates the local user. Equivalent to calling
-        /// <see cref="PlayGamesPlatform.Authenticate" />.
-        /// </summary>
-        /// <param name="callback"></param>
-        /// <param name="silent"></param>
         public void Authenticate(Action<bool, string> callback, bool silent)
         {
-            callback = delegate (bool arg1, string arg2) {
-                Action<bool> newBool = new Action<bool>(DummyBoolDelegate);
-                newBool.Invoke(arg1);
-                mPlatform.Authenticate(newBool, silent);
-            };
-        }
-
-        /// <summary>
-        /// Dummy delegate method for unity 5.5 support.
-        /// </summary>
-        /// <param name="boolean"></param>
-        static void DummyBoolDelegate(bool boolean)
-        {
-            //
+            mPlatform.Authenticate(callback, silent);
         }
 
         /// <summary>
@@ -124,7 +104,7 @@ namespace GooglePlayGames
         [Obsolete("Use PlayGamesPlatform.GetServerAuthCode()")]
         public void GetIdToken(Action<string> idTokenCallback)
         {
-            if(authenticated)
+            if (authenticated)
                 mPlatform.GetIdToken(idTokenCallback);
             else
                 idTokenCallback(null);
@@ -298,10 +278,10 @@ namespace GooglePlayGames
             if (mStats == null || !mStats.Valid)
             {
                 mPlatform.GetPlayerStats((rc, stats) =>
-                    {
-                        mStats = stats;
-                        callback(rc, stats);
-                    });
+                {
+                    mStats = stats;
+                    callback(rc, stats);
+                });
             }
             else
             {

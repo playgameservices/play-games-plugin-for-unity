@@ -345,6 +345,19 @@ namespace GooglePlayGames
         /// with <c>true</c> if authentication was successful, <c>false</c>
         /// otherwise.
         /// </param>
+        public void Authenticate(Action<bool, string> callback)
+        {
+            Authenticate(callback, false);
+        }
+
+        /// <summary>
+        /// Authenticate the local user with the Google Play Games service.
+        /// </summary>
+        /// <param name='callback'>
+        /// The callback to call when authentication finishes. It will be called
+        /// with <c>true</c> if authentication was successful, <c>false</c>
+        /// otherwise.
+        /// </param>
         /// <param name='silent'>
         /// Indicates whether authentication should be silent. If <c>false</c>,
         /// authentication may show popups and interact with the user to obtain
@@ -369,6 +382,38 @@ namespace GooglePlayGames
         }
 
         /// <summary>
+        /// Authenticate the local user with the Google Play Games service.
+        /// </summary>
+        /// <param name='callback'>
+        /// The callback to call when authentication finishes. It will be called
+        /// with <c>true</c> if authentication was successful, <c>false</c>
+        /// otherwise.
+        /// </param>
+        /// <param name='silent'>
+        /// Indicates whether authentication should be silent. If <c>false</c>,
+        /// authentication may show popups and interact with the user to obtain
+        /// authorization. If <c>true</c>, there will be no popups or interaction with
+        /// the user, and the authentication will fail instead if such interaction
+        /// is required. A typical pattern is to try silent authentication on startup
+        /// and, if that fails, present the user with a "Sign in" button that then
+        /// triggers normal (not silent) authentication.
+        /// </param>
+        public void Authenticate(Action<bool, string> callback, bool silent)
+        {
+            // make a platform-specific Play Games client
+            if (mClient == null)
+            {
+                GooglePlayGames.OurUtils.Logger.d(
+                    "Creating platform-specific Play Games client.");
+                mClient = PlayGamesClientFactory.GetPlatformPlayGamesClient(mConfiguration);
+            }
+
+            // authenticate!
+            Action<bool> c = (bool a) => callback(a, "");
+            mClient.Authenticate(c, silent);
+        }
+
+        /// <summary>
         ///  Provided for compatibility with ISocialPlatform.
         /// </summary>
         /// <seealso cref="Authenticate(Action&lt;bool&gt;,bool)"/>
@@ -383,25 +428,11 @@ namespace GooglePlayGames
         ///  Provided for compatibility with ISocialPlatform.
         /// </summary>
         /// <seealso cref="Authenticate(Action&lt;bool&gt;,bool)"/>
-        /// <param name="unused"></param>
-        /// <param name="callback"></param>
+        /// <param name="unused">Unused parameter for this implementation.</param>
+        /// <param name="callback">Callback invoked when complete.</param>
         public void Authenticate(ILocalUser unused, Action<bool, string> callback)
         {
-            callback = delegate (bool arg1, string arg2) {
-                Action<bool> newBool = new Action<bool>(DummyBoolDelegate);
-                newBool.Invoke(arg1);
-                Authenticate(newBool, false);
-            };
-        }
-
-
-        /// <summary>
-        /// Dummy delegate method for unity 5.5 support.
-        /// </summary>
-        /// <param name="boolean"></param>
-        static void DummyBoolDelegate(bool boolean)
-        {
-            //
+            Authenticate(callback, false);
         }
 
         /// <summary>
@@ -742,7 +773,7 @@ namespace GooglePlayGames
                         " is less than or equal to 1. You might be trying to use values in the range of [0,1], while values are expected to be within the range [0,100]. If you are using the latter, you can safely ignore this message.");
                 }
 
-                int targetSteps = (int) Math.Round((progress / 100f) * totalSteps);
+                int targetSteps = (int)Math.Round((progress / 100f) * totalSteps);
                 int numSteps = targetSteps - curSteps;
                 GooglePlayGames.OurUtils.Logger.d("Target steps: " +
                     targetSteps + ", cur steps:" + curSteps);
@@ -864,15 +895,15 @@ namespace GooglePlayGames
             }
 
             mClient.LoadAchievements(ach =>
+            {
+                IAchievementDescription[] data = new IAchievementDescription[ach.Length];
+                for (int i = 0; i < data.Length; i++)
                 {
-                    IAchievementDescription[] data = new IAchievementDescription[ach.Length];
-                    for (int i = 0; i < data.Length; i++)
-                    {
-                        data[i] = new PlayGamesAchievement(ach[i]);
-                    }
+                    data[i] = new PlayGamesAchievement(ach[i]);
+                }
 
-                    callback.Invoke(data);
-                });
+                callback.Invoke(data);
+            });
         }
 
         /// <summary>
@@ -890,15 +921,15 @@ namespace GooglePlayGames
             }
 
             mClient.LoadAchievements(ach =>
+            {
+                IAchievement[] data = new IAchievement[ach.Length];
+                for (int i = 0; i < data.Length; i++)
                 {
-                    IAchievement[] data = new IAchievement[ach.Length];
-                    for (int i = 0; i < data.Length; i++)
-                    {
-                        data[i] = new PlayGamesAchievement(ach[i]);
-                    }
+                    data[i] = new PlayGamesAchievement(ach[i]);
+                }
 
-                    callback.Invoke(data);
-                });
+                callback.Invoke(data);
+            });
         }
 
         /// <summary>
@@ -1090,7 +1121,7 @@ namespace GooglePlayGames
                 return;
             }
 
-            GooglePlayGames.OurUtils.Logger.d("ShowAchievementsUI callback is "  + callback);
+            GooglePlayGames.OurUtils.Logger.d("ShowAchievementsUI callback is " + callback);
             mClient.ShowAchievementsUI(callback);
         }
 
@@ -1186,15 +1217,15 @@ namespace GooglePlayGames
             mDefaultLbUi = lbid;
         }
 
-       /// <summary>
-       /// Loads the friends that also play this game.  See loadConnectedPlayers.
-       /// </summary>
+        /// <summary>
+        /// Loads the friends that also play this game.  See loadConnectedPlayers.
+        /// </summary>
         /// <remarks>This is a callback variant of LoadFriends.  When completed,
         /// the friends list set in the user object, so they can accessed via the
         /// friends property as needed.
         /// </remarks>
         /// <param name="user">The current local user</param>
-       /// <param name="callback">Callback invoked when complete.</param>
+        /// <param name="callback">Callback invoked when complete.</param>
         public void LoadFriends(ILocalUser user, Action<bool> callback)
         {
             if (!IsAuthenticated())
