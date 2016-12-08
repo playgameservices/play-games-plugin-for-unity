@@ -53,7 +53,25 @@ namespace GooglePlayGames
         /// Authenticates the local user. Equivalent to calling
         /// <see cref="PlayGamesPlatform.Authenticate" />.
         /// </summary>
+        public void Authenticate(Action<bool, string> callback)
+        {
+            mPlatform.Authenticate(callback);
+        }
+
+        /// <summary>
+        /// Authenticates the local user. Equivalent to calling
+        /// <see cref="PlayGamesPlatform.Authenticate" />.
+        /// </summary>
         public void Authenticate(Action<bool> callback, bool silent)
+        {
+            mPlatform.Authenticate(callback, silent);
+        }
+
+        /// <summary>
+        /// Authenticates the local user. Equivalent to calling
+        /// <see cref="PlayGamesPlatform.Authenticate" />.
+        /// </summary>
+        public void Authenticate(Action<bool, string> callback, bool silent)
         {
             mPlatform.Authenticate(callback, silent);
         }
@@ -86,7 +104,7 @@ namespace GooglePlayGames
         [Obsolete("Use PlayGamesPlatform.GetServerAuthCode()")]
         public void GetIdToken(Action<string> idTokenCallback)
         {
-            if(authenticated)
+            if (authenticated)
                 mPlatform.GetIdToken(idTokenCallback);
             else
                 idTokenCallback(null);
@@ -260,10 +278,10 @@ namespace GooglePlayGames
             if (mStats == null || !mStats.Valid)
             {
                 mPlatform.GetPlayerStats((rc, stats) =>
-                    {
-                        mStats = stats;
-                        callback(rc, stats);
-                    });
+                {
+                    mStats = stats;
+                    callback(rc, stats);
+                });
             }
             else
             {
