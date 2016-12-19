@@ -34,10 +34,14 @@
             openURL:(NSURL *)url
   sourceApplication:(NSString *)sourceApplication
          annotation:(id)annotation {
-  [super application:application
-             openURL:url
-   sourceApplication:sourceApplication
-          annotation:annotation];
+
+  // Uncomment this if you extend another AppController class that needs to handle
+  // being opened from a url.
+  //[super application:application
+  //           openURL:url
+  // sourceApplication:sourceApplication
+  //        annotation:annotation];
+
   return [[GIDSignIn sharedInstance] handleURL:url
                              sourceApplication:sourceApplication
                                     annotation:annotation];

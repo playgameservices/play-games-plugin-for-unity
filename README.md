@@ -235,7 +235,7 @@ For more information, consult the documentation for your version of Windows.
 Install Cocoapods
 
 
-This plugin uses another plugin called the Unity Jar Resolver, which handles 
+This plugin uses another plugin called the Unity Jar Resolver, which handles
 resolving the dependencies needed for this plugin.  When building for iOS in
 Unity, a post build step is executed that runs Cocoapods and then adds the required
 libraries and frameworks directly to the XCode project.  This is different from
@@ -983,9 +983,6 @@ To sign the user out, use the **PlayGamesPlatform.SignOut** method.
 
 After signing out, no further API calls can be made until the user authenticates again.
 
-
-## Building for Android
-
 ## Building for iOS
 
 To build your game for iOS, do as you would normally do in Unity. Select **File > Build Settings**, then select the **iOS** platform.
@@ -1000,6 +997,30 @@ configure the Info.plist settings on your project. You will see a log of the
 operation, which if successful, will give you additional instructions to finish
 configuring your XCode project.
 
+In your xcode project directory, create a file named __Podfile__.  In this file
+add  the following lines (or merge them in if you have other Cocoapod dependencies).
+
+```
+# Uncomment this line to define a global platform for your project
+platform :ios, '7.0'
+
+target 'Unity-iPhone' do
+    pod 'GooglePlayGames', '5.1.2'
+end
+
+target 'Unity-iPhone Tests' do
+    pod 'GooglePlayGames', '5.1.2'
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['ENABLE_BITCODE'] = 'NO'
+    end
+  end
+end
+```
+
 The final step that is run is adding the Podfile to the project and running
 `pod install`.  This creates a pod project containing the dependencies, and also
 a workspace configuration called Unity-iPhone.xcworkspace.
@@ -1007,6 +1028,8 @@ a workspace configuration called Unity-iPhone.xcworkspace.
 To open and build the project open a terminal window in the project directory, and type
 `open Unity-iPhone.xcworkspace`. Alternatively, you can double click the file in Finder.
 
+**Notice:** GooglePlayGames is using a fixed version number, and may be incompatible
+with other pods.
 
 ## Excluding all Google Play Game Services when building for iOS
 
@@ -1129,36 +1152,16 @@ In the `GPGSAppController.m` file, you will notice within the `application:didRe
 
 ## Building iOS projects without Cocoapods
 
-These are the manual steps needed to build iOS projects without using Cocoapods:
+Building without Cocoapods is not recommended.  The reason is there are a
+large set of dependencies.  Many of these dependencies are changing to keep
+pace with improvements and changes in the iOS eco-system.  GooglePlayGames is
+a framework with a low update frequency so sometimes finding the links to the
+correct versions of libraries is difficult.
 
-1. Add these frameworks. To do this, click the top-level project (the item on the
-list labeled **Unity-iPhone, 1 target, iOS SDK**), then click the **Build Phases**
-tab and expand the **Link Binary with Libraries** item. Then, add the following
-frameworks to that list:
-<br/><br/>
+One alternative to always using Cocoapods to build is to use Cocapods once and
+create a library from the 'Pods' project and then integrate that into your project.
 
-**AddressBook.framework**<br/>
-**AssetsLibrary.framework**<br/>
-**CoreData.framework**<br/>
-**CoreTelephony.framework**<br/>
-**CoreText.framework**<br/>
-**Security.framework**<br/>
-**libc++.dylib**<br/>
-**libz.dylib**<br/><br/>
-
-2. Add the following bundles and frameworks from the Google Plus and Google Play
-   Games C++ SDK that you have previously downloaded. If you have not downloaded
-   these files yet, they can be found [in the downloads section](https://developers.google.com/games/services/downloads) of the Google Play Games developer site. To add these frameworks you can simply drag
-and drop these files on the top-level project item (labeled **Unity-iPhone**).<br/><br/>
-     **GoogleSignIn.framework**<br/>
-     **GoogleSignIn.bundle**<br/>
-     **GoogleOpenSource.framework**<br/>
-     **gpg.bundle**<br/>
-     **gpg.framework**<br/><br/>
-3. Add the **"-ObjC"** linker flag. To do this, select the top-level project
-   object, then go to the **Build Settings**
-   tab. Search for **"Other Linker Flags"** using the search tool, double click
-   the **Other Linker Flags** item and add **"-ObjC"** to that list (attention to case!).
+But really, not using Cocapods is not recommended.
 
 **Note:** If you export the project a second time to the same XCode project
 directory, you can use Unity's **Append** option to avoid overwriting these

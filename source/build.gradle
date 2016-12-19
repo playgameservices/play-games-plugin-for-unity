@@ -55,9 +55,7 @@ project.ext {
 
     jarresolver_uri = System.getProperty("RESOLVER_PACKAGE_URI")
     jarresolver_repos = [
-      'sso://devrel/libraries/android/unity-jar-resolver',
-      'https://devrel.googlesource.com/libraries/android/unity-jar-resolver',
-      'https://github.com/googlesamples/unity-jar-resolver.git',
+      'https://github.com/googlesamples/unity-jar-resolver.git'
     ]
 }
 

@@ -1,3 +1,10 @@
+Version 0.9.36
+    Bug Fixes:
+        * #1432 - Updating Authenticate to match Unity 5.5 interface.
+        * #1496 - Fixing NO_GPGS not being honored.
+        * Disabled JarResolver for iOS, added instructions for CocoaPods.
+    New Features:
+        * #1346 - Check if Play Games is installed.
 Version 0.9.35
     Bug Fixes:
         * #1194 - OnPostprocessAllAssets called before Resolver is registered.

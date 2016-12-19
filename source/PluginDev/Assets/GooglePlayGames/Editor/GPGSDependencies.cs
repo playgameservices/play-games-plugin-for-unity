@@ -94,6 +94,18 @@ public class GPGSDependencies : AssetPostprocessor
                     {"packageIds", new string[] { "extra-android-m2repository" } }
                 });
 #elif UNITY_IOS && !NO_GPGS
+            /*
+            *
+            *  THIS IS A TEMPORARY HACK!
+            *
+            *   The ios resolver is not handling static libraries correctly,
+            *   as a result, the project is left in a bad state.
+            *
+            *   This disables the resolver for iOS, and developers can manually
+            *   create a podfile and use cocoapods to set up the xcode project.
+            *
+            */
+            Google.IOSResolver.Enabled = false;
             Type iosResolver = Google.VersionHandler.FindClass(
                 "Google.IOSResolver", "Google.IOSResolver");
             if (iosResolver == null) {
@@ -103,7 +115,7 @@ public class GPGSDependencies : AssetPostprocessor
                 iosResolver, "AddPod",
                 new object[] { "GooglePlayGames" },
                 namedArgs: new Dictionary<string, object>() {
-                    { "version", "5.0+" },
+                    { "version", "5.1.2" },
                     { "bitcodeEnabled", false },
                 });
 #endif  // UNITY_IOS

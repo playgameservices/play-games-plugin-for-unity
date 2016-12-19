@@ -369,16 +369,7 @@ namespace GooglePlayGames
         /// </param>
         public void Authenticate(Action<bool> callback, bool silent)
         {
-            // make a platform-specific Play Games client
-            if (mClient == null)
-            {
-                GooglePlayGames.OurUtils.Logger.d(
-                    "Creating platform-specific Play Games client.");
-                mClient = PlayGamesClientFactory.GetPlatformPlayGamesClient(mConfiguration);
-            }
-
-            // authenticate!
-            mClient.Authenticate(callback, silent);
+            Authenticate((bool success, string msg) => callback(success), silent);
         }
 
         /// <summary>
@@ -409,8 +400,7 @@ namespace GooglePlayGames
             }
 
             // authenticate!
-            Action<bool> c = (bool a) => callback(a, "");
-            mClient.Authenticate(c, silent);
+            mClient.Authenticate(callback, silent);
         }
 
         /// <summary>
