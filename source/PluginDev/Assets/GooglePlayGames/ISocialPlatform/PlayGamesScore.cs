@@ -134,19 +134,19 @@ namespace GooglePlayGames
             }
         }
 
-		/// <summary>
-		/// Gets the metaData (scoreTag).
-		/// </summary>
-		/// <returns>
-		/// The metaData.
-		/// </returns>
-		public string metaData
-		{
-			get 
-			{
-				return mMetadata;
-			}
-		}
+        /// <summary>
+        /// Gets the metaData (scoreTag).
+        /// </summary>
+        /// <returns>
+        /// The metaData.
+        /// </returns>
+        public string metaData
+        {
+            get 
+            {
+                return mMetadata;
+            }
+        }
     }
 }
 #endif
