@@ -792,6 +792,46 @@ namespace GooglePlayGames
         }
 
         /// <summary>
+        /// Unlocks the achievement with the passed identifier. This is a Play Games extension of the ISocialPlatform API.
+        /// </summary>
+        /// <remarks>If the operation succeeds, the callback
+        /// will be invoked on the game thread with <code>true</code>. If the operation fails, the
+        /// callback will be invoked with <code>false</code>. This operation will immediately fail if
+        /// the user is not authenticated (i.e. the callback will immediately be invoked with
+        /// <code>false</code>). If the achievement is already unlocked, this call will
+        /// succeed immediately.
+        /// </remarks>
+        /// <param name='achievementID'>
+        /// The ID of the achievement to increment. This can be a raw Google Play
+        /// Games achievement ID (alphanumeric string), or an alias that was previously configured
+        /// by a call to <see cref="AddIdMapping" />.
+        /// </param>
+        /// <param name='callback'>
+        /// The callback to call to report the success or failure of the operation. The callback
+        /// will be called with <c>true</c> to indicate success or <c>false</c> for failure.
+        /// </param>
+        public void UnlockAchievement(string achievementID, Action<bool> callback)
+        {
+            if (!IsAuthenticated())
+            {
+                GooglePlayGames.OurUtils.Logger.e(
+                    "UnlockAchievement can only be called after authentication.");
+                if (callback != null)
+                {
+                    callback.Invoke(false);
+                }
+
+                return;
+            }
+
+            // map ID, if it's in the dictionary
+            GooglePlayGames.OurUtils.Logger.d(
+                "UnlockAchievement: " + achievementID);
+            achievementID = MapId(achievementID);
+            mClient.UnlockAchievement(achievementID, callback);
+        }
+
+        /// <summary>
         /// Increments an achievement. This is a Play Games extension of the ISocialPlatform API.
         /// </summary>
         /// <param name='achievementID'>
