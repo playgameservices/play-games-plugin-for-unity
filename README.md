@@ -1054,6 +1054,16 @@ Select **DWARF** instead of **DWARF with dSYM**.
 to the framework in the Pods project, then add it back.  This is a resolution for
 missing other frameworks as well.
 
+**GIDSignIn.h file not found**.  Make sure you are:
+```
+# Opening the .xcworkspace file.
+# OTHER_LDFLAGS in build settings include $(inherited)
+# HEADER_SEARCH_PATHS in build settings include $(inherited)
+# OTHER_CFLAGS in build settings include $(inherited)
+# ENABLE_BITCODE in build settings is set to NO
+# Libraries/Plugins/iOS/GPGSAppController.mm (or Libraries/GPGSAppController.mm) has compiler flags that include -fobjc-arc
+```
+
 ## Building for iOS to run on the simulator (pre-Unity 5.0)
 
 **Note:** If you are using Unity 5.0 or greater, no changes to the generated project
