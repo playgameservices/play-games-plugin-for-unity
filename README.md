@@ -1055,14 +1055,13 @@ to the framework in the Pods project, then add it back.  This is a resolution fo
 missing other frameworks as well.
 
 **GIDSignIn.h file not found**.  Make sure you are:
-```
-# Opening the .xcworkspace file.
-# OTHER_LDFLAGS in build settings include $(inherited)
-# HEADER_SEARCH_PATHS in build settings include $(inherited)
-# OTHER_CFLAGS in build settings include $(inherited)
-# ENABLE_BITCODE in build settings is set to NO
-# Libraries/Plugins/iOS/GPGSAppController.mm (or Libraries/GPGSAppController.mm) has compiler flags that include -fobjc-arc
-```
+
+1. Opening the .xcworkspace file.
+2. OTHER_LDFLAGS in build settings include $(inherited)
+3. HEADER_SEARCH_PATHS in build settings include $(inherited)
+4. OTHER_CFLAGS in build settings include $(inherited)
+5. ENABLE_BITCODE in build settings is set to NO
+6. Libraries/Plugins/iOS/GPGSAppController.mm (or Libraries/GPGSAppController.mm) has compiler flags that include -fobjc-arc
 
 ## Building for iOS to run on the simulator (pre-Unity 5.0)
 
