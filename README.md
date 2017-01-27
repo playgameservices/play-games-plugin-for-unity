@@ -1054,9 +1054,9 @@ Select **DWARF** instead of **DWARF with dSYM**.
 to the framework in the Pods project, then add it back.  This is a resolution for
 missing other frameworks as well.
 
-**GIDSignIn.h file not found**.  Make sure you are:
+**GIDSignIn.h file not found**.  Make sure:
 
-1. Opening the .xcworkspace file.
+1. You open the .xcworkspace file.
 2. OTHER_LDFLAGS in build settings include $(inherited)
 3. HEADER_SEARCH_PATHS in build settings include $(inherited)
 4. OTHER_CFLAGS in build settings include $(inherited)
