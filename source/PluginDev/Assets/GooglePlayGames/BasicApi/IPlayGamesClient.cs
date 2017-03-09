@@ -357,6 +357,12 @@ namespace GooglePlayGames.BasicApi
     Quests.IQuestsClient GetQuestsClient();
 
     /// <summary>
+    /// Gets the video client.
+    /// </summary>
+    /// <returns>The video client.</returns>
+    Video.IVideoClient GetVideoClient();
+
+    /// <summary>
     /// Registers the invitation delegate.
     /// </summary>
     /// <param name="invitationDelegate">Invitation delegate.</param>

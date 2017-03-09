@@ -170,6 +170,28 @@ namespace GooglePlayGames.Native.Cwrapper
             LAST_KNOWN_GOOD = 3,
             MOST_RECENTLY_MODIFIED = 4,
         }
+
+        internal enum VideoCaptureMode {
+            UNKNOWN = -1,
+            FILE = 0,
+            STREAM = 1,
+        }
+
+        internal enum VideoQualityLevel {
+            UNKNOWN = -1,
+            SD = 0,
+            HD = 1,
+            XHD = 2,
+            FULLHD = 3
+        }
+
+        internal enum VideoCaptureOverlayState {
+            UNKNOWN = -1,
+            SHOWN = 1,
+            STARTED = 2,
+            STOPPED = 3,
+            DISMISSED = 4
+        };
     }
 }
 #endif // (UNITY_ANDROID || UNITY_IPHONE)

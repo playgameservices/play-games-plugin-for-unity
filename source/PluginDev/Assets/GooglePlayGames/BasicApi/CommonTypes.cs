@@ -113,4 +113,48 @@ namespace GooglePlayGames.BasicApi
         /// <summary>Social leaderboards contain the scores of players in the viewing player's circles.</summary>
         Social = 2,
       }
+
+      public enum VideoCaptureMode {
+        /// <summary>An unknown value to return when capture mode is not available.</summary>
+        Unknown = -1,
+        /// <summary>Capture device audio and video to a local file.</summary>
+        File = 0,
+        /// <summary>Capture device audio and video, and stream it live.</summary>
+        /// <remarks>Not currently supported in the Unity Plugin.</remarks>
+        Stream = 1  // Not currently supported in the Unity Plugin.
+      }
+
+      public enum VideoQualityLevel {
+        /// <summary>An unknown value to return when quality level is not available.</summary>
+        Unknown = -1,
+        /// <summary>SD quality: Standard def resolution (e.g. 480p) and a low bit rate (e.g. 1-2Mbps).</summary>
+        SD = 0,
+        /// <summary>HD quality: DVD HD resolution (i.e. 720p) and a medium bit rate (e.g. 3-4Mbps).</summary>
+        HD = 1,
+        /// <summary>Extreme HD quality: BluRay HD resolution (i.e. 1080p) and a high bit rate (e.g. 6-8Mbps).</summary>
+        XHD = 2,
+        /// <summary>Full HD quality: 2160P resolution and high bit rate, e.g. 10-12Mbps.</summary>
+        FullHD = 3
+      }
+
+      public enum VideoCaptureOverlayState {
+        /// <summary>State used to indicate that the state of the capture overlay is unknown.</summary>
+        /// <remarks>This usually indicates an error.</remarks>
+        Unknown = -1,
+        /// <summary>State used to indicate that the capture overlay is drawn on the screen and visible to the user.</summary>
+        Shown = 1,
+        /// <summary>State used to indicate that the user has initiated capture via the capture overlay.</summary>
+        Started = 2,
+        /// <summary>State used to indicate that the user has stopped capturing via the capture overlay.</summary>
+        Stopped = 3,
+        /// <summary>State used to indicate that the user has dismissed the capture overlay and it is no longer visible.</summary>
+        Dismissed = 4
+      }
+
+    public class CommonTypesUtil {
+        public static bool StatusIsSuccess(ResponseStatus status)
+        {
+            return ((int)status) > 0;
+        }
+    }
 }

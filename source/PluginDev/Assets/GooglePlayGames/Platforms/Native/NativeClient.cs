@@ -28,6 +28,7 @@ namespace GooglePlayGames.Native
     using System.Collections.Generic;
     using GooglePlayGames.BasicApi.Events;
     using GooglePlayGames.BasicApi.Quests;
+    using GooglePlayGames.BasicApi.Video;
     using Types = GooglePlayGames.Native.Cwrapper.Types;
     using Status = GooglePlayGames.Native.Cwrapper.CommonErrorStatus;
     using UnityEngine;
@@ -55,6 +56,7 @@ namespace GooglePlayGames.Native
         private volatile ISavedGameClient mSavedGameClient;
         private volatile IEventsClient mEventsClient;
         private volatile IQuestsClient mQuestsClient;
+        private volatile IVideoClient mVideoClient;
         private volatile TokenClient mTokenClient;
         private volatile Action<Invitation, bool> mInvitationDelegate;
         private volatile Dictionary<String, Achievement> mAchievements = null;
@@ -193,14 +195,19 @@ namespace GooglePlayGames.Native
                 {
                     using (var config = clientImpl.CreatePlatformConfiguration())
                     {
-                        // We need to make sure that the invitation delegate is registered before the
-                        // services object is initialized - otherwise we might miss a callback if
-                        // the game was opened because of a user accepting an invitation through
-                        // a system notification.
+                        // We need to make sure that the invitation delegate
+                        // is registered before the services object is
+                        // initialized - otherwise we might miss a callback if
+                        // the game was opened because of a user accepting an
+                        // invitation through a system notification.
                         RegisterInvitationDelegate(mConfiguration.InvitationDelegate);
                         builder.SetOnAuthFinishedCallback(HandleAuthTransition);
-                        builder.SetOnTurnBasedMatchEventCallback((eventType, matchId, match) => mTurnBasedClient.HandleMatchEvent(eventType, matchId, match));
-                        builder.SetOnMultiplayerInvitationEventCallback(HandleInvitation);
+                        builder.SetOnTurnBasedMatchEventCallback(
+                            (eventType, matchId, match) => 
+                                mTurnBasedClient.HandleMatchEvent(
+                                    eventType, matchId, match));
+                        builder.SetOnMultiplayerInvitationEventCallback(
+                                    HandleInvitation);
                         if (mConfiguration.EnableSavedGames)
                         {
                             builder.EnableSnapshots();
@@ -218,6 +225,7 @@ namespace GooglePlayGames.Native
                         mServices = builder.Build(config);
                         mEventsClient = new NativeEventClient(new EventManager(mServices));
                         mQuestsClient = new NativeQuestClient(new QuestManager(mServices));
+                        mVideoClient = new NativeVideoClient(new VideoManager(mServices));
                         mTurnBasedClient =
                         new NativeTurnBasedMultiplayerClient(this, new TurnBasedManager(mServices));
 
@@ -1170,6 +1178,16 @@ namespace GooglePlayGames.Native
             lock (GameServicesLock)
             {
                 return mQuestsClient;
+            }
+        }
+
+        ///<summary></summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.GetVideoClient"/>
+        public IVideoClient GetVideoClient()
+        {
+            lock (GameServicesLock)
+            {
+                return mVideoClient;
             }
         }
 

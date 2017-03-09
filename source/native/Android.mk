@@ -6,7 +6,7 @@ LOCAL_MODULE := gpg
 
 LOCAL_MODULE_FILENAME := libgpg
 
-LOCAL_STATIC_LIBRARIES := libgpg-1
+LOCAL_WHOLE_STATIC_LIBRARIES := libgpg-1
 LOCAL_SRC_FILES := plugin_shim.cc bridge.cc
 LOCAL_LDLIBS := -llog
 

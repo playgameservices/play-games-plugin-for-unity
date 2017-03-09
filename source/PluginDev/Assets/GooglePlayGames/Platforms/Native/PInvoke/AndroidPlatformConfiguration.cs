@@ -51,7 +51,8 @@ sealed class AndroidPlatformConfiguration : PlatformConfiguration {
     }
 
     internal static AndroidPlatformConfiguration Create() {
-        return new AndroidPlatformConfiguration(C.AndroidPlatformConfiguration_Construct());
+        IntPtr p = C.AndroidPlatformConfiguration_Construct();
+        return new AndroidPlatformConfiguration(p);
     }
 }
 }

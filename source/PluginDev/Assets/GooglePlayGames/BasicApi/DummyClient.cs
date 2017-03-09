@@ -478,6 +478,16 @@ namespace GooglePlayGames.BasicApi
         }
 
         /// <summary>
+        /// Gets the video client.
+        /// </summary>
+        /// <returns>The video client.</returns>
+        public GooglePlayGames.BasicApi.Video.IVideoClient GetVideoClient()
+        {
+            LogUsage();
+            return null;
+        }
+
+        /// <summary>
         /// Registers the invitation delegate.
         /// </summary>
         /// <param name="invitationDelegate">Invitation delegate.</param>
