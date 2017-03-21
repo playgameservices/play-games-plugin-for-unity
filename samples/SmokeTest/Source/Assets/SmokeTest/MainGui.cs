@@ -78,6 +78,7 @@ namespace SmokeTest
         private NearbyGUI mNearbyGui;
         private AchievementGUI mAchievementGui;
         private LeaderboardGUI mLeaderboardGui;
+        private VideoGUI mVideoGui;
 
         // which UI are we showing?
         public enum Ui
@@ -96,6 +97,7 @@ namespace SmokeTest
             NearbyConnections,
             Achievements,
             Leaderboards,
+            Video,
             UserInfo
         }
 
@@ -107,6 +109,7 @@ namespace SmokeTest
             this.mNearbyGui = new NearbyGUI(this);
             this.mAchievementGui = new AchievementGUI(this);
             this.mLeaderboardGui = new LeaderboardGUI(this);
+            this.mVideoGui = new VideoGUI(this);
 
             loadedFriends = false;
         }
@@ -300,19 +303,23 @@ namespace SmokeTest
             {
                 SetUI(Ui.UserInfo);
             }
-            else if (GUI.Button(this.CalcGrid(0, 4), "Multiplayer"))
+            else if (GUI.Button(this.CalcGrid(0, 3), "Multiplayer"))
             {
                 SetUI(Ui.Multiplayer);
             }
-            else if (GUI.Button(this.CalcGrid(1, 4), "Saved Game"))
+            else if (GUI.Button(this.CalcGrid(1, 3), "Saved Game"))
             {
                 SetUI(Ui.SavedGame);
             }
-            else if (GUI.Button(this.CalcGrid(1, 6), "Nearby Connections"))
+            else if (GUI.Button(this.CalcGrid(0, 4), "Video"))
+            {
+                 SetUI(Ui.Video);
+            }
+            else if (GUI.Button(this.CalcGrid(1, 4), "Nearby Connections"))
             {
                 SetUI(Ui.NearbyConnections);
             }
-            else if (GUI.Button(this.CalcGrid(0, 6), "Sign Out"))
+            else if (GUI.Button(this.CalcGrid(0, 5), "Sign Out"))
             {
                 this.DoSignOut();
             }
@@ -1154,6 +1161,9 @@ namespace SmokeTest
                         break;
                     case Ui.NearbyConnections:
                         mNearbyGui.OnGUI();
+                        break;
+                    case Ui.Video:
+                        mVideoGui.OnGUI();
                         break;
                     case Ui.UserInfo:
                         // start loading the id token:

@@ -25,6 +25,7 @@ namespace GooglePlayGames
     using GooglePlayGames.BasicApi.Nearby;
     using GooglePlayGames.BasicApi.Quests;
     using GooglePlayGames.BasicApi.SavedGame;
+    using GooglePlayGames.BasicApi.Video;
     using GooglePlayGames.OurUtils;
     using UnityEngine;
     using UnityEngine.SocialPlatforms;
@@ -82,6 +83,7 @@ namespace GooglePlayGames
         /// <param name="configuration">Configuration object to use.</param>
         private PlayGamesPlatform(PlayGamesClientConfiguration configuration)
         {
+            GooglePlayGames.OurUtils.Logger.w("Creating new PlayGamesPlatform");
             this.mLocalUser = new PlayGamesLocalUser(this);
             this.mConfiguration = configuration;
         }

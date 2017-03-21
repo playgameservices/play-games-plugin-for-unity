@@ -66,7 +66,6 @@ namespace GooglePlayGames.Android
                             });
                     });
             }
-
             return config;
         }
 

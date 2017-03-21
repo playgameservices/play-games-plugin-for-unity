@@ -23,14 +23,15 @@ namespace GooglePlayGames.Native.Cwrapper
 
     internal static class InternalHooks
     {
-
-        [DllImport(SymbolLocation.NativeSymbolLocation)]
-        internal static extern void InternalHooks_ConfigureForUnityPlugin(HandleRef builder);
+      [DllImport(SymbolLocation.NativeSymbolLocation)]
+        internal static extern void InternalHooks_ConfigureForUnityPlugin(
+                HandleRef builder, string unity_version);
 
 
         #if UNITY_ANDROID
         [DllImport(SymbolLocation.NativeSymbolLocation)]
-        internal static extern IntPtr InternalHooks_GetApiClient(HandleRef services);
+        internal static extern IntPtr InternalHooks_GetApiClient(
+                HandleRef services);
         #endif
     }
 }
