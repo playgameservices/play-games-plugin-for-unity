@@ -75,24 +75,6 @@ public class GPGSDependencies : AssetPostprocessor
                         {"packageIds", new string[] { "extra-google-m2repository" } }
             });
 
-            // if google+ is needed, add it
-            if (GameInfo.RequireGooglePlus())
-            {
-                Google.VersionHandler.InvokeInstanceMethod(
-                        svcSupport, "DependOn",
-                        new object[] { "com.google.android.gms", "play-services-plus",
-                         PluginVersion.PlayServicesVersionConstraint },
-                        namedArgs: new Dictionary<string, object>() {
-                        {"packageIds", new string[] { "extra-google-m2repository" } }
-                });
-            }
-
-            Google.VersionHandler.InvokeInstanceMethod(
-                svcSupport, "DependOn",
-                new object[] { "com.android.support", "support-v4", "23.1+" },
-                namedArgs: new Dictionary<string, object>() {
-                    {"packageIds", new string[] { "extra-android-m2repository" } }
-                });
 #elif UNITY_IOS && !NO_GPGS
             /*
             *

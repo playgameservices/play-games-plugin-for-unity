@@ -43,10 +43,6 @@ namespace GooglePlayGames
         public const string WebClientId = "__WEB_CLIENTID__"; // Filled in automatically
         public const string NearbyConnectionServiceId = "__NEARBY_SERVICE_ID__";
 
-        public static bool RequireGooglePlus()
-        {
-            return false;
-        }
 
         public static bool ApplicationIdInitialized()
         {

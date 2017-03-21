@@ -70,12 +70,17 @@ namespace GooglePlayGames.Android
         }
 
 
-        public TokenClient CreateTokenClient(string playerId, bool reset)
+        public TokenClient CreateTokenClient(bool reset)
         {
-            if (tokenClient == null || reset)
+            if (tokenClient == null)
             {
-                tokenClient = new AndroidTokenClient(playerId);
+                tokenClient = new AndroidTokenClient();
             }
+            else if (reset)
+            {
+                tokenClient.Signout();
+            }
+
             return tokenClient;
         }
 
@@ -111,6 +116,14 @@ namespace GooglePlayGames.Android
             finally
             {
                 AndroidJNIHelper.DeleteJNIArgArray(objectArray, jArgs);
+            }
+        }
+
+        public void Signout()
+        {
+            if (tokenClient != null)
+            {
+                tokenClient.Signout();
             }
         }
 

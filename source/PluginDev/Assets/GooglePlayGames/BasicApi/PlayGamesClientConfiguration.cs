@@ -34,7 +34,6 @@ namespace GooglePlayGames.BasicApi
         /// </summary>
         public static readonly PlayGamesClientConfiguration DefaultConfiguration =
             new Builder()
-           .WithPermissionRationale("Select email address to send to this game or hit cancel to not share.")
            .Build();
         /// <summary>
         /// Flag indicating to enable saved games API.
@@ -42,14 +41,29 @@ namespace GooglePlayGames.BasicApi
         private readonly bool mEnableSavedGames;
 
         /// <summary>
-        /// Flag indicating to request use of a player's Google+ social graph.
-        /// </summary>
-        private readonly bool mRequireGooglePlus;
-        
-        /// <summary>
         /// Array of scopes to be requested from user. None is considered as 'games_lite'.
         /// </summary>
         private readonly string[] mScopes;
+
+        /// <summary>
+        /// The flag to indicate a server auth code should be requested when authenticating.
+        /// </summary>
+        private readonly bool mRequestAuthCode;
+
+        /// <summary>
+        /// The flag indicating the auth code should be refresh, causing re-consent and issuing a new refresh token.
+        /// </summary>
+        private readonly bool mForceRefresh;
+
+        /// <summary>
+        /// The flag indicating the email address should returned when authenticating.
+        /// </summary>
+        private readonly bool mRequestEmail;
+
+        /// <summary>
+        /// The flag indicating the id token should be returned when authenticating.
+        /// </summary>
+        private readonly bool mRequestIdToken;
 
         /// <summary>
         /// The invitation delegate.
@@ -62,12 +76,6 @@ namespace GooglePlayGames.BasicApi
         private readonly MatchDelegate mMatchDelegate;
 
         /// <summary>
-        /// The permission rationale message to show in Android when requesting
-        /// the GET_ACCOUNTS permission to get email and tokens.
-        /// </summary>
-        private readonly string mPermissionRationale;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="GooglePlayGames.BasicApi.PlayGamesClientConfiguration"/> struct.
         /// </summary>
         /// <param name="builder">Builder for this configuration.</param>
@@ -76,9 +84,11 @@ namespace GooglePlayGames.BasicApi
             this.mEnableSavedGames = builder.HasEnableSaveGames();
             this.mInvitationDelegate = builder.GetInvitationDelegate();
             this.mMatchDelegate = builder.GetMatchDelegate();
-            this.mPermissionRationale = builder.GetPermissionRationale();
-            this.mRequireGooglePlus = builder.HasRequireGooglePlus();
             this.mScopes = builder.getScopes();
+            this.mRequestAuthCode = builder.IsRequestingAuthCode();
+            this.mForceRefresh = builder.IsForcingRefresh();
+            this.mRequestEmail = builder.IsRequestingEmail();
+            this.mRequestIdToken = builder.IsRequestingIdToken();
         }
 
         /// <summary>
@@ -94,19 +104,38 @@ namespace GooglePlayGames.BasicApi
             }
         }
 
-        /// <summary>
-        /// Gets a value indicating whether this <see cref="GooglePlayGames.BasicApi.PlayGamesClientConfiguration"/>
-        /// requests a player's Google+ social graph.
-        /// </summary>
-        /// <value><c>true</c> if requests Google+ social graph; otherwise, <c>false</c>.</value>
-        public bool RequireGooglePlus
+        public bool IsRequestingAuthCode
         {
             get
             {
-                return mRequireGooglePlus;
+                return mRequestAuthCode;
             }
         }
-        
+
+        public bool IsForcingRefresh
+        {
+            get
+            {
+                return mForceRefresh;
+            }
+        }
+
+        public bool IsRequestingEmail
+        {
+            get
+            {
+                return mRequestEmail;
+            }
+        }
+
+        public bool IsRequestingIdToken
+        {
+            get
+            {
+                return mRequestIdToken;
+            }
+        }
+
         /// <summary>
         /// Gets a array of scopes to be requested from the user.
         /// </summary>
@@ -144,18 +173,6 @@ namespace GooglePlayGames.BasicApi
         }
 
         /// <summary>
-        /// Gets the permission rationale.
-        /// </summary>
-        /// <value>The permission rationale.</value>
-        public string PermissionRationale
-        {
-            get
-            {
-                return mPermissionRationale;
-            }
-        }
-
-        /// <summary>
         /// Builder class for the configuration.
         /// </summary>
         public class Builder
@@ -166,14 +183,29 @@ namespace GooglePlayGames.BasicApi
             private bool mEnableSaveGames = false;
 
             /// <summary>
-            /// The flag to request Google+. Default is false.
-            /// </summary>
-            private bool mRequireGooglePlus = false;
-            
-            /// <summary>
             /// The scopes to request from the user. Default is none.
             /// </summary>
             private List<string> mScopes = null;
+
+            /// <summary>
+            /// The flag to indicate a server auth code should be requested when authenticating.
+            /// </summary>
+            private bool mRequestAuthCode = false;
+
+            /// <summary>
+            /// The flag indicating the auth code should be refresh, causing re-consent and issuing a new refresh token.
+            /// </summary>
+            private bool mForceRefresh = false;
+
+            /// <summary>
+            /// The flag indicating the email address should returned when authenticating.
+            /// </summary>
+            private bool mRequestEmail = false;
+
+            /// <summary>
+            /// The flag indicating the id token should be returned when authenticating.
+            /// </summary>
+            private bool mRequestIdToken = false;
 
             /// <summary>
             /// The invitation delegate.  Default is a no-op;
@@ -190,12 +222,6 @@ namespace GooglePlayGames.BasicApi
             };
 
             /// <summary>
-            /// The rationale for the GET_ACCOUNTS permission in android.
-            /// Default is empty.
-            /// </summary>
-            private string mRationale;
-
-            /// <summary>
             /// Enables the saved games.
             /// </summary>
             /// <returns>The builder.</returns>
@@ -205,18 +231,22 @@ namespace GooglePlayGames.BasicApi
                 return this;
             }
 
-            /// <summary>
-            /// Requests use of the player's Google+ social graph.
-            /// </summary>
-            /// <remarks>
-            /// Set this to request use of the player's Google+ social graph. Setting
-            /// this will require Android users to have a Google+ profile in order
-            /// to be able to sign in (on iOS, users must always have one).
-            /// </remarks>
-            /// <returns>The builder.</returns>
-            public Builder RequireGooglePlus()
+            public Builder RequestServerAuthCode(bool forceRefresh)
             {
-                mRequireGooglePlus = true;
+              mRequestAuthCode = true;
+              mForceRefresh = forceRefresh;
+              return this;
+            }
+
+            public Builder RequestEmail()
+            {
+                mRequestEmail = true;
+                return this;
+            }
+
+            public Builder RequestIdToken()
+            {
+                mRequestIdToken = true;
                 return this;
             }
 
@@ -227,7 +257,7 @@ namespace GooglePlayGames.BasicApi
             /// Not setting one will default to 'games_lite' and will not show a consent
             /// dialog to the user. Valid examples are 'profile' and 'email'.
             /// Full list: https://developers.google.com/identity/protocols/googlescopes
-            /// To exchange the auth code with an id_token (or user id) on your server, 
+            /// To exchange the auth code with an id_token (or user id) on your server,
             /// you must add at least one scope.
             /// </remarks>
             /// <returns>The builder.</returns>
@@ -263,25 +293,11 @@ namespace GooglePlayGames.BasicApi
             }
 
             /// <summary>
-            /// Adds the permission rationale.  This is used only in Android
-            /// when accessing the email or tokens of the player.  This is the
-            /// rationale for asking for the GET_ACCOUNTS permission.
-            /// </summary>
-            /// <returns>The permission rationale.</returns>
-            /// <param name="rationale">Rationale to display.</param>
-            public Builder WithPermissionRationale(string rationale)
-            {
-                this.mRationale = rationale;
-                return this;
-            }
-
-            /// <summary>
             /// Build this instance.
             /// </summary>
             /// <returns>the client configuration instance</returns>
             public PlayGamesClientConfiguration Build()
             {
-                mRequireGooglePlus = GameInfo.RequireGooglePlus();
                 return new PlayGamesClientConfiguration(this);
             }
 
@@ -294,13 +310,24 @@ namespace GooglePlayGames.BasicApi
                 return mEnableSaveGames;
             }
 
-            /// <summary>
-            /// Determines whether this instance has Google+ required.
-            /// </summary>
-            /// <returns><c>true</c> if this instance has Google+ required; otherwise, <c>false</c>.</returns>
-            internal bool HasRequireGooglePlus()
+            internal bool IsRequestingAuthCode()
             {
-                return mRequireGooglePlus;
+                return mRequestAuthCode;
+            }
+
+            internal bool IsForcingRefresh()
+            {
+                return mForceRefresh;
+            }
+
+            internal bool IsRequestingEmail()
+            {
+                return mRequestEmail;
+            }
+
+            internal bool IsRequestingIdToken()
+            {
+                return mRequestIdToken;
             }
 
             /// <summary>
@@ -329,14 +356,6 @@ namespace GooglePlayGames.BasicApi
                 return mInvitationDelegate;
             }
 
-            /// <summary>
-            /// Gets the permission rationale.
-            /// </summary>
-            /// <returns>The permission rationale.</returns>
-            internal string GetPermissionRationale()
-            {
-                return mRationale;
-            }
         }
     }
 }
