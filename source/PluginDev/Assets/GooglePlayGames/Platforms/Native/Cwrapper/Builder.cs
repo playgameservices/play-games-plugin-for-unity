@@ -79,10 +79,6 @@ namespace GooglePlayGames.Native.Cwrapper
             HandleRef self);
 
         [DllImport(SymbolLocation.NativeSymbolLocation)]
-        internal static extern void GameServices_Builder_RequireGooglePlus(
-            HandleRef self);
-
-        [DllImport(SymbolLocation.NativeSymbolLocation)]
         internal static extern void GameServices_Builder_SetOnLog(
             HandleRef self,
          /* from(GameServices_Builder_OnLogCallback_t) */OnLogCallback callback,

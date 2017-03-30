@@ -35,17 +35,11 @@ namespace GooglePlayGames {
         private const string UnescapedIosClientId = "IOS_CLIENTID";
         private const string UnescapedWebClientId = "WEB_CLIENTID";
         private const string UnescapedNearbyServiceId = "NEARBY_SERVICE_ID";
-        private const string UnescapedRequireGooglePlus = "REQUIRE_GOOGLE_PLUS";
 
         public const string ApplicationId = "__APP_ID__"; // Filled in automatically
         public const string IosClientId = "__IOS_CLIENTID__"; // Filled in automatically
         public const string WebClientId = "__WEB_CLIENTID__"; // Filled in automatically
         public const string NearbyConnectionServiceId = "__NEARBY_SERVICE_ID__";
-
-        public static bool RequireGooglePlus()
-        {
-            return "__REQUIRE_GOOGLE_PLUS__" == "true";
-        }
 
         public static bool ApplicationIdInitialized() {
             return !string.IsNullOrEmpty(ApplicationId) && !ApplicationId.Equals(ToEscapedToken(UnescapedApplicationId));

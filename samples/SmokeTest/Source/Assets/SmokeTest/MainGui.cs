@@ -42,6 +42,9 @@ namespace SmokeTest
         private static readonly PlayGamesClientConfiguration ClientConfiguration =
             new PlayGamesClientConfiguration.Builder()
                 .EnableSavedGames()
+                .RequestEmail()
+                .RequestServerAuthCode(false)
+                .RequestIdToken()
                 .Build();
 
         private Ui mUi = Ui.Main;
@@ -1169,24 +1172,11 @@ namespace SmokeTest
                         // start loading the id token:
                         if (idToken == null)
                         {
-                            idToken = "loading...";
-                            ((PlayGamesLocalUser)Social.localUser).GetIdToken(
-                                token => this.idToken = token);
+                            idToken = ((PlayGamesLocalUser)Social.localUser).GetIdToken();
                         }
                         if (authCode == null)
                         {
-                            authCode = "loading...";
-                            PlayGamesPlatform.Instance.GetServerAuthCode((authStatus, code) =>
-                                {
-                                    if (authStatus == CommonStatusCodes.Success)
-                                    {
-                                        authCode = code;
-                                    }
-                                    else
-                                    {
-                                        authCode = authStatus.ToString();
-                                    }
-                                });
+                            authCode = PlayGamesPlatform.Instance.GetServerAuthCode();
                         }
                         ShowUserInfoUi();
                     break;

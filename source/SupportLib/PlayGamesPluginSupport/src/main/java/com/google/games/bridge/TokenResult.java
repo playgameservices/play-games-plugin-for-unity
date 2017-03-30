@@ -25,7 +25,7 @@ import com.google.android.gms.common.api.Status;
  */
 public class TokenResult implements Result {
     private Status status;
-    private String accessToken;
+    private String authCode;
     private String idToken;
     private String email;
 
@@ -33,9 +33,9 @@ public class TokenResult implements Result {
 
     }
 
-    TokenResult(String accessToken, String idToken, String email, int resultCode) {
+    TokenResult(String authCode, String email, String idToken, int resultCode) {
         status = new Status(resultCode);
-        this.accessToken = accessToken;
+        this.authCode = authCode;
         this.idToken = idToken;
         this.email = email;
     }
@@ -57,7 +57,7 @@ public class TokenResult implements Result {
     public String toString() {
         return "Status: " + status + " email: " + (email==null?"<null>":email) + " id:" +
                 (idToken==null?"<null>":idToken) + " access: " +
-                (accessToken==null?"<null>":accessToken);
+                (authCode==null?"<null>":authCode);
     }
 
     @Override
@@ -67,8 +67,8 @@ public class TokenResult implements Result {
 
     public int getStatusCode() { return status.getStatusCode();}
 
-    public String getAccessToken() {
-        return accessToken == null ? "" : accessToken;
+    public String getAuthCode() {
+        return authCode == null ? "" : authCode;
     }
 
     public String getIdToken() {
@@ -87,8 +87,8 @@ public class TokenResult implements Result {
         this.email = email;
     }
 
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
+    public void setAuthCode(String authCode) {
+        this.authCode = authCode;
     }
 
     public void setIdToken(String idToken) {

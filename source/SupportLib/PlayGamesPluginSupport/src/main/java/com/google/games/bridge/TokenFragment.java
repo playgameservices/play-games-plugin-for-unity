@@ -16,43 +16,42 @@
 
 package com.google.games.bridge;
 
-import android.accounts.AccountManager;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.util.Log;
 
-import com.google.android.gms.auth.GoogleAuthUtil;
-import com.google.android.gms.common.AccountPicker;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.google.android.gms.common.api.Scope;
 
 /**
  * Activity fragment with no UI added to the parent activity in order to manage
  * the accessing of the player's email address and tokens.
  */
-@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class TokenFragment extends Fragment {
 
     private static final String TAG = "TokenFragment";
-    private static final String FRAGMENT_TAG = "gpg.TokenSupport";
+    private static final String FRAGMENT_TAG = "gpg.AuthTokenSupport";
     private static final int RC_ACCT = 9002;
 
-    // map of pending results used to pass back information to the caller.
-    // the key is a unique key added to the intent extras so the bridge activity
-    // can find the result to respond.
-    private static final List<TokenRequest> pendingTokenRequests = new ArrayList<>();
+    // Pending token request.  There can be only one outstanding request at a
+    // time.
+    private static TokenRequest pendingTokenRequest;
 
-    private static String selectedAccountName;
-    private static String currentPlayerId;
-    private static boolean mIsSelecting = false;
+    private static String currentEmail;
+    private static String currentAuthCode;
+    private static String currentIdToken;
+    private GoogleApiClient mGoogleApiClient;
+    private boolean requested_authcode;
+    private boolean requested_email;
+    private boolean requested_id_token;
 
     /**
      * External entry point for getting tokens and email address.  This
@@ -60,38 +59,49 @@ public class TokenFragment extends Fragment {
      * active processes the list of requests.
      *
      * @param parentActivity   - the activity to attach the fragment to.
-     * @param playerId         - the authenticated player id.  This is used to detect
-     *                         switching players.
-     * @param rationale        - the rationale to display when requesting permission.
+     * @param fetchServerAuthCode - true indicates get the serverAuthCode.
      * @param fetchEmail       - true indicates get the email.
-     * @param fetchAccessToken - true indicates get the access token.
      * @param fetchIdToken     - true indicates get the id token.
-     * @param scope            - the scope for getting the id token.
+     * @param webClientId      - web client Id needed for authcode and
+     *                         id token.
+     * @param forceRefresh     - force refresh of auth code and refresh token.
+     *
      * @return PendingResult for retrieving the results when ready.
      */
     public static PendingResult fetchToken(Activity parentActivity,
-                                           String playerId,
-                                           String rationale, boolean fetchEmail,
-                                           boolean fetchAccessToken, boolean fetchIdToken, String scope) {
-        TokenRequest request = new TokenRequest(fetchEmail, fetchAccessToken, fetchIdToken, scope);
-        request.setRationale(rationale);
+                                           boolean fetchServerAuthCode,
+                                           boolean fetchEmail,
+                                           boolean fetchIdToken,
+                                           String webClientId,
+                                           boolean forceRefresh,
+                                           String[] oauthScopes) {
+        TokenRequest request = new TokenRequest(fetchServerAuthCode,
+                fetchEmail, fetchIdToken, webClientId, forceRefresh, oauthScopes);
 
-        synchronized (pendingTokenRequests) {
-            if (playerId == null || !playerId.equals(currentPlayerId)) {
-                currentPlayerId = playerId;
-                selectedAccountName = null;
-            }
-
-            // see if we can short circuit this process if the player already selected an account.
-            if (selectedAccountName != null && fetchEmail && !fetchAccessToken && !fetchIdToken) {
-                Log.i(TAG, "Returning accountName: " + selectedAccountName);
-                request.setEmail(selectedAccountName);
+            // we have all the info we need, so just return.
+            if (
+            (!fetchServerAuthCode || currentAuthCode != null) &&
+            (!fetchEmail || currentEmail != null) &&
+                    (!fetchIdToken || currentIdToken != null)
+                    ) {
+                request.setAuthCode(currentAuthCode);
+                request.setEmail(currentEmail);
+                request.setIdToken(currentIdToken);
                 request.setResult(CommonStatusCodes.SUCCESS);
                 return request.getPendingResponse();
             } else {
-                pendingTokenRequests.add(request);
+                boolean ok = false;
+                synchronized (TAG) {
+                    if (pendingTokenRequest == null) {
+                        pendingTokenRequest = request;
+                        ok = true;
+                    }
+                }
+                if(!ok) {
+                    Log.e(TAG, "Already a pending token request!");
+                    request.setResult(CommonStatusCodes.DEVELOPER_ERROR);
+                }
             }
-        }
 
         TokenFragment fragment = (TokenFragment)
                 parentActivity.getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
@@ -106,195 +116,139 @@ public class TokenFragment extends Fragment {
             } catch (Throwable th) {
                 Log.e(TAG, "Cannot launch token fragment:" + th.getMessage(), th);
                 request.setResult(CommonStatusCodes.ERROR);
-                synchronized (pendingTokenRequests) {
-                    pendingTokenRequests.remove(request);
+                synchronized (TAG) {
+                    pendingTokenRequest = null;
                 }
             }
         } else {
-            synchronized (pendingTokenRequests) {
-                if (!mIsSelecting) {
-                    Log.d(TAG, "Fragment exists.. and not selecting calling processRequests");
-                    fragment.processRequests(CommonStatusCodes.SUCCESS);
-                }
-            }
+                    Log.d(TAG, "Fragment exists.. calling processRequests");
+                    fragment.processRequest();
         }
 
         return request.getPendingResponse();
     }
 
+    public static void signOut() {
+        currentAuthCode = null;
+        currentEmail = null;
+        currentIdToken = null;
+        synchronized (TAG) {
+            pendingTokenRequest = null;
+        }
+    }
+
     /**
      * Processes the token requests that are queued up.
      * First checking that the google api client is connected.
-     * If the error code is not SUCCESS, then all the requests in the queue
-     * are failed using the given error code.
-     *
-     * @param errorCode - if not SUCCESS, all requests are failed using this code.
      */
-    private void processRequests(int errorCode) {
+    private void processRequest() {
 
-        TokenRequest request = null;
-        String acctName;
-
-        // First, if the error code is set, fail all the pending calls
-        if (errorCode != CommonStatusCodes.SUCCESS) {
-            synchronized (pendingTokenRequests) {
-                while (!pendingTokenRequests.isEmpty()) {
-                    request = pendingTokenRequests.remove(0);
-                    Log.d(TAG," Setting result to " + errorCode + " for " + request);
-                    request.setResult(errorCode);
-                }
+        TokenRequest request;
+            synchronized (TAG) {
+                request = pendingTokenRequest;
             }
-            return;
-        }
-
-        // Next, see if we still need to select an account.  We do this in the
-        // synchronized block so we don't miss a callback from a previous call.
-        synchronized (pendingTokenRequests) {
-            if (!pendingTokenRequests.isEmpty()) {
-                request = pendingTokenRequests.get(0);
-            }
-            acctName = selectedAccountName;
-        }
 
         // no request, no need to continue.
         if (request == null) {
             return;
         }
 
-        // If the accountName is null, then prompt the user to select one.
-        if (acctName == null) {
-            // set the flag so we don't prompt twice in a row.
-            synchronized (pendingTokenRequests) {
-                mIsSelecting = true;
-            }
+        // Build the GoogleAPIClient
+        buildClient(request);
+        synchronized (TAG) {
+            request = pendingTokenRequest;
+        }
+        if (request != null) {
+            // Sign-in, the result is processed in OnActivityResult()
+            doAuthenticate(request);
+        }
 
-            // build the intent to get the account
-            Intent intent = AccountPicker.newChooseAccountIntent(null, null, new String[]{"com.google"},
-                    true, request.getRationale(), null, null, null);
-            startActivityForResult(intent, RC_ACCT);
-        } else {
-            // we have the accountName already, process the requests.
+        Log.d(TAG, "Done with processRequest!");
+    }
 
-            synchronized (pendingTokenRequests) {
-                try {
-                    while (!pendingTokenRequests.isEmpty()) {
-                        request = pendingTokenRequests.remove(0);
-                        if (request != null) {
-                            doGetToken(request, acctName);
-                        }
+    private void buildClient(TokenRequest request) {
+
+        // Validate that we need to rebuild the client.
+        if (mGoogleApiClient == null ||
+                requested_authcode != request.doAuthCode ||
+                requested_email != request.doEmail ||
+                requested_id_token != request.doIdToken) {
+
+
+            GoogleSignInOptions.Builder builder = new GoogleSignInOptions
+                    .Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
+            if (request.doAuthCode) {
+                if (!request.getWebClientId().isEmpty()) {
+                    builder.requestServerAuthCode(request.getWebClientId(),
+                            request.getForceRefresh());
+                } else {
+                    Log.e(TAG,"Web client ID is needed for Auth Code");
+                    request.setResult(CommonStatusCodes.DEVELOPER_ERROR);
+                    synchronized (TAG) {
+                        pendingTokenRequest = null;
                     }
-
-                } catch (Throwable th) {
-                    // catch everything so we can return something to the callback for each call.
-                    if (request != null) {
-                        Log.e(TAG, "Cannot process request", th);
-                        request.setResult(CommonStatusCodes.ERROR);
-                    }
+                    return;
                 }
             }
+            if (request.doEmail) {
+                builder.requestEmail();
+            }
+            if (request.doIdToken) {
+                if (!request.getWebClientId().isEmpty()) {
+                    builder.requestIdToken(request.getWebClientId());
+                } else {
+                    Log.e(TAG,"Web client ID is needed for ID Token");
+                    request.setResult(CommonStatusCodes.DEVELOPER_ERROR);
+                    synchronized (TAG) {
+                        pendingTokenRequest = null;
+                    }
+                    return;
+                }
+            }
+            if (request.scopes != null) {
+                for(String s: request.scopes) {
+                    builder.requestScopes(new Scope(s));
+                }
+            }
+
+            requested_authcode = request.doAuthCode;
+            requested_email = request.doEmail;
+            requested_id_token = request.doIdToken;
+
+            GoogleSignInOptions options = builder.build();
+
+            mGoogleApiClient = new GoogleApiClient.Builder(getContext())
+                    .addApi(Auth.GOOGLE_SIGN_IN_API, options)
+                    .build();
         }
-        Log.d(TAG, "Done with processRequests!");
     }
 
-    /**
-     * Gets the email, and/or tokens as requested.
-     *
-     * @param tokenRequest - the request to process.
-     */
-    private void doGetToken(final TokenRequest tokenRequest, final String accountName) {
-        final Activity theActivity = getActivity();
+    void doAuthenticate(TokenRequest request) {
+        if (request == null) {
+            return;
+        }
 
-        Log.d(TAG, "Calling doGetToken for " +
-                "e: " + tokenRequest.doEmail + " a:" + tokenRequest.doAccessToken + " i:" +
-                tokenRequest.doIdToken);
+        if (mGoogleApiClient == null) {
+            throw new IllegalStateException("client is null!");
+        }
 
-        AsyncTask<Object, Integer, Integer> t =
-                new AsyncTask<Object, Integer, Integer>() {
-                    @Override
-                    protected Integer doInBackground(Object[] params) {
-                        // initialize the email to null, since it used by all the token getters.
-                        String accessToken;
-                        String idToken;
-                        int statusCode = CommonStatusCodes.SUCCESS;
-
-                        tokenRequest.setEmail(accountName);
-
-                        if (tokenRequest.doAccessToken && accountName != null) {
-                            // now the access token
-                            String accessScope = "oauth2:https://www.googleapis.com/auth/plus.me";
-                            try {
-                                Log.d(TAG, "getting accessToken for " + accountName);
-                                accessToken = GoogleAuthUtil.getToken(theActivity, accountName, accessScope);
-                                tokenRequest.setAccessToken(accessToken);
-                            } catch (Throwable th) {
-                                Log.e(TAG, "Exception getting access token", th);
-                                statusCode = CommonStatusCodes.INTERNAL_ERROR;
-                            }
-                        }
-
-                        if (tokenRequest.doIdToken && accountName != null) {
-                            if (tokenRequest.getScope() != null &&
-                                    !tokenRequest.getScope().isEmpty()) {
-                                try {
-                                    Log.d(TAG, "Getting ID token.  Scope = " +
-                                            tokenRequest.getScope() + " email: " + accountName);
-                                    idToken = GoogleAuthUtil.getToken(theActivity, accountName,
-                                            tokenRequest.getScope());
-                                    tokenRequest.setIdToken(idToken);
-                                } catch (Throwable th) {
-                                    Log.e(TAG, "Exception getting access token", th);
-                                    statusCode = CommonStatusCodes.INTERNAL_ERROR;
-                                }
-                            } else {
-                                Log.w(TAG, "Skipping ID token: scope is empty");
-                                statusCode = CommonStatusCodes.DEVELOPER_ERROR;
-                            }
-                        } else if (tokenRequest.doIdToken) {
-                            Log.e(TAG, "Skipping ID token: email is empty?");
-                        }
-
-                        Log.d(TAG, "Done with tokenRequest status: " + statusCode);
-                       //
-                        return statusCode;
-                    }
-
-                    /**
-                     * <p>Applications should preferably override {@link #onCancelled(Object)}.
-                     * This method is invoked by the default implementation of
-                     * {@link #onCancelled(Object)}.</p>
-                     * <p/>
-                     * <p>Runs on the UI thread after {@link #cancel(boolean)} is invoked and
-                     * {@link #doInBackground(Object[])} has finished.</p>
-                     *
-                     * @see #onCancelled(Object)
-                     * @see #cancel(boolean)
-                     * @see #isCancelled()
-                     */
-                    @Override
-                    protected void onCancelled() {
-                        super.onCancelled();
-                        tokenRequest.cancel();
-                    }
-
-                    /**
-                     * <p>Runs on the UI thread after {@link #doInBackground}. The
-                     * specified result is the value returned by {@link #doInBackground}.</p>
-                     * <p/>
-                     * <p>This method won't be invoked if the task was cancelled.</p>
-                     *
-                     * @param statusCode The result of the operation computed by {@link #doInBackground}.
-                     * @see #onPreExecute
-                     * @see #doInBackground
-                     * @see #onCancelled(Object)
-                     */
-                    @Override
-                    protected void onPostExecute(Integer statusCode) {
-                        Log.d(TAG, "onPostExecute for the token fetch");
-                        tokenRequest.setResult(statusCode);
-                    }
-                };
-        t.execute();
+        // check if we have all the info we need
+        if ((requested_authcode && currentAuthCode == null) ||
+                (requested_email && currentEmail == null) ||
+                (requested_id_token && currentIdToken == null)) {
+            Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+            startActivityForResult(signInIntent, RC_ACCT);
+        } else {
+            request.setAuthCode(currentAuthCode);
+            request.setEmail(currentEmail);
+            request.setIdToken(currentIdToken);
+            request.setResult(CommonStatusCodes.SUCCESS);
+            synchronized (TAG) {
+                pendingTokenRequest = null;
+            }
+        }
     }
+
 
     /**
      * Receive the result from a previous call to
@@ -311,27 +265,26 @@ public class TokenFragment extends Fragment {
      */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        Log.d(TAG, "onActivityResult: " + requestCode + ": " + resultCode);
-
         if (requestCode == RC_ACCT) {
-            int status = resultCode;
-            String accountName = selectedAccountName;
-            if (resultCode == Activity.RESULT_OK) {
-                status = CommonStatusCodes.SUCCESS;
-                accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-            } else if (resultCode == Activity.RESULT_CANCELED) {
-                status = CommonStatusCodes.CANCELED;
+            GoogleSignInResult result =
+                    Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            TokenRequest request;
+            synchronized (TAG) {
+                request = pendingTokenRequest;
+                pendingTokenRequest = null;
             }
-
-            // always clear the flag - even if it is an error.
-            synchronized (pendingTokenRequests) {
-                selectedAccountName = accountName;
-                mIsSelecting = false;
-            }
-
-            // Process all the requests using this status.
-            processRequests(status);
+            GoogleSignInAccount acct = result.getSignInAccount();
+                if (request != null) {
+                    if (acct != null) {
+                        request.setAuthCode(acct.getServerAuthCode());
+                        request.setEmail(acct.getEmail());
+                        request.setIdToken(acct.getIdToken());
+                        currentAuthCode = acct.getServerAuthCode();
+                        currentEmail = acct.getEmail();
+                        currentIdToken = acct.getIdToken();
+                    }
+                    request.setResult(result.getStatus().getStatusCode());
+                }
             return;
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -346,8 +299,8 @@ public class TokenFragment extends Fragment {
     @Override
     public void onResume() {
         Log.d(TAG, "onResume called");
-        processRequests(CommonStatusCodes.SUCCESS);
         super.onResume();
+            processRequest();
     }
 
     /**
@@ -355,18 +308,28 @@ public class TokenFragment extends Fragment {
      */
     private static class TokenRequest {
         private TokenPendingResult pendingResponse;
+        private boolean doAuthCode;
         private boolean doEmail;
-        private boolean doAccessToken;
         private boolean doIdToken;
-        private String scope;
-        private String rationale;
+        private String webClientId;
+        private boolean forceRefresh;
+        private String[] scopes;
 
-        public TokenRequest(boolean fetchEmail, boolean fetchAccessToken, boolean fetchIdToken, String scope) {
+        public TokenRequest(boolean fetchAuthCode, boolean fetchEmail,
+                            boolean fetchIdToken, String webClientId, boolean
+                            forceRefresh, String[] oAuthScopes) {
             pendingResponse = new TokenPendingResult();
+            doAuthCode = fetchAuthCode;
             doEmail = fetchEmail;
-            doAccessToken = fetchAccessToken;
             doIdToken = fetchIdToken;
-            this.scope = scope;
+            this.webClientId =webClientId;
+            this.forceRefresh = forceRefresh;
+            if(oAuthScopes != null && oAuthScopes.length > 0) {
+                scopes = new String[oAuthScopes.length];
+                System.arraycopy(oAuthScopes,0,scopes,0,oAuthScopes.length);
+            } else {
+                scopes = null;
+            }
         }
 
         public PendingResult getPendingResponse() {
@@ -385,12 +348,8 @@ public class TokenFragment extends Fragment {
             pendingResponse.cancel();
         }
 
-        public String getScope() {
-            return scope;
-        }
-
-        public void setAccessToken(String accessToken) {
-            pendingResponse.setAccessToken(accessToken);
+        public void setAuthCode(String authCode) {
+            pendingResponse.setAuthCode(authCode);
         }
 
         public void setIdToken(String idToken) {
@@ -405,21 +364,23 @@ public class TokenFragment extends Fragment {
             return pendingResponse.result.getIdToken();
         }
 
-        public String getAccessToken() {
-            return pendingResponse.result.getAccessToken();
-        }
-
-        public String getRationale() {
-            return rationale;
-        }
-
-        public void setRationale(String rationale) {
-            this.rationale = rationale;
+        public String getAuthCode() {
+            return pendingResponse.result.getAuthCode();
         }
 
         @Override
         public String toString() {
-            return Integer.toHexString(hashCode()) + " (e:" + doEmail + " a:" + doAccessToken + " i:" + doIdToken + ")";
+            return Integer.toHexString(hashCode()) + " (a:" +
+                    doAuthCode + " e:" + doEmail + " i:" + doIdToken +
+                    ")";
+        }
+
+        public String getWebClientId() {
+            return webClientId==null?"":webClientId;
+        }
+
+        public boolean getForceRefresh() {
+            return forceRefresh;
         }
     }
 }
