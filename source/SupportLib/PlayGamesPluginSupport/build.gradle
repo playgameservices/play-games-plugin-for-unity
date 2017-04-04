@@ -6,5 +6,6 @@ android {
 }
 
 dependencies {
+    compile 'com.google.android.gms:play-services-games:10.2.0'
     compile 'com.google.android.gms:play-services-auth:10.2.0'
 }

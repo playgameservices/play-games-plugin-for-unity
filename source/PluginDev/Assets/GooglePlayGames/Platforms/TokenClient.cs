@@ -45,7 +45,11 @@ namespace GooglePlayGames
 
         void SetWebClientId(string webClientId);
 
+        void SetAccountName(string accountName);
+
         void AddOauthScopes(string[] scopes);
+
+        void SetHidePopups(bool flag);
 
         bool NeedsToRun();
 

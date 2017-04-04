@@ -27,8 +27,21 @@ namespace GooglePlayGames.Android
     internal class AndroidTokenClient : TokenClient
     {
         private const string TokenFragmentClass = "com.google.games.bridge.TokenFragment";
+
+        /*
+         * fetchToken(Activity parentActivity,
+                                           boolean requestAuthCode,
+                                           boolean requestEmail,
+                                           boolean requestIdToken,
+                                           String webClientId,
+                                           boolean forceRefreshToken,
+                                           String[] additionalScopes,
+                                           boolean hidePopups,
+                                           String accountName)
+         */
         private const string FetchTokenSignature =
-            "(Landroid/app/Activity;ZZZLjava/lang/String;Z[Ljava/lang/String;)Lcom/google/android/gms/common/api/PendingResult;";
+            "(Landroid/app/Activity;ZZZLjava/lang/String;Z[Ljava/lang/String;ZLjava/lang/String;)Lcom/google/android/gms/common/api/PendingResult;";
+        
         private const string FetchTokenMethod = "fetchToken";
 
         // These are the configuration values.
@@ -38,6 +51,8 @@ namespace GooglePlayGames.Android
         private List<string> oauthScopes;
         private string webClientId;
         private bool forceRefresh;
+        private bool hidePopups;
+        private string accountName;
 
         // These are the results
         private string email;
@@ -73,6 +88,16 @@ namespace GooglePlayGames.Android
             this.webClientId = webClientId;
         }
 
+        public void SetHidePopups(bool flag)
+        {
+            this.hidePopups = flag;
+        }
+
+        public void SetAccountName(string accountName)
+        {
+            this.accountName = accountName;
+        }
+
         public void AddOauthScopes(string[] scopes)
         {
             if (scopes != null)
@@ -106,7 +131,7 @@ namespace GooglePlayGames.Android
 
         internal void DoFetchToken(Action callback)
         {
-            object[] objectArray = new object[7];
+            object[] objectArray = new object[9];
             jvalue[] jArgs = AndroidJNIHelper.CreateJNIArgArray(objectArray);
 
             try
@@ -127,6 +152,8 @@ namespace GooglePlayGames.Android
                         jArgs[4].l = AndroidJNI.NewStringUTF(webClientId);
                         jArgs[5].z = forceRefresh;
                         jArgs[6].l = AndroidJNIHelper.ConvertToJNIArray(oauthScopes.ToArray());
+                        jArgs[7].z = hidePopups;
+                        jArgs[8].l = AndroidJNI.NewStringUTF(accountName);
 
                         IntPtr ptr =
                             AndroidJNI.CallStaticObjectMethod(bridgeClass.GetRawClass(), methodId, jArgs);

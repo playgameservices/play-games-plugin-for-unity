@@ -106,6 +106,11 @@ namespace GooglePlayGames.Native.PInvoke
             }
         }
 
+        internal void SetShowConnectingPopup(bool flag)
+        {
+            C.GameServices_Builder_SetShowConnectingPopup(SelfPtr(), flag);
+        }
+
         protected override void CallDispose(HandleRef selfPointer)
         {
             C.GameServices_Builder_Dispose(selfPointer);

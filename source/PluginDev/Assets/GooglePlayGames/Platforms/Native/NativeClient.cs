@@ -191,7 +191,7 @@ namespace GooglePlayGames.Native
 
                 using (var builder = GameServicesBuilder.Create())
                 {
-                    using (var config = clientImpl.CreatePlatformConfiguration())
+                    using (var config = clientImpl.CreatePlatformConfiguration(mConfiguration))
                     {
                         // We need to make sure that the invitation delegate
                         // is registered before the services object is
@@ -215,6 +215,12 @@ namespace GooglePlayGames.Native
                         for (int i = 0; i < scopes.Length; i++) {
                             builder.AddOauthScope(scopes[i]);
                         }
+
+                        if (mConfiguration.IsHidingPopups)
+                        {
+                            builder.SetShowConnectingPopup(false);
+                        }
+
                         Debug.Log("Building GPG services, implicitly attempts silent auth");
                         mAuthState = AuthState.SilentPending;
                         mServices = builder.Build(config);
@@ -254,7 +260,9 @@ namespace GooglePlayGames.Native
                         mTokenClient.SetRequestAuthCode(mConfiguration.IsRequestingAuthCode, mConfiguration.IsForcingRefresh);
                         mTokenClient.SetRequestEmail(mConfiguration.IsRequestingEmail);
                         mTokenClient.SetRequestIdToken(mConfiguration.IsRequestingIdToken);
+                        mTokenClient.SetHidePopups(mConfiguration.IsHidingPopups);
                         mTokenClient.AddOauthScopes(scopes);
+                        mTokenClient.SetAccountName(mConfiguration.AccountName);
                     }
                 }
             }

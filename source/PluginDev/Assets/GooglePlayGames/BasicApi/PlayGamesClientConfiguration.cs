@@ -56,6 +56,11 @@ namespace GooglePlayGames.BasicApi
         private readonly bool mForceRefresh;
 
         /// <summary>
+        /// The flag indicating popup UIs should be hidden.
+        /// </summary>
+        private readonly bool mHidePopups;
+
+        /// <summary>
         /// The flag indicating the email address should returned when authenticating.
         /// </summary>
         private readonly bool mRequestEmail;
@@ -64,6 +69,11 @@ namespace GooglePlayGames.BasicApi
         /// The flag indicating the id token should be returned when authenticating.
         /// </summary>
         private readonly bool mRequestIdToken;
+
+        /// <summary>
+        /// The account name to attempt to use when signing in.  Null indicates use the default.
+        /// </summary>
+        private readonly string mAccountName;
 
         /// <summary>
         /// The invitation delegate.
@@ -85,10 +95,12 @@ namespace GooglePlayGames.BasicApi
             this.mInvitationDelegate = builder.GetInvitationDelegate();
             this.mMatchDelegate = builder.GetMatchDelegate();
             this.mScopes = builder.getScopes();
+            this.mHidePopups = builder.IsHidingPopups();
             this.mRequestAuthCode = builder.IsRequestingAuthCode();
             this.mForceRefresh = builder.IsForcingRefresh();
             this.mRequestEmail = builder.IsRequestingEmail();
             this.mRequestIdToken = builder.IsRequestingIdToken();
+            this.mAccountName = builder.GetAccountName();
         }
 
         /// <summary>
@@ -101,6 +113,14 @@ namespace GooglePlayGames.BasicApi
             get
             {
                 return mEnableSavedGames;
+            }
+        }
+
+        public bool IsHidingPopups
+        {
+            get
+            {
+                return mHidePopups;
             }
         }
 
@@ -133,6 +153,14 @@ namespace GooglePlayGames.BasicApi
             get
             {
                 return mRequestIdToken;
+            }
+        }
+
+        public string AccountName
+        {
+            get
+            {
+                return mAccountName;
             }
         }
 
@@ -188,6 +216,11 @@ namespace GooglePlayGames.BasicApi
             private List<string> mScopes = null;
 
             /// <summary>
+            /// The flag indicating that popup UI should be hidden.
+            /// </summary>
+            private bool mHidePopups = false;
+
+            /// <summary>
             /// The flag to indicate a server auth code should be requested when authenticating.
             /// </summary>
             private bool mRequestAuthCode = false;
@@ -206,6 +239,14 @@ namespace GooglePlayGames.BasicApi
             /// The flag indicating the id token should be returned when authenticating.
             /// </summary>
             private bool mRequestIdToken = false;
+
+            /// <summary>
+            /// The account name to use as a default when authenticating.
+            /// </summary>
+            /// <remarks>
+            /// This is only used when requesting auth code or id token.
+            /// </remarks>
+            private string mAccountName = null;
 
             /// <summary>
             /// The invitation delegate.  Default is a no-op;
@@ -231,6 +272,16 @@ namespace GooglePlayGames.BasicApi
                 return this;
             }
 
+            /// <summary>
+            /// Enables hiding popups.  This is recommended for VR apps.
+            /// </summary>
+            /// <returns>The hide popups.</returns>
+            public Builder EnableHidePopups()
+            {
+                mHidePopups = true;
+                return this;
+            }
+
             public Builder RequestServerAuthCode(bool forceRefresh)
             {
               mRequestAuthCode = true;
@@ -247,6 +298,12 @@ namespace GooglePlayGames.BasicApi
             public Builder RequestIdToken()
             {
                 mRequestIdToken = true;
+                return this;
+            }
+
+            public Builder SetAccountName(string accountName)
+            {
+                mAccountName = accountName;
                 return this;
             }
 
@@ -315,6 +372,11 @@ namespace GooglePlayGames.BasicApi
                 return mRequestAuthCode;
             }
 
+            internal bool IsHidingPopups()
+            {
+                return mHidePopups;
+            }
+
             internal bool IsForcingRefresh()
             {
                 return mForceRefresh;
@@ -328,6 +390,11 @@ namespace GooglePlayGames.BasicApi
             internal bool IsRequestingIdToken()
             {
                 return mRequestIdToken;
+            }
+
+            internal string GetAccountName()
+            {
+                return mAccountName;
             }
 
             /// <summary>

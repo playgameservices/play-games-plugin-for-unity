@@ -66,6 +66,11 @@ namespace GooglePlayGames.Native.Cwrapper {
         HandleRef self,
          /* from(AndroidPlatformConfiguration_OnLaunchedWithQuestCallback_t) */ OnLaunchedWithQuestCallback callback,
          /* from(void *) */ IntPtr callback_arg);
+
+        [DllImport(SymbolLocation.NativeSymbolLocation)]
+        internal static extern void AndroidPlatformConfiguration_SetOptionalViewForPopups(
+            HandleRef self,
+            /* from (jobject) */ IntPtr android_view);
 }
 }
 #endif // UNITY_ANDROID

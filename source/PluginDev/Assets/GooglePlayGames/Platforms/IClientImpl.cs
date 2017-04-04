@@ -27,7 +27,7 @@ namespace GooglePlayGames
     /// </summary>
     internal interface IClientImpl
     {
-        PlatformConfiguration CreatePlatformConfiguration ();
+        PlatformConfiguration CreatePlatformConfiguration (PlayGamesClientConfiguration clientConfig);
 
         TokenClient CreateTokenClient (bool reset);
 

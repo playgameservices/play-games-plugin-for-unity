@@ -57,6 +57,7 @@ project.ext {
     jarresolver_repos = [
       'https://github.com/googlesamples/unity-jar-resolver.git'
     ]
+     jarresolver_tag = "v1.2.12";
 }
 
 
@@ -446,6 +447,14 @@ task copy_jarresolver() {
                 args "clone", repo, "${resolverDir}"
                 ignoreExitValue true
             }
+            if (result.exitValue == 0 && jarresolver_tag != null) {
+                result = exec {
+                    executable "${git_exe}"
+                    args "checkout", "-b", "buildver", "${jarresolver_tag}"
+                    workingDir "${resolverDir}"
+                }
+            }
+
             if (result.exitValue == 0) {
                 println "Downloaded resolver from " + repo
                 return

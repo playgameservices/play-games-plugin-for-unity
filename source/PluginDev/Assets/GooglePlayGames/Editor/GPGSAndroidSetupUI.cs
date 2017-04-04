@@ -102,13 +102,19 @@ namespace GooglePlayGames.Editor
                 // check the bundle id and set it if needed.
                 CheckBundleId();
 
-                Google.VersionHandler.InvokeInstanceMethod(
-                    GPGSDependencies.svcSupport, "ClearDependencies", null);
+
+                Google.VersionHandler.VerboseLoggingEnabled = true;
+                Google.VersionHandler.UpdateVersionedAssets(forceUpdate: true);
+                Google.VersionHandler.Enabled = true;
+                AssetDatabase.Refresh();
+
                 GPGSDependencies.RegisterDependencies();
+
                 Google.VersionHandler.InvokeStaticMethod(
                     Google.VersionHandler.FindClass(
-                        "Google.JarResolver", "GooglePlayServices.PlayServicesResolver"),
-                    "MenuResolve", null);
+                   "Google.JarResolver",
+                   "GooglePlayServices.PlayServicesResolver"),
+                   "MenuResolve", null);
 
                 return PerformSetup(
                     clientId,
@@ -275,6 +281,7 @@ namespace GooglePlayGames.Editor
                     if (GPGSUtil.LooksLikeValidPackageName(mClassName))
                     {
                         DoSetup();
+                        return;
                     }
                 }
                 catch (Exception e)
@@ -335,13 +342,24 @@ namespace GooglePlayGames.Editor
         {
             string packageName = GPGSProjectSettings.Instance.Get(
                 GPGSUtil.ANDROIDBUNDLEIDKEY, string.Empty);
-            string currentId = PlayerSettings.bundleIdentifier;
+            string currentId;
+#if UNITY_5_6_OR_NEWER
+            currentId = PlayerSettings.GetApplicationIdentifier(
+                BuildTargetGroup.Android);
+#else
+            currentId = PlayerSettings.bundleIdentifier;
+#endif
             if (!string.IsNullOrEmpty(packageName))
             {
                 if (string.IsNullOrEmpty(currentId) ||
-                    currentId == "com.Company.ProductName")
+                    currentId == "com.Company.ProductName") 
                 {
+#if UNITY_5_6_OR_NEWER
+                    PlayerSettings.SetApplicationIdentifier(
+                        BuildTargetGroup.Android, packageName);
+#else
                     PlayerSettings.bundleIdentifier = packageName;
+#endif
                 }
                 else if (currentId != packageName)
                 {
@@ -354,7 +372,12 @@ namespace GooglePlayGames.Editor
                         "OK",
                         "Cancel"))
                     {
+#if UNITY_5_6_OR_NEWER
+                        PlayerSettings.SetApplicationIdentifier(
+                            BuildTargetGroup.Android, packageName);
+#else
                         PlayerSettings.bundleIdentifier = packageName;
+#endif
                     }
                 }
             }

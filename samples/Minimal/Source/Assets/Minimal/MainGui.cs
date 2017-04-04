@@ -23,7 +23,6 @@ public class MainGui : MonoBehaviour
     private const float FontSizeMult = 0.05f;
     private bool mWaitingForAuth = false;
     private string mStatusText = "Ready.";
-    private bool dumpedToken = false;
 
     void Start()
     {
@@ -66,14 +65,6 @@ public class MainGui : MonoBehaviour
             }
 
             mStatusText = "Ready";
-
-            if (!dumpedToken)
-            {
-                string token = GooglePlayGames.PlayGamesPlatform.Instance.GetToken();
-
-                Debug.Log("AccessToken = " + token);
-                dumpedToken = token != null && token.Length > 0;
-            }
         }
         else {
             buttonLabel = "Authenticate";

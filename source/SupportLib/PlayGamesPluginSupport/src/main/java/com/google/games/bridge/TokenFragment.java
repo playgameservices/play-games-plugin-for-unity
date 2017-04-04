@@ -21,6 +21,7 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.util.Log;
+import android.view.View;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -30,6 +31,7 @@ import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.games.Games;
 
 /**
  * Activity fragment with no UI added to the parent activity in order to manage
@@ -43,7 +45,9 @@ public class TokenFragment extends Fragment {
 
     // Pending token request.  There can be only one outstanding request at a
     // time.
+    private static final Object lock = new Object();
     private static TokenRequest pendingTokenRequest;
+    private static TokenFragment helperFragment;
 
     private static String currentEmail;
     private static String currentAuthCode;
@@ -58,31 +62,52 @@ public class TokenFragment extends Fragment {
      * creates the fragment if needed and queues up the request.  The fragment, once
      * active processes the list of requests.
      *
-     * @param parentActivity   - the activity to attach the fragment to.
-     * @param fetchServerAuthCode - true indicates get the serverAuthCode.
-     * @param fetchEmail       - true indicates get the email.
-     * @param fetchIdToken     - true indicates get the id token.
-     * @param webClientId      - web client Id needed for authcode and
-     *                         id token.
-     * @param forceRefresh     - force refresh of auth code and refresh token.
+     * @param parentActivity - the parent activity to attach the fragment to.
+     * @param requestAuthCode - request a server auth code to exchange on the
+     *                        server for an OAuth token.
+     * @param requestEmail - request the email address of the user.  This
+     *                     requires the consent of the user.
+     * @param requestIdToken - request an OAuth ID token for the user.  This
+     *                       requires the consent of the user.
+     * @param webClientId - the client id of the associated web application.
+     *                    This is required when requesting auth code or id
+     *                    token.  The client id must be associated with the same
+     *                    client as this application.
+     * @param forceRefreshToken - force refreshing the token when requesting
+     *                          a server auth code.  This causes the consent
+     *                          screen to be presented to the user, so it
+     *                          should be used only when necessary (if at all).
+     * @param additionalScopes - Additional scopes to request.  These will most
+     *                         likely require the consent of the user.
+     * @param hidePopups - Hides the popups during authentication and game
+     *                   services events.  This done by calling
+     *                   GamesOptions.setShowConnectingPopup and
+     *                   GoogleAPIClient.setViewForPopups.  This is usful for
+     *                   VR apps.
+     * @param accountName - if non-null, the account name to use when
+     *                    authenticating.
+
      *
      * @return PendingResult for retrieving the results when ready.
      */
     public static PendingResult fetchToken(Activity parentActivity,
-                                           boolean fetchServerAuthCode,
-                                           boolean fetchEmail,
-                                           boolean fetchIdToken,
+                                           boolean requestAuthCode,
+                                           boolean requestEmail,
+                                           boolean requestIdToken,
                                            String webClientId,
-                                           boolean forceRefresh,
-                                           String[] oauthScopes) {
-        TokenRequest request = new TokenRequest(fetchServerAuthCode,
-                fetchEmail, fetchIdToken, webClientId, forceRefresh, oauthScopes);
+                                           boolean forceRefreshToken,
+                                           String[] additionalScopes,
+                                           boolean hidePopups,
+                                           String accountName) {
+        TokenRequest request = new TokenRequest(requestAuthCode,
+                requestEmail, requestIdToken, webClientId,
+                forceRefreshToken, additionalScopes, hidePopups, accountName);
 
             // we have all the info we need, so just return.
             if (
-            (!fetchServerAuthCode || currentAuthCode != null) &&
-            (!fetchEmail || currentEmail != null) &&
-                    (!fetchIdToken || currentIdToken != null)
+            (!requestAuthCode || currentAuthCode != null) &&
+            (!requestEmail || currentEmail != null) &&
+                    (!requestIdToken || currentIdToken != null)
                     ) {
                 request.setAuthCode(currentAuthCode);
                 request.setEmail(currentEmail);
@@ -91,7 +116,7 @@ public class TokenFragment extends Fragment {
                 return request.getPendingResponse();
             } else {
                 boolean ok = false;
-                synchronized (TAG) {
+                synchronized (lock) {
                     if (pendingTokenRequest == null) {
                         pendingTokenRequest = request;
                         ok = true;
@@ -116,7 +141,7 @@ public class TokenFragment extends Fragment {
             } catch (Throwable th) {
                 Log.e(TAG, "Cannot launch token fragment:" + th.getMessage(), th);
                 request.setResult(CommonStatusCodes.ERROR);
-                synchronized (TAG) {
+                synchronized (lock) {
                     pendingTokenRequest = null;
                 }
             }
@@ -132,8 +157,26 @@ public class TokenFragment extends Fragment {
         currentAuthCode = null;
         currentEmail = null;
         currentIdToken = null;
-        synchronized (TAG) {
+        synchronized (lock) {
             pendingTokenRequest = null;
+        }
+        if (helperFragment != null) {
+            helperFragment.reset();
+        }
+
+    }
+
+    /**
+     * signs out and disconnects the client.
+     */
+    private void reset() {
+        if (mGoogleApiClient != null) {
+            if (mGoogleApiClient.hasConnectedApi(Games.API)) {
+                Games.signOut(mGoogleApiClient);
+                Auth.GoogleSignInApi.signOut(mGoogleApiClient);
+            }
+            mGoogleApiClient.disconnect();
+            mGoogleApiClient = null;
         }
     }
 
@@ -144,7 +187,7 @@ public class TokenFragment extends Fragment {
     private void processRequest() {
 
         TokenRequest request;
-            synchronized (TAG) {
+            synchronized (lock) {
                 request = pendingTokenRequest;
             }
 
@@ -155,7 +198,7 @@ public class TokenFragment extends Fragment {
 
         // Build the GoogleAPIClient
         buildClient(request);
-        synchronized (TAG) {
+        synchronized (lock) {
             request = pendingTokenRequest;
         }
         if (request != null) {
@@ -182,33 +225,46 @@ public class TokenFragment extends Fragment {
                     builder.requestServerAuthCode(request.getWebClientId(),
                             request.getForceRefresh());
                 } else {
-                    Log.e(TAG,"Web client ID is needed for Auth Code");
+                    Log.e(TAG, "Web client ID is needed for Auth Code");
                     request.setResult(CommonStatusCodes.DEVELOPER_ERROR);
-                    synchronized (TAG) {
+                    synchronized (lock) {
                         pendingTokenRequest = null;
                     }
                     return;
                 }
             }
+
             if (request.doEmail) {
                 builder.requestEmail();
             }
+
             if (request.doIdToken) {
                 if (!request.getWebClientId().isEmpty()) {
                     builder.requestIdToken(request.getWebClientId());
                 } else {
-                    Log.e(TAG,"Web client ID is needed for ID Token");
+                    Log.e(TAG, "Web client ID is needed for ID Token");
                     request.setResult(CommonStatusCodes.DEVELOPER_ERROR);
-                    synchronized (TAG) {
+                    synchronized (lock) {
                         pendingTokenRequest = null;
                     }
                     return;
                 }
             }
             if (request.scopes != null) {
-                for(String s: request.scopes) {
+                for (String s : request.scopes) {
                     builder.requestScopes(new Scope(s));
                 }
+            }
+
+            if (request.hidePopups) {
+                Log.d(TAG, "hiding popup views for games API");
+                builder.addExtension(
+                        Games.GamesOptions.builder().setShowConnectingPopup(false)
+                                .build());
+            }
+
+            if (request.accountName != null && !request.accountName.isEmpty()) {
+                builder.setAccountName(request.accountName);
             }
 
             requested_authcode = request.doAuthCode;
@@ -217,9 +273,19 @@ public class TokenFragment extends Fragment {
 
             GoogleSignInOptions options = builder.build();
 
-            mGoogleApiClient = new GoogleApiClient.Builder(getContext())
-                    .addApi(Auth.GOOGLE_SIGN_IN_API, options)
-                    .build();
+            GoogleApiClient.Builder clientBuilder = new GoogleApiClient.Builder(
+                    getActivity())
+                    .addApi(Auth.GOOGLE_SIGN_IN_API, options);
+            clientBuilder.addApi(Games.API);
+
+            if (request.hidePopups) {
+                View invisible = new View(getContext());
+                invisible.setVisibility(View.INVISIBLE);
+                invisible.setClickable(false);
+                clientBuilder.setViewForPopups(invisible);
+            }
+            mGoogleApiClient = clientBuilder.build();
+            mGoogleApiClient.connect(GoogleApiClient.SIGN_IN_MODE_OPTIONAL);
         }
     }
 
@@ -243,7 +309,7 @@ public class TokenFragment extends Fragment {
             request.setEmail(currentEmail);
             request.setIdToken(currentIdToken);
             request.setResult(CommonStatusCodes.SUCCESS);
-            synchronized (TAG) {
+            synchronized (lock) {
                 pendingTokenRequest = null;
             }
         }
@@ -269,7 +335,7 @@ public class TokenFragment extends Fragment {
             GoogleSignInResult result =
                     Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             TokenRequest request;
-            synchronized (TAG) {
+            synchronized (lock) {
                 request = pendingTokenRequest;
                 pendingTokenRequest = null;
             }
@@ -290,6 +356,29 @@ public class TokenFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+
+    @Override
+    public void onStart() {
+        Log.d(TAG, "onStart()");
+        super.onStart();
+
+        // This just connects the client.  If there is no user signed in, you
+        // still need to call Auth.GoogleSignInApi.getSignInIntent() to start
+        // the sign-in process.
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.connect(GoogleApiClient.SIGN_IN_MODE_OPTIONAL);
+        }
+    }
+
+    @Override
+    public void onStop() {
+        Log.d(TAG, "onStop()");
+        super.onStop();
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
+    }
+
     /**
      * Called when the fragment is visible to the user and actively running.
      * This is generally
@@ -300,6 +389,9 @@ public class TokenFragment extends Fragment {
     public void onResume() {
         Log.d(TAG, "onResume called");
         super.onResume();
+        if (helperFragment == null) {
+            helperFragment = this;
+        }
             processRequest();
     }
 
@@ -313,11 +405,14 @@ public class TokenFragment extends Fragment {
         private boolean doIdToken;
         private String webClientId;
         private boolean forceRefresh;
+        private boolean hidePopups;
+        private String accountName;
         private String[] scopes;
 
         public TokenRequest(boolean fetchAuthCode, boolean fetchEmail,
                             boolean fetchIdToken, String webClientId, boolean
-                            forceRefresh, String[] oAuthScopes) {
+                            forceRefresh, String[] oAuthScopes,
+                            boolean hidePopups, String accountName) {
             pendingResponse = new TokenPendingResult();
             doAuthCode = fetchAuthCode;
             doEmail = fetchEmail;
@@ -330,9 +425,11 @@ public class TokenFragment extends Fragment {
             } else {
                 scopes = null;
             }
+            this.hidePopups = hidePopups;
+            this.accountName = accountName;
         }
 
-        public PendingResult getPendingResponse() {
+        public PendingResult<TokenResult> getPendingResponse() {
             return pendingResponse;
         }
 

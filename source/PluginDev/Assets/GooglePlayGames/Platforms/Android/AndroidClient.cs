@@ -36,8 +36,9 @@ namespace GooglePlayGames.Android
             "(Landroid/app/Activity;Landroid/content/Intent;)V";
 
         private TokenClient tokenClient;
+        private static AndroidJavaObject invisible;
 
-        public PlatformConfiguration CreatePlatformConfiguration()
+        public PlatformConfiguration CreatePlatformConfiguration(PlayGamesClientConfiguration clientConfig)
         {
             var config = AndroidPlatformConfiguration.Create();
             using (var activity = AndroidTokenClient.GetActivity())
@@ -65,6 +66,10 @@ namespace GooglePlayGames.Android
                                 }
                             });
                     });
+                if (clientConfig.IsHidingPopups)
+                {
+                    config.SetOptionalViewForPopups(CreateHiddenView(activity.GetRawObject()));
+                }
             }
             return config;
         }
@@ -82,6 +87,19 @@ namespace GooglePlayGames.Android
             }
 
             return tokenClient;
+        }
+
+        private IntPtr CreateHiddenView(IntPtr activity)
+        {
+            // Keep it static so it will always be referenced.
+            if (invisible == null || invisible.GetRawObject() == IntPtr.Zero) {
+              invisible = new AndroidJavaObject("android.view.View", activity);
+              invisible.Call("setVisibility",/*View.INVISIBLE*/(int)0x00000004);
+              invisible.Call("setClickable", false);
+            }
+
+            return invisible.GetRawObject();
+            
         }
 
 
