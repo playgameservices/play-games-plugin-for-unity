@@ -15,6 +15,7 @@ RUN chmod g+rwxs $ANDROID_HOME
 # Install Android SDK components
 ENV ANDROID_SDK_COMPONENTS platform-tools,build-tools;25.0.2,build-tools-23.0.2,android-23,android-22,source-21,extra-android-support,extra-android-m2repository,extra-google-m2repository
 RUN echo y | ${ANDROID_SDK_HOME}/tools/android update sdk --no-ui --all --filter "${ANDROID_SDK_COMPONENTS}"
+RUN chmod -R 777 $ANDROID_HOME
 # Install Android NDK
 ENV NDK_URL http://dl.google.com/android/ndk/android-ndk-r10d-linux-x86_64.bin
 RUN curl ${NDK_URL} -o /tmp/android-ndk-r10d-linux-x86_64.bin && chmod +x /tmp/android-ndk-r10d-linux-x86_64.bin && \
