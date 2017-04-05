@@ -189,6 +189,7 @@ namespace GooglePlayGames
 
         /// <summary>Gets the quests client object.</summary>
         /// <value>The quests client.</value>
+        [Obsolete("Quests are being removed in 2018.")]
         public IQuestsClient Quests
         {
             get

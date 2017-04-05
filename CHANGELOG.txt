@@ -1,3 +1,14 @@
+Version 0.9.37
+    Bug Fixes:
+        * #1604 - Incompatible class error with play-services 10.2.
+        * #370 - Fixed freeze/crash when calling Application.Quit().
+    New Features:
+        * #35 - Added a method to inhibit achievment popups.
+        * Google SignIn support for Auth Code, Id Token and email.
+    Deprecated Features:
+        * iOS Support will be winding down, ending iOS services in March 2018.
+            See https://android-developers.googleblog.com/2017/04/focusing-our-google-play-games-services.html
+
 Version 0.9.36
     Bug Fixes:
         * #1432 - Updating Authenticate to match Unity 5.5 interface.

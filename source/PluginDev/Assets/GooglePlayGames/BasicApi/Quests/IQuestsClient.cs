@@ -88,6 +88,7 @@ namespace GooglePlayGames.BasicApi.Quests
     ///
     /// All callbacks in this interface must be invoked on the game thread.
     /// </summary>
+    [Obsolete("Quests are being removed in 2018.")]
     public interface IQuestsClient
     {
         /// <summary>

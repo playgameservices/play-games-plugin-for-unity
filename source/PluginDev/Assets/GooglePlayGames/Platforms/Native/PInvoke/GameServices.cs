@@ -77,57 +77,6 @@ namespace GooglePlayGames.Native.PInvoke
         {
             C.GameServices_Dispose(selfPointer);
         }
-
-        internal void FetchServerAuthCode(string server_client_id,
-            Action<FetchServerAuthCodeResponse> callback)
-        {
-            Misc.CheckNotNull(callback);
-            Misc.CheckNotNull(server_client_id);
-
-            C.GameServices_FetchServerAuthCode(this.AsHandle(),
-                server_client_id,
-                InternalFetchServerAuthCodeCallback,
-                Callbacks.ToIntPtr<FetchServerAuthCodeResponse>(callback, FetchServerAuthCodeResponse.FromPointer));
-        }
-
-        [AOT.MonoPInvokeCallback(typeof(C.FetchServerAuthCodeCallback))]
-        private static void InternalFetchServerAuthCodeCallback(IntPtr response, IntPtr data)
-        {
-            Callbacks.PerformInternalCallback("GameServices#InternalFetchServerAuthCodeCallback",
-                Callbacks.Type.Temporary, response, data);
-        }
-
-        internal class FetchServerAuthCodeResponse : BaseReferenceHolder
-        {
-            internal FetchServerAuthCodeResponse(IntPtr selfPointer) : base(selfPointer)
-            {
-            }
-
-            internal CommonErrorStatus.ResponseStatus Status()
-            {
-                return C.GameServices_FetchServerAuthCodeResponse_GetStatus(SelfPtr());
-            }
-
-            internal string Code()
-            {
-                return PInvokeUtilities.OutParamsToString(
-                    (out_string, out_size) => C.GameServices_FetchServerAuthCodeResponse_GetCode(SelfPtr(), out_string, out_size));
-            }
-
-            protected override void CallDispose(HandleRef selfPointer)
-            {
-                C.GameServices_FetchServerAuthCodeResponse_Dispose(selfPointer);
-            }
-
-            internal static FetchServerAuthCodeResponse FromPointer(IntPtr pointer)
-            {
-                if (pointer.Equals(IntPtr.Zero)) {
-                    return null;
-                }
-
-                return new FetchServerAuthCodeResponse(pointer);
-            }
-        }
     }
 }
 

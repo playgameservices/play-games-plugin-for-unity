@@ -27,8 +27,11 @@ following features of the Google Play Games API:<br/>
 * [turn-based multiplayer](TBMP.md)
 * [real-time multiplayer](RTMP.md)
 
-All features except the nearby connections are available on Android and iOS.
-The Nearby connections feature is currently only available on Android.
+
+__NOTICE__: Google Play games services for iOS is deprecated,
+and is not likely to function as expected. Do not use Google Play games
+services for iOS in new apps. See the [deprecation announcement](https://android-developers.googleblog.com/2017/04/focusing-our-google-play-games-services.html)
+blog post for more details.
 
 Features:
 
@@ -99,8 +102,9 @@ Back in Unity, open the setup dialog **Window > Google Play Games > Setup... > A
  * **Constants class name** - this is the name of the C# class to create, including namespace.
  * **Resources Definition** - paste the resource data from the Play Games console here.
  * **Web client ID** - this is the client ID of the linked web app.  It is only needed if
-you have a web based back-end for your game, need an access token for the player to
-make other, non-game API calls, or need to access the email address of the player.
+you have a web-based backend for your game and need a server auth code to be
+exchanged for an access token by the backend server, or if you need an id token
+for the player to make other, non-game, API calls.
 
 The setup process will configure your game with the client id and generate a
 C# class that contains constants for each of your resources.
@@ -126,6 +130,10 @@ as those will be needed when making the API calls.
 Achievement and leaderboard IDs are alphanumeric strings (e.g.  "Cgkx9eiuwi8_AQ").
 
 ## Add Events and Quests
+
+__Important__: The Google Play Games quests service will be deprecated as
+of March 31st 2018. Do not use the Google Play Games quests API in new apps.
+
 Events and Quests are a way to introduce new challenges for players to complete and
 incentivizing them with some in-game reward or benefit if they succeed.
 Read more about how to configure and use Events and Quests on
@@ -184,7 +192,6 @@ Player Settings window. In that window, look for the **Bundle Identifier** setti
 under **Other Settings**. Enter your package name there (for example
 _com.example.my.awesome.game_).
 
-
 In order to sign in to Play Game Services, you need to sign your APK file,
 make sure that you are signing it with the
 correct certificate, that is, the one that corresponds to the SHA1 certificate
@@ -207,9 +214,9 @@ After pasting the data into the text area, click the **Setup** button.
 
 **Note:**  If you are using a web application or backend server with your game,
 you can link the web application to the game to enable gettting the player's
-access token and/or email address.  To do this, link a web application to the
-game in the Google Play Developer Console, and enter the client id for the web application into
-the setup dialog.
+id token and/or email address.  To do this, link a web application to the
+game in the Google Play Developer Console, and enter the client id for
+the web application into the setup dialog.
 
 ### Additional instructions on building for Android on Windows
 
@@ -231,6 +238,11 @@ For more information, consult the documentation for your version of Windows.
 
 
 ## iOS Setup
+
+__NOTICE__: Google Play games services for iOS is deprecated,
+and is not likely to function as expected. Do not use Google Play games
+services for iOS in new apps. See the [deprecation announcement](https://android-developers.googleblog.com/2017/04/focusing-our-google-play-games-services.html)
+blog post for more details.
 
 Install Cocoapods
 
@@ -270,7 +282,7 @@ again in order to update the necessary files where this information gets replica
 
 **Note:**  If you are using a web application or backend server with your game,
 you can link the web application to the game to enable gettting the player's
-access token and/or email address.  To do this, link a web application to the
+id token and/or email address.  To do this, link a web application to the
 game in the Google Play Developer Console, and enter the client id for the web application into
 the setup dialog.
 
@@ -344,8 +356,15 @@ make it your default social platform by calling **PlayGamesPlatform.Activate**:
         // registers a callback for turn based match notifications received while the
         // game is not running.
         .WithMatchDelegate(<callback method>)
-        // require access to a player's Google+ social graph (usually not needed)
-        .RequireGooglePlus()
+        // requests the email address of the player be available.
+        // Will bring up a prompt for consent.
+        .RequestEmail()
+        // requests a server auth code be generated so it can be passed to an
+        //  associated back end server application and exchanged for an OAuth token.
+        .RequestServerAuthCode(false)
+        // requests an ID token be generated.  This OAuth token can be used to
+        //  identify the player to other services such as Firebase.
+        .RequestIdToken()
         .Build();
 
     PlayGamesPlatform.InitializeInstance(config);
@@ -675,6 +694,10 @@ Incrementing an event is very simple, just call the following method:
 This call is "fire and forget", it will handle batching and execution for you in the background.
 
 ## Viewing/Accepting/Completing Quests
+
+__Important__: The Google Play Games quests service will be deprecated as
+of March 31st 2018. Do not use the Google Play Games quests API in new apps.
+
 In order to accept a quest, view quests in progress, or claim the reward for completing a quest
 your app must present the quests UI.  To bring up the UI, call the following method:
 
@@ -908,25 +931,24 @@ For more details on this flow see: [Google Sign-In for Websites](https://develop
 To get the Auth code:
 1. Configure the web client Id of the web application linked to your game in the
 Play Game Console.
-2. Call `PlayGamesPlatform.GetServerAuthCode()` to get the code.
-3. Pass this code to your server application.
+2. Call `PlayGamesClientConfiguration.Builder.RequestServerAuthCode(false)` when
+    creating the configuration.
+3. Call `PlayGamesPlatform.Instance.GetServerAuthCode()` once the player is authenticated.
+4. Pass this code to your server application.
 
 
 ## Retrieving player's email or a unique identifier##
-In order to access the player's email address, the plugin uses the account picker
-standard UI from Android.  This API presents an account picker to the player.  The
-account the player selects does not necessarily correspond to gamer account the user
-authenticated with.  The user can also select "Cancel" and not select any email.
-In this case, null is returned as the email address. __Note__: This also means the
-email address is not a reliable unique identifier.
+In order to access the player's email address:
+1. Call `PlayGamesClientConfiguration.Builder.RequestEmail()` when creating
+    the configuration.
+2. Access the email property `((PlayGamesLocalUser) Social.localUser).Email`
+    after the player is authenticated.
 
+__Note:__
 If all that is needed is a persistent unique identifier for the player, then you
 should use the player's id.  This is a unique ID specific to that player and
 is the same value all the time.
 
-Once the user is authenticated, you can get the email via polling:
-The email address is populated asynchronously, and is only available
-on the UI thread.
 
 ```csharp
     // call this from Update()
@@ -934,18 +956,6 @@ on the UI thread.
         ((PlayGamesLocalUser)Social.localUser).Email);
 ```
 
-You can also get the email address asynchrously:
-
-```csharp
-    PlayGamesPlatform.Instance.GetEmail((status, email) => {
-            if (status == CommonStatusCodes.Success) {
-                Debug.Log("The address is " + email");
-            }
-            else {
-                Debug.Log("Error getting email: " + status);
-            }
-        });
-```
 ## Loading Friends
 
 To load the friends of the current player, you can use the ISocial framework.
@@ -984,6 +994,11 @@ To sign the user out, use the **PlayGamesPlatform.SignOut** method.
 After signing out, no further API calls can be made until the user authenticates again.
 
 ## Building for iOS
+
+__NOTICE__: Google Play games services for iOS is deprecated,
+and is not likely to function as expected. Do not use Google Play games
+services for iOS in new apps. See the [deprecation announcement](https://android-developers.googleblog.com/2017/04/focusing-our-google-play-games-services.html)
+blog post for more details.
 
 To build your game for iOS, do as you would normally do in Unity. Select **File > Build Settings**, then select the **iOS** platform.
 Click **Player Settings** and make sure that the target iOS platform is 7.0 or above.

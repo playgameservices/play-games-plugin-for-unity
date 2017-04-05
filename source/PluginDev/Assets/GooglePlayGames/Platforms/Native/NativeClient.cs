@@ -126,6 +126,12 @@ namespace GooglePlayGames.Native
             // reset friends loading flag
             friendsLoading = false;
 
+            if (mTokenClient.NeedsToRun())
+            {
+              Debug.Log("Using AuthHelper to sign in");
+              mTokenClient.FetchTokens(() => GameServices().StartAuthorizationUI());
+            }
+
             if (!silent)
             {
                 // If we need tokens or email, then get those first
