@@ -11,6 +11,7 @@ ENV ANDROID_SDK_URL http://dl.google.com/android/android-sdk_r24.4.1-linux.tgz
 RUN curl -L ${ANDROID_SDK_URL} | tar xz -C /usr/local
 ENV ANDROID_SDK_HOME /usr/local/android-sdk-linux
 ENV ANDROID_HOME /usr/local/android-sdk-linux
+RUN chmod g+rwxs $ANDROID_HOME
 # Install Android SDK components
 ENV ANDROID_SDK_COMPONENTS platform-tools,build-tools;25.0.2,build-tools-23.0.2,android-23,android-22,source-21,extra-android-support,extra-android-m2repository,extra-google-m2repository
 RUN echo y | ${ANDROID_SDK_HOME}/tools/android update sdk --no-ui --all --filter "${ANDROID_SDK_COMPONENTS}"
