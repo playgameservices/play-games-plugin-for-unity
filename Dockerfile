@@ -12,7 +12,7 @@ RUN curl -L ${ANDROID_SDK_URL} | tar xz -C /usr/local
 ENV ANDROID_SDK_HOME /usr/local/android-sdk-linux
 ENV ANDROID_HOME /usr/local/android-sdk-linux
 # Install Android SDK components
-ENV ANDROID_SDK_COMPONENTS platform-tools,build-tools-23.0.2,build-tools-21.1.2,android-23,android-22,source-21,extra-android-support,extra-android-m2repository,extra-google-m2repository
+ENV ANDROID_SDK_COMPONENTS platform-tools,build-tools;25.0.2,build-tools-23.0.2,android-23,android-22,source-21,extra-android-support,extra-android-m2repository,extra-google-m2repository
 RUN echo y | ${ANDROID_SDK_HOME}/tools/android update sdk --no-ui --all --filter "${ANDROID_SDK_COMPONENTS}"
 # Install Android NDK
 ENV NDK_URL http://dl.google.com/android/ndk/android-ndk-r10d-linux-x86_64.bin
