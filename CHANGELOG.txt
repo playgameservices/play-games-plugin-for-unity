@@ -5,9 +5,16 @@ Version 0.9.37
     New Features:
         * #35 - Added a method to inhibit achievment popups.
         * Google SignIn support for Auth Code, Id Token and email.
+        * Updated to use GPGS C++ SDK version 2.3.
+        * Added the Video Capture API.
     Deprecated Features:
         * iOS Support will be winding down, ending iOS services in March 2018.
             See https://android-developers.googleblog.com/2017/04/focusing-our-google-play-games-services.html
+        ** IMPORTANT **
+        This is the last version with iOS support for GPGS.  Plan accordingly.
+        ** IMPORTANT **
+
+        * Quests are deprecated.
 
 Version 0.9.36
     Bug Fixes:

@@ -979,6 +979,103 @@ If you wish to integrate **turn-based multiplayer** in your game, refer to the
 If you wish to integrate **real-time multiplayer** in your game, refer to the
 [Getting Started with Real-Time Multiplayer](RTMP.md).
 
+## Video Recording
+
+If you wish to integrate the Play Games video capture functionality (Android only) into your game,
+you can use the following features.
+
+### Get Video Capture Capabilities ###
+
+You can access the video capture capabilities of a device, including if the camera, mic,
+or write storage can be used, as well as the capture modes (save as a file or live stream)
+and quality levels (SD, HD, etc.).
+
+```csharp
+PlayGamesPlatform.Instance.Video.GetCaptureCapabilities(
+  (status, capabilities) => {
+    bool isSuccess = CommonTypesUtil.StatusIsSuccess(status);
+    if (isSuccess) {
+      if (capabilities.IsCameraSupported && capabilities.IsMicSupported &&
+          capabilities.IsWriteStorageSupported &&
+          capabilities.SupportsCaptureMode(VideoCaptureMode.File) &&
+          capabilities.SupportsQualityLevel(VideoQualityLevel.SD)) {
+        Debug.Log("All requested capabilities are present.");
+      } else {
+        Debug.Log("Not all requested capabilities are present!");
+      }
+    } else {
+      Debug.Log("Error: " + status.ToString());
+    }
+  });
+```
+
+### Launch the Video Capture Overlay ###
+
+Before activating the video capture overlay, be sure to check that it can be launched with
+**IsCaptureSupported** and **IsCaptureAvailable**.
+
+```csharp
+if (PlayGamesPlatform.Instance.Video.IsCaptureSupported()) {
+  PlayGamesPlatform.Instance.Video.IsCaptureAvailable(VideoCaptureMode.File,
+    (status, isAvailable) => {
+      bool isSuccess = CommonTypesUtil.StatusIsSuccess(status);
+      if (isSuccess) {
+        if (isAvailable) {
+          PlayGamesPlatform.Instance.Video.ShowCaptureOverlay();
+        } else {
+          Debug.Log("Video capture is unavailable. Is the overlay already open?");
+        }
+      } else {
+        Debug.Log("Error: " + status.ToString());
+      }
+    });
+}
+```
+
+### Get the Current Video Capture State ###
+
+When required, you can access the current state of the video capture overlay,
+including whether or not it is recording, and what mode and resolution it is recording in.
+
+```csharp
+PlayGamesPlatform.Instance.Video.GetCaptureState(
+  (status, state) => {
+    bool isSuccess = CommonTypesUtil.StatusIsSuccess(status);
+    if (isSuccess) {
+      if (state.IsCapturing) {
+        Debug.Log("Currently capturing to " + state.CaptureMode.ToString() + " in " +
+                  state.QualityLevel.ToString());
+      } else {
+        Debug.Log("Not currently capturing.");
+      }
+    } else {
+      Debug.Log("Error: " + status.ToString());
+    }
+  });
+```
+
+### Setup a Listener for Live Updates to the Capture State ###
+
+To receive an update whenever the status of the video capture overlay changes,
+use **RegisterCaptureOverlayStateChangedListener**.
+Only one listener can be registered at a time, subsequent calls will replace the previous listener.
+The listener can be unregistered with **UnregisterCaptureOverlayStateChangedListener**.
+
+```csharp
+PlayGamesPlatform.Instance.Video.RegisterCaptureOverlayStateChangedListener(this);
+```
+
+The object passed to **RegisterCaptureOverlayStateChangedListener** must implement
+**CaptureOverlayStateListener** from **GooglePlayGames.BasicApi.Video**.
+The **OnCaptureOverlayStateChanged** in that object will be called when the state changes.
+
+```csharp
+public void OnCaptureOverlayStateChanged(VideoCaptureOverlayState overlayState)
+{
+  Debug.Log("Overlay State is now " + overlayState.ToString());
+}
+```
+
 ## Sign out
 
 To sign the user out, use the **PlayGamesPlatform.SignOut** method.
