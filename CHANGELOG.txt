@@ -10,6 +10,7 @@ Version 0.9.37
     Deprecated Features:
         * iOS Support will be winding down, ending iOS services in March 2018.
             See https://android-developers.googleblog.com/2017/04/focusing-our-google-play-games-services.html
+
         ** IMPORTANT **
         This is the last version with iOS support for GPGS.  Plan accordingly.
         ** IMPORTANT **
