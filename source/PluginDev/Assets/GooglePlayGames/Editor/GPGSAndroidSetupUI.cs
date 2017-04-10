@@ -22,7 +22,6 @@ namespace GooglePlayGames.Editor
     using System.Collections;
     using System.IO;
     using System.Xml;
-    using GooglePlayServices;
     using UnityEditor;
     using UnityEngine;
 
@@ -108,12 +107,13 @@ namespace GooglePlayGames.Editor
                 // check the bundle id and set it if needed.
                 CheckBundleId();
 
-                GPGSDependencies.svcSupport.ClearDependencies();
+                Google.VersionHandler.InvokeInstanceMethod(
+                    GPGSDependencies.svcSupport, "ClearDependencies", null);
                 GPGSDependencies.RegisterDependencies();
-                PlayServicesResolver.Resolver.DoResolution(
-                    GPGSDependencies.svcSupport,
-                    "Assets/Plugins/Android",
-                    PlayServicesResolver.HandleOverwriteConfirmation);
+                Google.VersionHandler.InvokeStaticMethod(
+                    Google.VersionHandler.FindClass(
+                        "Google.JarResolver", "GooglePlayServices.PlayServicesResolver"),
+                    "MenuResolve", null);
 
                 return PerformSetup(
                     clientId,
@@ -203,8 +203,8 @@ namespace GooglePlayGames.Editor
         public void OnEnable()
         {
             GPGSProjectSettings settings = GPGSProjectSettings.Instance;
-            mConstantDirectory = settings.Get("ConstDir", mConstantDirectory);
-            mClassName = settings.Get(GPGSUtil.CLASSNAMEKEY);
+            mConstantDirectory = settings.Get(GPGSUtil.CLASSDIRECTORYKEY, mConstantDirectory);
+            mClassName = settings.Get(GPGSUtil.CLASSNAMEKEY, mClassName);
             mConfigData = settings.Get(GPGSUtil.ANDROIDRESOURCEKEY);
             mWebClientId = settings.Get(GPGSUtil.WEBCLIENTIDKEY);
             mRequiresGooglePlus = settings.GetBool(GPGSUtil.REQUIREGOOGLEPLUSKEY, false);

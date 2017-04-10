@@ -34,10 +34,14 @@
             openURL:(NSURL *)url
   sourceApplication:(NSString *)sourceApplication
          annotation:(id)annotation {
-  [super application:application
-             openURL:url
-   sourceApplication:sourceApplication
-          annotation:annotation];
+
+  // Uncomment this if you extend another AppController class that needs to handle
+  // being opened from a url.
+  //[super application:application
+  //           openURL:url
+  // sourceApplication:sourceApplication
+  //        annotation:annotation];
+
   return [[GIDSignIn sharedInstance] handleURL:url
                              sourceApplication:sourceApplication
                                     annotation:annotation];
@@ -74,7 +78,6 @@ didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 - (void)application:(UIApplication *)application
 didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
 
-  [super application:application didRegisterForRemoteNotificationsWithDeviceToken:deviceToken];
   NSLog(@"Got Token for APNS: %@", deviceToken);
 
 
@@ -82,7 +85,7 @@ didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
   // NOTE: GPGPushNotificationEnvironmentProduction indicates this is
   // using the production APNS service.
   // GPGPushNotificationEnvironmentSandbox indicates that the sandbox
-  // service should be used.  This value needs to match the cooresponding
+  // service should be used.  This value needs to match the
   // certificate registered in the play app console, under linked apps > ios in
   // the section for push notifications.
   gpg::RegisterDeviceToken(deviceToken, GPGPushNotificationEnvironmentProduction);
@@ -90,7 +93,6 @@ didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
 
 - (void)application:(UIApplication *)application
 didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
-  [super application:application didFailToRegisterForRemoteNotificationsWithError:error];
   NSLog(@"Error registering for remote notifications! %@", error);
 }
 

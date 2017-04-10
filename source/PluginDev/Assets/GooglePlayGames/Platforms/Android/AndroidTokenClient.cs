@@ -23,7 +23,7 @@ namespace GooglePlayGames.Android
     using Com.Google.Android.Gms.Common.Api;
     using UnityEngine;
 
-    internal class AndroidTokenClient: TokenClient
+    internal class AndroidTokenClient : TokenClient
     {
         private const string TokenFragmentClass = "com.google.games.bridge.TokenFragment";
         private const string FetchTokenSignature =
@@ -301,10 +301,11 @@ namespace GooglePlayGames.Android
                     fetchingIdToken = true;
                     idTokenScope = newScope;
                     idTokenCb = idTokenCallback;
-                    Fetch(idTokenScope, false, false, true, (status) => {
+                    Fetch(idTokenScope, false, false, true, (status) =>
+                    {
                         fetchingIdToken = false;
 
-                        if(status == CommonStatusCodes.Success)
+                        if (status == CommonStatusCodes.Success)
                         {
                             idTokenCb(null);
                         }
@@ -322,7 +323,7 @@ namespace GooglePlayGames.Android
         }
     }
 
-    class TokenResult : Google.Developers.JavaObjWrapper , Result
+    class TokenResult : Google.Developers.JavaObjWrapper, Result
     {
         #region Result implementation
 
@@ -338,6 +339,12 @@ namespace GooglePlayGames.Android
         }
 
         #endregion
+
+        public int getStatusCode()
+        {
+            return InvokeCall<int>("getStatusCode", "()I");
+
+        }
 
         public String getAccessToken()
         {
@@ -367,8 +374,17 @@ namespace GooglePlayGames.Android
 
         public override void OnResult(TokenResult arg_Result_1)
         {
-            callback(arg_Result_1.getStatus().getStatusCode(), arg_Result_1.getAccessToken(), arg_Result_1.getIdToken(),
-                arg_Result_1.getEmail());
+            if (callback != null) {
+                    callback(arg_Result_1.getStatusCode(),
+                            arg_Result_1.getAccessToken(),
+                            arg_Result_1.getIdToken(),
+                            arg_Result_1.getEmail());
+            }
+        }
+
+        public string toString()
+        {
+            return ToString();
         }
     }
 }

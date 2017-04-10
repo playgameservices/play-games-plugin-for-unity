@@ -33,6 +33,8 @@ namespace Google.Developers
         /// </summary>
         IntPtr raw;
 
+        IntPtr cachedRawClass = IntPtr.Zero;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Google.Developers.JavaObjWrapper"/> class.
         /// Does not create an instance of the java class.
@@ -57,7 +59,7 @@ namespace Google.Developers
         /// <param name="rawObject">Raw object.</param>
         public JavaObjWrapper(IntPtr rawObject)
         {
-            this.raw = rawObject;
+            raw = rawObject;
         }
 
         /// <summary>
@@ -69,6 +71,18 @@ namespace Google.Developers
             get
             {
                 return raw;
+            }
+        }
+
+        public virtual IntPtr RawClass
+        {
+            get
+            {
+                if (cachedRawClass == IntPtr.Zero && raw != IntPtr.Zero)
+                {
+                    cachedRawClass = AndroidJNI.GetObjectClass(raw);
+                }
+                return cachedRawClass;
             }
         }
 
@@ -86,15 +100,13 @@ namespace Google.Developers
                 throw new Exception("Java object already set");
             }
 
-            IntPtr rawClass = AndroidJNI.FindClass(clazzName);
-
             // TODO: use a specific signature. This could be problematic when
             // using arguments that are subclasses of the declared parameter types.
-            IntPtr method = AndroidJNIHelper.GetConstructorID(rawClass, args);
+            IntPtr method = AndroidJNIHelper.GetConstructorID(RawClass, args);
             jvalue[] jArgs = ConstructArgArray(args);
 
             // assign the raw object.
-            raw = AndroidJNI.NewObject(rawClass, method, jArgs);
+            raw = AndroidJNI.NewObject(RawClass, method, jArgs);
         }
 
         /// <summary>
@@ -267,8 +279,7 @@ namespace Google.Developers
         /// <param name="args">Arguments.</param>
         public void InvokeCallVoid(string name, string sig, params object[] args)
         {
-            IntPtr rawClass = AndroidJNI.GetObjectClass(raw);
-            IntPtr method = AndroidJNI.GetMethodID(rawClass, name, sig);
+            IntPtr method = AndroidJNI.GetMethodID(RawClass, name, sig);
 
             jvalue[] jArgs = ConstructArgArray(args);
             AndroidJNI.CallVoidMethod(raw, method, jArgs);
@@ -277,15 +288,8 @@ namespace Google.Developers
         public T InvokeCall<T>(string name, string sig, params object[] args)
         {
             Type t = typeof(T);
-            IntPtr rawClass = AndroidJNI.GetObjectClass(raw);
-            IntPtr method = AndroidJNI.GetMethodID(rawClass, name, sig);
+            IntPtr method = AndroidJNI.GetMethodID(RawClass, name, sig);
             jvalue[] jArgs = ConstructArgArray(args);
-
-            if (rawClass == IntPtr.Zero)
-            {
-                Debug.LogError("Cannot get rawClass object!");
-                throw new Exception("Cannot get rawClass object");
-            }
 
             if (method == IntPtr.Zero)
             {
@@ -404,8 +408,7 @@ namespace Google.Developers
         public T InvokeObjectCall<T>(string name, string sig,
             params object[] theArgs)
         {
-            IntPtr rawClass = AndroidJNI.GetObjectClass(raw);
-            IntPtr methodId = AndroidJNI.GetMethodID(rawClass, name, sig);
+            IntPtr methodId = AndroidJNI.GetMethodID(RawClass, name, sig);
 
             jvalue[] jArgs = ConstructArgArray(theArgs);
 

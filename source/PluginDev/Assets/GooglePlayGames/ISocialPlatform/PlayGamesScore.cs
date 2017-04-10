@@ -133,6 +133,20 @@ namespace GooglePlayGames
                 return (int)mRank;
             }
         }
+
+        /// <summary>
+        /// Gets the metaData (scoreTag).
+        /// </summary>
+        /// <returns>
+        /// The metaData.
+        /// </returns>
+        public string metaData
+        {
+            get 
+            {
+                return mMetadata;
+            }
+        }
     }
 }
 #endif

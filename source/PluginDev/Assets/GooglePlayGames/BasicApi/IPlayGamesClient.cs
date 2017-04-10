@@ -61,7 +61,7 @@ namespace GooglePlayGames.BasicApi
     /// </remarks>
     /// <param name="callback">Callback.</param>
     /// <param name="silent">If set to <c>true</c> silent.</param>
-    void Authenticate(System.Action<bool> callback, bool silent);
+    void Authenticate(System.Action<bool, string> callback, bool silent);
 
     /// <summary>
     /// Returns whether or not user is authenticated.

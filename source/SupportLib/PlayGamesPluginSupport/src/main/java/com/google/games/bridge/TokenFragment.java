@@ -140,6 +140,7 @@ public class TokenFragment extends Fragment {
             synchronized (pendingTokenRequests) {
                 while (!pendingTokenRequests.isEmpty()) {
                     request = pendingTokenRequests.remove(0);
+                    Log.d(TAG," Setting result to " + errorCode + " for " + request);
                     request.setResult(errorCode);
                 }
             }
@@ -207,10 +208,10 @@ public class TokenFragment extends Fragment {
                 "e: " + tokenRequest.doEmail + " a:" + tokenRequest.doAccessToken + " i:" +
                 tokenRequest.doIdToken);
 
-        AsyncTask<Object, Integer, TokenRequest> t =
-                new AsyncTask<Object, Integer, TokenRequest>() {
+        AsyncTask<Object, Integer, Integer> t =
+                new AsyncTask<Object, Integer, Integer>() {
                     @Override
-                    protected TokenRequest doInBackground(Object[] params) {
+                    protected Integer doInBackground(Object[] params) {
                         // initialize the email to null, since it used by all the token getters.
                         String accessToken;
                         String idToken;
@@ -253,8 +254,8 @@ public class TokenFragment extends Fragment {
                         }
 
                         Log.d(TAG, "Done with tokenRequest status: " + statusCode);
-                        tokenRequest.setResult(statusCode);
-                        return tokenRequest;
+                       //
+                        return statusCode;
                     }
 
                     /**
@@ -281,15 +282,15 @@ public class TokenFragment extends Fragment {
                      * <p/>
                      * <p>This method won't be invoked if the task was cancelled.</p>
                      *
-                     * @param tokenPendingResult The result of the operation computed by {@link #doInBackground}.
+                     * @param statusCode The result of the operation computed by {@link #doInBackground}.
                      * @see #onPreExecute
                      * @see #doInBackground
                      * @see #onCancelled(Object)
                      */
                     @Override
-                    protected void onPostExecute(TokenRequest tokenPendingResult) {
+                    protected void onPostExecute(Integer statusCode) {
                         Log.d(TAG, "onPostExecute for the token fetch");
-                        super.onPostExecute(tokenPendingResult);
+                        tokenRequest.setResult(statusCode);
                     }
                 };
         t.execute();

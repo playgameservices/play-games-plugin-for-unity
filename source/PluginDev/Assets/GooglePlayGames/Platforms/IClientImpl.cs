@@ -31,7 +31,7 @@ namespace GooglePlayGames
 
         TokenClient CreateTokenClient (string playerId, bool reset);
 
-        void GetPlayerStats(IntPtr apiClientPtr, Action<CommonStatusCodes, PlayerStats> callback);
+        void GetPlayerStats(IntPtr apiClientPtr, Action<CommonStatusCodes, GooglePlayGames.BasicApi.PlayerStats> callback);
     }
 }
 

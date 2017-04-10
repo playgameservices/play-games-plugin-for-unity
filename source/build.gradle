@@ -44,7 +44,7 @@ project.ext {
     samplesBuildSrc = file('build/sampleSrc').absolutePath
     exportPath = file('build/plugin.unitypackage').absolutePath
     currentPluginPath = file('../current-build').absolutePath
-    currentPluginName = 'GooglePlayGamesPlugin-0.9.34.unitypackage'
+    currentPluginName = 'GooglePlayGamesPlugin-0.9.36.unitypackage'
     resolverDir = new File('build/jarresolver').absolutePath
 
     sampleList = ['CubicPilot', 'Minimal',
@@ -53,9 +53,10 @@ project.ext {
 
     gpg_sdk_link = 'https://developers.google.com/games/services/downloads/gpg-cpp-sdk.v2.1.zip'
 
-    sso_jarresolver_repo = 'sso://devrel/libraries/android/unity-jar-resolver'
-    https_jarresolver_repo = 'https://devrel.googlesource.com/libraries/android/unity-jar-resolver'
-    github_jarresolver_repo = 'https://github.com/googlesamples/unity-jar-resolver.git'
+    jarresolver_uri = System.getProperty("RESOLVER_PACKAGE_URI")
+    jarresolver_repos = [
+      'https://github.com/googlesamples/unity-jar-resolver.git'
+    ]
 }
 
 
@@ -138,9 +139,24 @@ sampleList.each { sampleName ->
     createTask.description = "Create the ${sampleName} package"
     createTask.dependsOn 'export_package'
     createTask.doFirst {
+        delete "${buildPath}/Samples/${sampleName}"
+
         exec {
             executable "${unity_exe}"
-                args "-buildTarget", "android", "-batchmode", "-createProject", "${buildPath}/Samples/${sampleName}", "-logFile", "${buildPath}/CreateSample${sampleName}.log",  "-importPackage", "${exportPath}", "-quit"
+            args "-batchmode",
+                 "-createProject", "${buildPath}/Samples/${sampleName}",
+                 "-logFile", "${buildPath}/CreateSample${sampleName}.1.log",
+                 "-importPackage", "${exportPath}",
+                 "-quit"
+        }
+        // Activate the resolver.
+        exec {
+            executable "${unity_exe}"
+             args "-batchmode",
+                 "-projectPath", "${buildPath}/Samples/${sampleName}",
+                 "-logFile", "${buildPath}/CreateSample${sampleName}.2.log",
+                 "-executeMethod", "Google.VersionHandler.UpdateNow",
+                 "-quit"
         }
     }
     // This is a build task
@@ -157,8 +173,8 @@ sampleList.each { sampleName ->
                 into sampleBuildSrcDir
             }
     }
-    copySrcTask.doLast {
-            println 'copied ' + sampleSrcDir + ' to' + sampleBuildSrcDir
+    copyBuildSrcTask.doLast {
+            println 'copied ' + sampleSrcDir + ' to ' + sampleBuildSrcDir
     }
 
     copyBuildSrcTask.ext.remoteTaskPhase = 'prebuild'
@@ -167,7 +183,7 @@ sampleList.each { sampleName ->
         sample package, since we want the latest source code.
     */
     copySrcTask.description = "Copies sample ${sampleName} source code to sample project build area"
-    copySrcTask.dependsOn createTask
+    copySrcTask.dependsOn createTask, copyBuildSrcTask
     copySrcTask.doFirst {
             copy {
                 from sampleBuildSrcDir
@@ -175,7 +191,7 @@ sampleList.each { sampleName ->
             }
     }
     copySrcTask.doLast {
-            println 'copied ' + sampleBuildSrcDir + ' to' + sampleDestSrcDir
+            println 'copied ' + sampleBuildSrcDir + ' to ' + sampleDestSrcDir
     }
 
     copySrcTask.ext.remoteTaskPhase = 'build'
@@ -187,15 +203,24 @@ sampleList.each { sampleName ->
 
         packageTask.description = "Package ${sampleName} sample"
 
-        packageTask.dependsOn createTask
+        packageTask.dependsOn createTask, copySrcTask
         /*
                 Next, export the project
+                Target Android here since the plugin only works for
+                android or ios, otherwise the sample won't compile
+                and then can't be exported.
         */
 
         packageTask.doLast {
             exec {
                 executable "${unity_exe}"
-                args "-buildTarget", "android", "-batchmode", "-projectPath", "${buildPath}/Samples/${sampleName}", "-logFile", "${buildPath}/ExportSample${sampleName}.log",  "-exportPackage", "${sampleAssets}",  "${buildPath}/Samples/${sampleName}.unitypackage",  "-quit"
+                args "-batchmode",
+                     "-buildTarget", "android",
+                     "-projectPath", "${buildPath}/Samples/${sampleName}",
+                     "-logFile", "${buildPath}/ExportSample${sampleName}.log",
+                     "-exportPackage", "${sampleAssets}",
+                         "${buildPath}/Samples/${sampleName}.unitypackage",
+                     "-quit"
             }
         }
         packageTask.ext.remoteTaskPhase = 'build'
@@ -217,6 +242,7 @@ sampleList.each { sampleName ->
 
 task import_jarresolver() {
     description = "Imports the jar resolver package into the plugin"
+    ext.remoteTaskPhase = 'build'
     doFirst {
         if (file(pluginProj).exists()) {
             delete pluginProj
@@ -227,12 +253,16 @@ task import_jarresolver() {
             {
                 include '*.unitypackage'
             }
-    def jarresolver_package = tree.getSingleFile()
+        def jarresolver_package = tree.getSingleFile()
 
         ext.execResult = exec {
-            executable "${unity_exe}"
-                args "-g.building", "-buildTarget", "android", "-batchmode", "-createProject", "${pluginProj}", "-logFile", "build/import_resolver_unity.log",  "-importPackage", "${jarresolver_package}", "-quit"
-                        ignoreExitValue true
+              executable "${unity_exe}"
+              args "-g.building",
+                   "-batchmode",
+                   "-createProject", "${pluginProj}",
+                   "-logFile", "build/import_resolver_unity.log",
+                   "-importPackage", "${jarresolver_package}", "-quit"
+              ignoreExitValue true
         }
         if (ext.execResult.exitValue != 0) {
             println "***Error Running Unity:"
@@ -244,6 +274,10 @@ task import_jarresolver() {
     }
 
 }
+// don't explicitly depend on copy_jarresolver here since it is run
+// as a prebuild step, and import_jarresolver is a build step which can happen
+// on a machine with limited network connectivity.
+// import_jarresolver.dependsOn "copy_jarresolver"
 
 task copy_pluginProjSrc << {
     copy {
@@ -266,7 +300,11 @@ task export_package () {
     doLast {
         def argv = [
                 "-g.building",
-                "-buildTarget", "android",
+                // NOTE: This doesn't target Android since we don't want to have
+                // dependencies on the Jar Resolver as they require the plugin to
+                // be enabled during the build process which would break the
+                // versioning process.  Compilation is verified when exporting
+                // the sample projects.
                 "-batchmode",
                 "-projectPath", "${pluginProj}",
                 "-logFile", "build/unity.log",
@@ -313,8 +351,7 @@ task copy_plugin() {
         println "Copied  ${exportPath}  to   ${currentPluginPath}"
     }
 
-        ext.remoteTaskPhase = 'postbuild'
-
+    ext.remoteTaskPhase = 'postbuild'
 }
 
 task get_gpg_cpp_sdk () {
@@ -381,7 +418,7 @@ copy_plugin_source.description = "Copies plugin source into build directory"
 copy_plugin_source.ext.remoteTaskPhase = 'prebuild'
 
 
-task copy_jarresolver (type:Exec) {
+task copy_jarresolver() {
     description = "Clones the jar resolver project and copied into the build."
     ext.remoteTaskPhase = "prebuild"
     dependsOn copy_plugin_source
@@ -392,28 +429,26 @@ task copy_jarresolver (type:Exec) {
         }
     }
 
-
-    executable "${git_exe}"
-    args "clone", "${https_jarresolver_repo}", "${resolverDir}"
-    ignoreExitValue true
-
-
     doLast {
-        if (execResult.exitValue != 0) {
-            ext.sso = exec {
-                executable = "${git_exe}"
-                args "clone", "${sso_jarresolver_repo}", "${resolverDir}"
+        if (jarresolver_uri != null) {
+            mkdir("${resolverDir}")
+            def resolver = new File("${resolverDir}/resolver.unitypackage")
+            new URL("${jarresolver_uri}").withInputStream {
+                inputStream -> resolver.withOutputStream { it << inputStream }
+            }
+            return
+        }
+
+        for (repo in jarresolver_repos) {
+            println 'clone ' + repo
+            def result = exec {
+                executable "${git_exe}"
+                args "clone", repo, "${resolverDir}"
                 ignoreExitValue true
             }
-
-            if (ext.sso.exitValue != 0) {
-                exec {
-                    // try github
-                    executable = "${git_exe}"
-                    args "clone", "${github_jarresolver_repo}", "${resolverDir}"
-                }
-            } else {
-                print " -- SSO was successful!"
+            if (result.exitValue == 0) {
+                println "Downloaded resolver from " + repo
+                return
             }
         }
     }
@@ -468,3 +503,8 @@ support_jar.dependsOn 'copy_plugin_source'
 
 support_jar.ext.remoteTaskPhase = 'prebuild'
 
+task clean() {
+    doFirst {
+        delete 'build'
+        }
+}
