@@ -73,15 +73,6 @@ public class TokenPendingResult extends PendingResult<TokenResult> {
         latch.countDown();
     }
 
-    @Deprecated
-    void setToken(String accessToken, String idToken, String email, int resultCode) {
-        setResult(accessToken, idToken, email, resultCode);
-        latch.countDown();
-        if (getCallback() != null) {
-            getCallback().onResult(getResult());
-        }
-    }
-
     @Override
     public boolean isCanceled() {
         return getResult() != null && getResult().getStatus().isCanceled();
@@ -126,17 +117,19 @@ public class TokenPendingResult extends PendingResult<TokenResult> {
      * Set the result.  If any of the values are null, and a previous non-null value was set,
      * the non-null value is retained.
      *
-     * @param accessToken - the access token
-     * @param idToken     - the id token
-     * @param email       - user's email  (aka accountName).
+     * @param authCode - the access token
+     * @param email     - the id token
+     * @param idToken       - user's email  (aka accountName).
      * @param resultCode  - the result code.
      */
-    private synchronized void setResult(String accessToken, String idToken, String email, int resultCode) {
-        String atok = (result != null && accessToken == null) ? result.getAccessToken() : accessToken;
+    private synchronized void setResult(String authCode, String email, String
+            idToken, int resultCode) {
+        String atok = (result != null && authCode == null) ? result.getAuthCode()
+                : authCode;
         String itok = (result != null && idToken == null) ? result.getIdToken() : idToken;
         String em = (result != null && email == null) ? result.getEmail() : email;
 
-        result = new TokenResult(atok, itok, em, resultCode);
+        result = new TokenResult(atok, em, itok, resultCode);
     }
 
     private synchronized TokenResult getResult() {
@@ -164,8 +157,8 @@ public class TokenPendingResult extends PendingResult<TokenResult> {
         result.setEmail(email);
     }
 
-    public void setAccessToken(String accessToken) {
-        result.setAccessToken(accessToken);
+    public void setAuthCode(String accessToken) {
+        result.setAuthCode(accessToken);
     }
 
     public void setIdToken(String idToken) {

@@ -70,27 +70,16 @@ namespace GooglePlayGames.BasicApi
             LogUsage();
         }
 
-        /// <summary>
-        /// Returns an access token.
-        /// </summary>
-        /// <returns>The access token.</returns>
-        public string GetAccessToken()
-        {
-            LogUsage();
-            return "DummyAccessToken";
-        }
 
         /// <summary>
         /// Retrieves an id token, which can be verified server side, if they are logged in.
         /// </summary>
         /// <param name="idTokenCallback">The callback invoked with the token</param>
         /// <returns>The identifier token.</returns>
-        public void GetIdToken(Action<string> idTokenCallback)
+        public string GetIdToken()
         {
             LogUsage();
-            if (idTokenCallback != null) {
-                idTokenCallback("DummyIdToken");
-            }
+            return null;
         }
 
         /// <summary>
@@ -104,30 +93,11 @@ namespace GooglePlayGames.BasicApi
             return "DummyID";
         }
 
-        /// <summary>
-        /// Retrieves an OAuth 2.0 bearer token for the client.
-        /// </summary>
-        /// <returns>A string representing the bearer token.</returns>
-        public string GetToken()
-        {
-            return "DummyToken";
-        }
 
-        /// <summary>
-        /// Asynchronously retrieves the server auth code for this client.
-        /// </summary>
-        /// <remarks>
-        /// Note: This function is only implemented for Android.
-        /// </remarks>
-        /// <param name="serverClientId">The Client ID.</param>
-        /// <param name="callback">Callback for response.</param>
-        public void GetServerAuthCode(string serverClientId, Action<CommonStatusCodes, string> callback)
+        public string GetServerAuthCode()
         {
             LogUsage();
-            if (callback != null)
-            {
-                callback(CommonStatusCodes.ApiNotConnected, "DummyServerAuthCode");
-            }
+            return null;
         }
 
         /// <summary>
@@ -143,25 +113,6 @@ namespace GooglePlayGames.BasicApi
         public string GetUserEmail()
         {
             return string.Empty;
-        }
-
-        /// <summary>
-        /// Gets the user's email with a callback.
-        /// </summary>
-        /// <remarks>The email address returned is selected by the user from the accounts present
-        /// on the device. There is no guarantee this uniquely identifies the player.
-        /// For unique identification use the id property of the local player.
-        /// The user can also choose to not select any email address, meaning it is not
-        /// available.</remarks>
-        /// <param name="callback">The callback with a status code of the request,
-        /// and string which is the email. It can be null.</param>
-        public void GetUserEmail(Action<CommonStatusCodes, string> callback)
-        {
-            LogUsage();
-            if (callback != null)
-            {
-                callback(CommonStatusCodes.ApiNotConnected, null);
-            }
         }
 
         /// <summary>
@@ -472,6 +423,16 @@ namespace GooglePlayGames.BasicApi
         /// </summary>
         /// <returns>The quests client.</returns>
         public GooglePlayGames.BasicApi.Quests.IQuestsClient GetQuestsClient()
+        {
+            LogUsage();
+            return null;
+        }
+
+        /// <summary>
+        /// Gets the video client.
+        /// </summary>
+        /// <returns>The video client.</returns>
+        public GooglePlayGames.BasicApi.Video.IVideoClient GetVideoClient()
         {
             LogUsage();
             return null;

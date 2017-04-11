@@ -79,10 +79,6 @@ namespace GooglePlayGames.Native.Cwrapper
             HandleRef self);
 
         [DllImport(SymbolLocation.NativeSymbolLocation)]
-        internal static extern void GameServices_Builder_RequireGooglePlus(
-            HandleRef self);
-
-        [DllImport(SymbolLocation.NativeSymbolLocation)]
         internal static extern void GameServices_Builder_SetOnLog(
             HandleRef self,
          /* from(GameServices_Builder_OnLogCallback_t) */OnLogCallback callback,
@@ -117,6 +113,11 @@ namespace GooglePlayGames.Native.Cwrapper
             HandleRef self,
          /* from(GameServices_Builder_OnMultiplayerInvitationEventCallback_t) */OnMultiplayerInvitationEventCallback callback,
          /* from(void *) */IntPtr callback_arg);
+
+        [DllImport(SymbolLocation.NativeSymbolLocation)]
+        internal static extern void GameServices_Builder_SetShowConnectingPopup(
+            HandleRef self,
+            /* from(bool) */ bool flag);
 
         [DllImport(SymbolLocation.NativeSymbolLocation)]
         internal static extern /* from(GameServices_t) */ IntPtr GameServices_Builder_Create(

@@ -44,19 +44,20 @@ project.ext {
     samplesBuildSrc = file('build/sampleSrc').absolutePath
     exportPath = file('build/plugin.unitypackage').absolutePath
     currentPluginPath = file('../current-build').absolutePath
-    currentPluginName = 'GooglePlayGamesPlugin-0.9.36.unitypackage'
+    currentPluginName = 'GooglePlayGamesPlugin-0.9.37.unitypackage'
     resolverDir = new File('build/jarresolver').absolutePath
 
     sampleList = ['CubicPilot', 'Minimal',
          'QuizRacer',  'TicTacToe',
          'NearbyDroids', 'SmokeTest', 'TrivialQuest']
 
-    gpg_sdk_link = 'https://developers.google.com/games/services/downloads/gpg-cpp-sdk.v2.1.zip'
+    gpg_sdk_link = 'https://developers.google.com/games/services/downloads/gpg-cpp-sdk.v2.3.zip'
 
     jarresolver_uri = System.getProperty("RESOLVER_PACKAGE_URI")
     jarresolver_repos = [
       'https://github.com/googlesamples/unity-jar-resolver.git'
     ]
+     jarresolver_tag = "v1.2.12";
 }
 
 
@@ -446,6 +447,14 @@ task copy_jarresolver() {
                 args "clone", repo, "${resolverDir}"
                 ignoreExitValue true
             }
+            if (result.exitValue == 0 && jarresolver_tag != null) {
+                result = exec {
+                    executable "${git_exe}"
+                    args "checkout", "-b", "buildver", "${jarresolver_tag}"
+                    workingDir "${resolverDir}"
+                }
+            }
+
             if (result.exitValue == 0) {
                 println "Downloaded resolver from " + repo
                 return

@@ -111,6 +111,82 @@ namespace GooglePlayGames.Native
             }
         }
 
+        internal static Types.VideoCaptureMode ConvertVideoCaptureMode(VideoCaptureMode captureMode)
+        {
+            switch (captureMode)
+            {
+                case VideoCaptureMode.File:
+                    return Types.VideoCaptureMode.FILE;
+                case VideoCaptureMode.Stream:
+                    return Types.VideoCaptureMode.STREAM;
+                case VideoCaptureMode.Unknown:
+                    return Types.VideoCaptureMode.UNKNOWN;
+                default:
+                    Debug.LogWarning("Unknown VideoCaptureMode: " + captureMode +
+                        ", defaulting to Types.VideoCaptureMode.UNKNOWN.");
+                    return Types.VideoCaptureMode.UNKNOWN;
+            }
+        }
+
+        internal static VideoCaptureMode ConvertNativeVideoCaptureMode(Types.VideoCaptureMode nativeCaptureMode)
+        {
+            switch (nativeCaptureMode)
+            {
+                case Types.VideoCaptureMode.FILE:
+                    return VideoCaptureMode.File;
+                case Types.VideoCaptureMode.STREAM:
+                    return VideoCaptureMode.Stream;
+                case Types.VideoCaptureMode.UNKNOWN:
+                    return VideoCaptureMode.Unknown;
+                default:
+                    Debug.LogWarning("Unknown Types.VideoCaptureMode: " + nativeCaptureMode +
+                        ", defaulting to VideoCaptureMode.Unknown.");
+                    return VideoCaptureMode.Unknown;
+            }
+        }
+
+        internal static VideoQualityLevel ConvertNativeVideoQualityLevel(Types.VideoQualityLevel nativeQualityLevel)
+        {
+            switch (nativeQualityLevel)
+            {
+                case Types.VideoQualityLevel.SD:
+                    return VideoQualityLevel.SD;
+                case Types.VideoQualityLevel.HD:
+                    return VideoQualityLevel.HD;
+                case Types.VideoQualityLevel.XHD:
+                    return VideoQualityLevel.XHD;
+                case Types.VideoQualityLevel.FULLHD:
+                    return VideoQualityLevel.FullHD;
+                case Types.VideoQualityLevel.UNKNOWN:
+                    return VideoQualityLevel.Unknown;
+                default:
+                    Debug.LogWarning("Unknown Types.VideoQualityLevel: " + nativeQualityLevel +
+                        ", defaulting to VideoQualityLevel.Unknown.");
+                    return VideoQualityLevel.Unknown;
+            }
+        }
+
+        internal static VideoCaptureOverlayState ConvertNativeVideoCaptureOverlayState(Types.VideoCaptureOverlayState nativeOverlayState)
+        {
+            switch (nativeOverlayState)
+            {
+                case Types.VideoCaptureOverlayState.DISMISSED:
+                    return VideoCaptureOverlayState.Dismissed;
+                case Types.VideoCaptureOverlayState.SHOWN:
+                    return VideoCaptureOverlayState.Shown;
+                case Types.VideoCaptureOverlayState.STARTED:
+                    return VideoCaptureOverlayState.Started;
+                case Types.VideoCaptureOverlayState.STOPPED:
+                    return VideoCaptureOverlayState.Stopped;
+                case Types.VideoCaptureOverlayState.UNKNOWN:
+                    return VideoCaptureOverlayState.Unknown;
+                default:
+                    Debug.LogWarning("Unknown Types.VideoCaptureOverlayState: " + nativeOverlayState +
+                        ", defaulting to VideoCaptureOverlayState.Unknown.");
+                    return VideoCaptureOverlayState.Unknown;
+            }
+        }
+
     }
 }
 #endif // #if (UNITY_ANDROID || UNITY_IPHONE)
