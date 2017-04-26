@@ -20,6 +20,9 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.View;
 
@@ -30,6 +33,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.games.Games;
 
@@ -37,7 +41,8 @@ import com.google.android.gms.games.Games;
  * Activity fragment with no UI added to the parent activity in order to manage
  * the accessing of the player's email address and tokens.
  */
-public class TokenFragment extends Fragment {
+public class TokenFragment extends Fragment
+        implements GoogleApiClient.ConnectionCallbacks {
 
     private static final String TAG = "TokenFragment";
     private static final String FRAGMENT_TAG = "gpg.AuthTokenSupport";
@@ -278,8 +283,10 @@ public class TokenFragment extends Fragment {
                     .addApi(Auth.GOOGLE_SIGN_IN_API, options);
             clientBuilder.addApi(Games.API);
 
+            clientBuilder.addConnectionCallbacks(this);
+
             if (request.hidePopups) {
-                View invisible = new View(getContext());
+                View invisible = new View(getActivity());
                 invisible.setVisibility(View.INVISIBLE);
                 invisible.setClickable(false);
                 clientBuilder.setViewForPopups(invisible);
@@ -299,12 +306,9 @@ public class TokenFragment extends Fragment {
         }
 
         // check if we have all the info we need
-        if ((requested_authcode && currentAuthCode == null) ||
-                (requested_email && currentEmail == null) ||
-                (requested_id_token && currentIdToken == null)) {
-            Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-            startActivityForResult(signInIntent, RC_ACCT);
-        } else {
+        if ((!requested_authcode || currentAuthCode != null) &&
+                (!requested_email || currentEmail != null) &&
+                (!requested_id_token || currentIdToken != null)) {
             request.setAuthCode(currentAuthCode);
             request.setEmail(currentEmail);
             request.setIdToken(currentIdToken);
@@ -334,26 +338,30 @@ public class TokenFragment extends Fragment {
         if (requestCode == RC_ACCT) {
             GoogleSignInResult result =
                     Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            TokenRequest request;
-            synchronized (lock) {
-                request = pendingTokenRequest;
-                pendingTokenRequest = null;
-            }
             GoogleSignInAccount acct = result.getSignInAccount();
-                if (request != null) {
-                    if (acct != null) {
-                        request.setAuthCode(acct.getServerAuthCode());
-                        request.setEmail(acct.getEmail());
-                        request.setIdToken(acct.getIdToken());
-                        currentAuthCode = acct.getServerAuthCode();
-                        currentEmail = acct.getEmail();
-                        currentIdToken = acct.getIdToken();
-                    }
-                    request.setResult(result.getStatus().getStatusCode());
-                }
+            onSignedIn(result.getStatus().getStatusCode(), acct);
             return;
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void onSignedIn(int resultCode, GoogleSignInAccount acct) {
+        TokenRequest request;
+        synchronized (lock) {
+            request = pendingTokenRequest;
+            pendingTokenRequest = null;
+        }
+        if (request != null) {
+            if (acct != null) {
+                request.setAuthCode(acct.getServerAuthCode());
+                request.setEmail(acct.getEmail());
+                request.setIdToken(acct.getIdToken());
+                currentAuthCode = acct.getServerAuthCode();
+                currentEmail = acct.getEmail();
+                currentIdToken = acct.getIdToken();
+            }
+            request.setResult(resultCode);
+        }
     }
 
 
@@ -394,6 +402,47 @@ public class TokenFragment extends Fragment {
         }
             processRequest();
     }
+
+    @Override
+    public void onConnected(@Nullable final Bundle bundle) {
+        if (mGoogleApiClient.hasConnectedApi(Games.API)) {
+            Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient).setResultCallback(
+                    new ResultCallback<GoogleSignInResult>() {
+                        @Override
+                        public void onResult(
+                                @NonNull GoogleSignInResult googleSignInResult) {
+                            if (googleSignInResult.isSuccess()) {
+                                onSignedIn(
+                                        googleSignInResult.getStatus()
+                                                .getStatusCode(),
+                                        googleSignInResult.getSignInAccount());
+                            } else {
+                                Log.e(TAG, "Error with silentSignIn: " +
+                                        googleSignInResult.getStatus());
+                                onSignedIn(googleSignInResult.getStatus()
+                                        .getStatusCode(),googleSignInResult.getSignInAccount());
+                            }
+                        }
+                    }
+            );
+        } else {
+            Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+            startActivityForResult(signInIntent, RC_ACCT);
+        }
+    }
+
+    /**
+     * Does nothing, but the interface requires an implementation.  A typical
+     * application would disable any UI that requires a connection.  When the
+     * connection is restored, onConnected will be called.
+     *
+     * @param cause - The reason of the disconnection.
+     */
+    @Override
+    public void onConnectionSuspended(int cause) {
+        Log.d(TAG, "onConnectionSuspended() called: " + cause);
+    }
+
 
     /**
      * Helper class containing the request for information.

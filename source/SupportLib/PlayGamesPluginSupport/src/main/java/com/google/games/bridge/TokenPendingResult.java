@@ -16,6 +16,7 @@
 
 package com.google.games.bridge;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.android.gms.common.api.CommonStatusCodes;
@@ -43,6 +44,8 @@ public class TokenPendingResult extends PendingResult<TokenResult> {
     {
         result = new TokenResult();
     }
+
+    @NonNull
     @Override
     public TokenResult await() {
 
@@ -55,8 +58,9 @@ public class TokenPendingResult extends PendingResult<TokenResult> {
         return getResult();
     }
 
+    @NonNull
     @Override
-    public TokenResult await(long l, TimeUnit timeUnit) {
+    public TokenResult await(long l, @NonNull TimeUnit timeUnit) {
         try {
             if (!latch.await(l, timeUnit)) {
                 setResult(null, null, null, CommonStatusCodes.TIMEOUT);
@@ -79,7 +83,8 @@ public class TokenPendingResult extends PendingResult<TokenResult> {
     }
 
     @Override
-    public void setResultCallback(ResultCallback<? super TokenResult> resultCallback) {
+    public void setResultCallback(
+            @NonNull ResultCallback<? super TokenResult> resultCallback) {
 
         // Handle adding the callback when the latch has already counted down.  This
         // can happen if there is an error right away.
@@ -91,8 +96,9 @@ public class TokenPendingResult extends PendingResult<TokenResult> {
     }
 
     @Override
-    public void setResultCallback(ResultCallback<? super TokenResult> resultCallback, long l,
-                                  TimeUnit timeUnit) {
+    public void setResultCallback(
+            @NonNull ResultCallback<? super TokenResult> resultCallback, long l,
+            @NonNull TimeUnit timeUnit) {
         try {
             if (!latch.await(l, timeUnit)) {
                 setResult(null, null, null, CommonStatusCodes.TIMEOUT);

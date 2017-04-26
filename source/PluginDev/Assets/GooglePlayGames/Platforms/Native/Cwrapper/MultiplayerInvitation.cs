@@ -61,7 +61,7 @@ internal static class MultiplayerInvitation
         [DllImport(SymbolLocation.NativeSymbolLocation)]
         internal static extern /* from(size_t) */ UIntPtr MultiplayerInvitation_Id(
             HandleRef self,
-         /* from(char *) */StringBuilder out_arg,
+            [In, Out] /* from(char *) */char[] out_arg,
          /* from(size_t) */UIntPtr out_size);
 
         [DllImport(SymbolLocation.NativeSymbolLocation)]

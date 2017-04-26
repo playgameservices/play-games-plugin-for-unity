@@ -36,7 +36,7 @@ namespace GooglePlayGames.Native.Cwrapper
         [DllImport(SymbolLocation.NativeSymbolLocation)]
         internal static extern /* from(size_t) */ UIntPtr ScorePage_LeaderboardId(
             HandleRef self,
-         /* from(char *) */StringBuilder out_arg,
+            [In, Out] /* from(char *) */char[] out_arg,
          /* from(size_t) */UIntPtr out_size);
 
         [DllImport(SymbolLocation.NativeSymbolLocation)]
@@ -86,7 +86,7 @@ namespace GooglePlayGames.Native.Cwrapper
         [DllImport(SymbolLocation.NativeSymbolLocation)]
         internal static extern /* from(size_t) */ UIntPtr ScorePage_Entry_PlayerId(
             HandleRef self,
-         /* from(char *) */StringBuilder out_arg,
+            [In, Out] /* from(char *) */char[] out_arg,
          /* from(size_t) */UIntPtr out_size);
 
         [DllImport(SymbolLocation.NativeSymbolLocation)]

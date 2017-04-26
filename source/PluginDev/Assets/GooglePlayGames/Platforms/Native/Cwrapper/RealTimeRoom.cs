@@ -31,7 +31,7 @@ internal static class RealTimeRoom
         [DllImport(SymbolLocation.NativeSymbolLocation)]
         internal static extern /* from(size_t) */ UIntPtr RealTimeRoom_Description(
             HandleRef self,
-         /* from(char *) */StringBuilder out_arg,
+            [In, Out] /* from(char *) */char[] out_arg,
          /* from(size_t) */UIntPtr out_size);
 
         [DllImport(SymbolLocation.NativeSymbolLocation)]
@@ -71,7 +71,7 @@ internal static class RealTimeRoom
         [DllImport(SymbolLocation.NativeSymbolLocation)]
         internal static extern /* from(size_t) */ UIntPtr RealTimeRoom_Id(
             HandleRef self,
-         /* from(char *) */StringBuilder out_arg,
+            [In, Out] /* from(char *) */char[] out_arg,
          /* from(size_t) */UIntPtr out_size);
 
         [DllImport(SymbolLocation.NativeSymbolLocation)]

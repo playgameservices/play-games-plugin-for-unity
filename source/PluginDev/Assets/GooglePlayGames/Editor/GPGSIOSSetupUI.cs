@@ -49,12 +49,16 @@ namespace GooglePlayGames.Editor
             mClassDirectory = GPGSProjectSettings.Instance.Get(GPGSUtil.CLASSDIRECTORYKEY, mClassDirectory);
             mClassName = GPGSProjectSettings.Instance.Get(GPGSUtil.CLASSNAMEKEY);
             mConfigData = GPGSProjectSettings.Instance.Get(GPGSUtil.IOSRESOURCEKEY);
-            mRequiresGooglePlus = GPGSProjectSettings.Instance.GetBool(GPGSUtil.REQUIREGOOGLEPLUSKEY, false);
 
             if (mBundleId.Trim().Length == 0)
             {
+#if UNITY_5_6_OR_NEWER
+              mBundleId = PlayerSettings.GetApplicationIdentifier(
+                  BuildTargetGroup.iOS);
+#else
                 mBundleId = PlayerSettings.bundleIdentifier;
-            }
+#endif
+			}
         }
 
         /// <summary>
@@ -87,7 +91,6 @@ namespace GooglePlayGames.Editor
                 webClientId = webClientId.Trim();
             }
             GPGSProjectSettings.Instance.Set(GPGSUtil.WEBCLIENTIDKEY, webClientId);
-            GPGSProjectSettings.Instance.Set(GPGSUtil.REQUIREGOOGLEPLUSKEY, requiresGooglePlus);
             GPGSProjectSettings.Instance.Save();
         }
 
@@ -124,13 +127,6 @@ namespace GooglePlayGames.Editor
             GUILayout.Width(450));
 
             GUILayout.Space(30);
-
-            // Requires G+ field
-            GUILayout.BeginHorizontal();
-            GUILayout.Label(GPGSStrings.Setup.RequiresGPlusTitle, EditorStyles.boldLabel);
-            mRequiresGooglePlus = EditorGUILayout.Toggle(mRequiresGooglePlus);
-            GUILayout.EndHorizontal();
-            GUILayout.Label(GPGSStrings.Setup.RequiresGPlusBlurb);
 
             // Client ID field
             GUILayout.Label(GPGSStrings.Setup.WebClientIdTitle, EditorStyles.boldLabel);
@@ -237,7 +233,12 @@ namespace GooglePlayGames.Editor
                 {
                     // get from settings
                     bundleId = GPGSProjectSettings.Instance.Get(GPGSUtil.IOSBUNDLEIDKEY);
+#if UNITY_5_6_OR_NEWER
+                    PlayerSettings.SetApplicationIdentifier(
+                        BuildTargetGroup.iOS, bundleId);
+#else
                     PlayerSettings.bundleIdentifier = bundleId;
+#endif
                 }
                 return PerformSetup(GPGSProjectSettings.Instance.Get(GPGSUtil.IOSCLIENTIDKEY),
                     bundleId, webClientId, nearbySvcId, requiresGooglePlus);

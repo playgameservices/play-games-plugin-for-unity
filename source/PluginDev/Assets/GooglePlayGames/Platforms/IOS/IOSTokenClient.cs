@@ -112,6 +112,66 @@ namespace GooglePlayGames.IOS {
                 idTokenCallback(token);
             }
         }
+
+        public string GetAuthCode()
+        {
+            throw new NotImplementedException();
+        }
+
+        public string GetIdToken()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Signout()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetRequestAuthCode(bool flag, bool forceRefresh)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetRequestEmail(bool flag)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetRequestIdToken(bool flag)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetWebClientId(string webClientId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetAccountName(string accountName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void AddOauthScopes(string[] scopes)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetHidePopups(bool flag)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool NeedsToRun()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void FetchTokens(Action callback)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 #endif

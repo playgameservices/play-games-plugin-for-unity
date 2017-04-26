@@ -27,19 +27,19 @@ namespace GooglePlayGames.Native.Cwrapper
         [DllImport(SymbolLocation.NativeSymbolLocation)]
         internal static extern /* from(size_t) */ UIntPtr Leaderboard_Name(
             HandleRef self,
-         /* from(char *) */StringBuilder out_arg,
+            [In, Out] /* from(char *) */char[] out_arg,
          /* from(size_t) */UIntPtr out_size);
 
         [DllImport(SymbolLocation.NativeSymbolLocation)]
         internal static extern /* from(size_t) */ UIntPtr Leaderboard_Id(
             HandleRef self,
-         /* from(char *) */StringBuilder out_arg,
+            [In, Out] /* from(char *) */char[] out_arg,
          /* from(size_t) */UIntPtr out_size);
 
         [DllImport(SymbolLocation.NativeSymbolLocation)]
         internal static extern /* from(size_t) */ UIntPtr Leaderboard_IconUrl(
             HandleRef self,
-         /* from(char *) */StringBuilder out_arg,
+            [In, Out] /* from(char *) */char[] out_arg,
          /* from(size_t) */UIntPtr out_size);
 
         [DllImport(SymbolLocation.NativeSymbolLocation)]

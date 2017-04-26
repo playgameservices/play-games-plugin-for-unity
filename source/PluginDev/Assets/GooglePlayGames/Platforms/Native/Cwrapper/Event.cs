@@ -31,13 +31,13 @@ namespace GooglePlayGames.Native.Cwrapper
         [DllImport(SymbolLocation.NativeSymbolLocation)]
         internal static extern /* from(size_t) */ UIntPtr Event_Description(
             HandleRef self,
-         /* from(char *) */StringBuilder out_arg,
+            [In, Out] /* from(char *) */char[] out_arg,
          /* from(size_t) */UIntPtr out_size);
 
         [DllImport(SymbolLocation.NativeSymbolLocation)]
         internal static extern /* from(size_t) */ UIntPtr Event_ImageUrl(
             HandleRef self,
-         /* from(char *) */StringBuilder out_arg,
+            [In, Out] /* from(char *) */char[] out_arg,
          /* from(size_t) */UIntPtr out_size);
 
         [DllImport(SymbolLocation.NativeSymbolLocation)]
@@ -47,7 +47,7 @@ namespace GooglePlayGames.Native.Cwrapper
         [DllImport(SymbolLocation.NativeSymbolLocation)]
         internal static extern /* from(size_t) */ UIntPtr Event_Id(
             HandleRef self,
-         /* from(char *) */StringBuilder out_arg,
+            [In, Out] /* from(char *) */char[] out_arg,
          /* from(size_t) */UIntPtr out_size);
 
         [DllImport(SymbolLocation.NativeSymbolLocation)]
@@ -66,7 +66,7 @@ namespace GooglePlayGames.Native.Cwrapper
         [DllImport(SymbolLocation.NativeSymbolLocation)]
         internal static extern /* from(size_t) */ UIntPtr Event_Name(
             HandleRef self,
-         /* from(char *) */StringBuilder out_arg,
+            [In, Out] /* from(char *) */char[] out_arg,
          /* from(size_t) */UIntPtr out_size);
     }
 }

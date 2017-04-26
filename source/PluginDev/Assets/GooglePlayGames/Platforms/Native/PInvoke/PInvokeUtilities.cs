@@ -24,7 +24,6 @@ namespace GooglePlayGames.Native.PInvoke
 
     static class PInvokeUtilities
     {
-        
         private static readonly DateTime UnixEpoch =
             DateTime.SpecifyKind(new DateTime(1970, 1, 1), DateTimeKind.Utc);
 
@@ -34,7 +33,7 @@ namespace GooglePlayGames.Native.PInvoke
             {
                 throw new System.InvalidOperationException();
             }
-            
+
             return reference;
         }
 
@@ -56,7 +55,7 @@ namespace GooglePlayGames.Native.PInvoke
             return UnixEpoch.Add(TimeSpan.FromMilliseconds(millisSinceEpoch));
         }
 
-        internal delegate UIntPtr OutStringMethod(StringBuilder out_string,UIntPtr out_size);
+        internal delegate UIntPtr OutStringMethod([In, Out] char[] out_bytes, UIntPtr out_size);
 
         internal static String OutParamsToString(OutStringMethod outStringMethod)
         {
@@ -65,10 +64,20 @@ namespace GooglePlayGames.Native.PInvoke
             {
                 return null;
             }
-            
-            StringBuilder sizedBuilder = new StringBuilder((int)requiredSize.ToUInt32());
-            outStringMethod(sizedBuilder, requiredSize);
-            return sizedBuilder.ToString();
+
+            string str = null;
+            try
+            {
+                char[] array = new char[requiredSize.ToUInt32()];
+                outStringMethod(array, requiredSize);
+                str = new string(array, 0, (int)requiredSize.ToUInt32() - 1);
+            }
+            catch (Exception e)
+            {
+                UnityEngine.Debug.LogError("Exception creating string from char array: " + e);
+                str = string.Empty;
+            }
+             return str;
         }
 
         internal delegate UIntPtr OutMethod<T>([In, Out] T[] out_bytes,UIntPtr out_size);
@@ -76,12 +85,12 @@ namespace GooglePlayGames.Native.PInvoke
         internal static T[] OutParamsToArray<T>(OutMethod<T> outMethod)
         {
             UIntPtr requiredSize = outMethod(null, UIntPtr.Zero);
-            
+
             if (requiredSize.Equals(UIntPtr.Zero))
             {
                 return new T[0];
             }
-            
+
             T[] array = new T[requiredSize.ToUInt64()];
             outMethod(array, requiredSize);
             return array;
@@ -106,24 +115,24 @@ namespace GooglePlayGames.Native.PInvoke
             {
                 return UIntPtr.Zero;
             }
-            
+
             return new UIntPtr((ulong)array.Length);
         }
 
         internal static long ToMilliseconds(TimeSpan span)
         {
             double millis = span.TotalMilliseconds;
-            
+
             if (millis > long.MaxValue)
             {
                 return long.MaxValue;
             }
-            
+
             if (millis < long.MinValue)
             {
                 return long.MinValue;
             }
-            
+
             return Convert.ToInt64(millis);
         }
     }

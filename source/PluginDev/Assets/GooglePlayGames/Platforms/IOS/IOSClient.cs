@@ -47,6 +47,16 @@ namespace GooglePlayGames.IOS
             return config;
         }
 
+        public PlatformConfiguration CreatePlatformConfiguration(PlayGamesClientConfiguration clientConfig)
+        {
+            return CreatePlatformConfiguration();
+        }
+
+        public TokenClient CreateTokenClient(bool reset)
+        {
+             return new IOSTokenClient();
+        }
+
         /// <summary>
         /// Creates the token client.
         /// </summary>
