@@ -928,7 +928,7 @@ pass this to your web server application.  This code can then be exchanged for
 an access token to make calls to the various APIs.
 For more details on this flow see: [Google Sign-In for Websites](https://developers.google.com/identity/sign-in/web/server-side-flow).
 
-To get the Auth code:
+To get the Server Auth code:
 1. Configure the web client Id of the web application linked to your game in the
 Play Game Console.
 2. Call `PlayGamesClientConfiguration.Builder.RequestServerAuthCode(false)` when
@@ -936,8 +936,7 @@ Play Game Console.
 3. Call `PlayGamesPlatform.Instance.GetServerAuthCode()` once the player is authenticated.
 4. Pass this code to your server application.
 
-
-## Retrieving player's email or a unique identifier##
+## Retrieving player's email
 In order to access the player's email address:
 1. Call `PlayGamesClientConfiguration.Builder.RequestEmail()` when creating
     the configuration.
@@ -955,6 +954,19 @@ is the same value all the time.
     Debug.Log("Local user's email is " +
         ((PlayGamesLocalUser)Social.localUser).Email);
 ```
+
+## Retrieving player's ID Token
+To get the player's OAuth ID token:
+1. Call `PlayGamesClientConfiguration.Builder.RequestIdToken()` when creating
+    the configuration.
+2. Access the idtoken property `((PlayGamesLocalUser) Social.localUser).GetIdToken()`
+    after the player is authenticated.
+
+__Note:__
+The ID Token can be used to identify the real player identity.  As a result
+requesting the ID Token will cause a consent screen to be presented to the user
+during login.
+
 
 ## Loading Friends
 

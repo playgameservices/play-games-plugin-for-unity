@@ -58,7 +58,7 @@ namespace GooglePlayGames.Editor
 #else
                 mBundleId = PlayerSettings.bundleIdentifier;
 #endif
-			}
+            }
         }
 
         /// <summary>
