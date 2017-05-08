@@ -21,6 +21,7 @@ namespace GooglePlayGames.BasicApi
     using GooglePlayGames.BasicApi.Multiplayer;
     using GooglePlayGames.OurUtils;
     using UnityEngine.SocialPlatforms;
+    using Logger = GooglePlayGames.OurUtils.Logger;
 
     /// <summary>
     /// Dummy client used in Editor.

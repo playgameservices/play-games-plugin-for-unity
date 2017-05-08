@@ -26,6 +26,7 @@ namespace GooglePlayGames.Native.PInvoke
     using Types = GooglePlayGames.Native.Cwrapper.Types;
     using Status = GooglePlayGames.Native.Cwrapper.CommonErrorStatus;
     using MultiplayerStatus = GooglePlayGames.Native.Cwrapper.CommonErrorStatus.MultiplayerStatus;
+    using Logger = GooglePlayGames.OurUtils.Logger;
 
     internal class TurnBasedManager
     {

@@ -24,6 +24,7 @@ namespace GooglePlayGames.Native.PInvoke
     using C = GooglePlayGames.Native.Cwrapper.RealTimeEventListenerHelper;
     using Types = GooglePlayGames.Native.Cwrapper.Types;
     using Status = GooglePlayGames.Native.Cwrapper.CommonErrorStatus;
+    using Logger = GooglePlayGames.OurUtils.Logger;
 
     internal class RealTimeEventListenerHelper : BaseReferenceHolder
     {

@@ -26,6 +26,7 @@ namespace GooglePlayGames.Native.PInvoke
     using Types = GooglePlayGames.Native.Cwrapper.Types;
     using Status = GooglePlayGames.Native.Cwrapper.CommonErrorStatus;
     using UnityEngine.SocialPlatforms;
+    using Logger = GooglePlayGames.OurUtils.Logger;
 
     internal class LeaderboardManager
     {

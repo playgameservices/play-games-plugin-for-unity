@@ -20,6 +20,7 @@ namespace GooglePlayGames.BasicApi.Multiplayer
     using System.Collections.Generic;
     using System.Linq;
     using GooglePlayGames.OurUtils;
+    using Logger = GooglePlayGames.OurUtils.Logger;
 
     /// <summary>
     /// Represents a turn-based match.

@@ -23,6 +23,7 @@ namespace GooglePlayGames.Native.PInvoke
     using System.Runtime.InteropServices;
     using GooglePlayGames.Native.Cwrapper;
     using GooglePlayGames.OurUtils;
+    using Logger = GooglePlayGames.OurUtils.Logger;
 
     static class Callbacks
     {

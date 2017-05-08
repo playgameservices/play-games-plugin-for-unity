@@ -29,6 +29,7 @@ namespace GooglePlayGames.Native.PInvoke
     using Status = GooglePlayGames.Native.Cwrapper.CommonErrorStatus;
     using MultiplayerStatus = GooglePlayGames.Native.Cwrapper.CommonErrorStatus.MultiplayerStatus;
     using System.Runtime.InteropServices;
+    using Logger = GooglePlayGames.OurUtils.Logger;
 
     internal class RealtimeManager
     {

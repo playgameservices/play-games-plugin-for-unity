@@ -26,6 +26,7 @@ namespace GooglePlayGames.Native.PInvoke
     using N = GooglePlayGames.Native.Cwrapper.NearbyConnectionTypes;
     using S = GooglePlayGames.Native.Cwrapper.NearbyConnectionsStatus;
     using Types = GooglePlayGames.Native.Cwrapper.Types;
+    using Logger = GooglePlayGames.OurUtils.Logger;
 
     internal class NearbyConnectionsManagerBuilder : BaseReferenceHolder
     {
