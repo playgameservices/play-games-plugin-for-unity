@@ -29,7 +29,7 @@ internal static class Player {
     [DllImport(SymbolLocation.NativeSymbolLocation)]
     internal static extern /* from(size_t) */ UIntPtr Player_Name(
         HandleRef self,
-        [In, Out] /* from(char *) */ char[] out_arg,
+        [In, Out] /* from(char *) */ byte[] out_arg,
          /* from(size_t) */ UIntPtr out_size);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
@@ -40,7 +40,7 @@ internal static class Player {
     internal static extern /* from(size_t) */ UIntPtr Player_AvatarUrl(
         HandleRef self,
          /* from(ImageResolution_t) */ Types.ImageResolution resolution,
-         [In, Out] /* from(char *) */ char[] out_arg,
+         [In, Out] /* from(char *) */ byte[] out_arg,
          /* from(size_t) */ UIntPtr out_size);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
@@ -50,7 +50,7 @@ internal static class Player {
     [DllImport(SymbolLocation.NativeSymbolLocation)]
     internal static extern /* from(size_t) */ UIntPtr Player_Title(
         HandleRef self,
-        [In, Out] /* from(char *) */ char[] out_arg,
+        [In, Out] /* from(char *) */ byte[] out_arg,
          /* from(size_t) */ UIntPtr out_size);
 
     [DllImport(SymbolLocation.NativeSymbolLocation)]
@@ -74,7 +74,7 @@ internal static class Player {
     [DllImport(SymbolLocation.NativeSymbolLocation)]
     internal static extern /* from(size_t) */ UIntPtr Player_Id(
         HandleRef self,
-        [In, Out] /* from(char *) */ char[] out_arg,
+        [In, Out] /* from(char *) */ byte[] out_arg,
          /* from(size_t) */ UIntPtr out_size);
 }
 }

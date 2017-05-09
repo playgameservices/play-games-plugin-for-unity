@@ -55,7 +55,7 @@ namespace GooglePlayGames.Native.PInvoke
             return UnixEpoch.Add(TimeSpan.FromMilliseconds(millisSinceEpoch));
         }
 
-        internal delegate UIntPtr OutStringMethod([In, Out] char[] out_bytes, UIntPtr out_size);
+        internal delegate UIntPtr OutStringMethod([In, Out] byte[] out_bytes, UIntPtr out_size);
 
         internal static String OutParamsToString(OutStringMethod outStringMethod)
         {
@@ -68,9 +68,9 @@ namespace GooglePlayGames.Native.PInvoke
             string str = null;
             try
             {
-                char[] array = new char[requiredSize.ToUInt32()];
+                byte[] array = new byte[requiredSize.ToUInt32()];
                 outStringMethod(array, requiredSize);
-                str = new string(array, 0, (int)requiredSize.ToUInt32() - 1);
+                str = Encoding.UTF8.GetString(array, 0, (int)requiredSize.ToUInt32() - 1);
             }
             catch (Exception e)
             {

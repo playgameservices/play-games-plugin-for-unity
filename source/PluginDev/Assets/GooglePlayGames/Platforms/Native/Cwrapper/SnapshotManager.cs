@@ -133,7 +133,7 @@ namespace GooglePlayGames.Native.Cwrapper
         [DllImport(SymbolLocation.NativeSymbolLocation)]
         internal static extern /* from(size_t) */ UIntPtr SnapshotManager_OpenResponse_GetConflictId(
             HandleRef self,
-            [In, Out] /* from(char *) */char[] out_arg,
+            [In, Out] /* from(char *) */byte[] out_arg,
          /* from(size_t) */UIntPtr out_size);
 
         [DllImport(SymbolLocation.NativeSymbolLocation)]
