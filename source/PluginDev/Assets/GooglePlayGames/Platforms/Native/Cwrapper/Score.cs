@@ -45,7 +45,7 @@ namespace GooglePlayGames.Native.Cwrapper
         [DllImport(SymbolLocation.NativeSymbolLocation)]
         internal static extern /* from(size_t) */ UIntPtr Score_Metadata(
             HandleRef self,
-            [In, Out] /* from(char *) */char[] out_arg,
+            [In, Out] /* from(char *) */byte[] out_arg,
          /* from(size_t) */UIntPtr out_size);
     }
 }
