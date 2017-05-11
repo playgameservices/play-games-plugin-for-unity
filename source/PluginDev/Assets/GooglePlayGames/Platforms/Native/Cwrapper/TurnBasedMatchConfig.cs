@@ -32,7 +32,7 @@ namespace GooglePlayGames.Native.Cwrapper
         internal static extern /* from(size_t) */ UIntPtr TurnBasedMatchConfig_PlayerIdsToInvite_GetElement(
             HandleRef self,
          /* from(size_t) */UIntPtr index,
-            [In, Out] /* from(char *) */char[] out_arg,
+            [In, Out] /* from(char *) */byte[] out_arg,
          /* from(size_t) */UIntPtr out_size);
 
         [DllImport(SymbolLocation.NativeSymbolLocation)]

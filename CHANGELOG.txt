@@ -1,3 +1,6 @@
+Version 0.9.38a
+    Bug Fixes:
+        * #1729 - Strings marshaled incorrectly.
 Version 0.9.38
     Bug Fixes:
         * #1711 - iOSClient Error does not implement interface member

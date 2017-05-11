@@ -28,7 +28,7 @@ namespace GooglePlayGames.Native.Cwrapper
         [DllImport(SymbolLocation.NativeSymbolLocation)]
         internal static extern /* from(size_t) */ UIntPtr QuestMilestone_EventId(
             HandleRef self,
-            [In, Out] /* from(char *) */char[] out_arg,
+            [In, Out] /* from(char *) */byte[] out_arg,
          /* from(size_t) */UIntPtr out_size);
 
         [DllImport(SymbolLocation.NativeSymbolLocation)]
@@ -50,7 +50,7 @@ namespace GooglePlayGames.Native.Cwrapper
         [DllImport(SymbolLocation.NativeSymbolLocation)]
         internal static extern /* from(size_t) */ UIntPtr QuestMilestone_QuestId(
             HandleRef self,
-            [In, Out] /* from(char *) */char[] out_arg,
+            [In, Out] /* from(char *) */byte[] out_arg,
          /* from(size_t) */UIntPtr out_size);
 
         [DllImport(SymbolLocation.NativeSymbolLocation)]
@@ -71,7 +71,7 @@ namespace GooglePlayGames.Native.Cwrapper
         [DllImport(SymbolLocation.NativeSymbolLocation)]
         internal static extern /* from(size_t) */ UIntPtr QuestMilestone_Id(
             HandleRef self,
-            [In, Out] /* from(char *) */char[] out_arg,
+            [In, Out] /* from(char *) */byte[] out_arg,
          /* from(size_t) */UIntPtr out_size);
     }
 }
