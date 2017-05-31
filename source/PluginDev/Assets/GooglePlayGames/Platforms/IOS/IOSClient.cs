@@ -73,6 +73,18 @@ namespace GooglePlayGames.IOS
             throw new InvalidOperationException(
                 "The native API should be called for iOS");
         }
+
+        /// <summary>
+        /// Sets the gravity for popups (Android only).
+        /// </summary>
+        /// <remarks>This can only be called after authentication.  It affects
+        /// popups for achievements and other game services elements.</remarks>
+        /// <param name="gravity">Gravity for the popup.</param>
+        public void SetGravityForPopups(IntPtr api, Gravity gravity)
+        {
+            throw new InvalidOperationException(
+                "Not supported on iOS");
+        }
     }
 }
 #endif

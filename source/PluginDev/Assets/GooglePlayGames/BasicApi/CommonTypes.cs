@@ -151,7 +151,16 @@ namespace GooglePlayGames.BasicApi
         Dismissed = 4
       }
 
-    public class CommonTypesUtil {
+      public enum Gravity
+      {
+        TOP = 48,
+        BOTTOM = 80,
+        LEFT = 3,
+        RIGHT = 5,
+        CENTER_HORIZONTAL = 1
+       }
+
+	public class CommonTypesUtil {
         public static bool StatusIsSuccess(ResponseStatus status)
         {
             return ((int)status) > 0;

@@ -499,6 +499,16 @@ namespace GooglePlayGames.BasicApi
         }
 
         /// <summary>
+        /// Sets the gravity for popups (Android only).
+        /// </summary>
+        /// <remarks>This can only be called after authentication.  It affects
+        /// popups for achievements and other game services elements.</remarks>
+        /// <param name="gravity">Gravity for the popup.</param>
+        public void SetGravityForPopups(Gravity gravity) {
+            LogUsage();
+        }
+
+        /// <summary>
         /// Logs the usage.
         /// </summary>
         private static void LogUsage()

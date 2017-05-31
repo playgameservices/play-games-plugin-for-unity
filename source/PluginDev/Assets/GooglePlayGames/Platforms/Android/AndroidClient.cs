@@ -27,7 +27,6 @@ namespace GooglePlayGames.Android
     using C = GooglePlayGames.Native.Cwrapper.InternalHooks;
     using GooglePlayGames.Native.PInvoke;
 
-
     internal class AndroidClient : IClientImpl
     {
         internal const string BridgeActivityClass = "com.google.games.bridge.NativeBridgeActivity";
@@ -186,6 +185,11 @@ namespace GooglePlayGames.Android
                     Games.Stats.loadPlayerStats(client, true);
 
             pr.setResultCallback(resCallback);
+        }
+
+        public void SetGravityForPopups(IntPtr apiClient, Gravity gravity) {
+            GoogleApiClient client = new GoogleApiClient(apiClient);
+            Games.setGravityForPopups(client, (int)gravity | (int)Gravity.CENTER_HORIZONTAL);
         }
 
         class StatsResultCallback : ResultCallbackProxy<Stats_LoadPlayerStatsResultObject>
