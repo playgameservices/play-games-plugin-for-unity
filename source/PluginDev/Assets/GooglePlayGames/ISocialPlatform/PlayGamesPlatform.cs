@@ -311,6 +311,16 @@ namespace GooglePlayGames
         }
 
         /// <summary>
+        /// Sets the gravity for popups (Android only).
+        /// </summary>
+        /// <remarks>This can only be called after authentication.  It affects
+        /// popups for achievements and other game services elements.</remarks>
+        /// <param name="gravity">Gravity for the popup.</param>
+        public void SetGravityForPopups(Gravity gravity) {
+            mClient.SetGravityForPopups(gravity);
+        }
+
+        /// <summary>
         /// Specifies that the ID <c>fromId</c> should be implicitly replaced by <c>toId</c>
         /// on any calls that take a leaderboard or achievement ID.
         /// </summary>

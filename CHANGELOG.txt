@@ -1,6 +1,8 @@
 Version 0.9.38a
     Bug Fixes:
         * #1729 - Strings marshaled incorrectly.
+    New Features:
+        * #1743 - Ability to set the gravity of Achievement popups.
 Version 0.9.38
     Bug Fixes:
         * #1711 - iOSClient Error does not implement interface member

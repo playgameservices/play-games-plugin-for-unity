@@ -682,6 +682,13 @@ namespace GooglePlayGames.Native
             return mUser.AvatarURL;
         }
 
+        public void SetGravityForPopups(Gravity gravity)
+        {
+            PlayGamesHelperObject.RunOnGameThread(() => 
+             clientImpl.SetGravityForPopups(GetApiClient(), gravity));
+        }
+
+
         ///<summary></summary>
         /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.GetPlayerStats"/>
         public void GetPlayerStats(Action<CommonStatusCodes, PlayerStats> callback)

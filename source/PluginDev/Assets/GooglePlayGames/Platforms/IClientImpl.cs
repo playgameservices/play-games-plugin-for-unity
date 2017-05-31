@@ -32,6 +32,14 @@ namespace GooglePlayGames
         TokenClient CreateTokenClient (bool reset);
 
         void GetPlayerStats(IntPtr apiClientPtr, Action<CommonStatusCodes, GooglePlayGames.BasicApi.PlayerStats> callback);
+
+        /// <summary>
+        /// Sets the gravity for popups (Android only).
+        /// </summary>
+        /// <remarks>This can only be called after authentication.  It affects
+        /// popups for achievements and other game services elements.</remarks>
+        /// <param name="gravity">Gravity for the popup.</param>
+        void SetGravityForPopups(IntPtr apiClient, Gravity gravity);
     }
 }
 
