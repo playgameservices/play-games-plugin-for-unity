@@ -1,3 +1,9 @@
+Version 0.9.39
+    Bug Fixes:
+        * #1712 - Signing in/out multiple accounts does not work.
+        * #1756 - After signout, email, token are empty when reconnected.
+        * #1761 - Google.IOSResolver.Enabled is read-only.
+`
 Version 0.9.38a
     Bug Fixes:
         * #1729 - Strings marshaled incorrectly.

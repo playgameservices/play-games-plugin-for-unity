@@ -53,14 +53,8 @@ public class TokenFragment extends Fragment
     private static final Object lock = new Object();
     private static TokenRequest pendingTokenRequest;
     private static TokenFragment helperFragment;
-
-    private static String currentEmail;
-    private static String currentAuthCode;
-    private static String currentIdToken;
     private GoogleApiClient mGoogleApiClient;
-    private boolean requested_authcode;
-    private boolean requested_email;
-    private boolean requested_id_token;
+
 
     /**
      * External entry point for getting tokens and email address.  This
@@ -108,18 +102,6 @@ public class TokenFragment extends Fragment
                 requestEmail, requestIdToken, webClientId,
                 forceRefreshToken, additionalScopes, hidePopups, accountName);
 
-            // we have all the info we need, so just return.
-            if (
-            (!requestAuthCode || currentAuthCode != null) &&
-            (!requestEmail || currentEmail != null) &&
-                    (!requestIdToken || currentIdToken != null)
-                    ) {
-                request.setAuthCode(currentAuthCode);
-                request.setEmail(currentEmail);
-                request.setIdToken(currentIdToken);
-                request.setResult(CommonStatusCodes.SUCCESS);
-                return request.getPendingResponse();
-            } else {
                 boolean ok = false;
                 synchronized (lock) {
                     if (pendingTokenRequest == null) {
@@ -128,10 +110,12 @@ public class TokenFragment extends Fragment
                     }
                 }
                 if(!ok) {
-                    Log.e(TAG, "Already a pending token request!");
+                    Log.e(TAG, "Already a pending token request (requested == ): " + request);
+                    Log.e(TAG, "Already a pending token request: " + pendingTokenRequest);
                     request.setResult(CommonStatusCodes.DEVELOPER_ERROR);
+                    return request.getPendingResponse();
                 }
-            }
+
 
         TokenFragment fragment = (TokenFragment)
                 parentActivity.getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
@@ -158,18 +142,17 @@ public class TokenFragment extends Fragment
         return request.getPendingResponse();
     }
 
-    public static void signOut() {
-        currentAuthCode = null;
-        currentEmail = null;
-        currentIdToken = null;
+    public static void signOut(Activity activity) {
+
+        TokenFragment fragment = (TokenFragment)
+                activity.getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+        if (fragment != null) {
+            fragment.reset();
+        }
         synchronized (lock) {
             pendingTokenRequest = null;
         }
-        if (helperFragment != null) {
-            helperFragment.reset();
-        }
-
-    }
+   }
 
     /**
      * signs out and disconnects the client.
@@ -177,8 +160,18 @@ public class TokenFragment extends Fragment
     private void reset() {
         if (mGoogleApiClient != null) {
             if (mGoogleApiClient.hasConnectedApi(Games.API)) {
-                Games.signOut(mGoogleApiClient);
+                try {
+                    Games.signOut(mGoogleApiClient);
+                } catch (RuntimeException e) {
+                    Log.w(TAG, "Caught exception when calling Games.signOut: " +
+                    e.getMessage(), e);
+                }
+                try {
                 Auth.GoogleSignInApi.signOut(mGoogleApiClient);
+                } catch (RuntimeException e) {
+                    Log.w(TAG, "Caught exception when calling GoogleSignInAPI.signOut: " +
+                            e.getMessage(), e);
+                }
             }
             mGoogleApiClient.disconnect();
             mGoogleApiClient = null;
@@ -207,8 +200,33 @@ public class TokenFragment extends Fragment
             request = pendingTokenRequest;
         }
         if (request != null) {
-            // Sign-in, the result is processed in OnActivityResult()
-            doAuthenticate(request);
+            if (mGoogleApiClient.hasConnectedApi(Games.API))  {
+
+                Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient).setResultCallback(
+                        new ResultCallback<GoogleSignInResult>() {
+                            @Override
+                            public void onResult(
+                                    @NonNull GoogleSignInResult googleSignInResult) {
+                                if (googleSignInResult.isSuccess()) {
+                                    onSignedIn(googleSignInResult.getStatus().getStatusCode(),
+                                            googleSignInResult.getSignInAccount());
+                                } else if (googleSignInResult.getStatus().getStatusCode() == CommonStatusCodes.SIGN_IN_REQUIRED) {
+                                    Intent signInIntent = Auth.GoogleSignInApi
+                                            .getSignInIntent(mGoogleApiClient);
+                                    startActivityForResult(signInIntent, RC_ACCT);
+                                } else {
+                                    Log.e(TAG,"Error with " +
+                                            "silentSignIn: " +
+                                            googleSignInResult.getStatus());
+                                    onSignedIn(googleSignInResult.getStatus().getStatusCode(),
+                                            null);
+                                }
+                            }
+                        }
+                );
+            } else {
+                Log.d(TAG,"No connected Games API,!!!!  Hoping for connection!");
+            }
         }
 
         Log.d(TAG, "Done with processRequest!");
@@ -216,13 +234,8 @@ public class TokenFragment extends Fragment
 
     private void buildClient(TokenRequest request) {
 
-        // Validate that we need to rebuild the client.
-        if (mGoogleApiClient == null ||
-                requested_authcode != request.doAuthCode ||
-                requested_email != request.doEmail ||
-                requested_id_token != request.doIdToken) {
 
-
+        Log.d(TAG,"Building client for: " + request);
             GoogleSignInOptions.Builder builder = new GoogleSignInOptions
                     .Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
             if (request.doAuthCode) {
@@ -272,9 +285,6 @@ public class TokenFragment extends Fragment
                 builder.setAccountName(request.accountName);
             }
 
-            requested_authcode = request.doAuthCode;
-            requested_email = request.doEmail;
-            requested_id_token = request.doIdToken;
 
             GoogleSignInOptions options = builder.build();
 
@@ -293,32 +303,8 @@ public class TokenFragment extends Fragment
             }
             mGoogleApiClient = clientBuilder.build();
             mGoogleApiClient.connect(GoogleApiClient.SIGN_IN_MODE_OPTIONAL);
-        }
+
     }
-
-    void doAuthenticate(TokenRequest request) {
-        if (request == null) {
-            return;
-        }
-
-        if (mGoogleApiClient == null) {
-            throw new IllegalStateException("client is null!");
-        }
-
-        // check if we have all the info we need
-        if ((!requested_authcode || currentAuthCode != null) &&
-                (!requested_email || currentEmail != null) &&
-                (!requested_id_token || currentIdToken != null)) {
-            request.setAuthCode(currentAuthCode);
-            request.setEmail(currentEmail);
-            request.setIdToken(currentIdToken);
-            request.setResult(CommonStatusCodes.SUCCESS);
-            synchronized (lock) {
-                pendingTokenRequest = null;
-            }
-        }
-    }
-
 
     /**
      * Receive the result from a previous call to
@@ -338,9 +324,11 @@ public class TokenFragment extends Fragment
         if (requestCode == RC_ACCT) {
             GoogleSignInResult result =
                     Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            GoogleSignInAccount acct = result.getSignInAccount();
-            onSignedIn(result.getStatus().getStatusCode(), acct);
-            return;
+            if (result != null) {
+                GoogleSignInAccount acct =  result.getSignInAccount();
+                onSignedIn(result.getStatus().getStatusCode(), acct);
+                return;
+            }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -356,9 +344,6 @@ public class TokenFragment extends Fragment
                 request.setAuthCode(acct.getServerAuthCode());
                 request.setEmail(acct.getEmail());
                 request.setIdToken(acct.getIdToken());
-                currentAuthCode = acct.getServerAuthCode();
-                currentEmail = acct.getEmail();
-                currentIdToken = acct.getIdToken();
             }
             request.setResult(resultCode);
         }
@@ -405,6 +390,9 @@ public class TokenFragment extends Fragment
 
     @Override
     public void onConnected(@Nullable final Bundle bundle) {
+        if (mGoogleApiClient == null) {
+            return;
+        }
         if (mGoogleApiClient.hasConnectedApi(Games.API)) {
             Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient).setResultCallback(
                     new ResultCallback<GoogleSignInResult>() {
@@ -518,7 +506,7 @@ public class TokenFragment extends Fragment
         public String toString() {
             return Integer.toHexString(hashCode()) + " (a:" +
                     doAuthCode + " e:" + doEmail + " i:" + doIdToken +
-                    ")";
+                    " wc: " + webClientId + " f: " + forceRefresh +")";
         }
 
         public String getWebClientId() {

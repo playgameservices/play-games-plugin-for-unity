@@ -126,10 +126,21 @@ namespace GooglePlayGames.Native
             // reset friends loading flag
             friendsLoading = false;
 
-            if (mTokenClient.NeedsToRun())
+            if (silent && mTokenClient.NeedsToRun())
             {
-              Debug.Log("Using AuthHelper to sign in");
-              mTokenClient.FetchTokens(() => GameServices().StartAuthorizationUI());
+                Debug.Log("Using AuthHelper to sign in silently");
+                mTokenClient.FetchTokens((int result) =>
+                {
+                    if (result == 0)
+                    {
+                        GameServices().StartAuthorizationUI();
+                    }
+                    else
+                    {
+                        HandleAuthTransition(Types.AuthOperation.SIGN_IN, (Status.AuthStatus)result);
+                    }
+                });
+
             }
 
             if (!silent)
@@ -137,7 +148,19 @@ namespace GooglePlayGames.Native
                 // If we need tokens or email, then get those first
                 if (mTokenClient.NeedsToRun())
                 {
-                    mTokenClient.FetchTokens(() => GameServices().StartAuthorizationUI());
+                    Debug.Log("Using AuthHelper to sign in not silent");
+                    mTokenClient.FetchTokens((int result) =>
+                    {
+                        if (result == 0)
+                        {
+                            GameServices().StartAuthorizationUI();
+                        }
+                        else
+                        {
+                            HandleAuthTransition(Types.AuthOperation.SIGN_IN,
+                                    (Status.AuthStatus)result);
+                        }
+                    });
                 }
                 else
                 {

@@ -53,7 +53,7 @@ namespace GooglePlayGames
 
         bool NeedsToRun();
 
-        void FetchTokens(Action callback);
+        void FetchTokens(Action<int> callback);
     }
 }
 #endif
