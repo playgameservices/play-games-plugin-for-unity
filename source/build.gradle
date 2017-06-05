@@ -44,7 +44,7 @@ project.ext {
     samplesBuildSrc = file('build/sampleSrc').absolutePath
     exportPath = file('build/plugin.unitypackage').absolutePath
     currentPluginPath = file('../current-build').absolutePath
-    currentPluginName = 'GooglePlayGamesPlugin-0.9.38a.unitypackage'
+    currentPluginName = 'GooglePlayGamesPlugin-0.9.39.unitypackage'
     resolverDir = new File('build/jarresolver').absolutePath
 
     sampleList = ['CubicPilot', 'Minimal',
