@@ -81,7 +81,7 @@ namespace GooglePlayGames.Native.Cwrapper
             HandleRef self);
 
         [DllImport(SymbolLocation.NativeSymbolLocation)]
-        internal static extern /* from(VideoCapabilities_t) */ IntPtr VideoManager_GetCaptureCapabilitiesResponse_GetVideocapabilities(
+        internal static extern /* from(VideoCapabilities_t) */ IntPtr VideoManager_GetCaptureCapabilitiesResponse_GetVideoCapabilities(
             HandleRef self);
 
         [DllImport(SymbolLocation.NativeSymbolLocation)]
@@ -93,7 +93,7 @@ namespace GooglePlayGames.Native.Cwrapper
             HandleRef self);
 
         [DllImport(SymbolLocation.NativeSymbolLocation)]
-        internal static extern /* from(VideoCaptureState_t) */ IntPtr VideoManager_GetCaptureStateResponse_GetVideocapturestate(
+        internal static extern /* from(VideoCaptureState_t) */ IntPtr VideoManager_GetCaptureStateResponse_GetVideoCaptureState(
             HandleRef self);
 
         [DllImport(SymbolLocation.NativeSymbolLocation)]
@@ -106,7 +106,7 @@ namespace GooglePlayGames.Native.Cwrapper
 
         [DllImport(SymbolLocation.NativeSymbolLocation)]
         [return: MarshalAs(UnmanagedType.I1)]
-        internal static extern /* from(bool) */ bool VideoManager_IsCaptureAvailableResponse_GetIscaptureavailable(
+        internal static extern /* from(bool) */ bool VideoManager_IsCaptureAvailableResponse_GetIsCaptureAvailable(
             HandleRef self);
     }
 }

@@ -145,7 +145,7 @@ namespace GooglePlayGames.Native.PInvoke
         internal NativeVideoCapabilities GetData()
         {
             return NativeVideoCapabilities.FromPointer(
-                C.VideoManager_GetCaptureCapabilitiesResponse_GetVideocapabilities(SelfPtr()));
+                C.VideoManager_GetCaptureCapabilitiesResponse_GetVideoCapabilities(SelfPtr()));
         }
 
         internal static GetCaptureCapabilitiesResponse FromPointer(IntPtr pointer)
@@ -172,7 +172,7 @@ namespace GooglePlayGames.Native.PInvoke
         internal NativeVideoCaptureState GetData()
         {
             return NativeVideoCaptureState.FromPointer(
-                C.VideoManager_GetCaptureStateResponse_GetVideocapturestate(SelfPtr()));
+                C.VideoManager_GetCaptureStateResponse_GetVideoCaptureState(SelfPtr()));
         }
 
     internal Status.ResponseStatus GetStatus()
@@ -218,7 +218,7 @@ namespace GooglePlayGames.Native.PInvoke
 
         internal bool IsCaptureAvailable()
         {
-            return C.VideoManager_IsCaptureAvailableResponse_GetIscaptureavailable(SelfPtr());
+            return C.VideoManager_IsCaptureAvailableResponse_GetIsCaptureAvailable(SelfPtr());
         }
 
         internal static IsCaptureAvailableResponse FromPointer(IntPtr pointer)

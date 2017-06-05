@@ -3,12 +3,12 @@ Version 0.9.39
         * #1712 - Signing in/out multiple accounts does not work.
         * #1756 - After signout, email, token are empty when reconnected.
         * #1761 - Google.IOSResolver.Enabled is read-only.
-`
+        * #1766 - Error executing VideoManager@IsCaptureAvailableCallback
+    New Features:
+        * #1743 - Ability to set the gravity of Achievement popups.
 Version 0.9.38a
     Bug Fixes:
         * #1729 - Strings marshaled incorrectly.
-    New Features:
-        * #1743 - Ability to set the gravity of Achievement popups.
 Version 0.9.38
     Bug Fixes:
         * #1711 - iOSClient Error does not implement interface member
