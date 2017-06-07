@@ -324,11 +324,16 @@ public class TokenFragment extends Fragment
         if (requestCode == RC_ACCT) {
             GoogleSignInResult result =
                     Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            if (result != null) {
+            if (result != null && result.isSuccess()) {
                 GoogleSignInAccount acct =  result.getSignInAccount();
                 onSignedIn(result.getStatus().getStatusCode(), acct);
-                return;
+            } else if (result != null) {
+                onSignedIn(result.getStatus().getStatusCode(), null);
+            } else {
+                Log.e(TAG, "Google SignIn Result is null?");
+                onSignedIn(CommonStatusCodes.ERROR, null);
             }
+            return;
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -430,7 +435,6 @@ public class TokenFragment extends Fragment
     public void onConnectionSuspended(int cause) {
         Log.d(TAG, "onConnectionSuspended() called: " + cause);
     }
-
 
     /**
      * Helper class containing the request for information.
