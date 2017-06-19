@@ -80,7 +80,7 @@ your application instances.
 
 Once you configure at least one resource (event, achievement, or leaderboard),
 copy the resource configuration from the Google Play Developer Console, and paste it
-into the setup configuration in Unity.  To get the resources go to the the Achievements
+into the setup configuration in Unity.  To get the resources go to the Achievements
 tab, then click on "Get resources" on the bottom of the list.
 
 ![click Get Resources](source/docgen/resourcesLink.png "Show the resources data")
@@ -845,7 +845,7 @@ See __GooglePlayGames/BasicApi/SavedGame/ISavedGameClient.cs__ for more details 
 
 ### Writing a saved game ###
 
-Once the saved game file is opened, it can be written to save the the game state.  This is done by calling **CommitUpdate**.
+Once the saved game file is opened, it can be written to save the game state.  This is done by calling **CommitUpdate**.
 There are four parameters to CommitUpdate:
 
 1. the saved game metadata passed to the callback passed to one of the Open calls.
