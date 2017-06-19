@@ -213,7 +213,7 @@ resource pages (e.g. Achievements or Leaderboards), then clicking Android.
 After pasting the data into the text area, click the **Setup** button.
 
 **Note:**  If you are using a web application or backend server with your game,
-you can link the web application to the game to enable gettting the player's
+you can link the web application to the game to enable getting the player's
 id token and/or email address.  To do this, link a web application to the
 game in the Google Play Developer Console, and enter the client id for
 the web application into the setup dialog.
