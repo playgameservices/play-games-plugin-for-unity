@@ -326,6 +326,7 @@ namespace GooglePlayGames.BasicApi
     /// Gets the quests client.
     /// </summary>
     /// <returns>The quests client.</returns>
+    [Obsolete("Quests are being removed in 2018.")]
     Quests.IQuestsClient GetQuestsClient();
 
     /// <summary>

@@ -28,11 +28,13 @@ namespace GooglePlayGames.Native
 using Types = GooglePlayGames.Native.Cwrapper.Types;
     using Status = GooglePlayGames.Native.Cwrapper.CommonErrorStatus;
 
+    [Obsolete("Quests are being removed in 2018.")]
     internal class NativeQuestClient : IQuestsClient
     {
 
         private readonly QuestManager mManager;
 
+        [Obsolete("Quests are being removed in 2018.")]
         internal NativeQuestClient(QuestManager manager)
         {
             this.mManager = Misc.CheckNotNull(manager);

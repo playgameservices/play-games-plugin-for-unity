@@ -108,6 +108,7 @@ namespace GooglePlayGames.BasicApi.Quests
         /// The current milestone for the quest. This represents the next goal that players should hit
         /// on their way to completing the quest.
         /// </summary>
+        [Obsolete("Quests are being removed in 2018.")]
         IQuestMilestone Milestone
         {
             get;

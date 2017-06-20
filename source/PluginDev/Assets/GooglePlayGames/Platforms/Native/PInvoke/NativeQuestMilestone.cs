@@ -24,6 +24,7 @@ namespace GooglePlayGames.Native.PInvoke
     using Types = GooglePlayGames.Native.Cwrapper.Types;
     using C = GooglePlayGames.Native.Cwrapper.QuestMilestone;
 
+    [Obsolete("Quests are being removed in 2018.")]
     internal class NativeQuestMilestone : BaseReferenceHolder, IQuestMilestone
     {
         internal NativeQuestMilestone(IntPtr selfPointer)
