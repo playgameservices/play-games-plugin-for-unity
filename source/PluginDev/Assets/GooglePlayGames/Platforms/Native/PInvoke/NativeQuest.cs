@@ -27,6 +27,7 @@ namespace GooglePlayGames.Native.PInvoke
     internal class NativeQuest : BaseReferenceHolder, IQuest
     {
 
+        [Obsolete("Quests are being removed in 2018.")]
         private volatile NativeQuestMilestone mCachedMilestone;
 
         internal NativeQuest(IntPtr selfPointer)
@@ -110,6 +111,7 @@ namespace GooglePlayGames.Native.PInvoke
             }
         }
 
+        [Obsolete("Quests are being removed in 2018.")]
         public IQuestMilestone Milestone
         {
             get
