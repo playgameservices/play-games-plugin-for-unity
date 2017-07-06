@@ -13,6 +13,7 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
+
 #if UNITY_ANDROID
 
 namespace GooglePlayGames.Editor
@@ -39,9 +40,6 @@ namespace GooglePlayGames.Editor
         /// </summary>
         private string mClassName = "GPGSIds";
 
-        /// <summary>True if G+ is needed for this application.</summary>
-        private bool mRequiresGooglePlus = false;
-
         /// <summary>
         /// The scroll position
         /// </summary>
@@ -56,6 +54,11 @@ namespace GooglePlayGames.Editor
         /// The web client identifier.
         /// </summary>
         private string mWebClientId = string.Empty;
+
+        /// <summary>
+        /// The web client identifier.
+        /// </summary>
+        private bool mRequestServerAuthCode = false;
 
         /// <summary>
         /// Menus the item for GPGS android setup.
@@ -73,99 +76,17 @@ namespace GooglePlayGames.Editor
         /// from the play console.
         /// </summary>
         /// <returns><c>true</c>, if setup was performed, <c>false</c> otherwise.</returns>
-        /// <param name="clientId">The web client id.</param>
+        /// <param name="appId">The app id.</param>
+        /// <param name="webClientId">The web client id.</param>
         /// <param name="classDirectory">the directory to write the constants file to.</param>
         /// <param name="className">Fully qualified class name for the resource Ids.</param>
         /// <param name="resourceXmlData">Resource xml data.</param>
-        /// <param name="nearbySvcId">Nearby svc identifier.</param>
-        /// <param name="requiresGooglePlus">Indicates this app requires G+</param>
-        public static bool PerformSetup(
-            string clientId,
+        public static bool PerformSetup(string appId,
+            string webClientId,
             string classDirectory,
             string className,
-            string resourceXmlData,
-            string nearbySvcId,
-            bool requiresGooglePlus)
+            string resourceXmlData)
         {
-            if (string.IsNullOrEmpty(resourceXmlData) &&
-                !string.IsNullOrEmpty(nearbySvcId))
-            {
-                return PerformSetup(
-                    clientId,
-                    GPGSProjectSettings.Instance.Get(GPGSUtil.APPIDKEY),
-                    nearbySvcId,
-                    requiresGooglePlus);
-            }
-
-            if (ParseResources(classDirectory, className, resourceXmlData))
-            {
-                GPGSProjectSettings.Instance.Set(GPGSUtil.CLASSDIRECTORYKEY, classDirectory);
-                GPGSProjectSettings.Instance.Set(GPGSUtil.CLASSNAMEKEY, className);
-                GPGSProjectSettings.Instance.Set(GPGSUtil.ANDROIDRESOURCEKEY, resourceXmlData);
-
-                // check the bundle id and set it if needed.
-                CheckBundleId();
-
-                return PerformSetup(
-                    clientId,
-                    GPGSProjectSettings.Instance.Get(GPGSUtil.APPIDKEY),
-                    nearbySvcId,
-                    requiresGooglePlus);
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Provide static access to setup for facilitating automated builds.
-        /// </summary>
-        /// <param name="webClientId">The oauth2 client id for the game.  This is only
-        /// needed if the ID Token or access token are needed.</param>
-        /// <param name="appId">App identifier.</param>
-        /// <param name="nearbySvcId">Optional nearby connection serviceId</param>
-        /// <param name="requiresGooglePlus">Indicates that GooglePlus should be enabled</param>
-        /// <returns>true if successful</returns>
-        public static bool PerformSetup(string webClientId, string appId,
-            string nearbySvcId,
-            bool requiresGooglePlus)
-        {
-            if (!string.IsNullOrEmpty(webClientId))
-            {
-                if (!GPGSUtil.LooksLikeValidClientId(webClientId))
-                {
-                    GPGSUtil.Alert(GPGSStrings.Setup.ClientIdError);
-                    return false;
-                }
-
-                string serverAppId = webClientId.Split('-')[0];
-                if (!serverAppId.Equals(appId))
-                {
-                    GPGSUtil.Alert(GPGSStrings.Setup.AppIdMismatch);
-                    return false;
-                }
-            }
-
-            // check for valid app id
-            if (!GPGSUtil.LooksLikeValidAppId(appId) && string.IsNullOrEmpty(nearbySvcId))
-            {
-                GPGSUtil.Alert(GPGSStrings.Setup.AppIdError);
-                return false;
-            }
-
-            if (nearbySvcId != null)
-            {
-                if (!NearbyConnectionUI.PerformSetup(nearbySvcId, true))
-                {
-                    return false;
-                }
-            }
-
-            GPGSProjectSettings.Instance.Set(GPGSUtil.APPIDKEY, appId);
-            GPGSProjectSettings.Instance.Set(GPGSUtil.WEBCLIENTIDKEY, webClientId);
-            GPGSProjectSettings.Instance.Set(GPGSUtil.REQUIREGOOGLEPLUSKEY, requiresGooglePlus);
-            GPGSProjectSettings.Instance.Save();
-            GPGSUtil.UpdateGameInfo();
-
             // check that Android SDK is there
             if (!GPGSUtil.HasAndroidSdk())
             {
@@ -177,8 +98,26 @@ namespace GooglePlayGames.Editor
                 return false;
             }
 
+            ParseResources(classDirectory, className, resourceXmlData);
+            
+            // Sanity Check ids
+            // check for valid app id
+            if (!GPGSUtil.LooksLikeValidAppId(appId))
+            {
+                GPGSUtil.Alert(GPGSStrings.Setup.AppIdError);
+                return false;
+            }
+
+            // Check web client id and compare to app id
+            if (!CheckWebClientId(webClientId, appId))
+                return false;
+            
+            
+            // Update GameInfo.cs
+            GPGSUtil.UpdateGameInfo();
+
             // Generate AndroidManifest.xml
-            GPGSUtil.GenerateAndroidManifest(requiresGooglePlus);
+            GPGSUtil.GenerateAndroidManifest();
 
             // refresh assets, and we're done
             AssetDatabase.Refresh();
@@ -186,19 +125,58 @@ namespace GooglePlayGames.Editor
             GPGSProjectSettings.Instance.Save();
 
             return true;
+
         }
 
+        private static void ResolveClientJars()
+        {
+            Google.VersionHandler.VerboseLoggingEnabled = true;
+            Google.VersionHandler.UpdateVersionedAssets(forceUpdate: true);
+            Google.VersionHandler.Enabled = true;
+            
+            AssetDatabase.Refresh();
+
+            GPGSDependencies.RegisterDependencies();
+
+            Google.VersionHandler.InvokeStaticMethod(
+                Google.VersionHandler.FindClass(
+                    "Google.JarResolver",
+                    "GooglePlayServices.PlayServicesResolver"),
+                "MenuResolve", null);
+        }
+
+        private static bool CheckWebClientId(string webClientId, string appId)
+        {
+            if (string.IsNullOrEmpty(webClientId))
+                return true;
+
+            if (!GPGSUtil.LooksLikeValidClientId(webClientId))
+            {
+                GPGSUtil.Alert(GPGSStrings.Setup.ClientIdError);
+                return false;
+            }
+
+            string serverAppId = webClientId.Split('-')[0];
+            if (!serverAppId.Equals(appId))
+            {
+                GPGSUtil.Alert(GPGSStrings.Setup.AppIdMismatch);
+                return false;
+            }
+
+            return true;
+        }
+        
         /// <summary>
         /// Called when this object is enabled by Unity editor.
         /// </summary>
         public void OnEnable()
         {
             GPGSProjectSettings settings = GPGSProjectSettings.Instance;
-            mConstantDirectory = settings.Get("ConstDir", mConstantDirectory);
-            mClassName = settings.Get(GPGSUtil.CLASSNAMEKEY);
+            mConstantDirectory = settings.Get(GPGSUtil.CLASSDIRECTORYKEY, mConstantDirectory);
+            mClassName = settings.Get(GPGSUtil.CLASSNAMEKEY, mClassName);
             mConfigData = settings.Get(GPGSUtil.ANDROIDRESOURCEKEY);
             mWebClientId = settings.Get(GPGSUtil.WEBCLIENTIDKEY);
-            mRequiresGooglePlus = settings.GetBool(GPGSUtil.REQUIREGOOGLEPLUSKEY, false);
+            mRequestServerAuthCode = settings.GetBool(GPGSUtil.REQUESTSERVERAUTHCODEKEY);
         }
 
         /// <summary>
@@ -210,7 +188,7 @@ namespace GooglePlayGames.Editor
             GUILayout.BeginVertical();
 
             GUIStyle link = new GUIStyle(GUI.skin.label);
-            link.normal.textColor = new Color(.7f, .7f, 1f);
+            link.normal.textColor = new Color(0f, 0f, 1f);
 
             GUILayout.Space(10);
             GUILayout.Label(GPGSStrings.AndroidSetup.Blurb);
@@ -254,13 +232,6 @@ namespace GooglePlayGames.Editor
             GUILayout.EndScrollView();
             GUILayout.Space(10);
 
-            // Requires G+ field
-            GUILayout.BeginHorizontal();
-            GUILayout.Label(GPGSStrings.Setup.RequiresGPlusTitle, EditorStyles.boldLabel);
-            mRequiresGooglePlus = EditorGUILayout.Toggle(mRequiresGooglePlus);
-            GUILayout.EndHorizontal();
-            GUILayout.Label(GPGSStrings.Setup.RequiresGPlusBlurb);
-
             // Client ID field
             GUILayout.Label(GPGSStrings.Setup.WebClientIdTitle, EditorStyles.boldLabel);
             GUILayout.Label(GPGSStrings.AndroidSetup.WebClientIdBlurb);
@@ -268,6 +239,12 @@ namespace GooglePlayGames.Editor
             mWebClientId = EditorGUILayout.TextField(
                 GPGSStrings.Setup.ClientId,
                 mWebClientId,
+                GUILayout.Width(450));
+
+            GUILayout.Space(10);
+
+            mRequestServerAuthCode = EditorGUILayout.Toggle(
+                GPGSStrings.Setup.RequestServerAuthCode, mRequestServerAuthCode,
                 GUILayout.Width(450));
 
             GUILayout.Space(10);
@@ -280,9 +257,12 @@ namespace GooglePlayGames.Editor
                 // check that the classname entered is valid
                 try
                 {
+                    SaveDialogValues();
+
                     if (GPGSUtil.LooksLikeValidPackageName(mClassName))
                     {
                         DoSetup();
+                        return;
                     }
                 }
                 catch (Exception e)
@@ -295,7 +275,7 @@ namespace GooglePlayGames.Editor
 
             if (GUILayout.Button("Cancel", GUILayout.Width(100)))
             {
-                this.Close();
+                Close();
             }
 
             GUILayout.FlexibleSpace();
@@ -309,17 +289,17 @@ namespace GooglePlayGames.Editor
         /// </summary>
         public void DoSetup()
         {
-            if (PerformSetup(mWebClientId, mConstantDirectory, mClassName, mConfigData, null, mRequiresGooglePlus))
-            {
-                CheckBundleId();
+            ResolveClientJars();
 
+            if (PerformSetup(GPGSProjectSettings.Instance.Get(GPGSUtil.APPIDKEY), mWebClientId, mConstantDirectory, mClassName, mConfigData))
+            {
                 EditorUtility.DisplayDialog(
                     GPGSStrings.Success,
                     GPGSStrings.AndroidSetup.SetupComplete,
                     GPGSStrings.Ok);
 
                 GPGSProjectSettings.Instance.Set(GPGSUtil.ANDROIDSETUPDONEKEY, true);
-                this.Close();
+                Close();
             }
             else
             {
@@ -328,6 +308,16 @@ namespace GooglePlayGames.Editor
                     "Invalid or missing XML resource data.  Make sure the data is" +
                     " valid and contains the app_id element");
             }
+        }
+
+        private void SaveDialogValues()
+        {
+            GPGSProjectSettings.Instance.Set(GPGSUtil.WEBCLIENTIDKEY, mWebClientId);
+            GPGSProjectSettings.Instance.Set(GPGSUtil.REQUESTSERVERAUTHCODEKEY, mRequestServerAuthCode);
+            GPGSProjectSettings.Instance.Set(GPGSUtil.CLASSDIRECTORYKEY, mConstantDirectory);
+            GPGSProjectSettings.Instance.Set(GPGSUtil.CLASSNAMEKEY, mClassName);
+            GPGSProjectSettings.Instance.Set(GPGSUtil.ANDROIDRESOURCEKEY, mConfigData);
+            GPGSProjectSettings.Instance.Save();
         }
 
         /// <summary>
@@ -343,13 +333,24 @@ namespace GooglePlayGames.Editor
         {
             string packageName = GPGSProjectSettings.Instance.Get(
                 GPGSUtil.ANDROIDBUNDLEIDKEY, string.Empty);
-            string currentId = PlayerSettings.bundleIdentifier;
+            string currentId;
+#if UNITY_5_6_OR_NEWER
+            currentId = PlayerSettings.GetApplicationIdentifier(
+                BuildTargetGroup.Android);
+#else
+            currentId = PlayerSettings.bundleIdentifier;
+#endif
             if (!string.IsNullOrEmpty(packageName))
             {
                 if (string.IsNullOrEmpty(currentId) ||
-                    currentId == "com.Company.ProductName")
+                    currentId == "com.Company.ProductName") 
                 {
+#if UNITY_5_6_OR_NEWER
+                    PlayerSettings.SetApplicationIdentifier(
+                        BuildTargetGroup.Android, packageName);
+#else
                     PlayerSettings.bundleIdentifier = packageName;
+#endif
                 }
                 else if (currentId != packageName)
                 {
@@ -362,7 +363,12 @@ namespace GooglePlayGames.Editor
                         "OK",
                         "Cancel"))
                     {
+#if UNITY_5_6_OR_NEWER
+                        PlayerSettings.SetApplicationIdentifier(
+                            BuildTargetGroup.Android, packageName);
+#else
                         PlayerSettings.bundleIdentifier = packageName;
+#endif
                     }
                 }
             }
@@ -410,6 +416,7 @@ namespace GooglePlayGames.Editor
                         else if (lastProp == "package_name")
                         {
                             GPGSProjectSettings.Instance.Set(GPGSUtil.ANDROIDBUNDLEIDKEY, reader.Value);
+                            CheckBundleId();
                         }
                         else
                         {
