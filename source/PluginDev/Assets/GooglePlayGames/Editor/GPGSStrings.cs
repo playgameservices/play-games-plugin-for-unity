@@ -57,6 +57,9 @@ namespace GooglePlayGames.Editor
             public const string ClientId = "Client ID";
             public const string ClientIdError = "The Client ID does not appear to be valid. " +
                                                 "It should end in .apps.googleusercontent.com.";
+                                                
+            public const string RequestServerAuthCode = "Request Auth Code";
+            
             public const string AppIdMismatch = "Web app client ID not associated with this game!";
 
             public const string NearbyServiceId = "Nearby Connection Service ID";
