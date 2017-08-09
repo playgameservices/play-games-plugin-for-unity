@@ -65,14 +65,14 @@ namespace GooglePlayGames.Editor
             window.minSize = new Vector2(500, 400);
         }
 
-		[MenuItem("Window/Google Play Games/Setup/Android setup...", true)]
-		public static bool EnableAndroidMenuItem() {
+        [MenuItem("Window/Google Play Games/Setup/Android setup...", true)]
+        public static bool EnableAndroidMenuItem() {
 #if UNITY_ANDROID
-			return true;
+            return true;
 #else
-			return false;
+            return false;
 #endif
-		}
+        }
 
         /// <summary>
         /// Performs setup using the Android resources downloaded XML file
@@ -167,7 +167,7 @@ namespace GooglePlayGames.Editor
                 return false;
             }
 
-			if (nearbySvcId != null) {
+            if (nearbySvcId != null) {
 #if UNITY_ANDROID
                 if (!NearbyConnectionUI.PerformSetup(nearbySvcId, true))
                 {
@@ -361,7 +361,7 @@ namespace GooglePlayGames.Editor
             if (!string.IsNullOrEmpty(packageName))
             {
                 if (string.IsNullOrEmpty(currentId) ||
-                    currentId == "com.Company.ProductName") 
+                    currentId == "com.Company.ProductName")
                 {
 #if UNITY_5_6_OR_NEWER
                     PlayerSettings.SetApplicationIdentifier(

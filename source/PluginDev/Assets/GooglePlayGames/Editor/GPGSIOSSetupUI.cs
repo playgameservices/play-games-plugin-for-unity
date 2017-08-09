@@ -40,15 +40,15 @@ namespace GooglePlayGames.Editor
             window.minSize = new Vector2(500, 600);
         }
 
-		[MenuItem("Window/Google Play Games/Setup/iOS setup...", true)]
-		public static bool EnableIOSMenu() {
+        [MenuItem("Window/Google Play Games/Setup/iOS setup...", true)]
+        public static bool EnableIOSMenu() {
 #if UNITY_IPHONE
-			return true;
+            return true;
 #else
-			return false;
+            return false;
 #endif
-		}
-		public void OnEnable() {
+        }
+        public void OnEnable() {
             mBundleId = GPGSProjectSettings.Instance.Get(GPGSUtil.IOSBUNDLEIDKEY);
 
             mWebClientId = GPGSProjectSettings.Instance.Get(GPGSUtil.WEBCLIENTIDKEY);
@@ -359,7 +359,7 @@ namespace GooglePlayGames.Editor
             }
 
             // nearby is optional - only set it up if present.
-			if (nearbySvcId != null) {
+            if (nearbySvcId != null) {
 #if (UNITY_IPHONE && !NO_GPGS)
                 bool ok = NearbyConnectionUI.PerformSetup(nearbySvcId, false);
                 if (!ok)
