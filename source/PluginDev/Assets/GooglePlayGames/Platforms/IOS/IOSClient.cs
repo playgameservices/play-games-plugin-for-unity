@@ -73,6 +73,10 @@ namespace GooglePlayGames.IOS
             throw new InvalidOperationException(
                 "The native API should be called for iOS");
         }
+
+        public void SetGravityForPopups(IntPtr apiClient, Gravity gravity) {
+            throw new NotImplementedException();
+        }
     }
 }
 #endif

@@ -172,6 +172,10 @@ namespace GooglePlayGames.IOS {
         {
             throw new NotImplementedException();
         }
+
+        public void FetchTokens(Action<int> callback) {
+            throw new NotImplementedException();
+        }
     }
 }
 #endif
