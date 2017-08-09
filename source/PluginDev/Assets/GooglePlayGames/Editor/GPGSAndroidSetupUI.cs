@@ -14,7 +14,6 @@
 //    limitations under the License.
 // </copyright>
 
-#if UNITY_ANDROID
 
 namespace GooglePlayGames.Editor
 {
@@ -65,6 +64,15 @@ namespace GooglePlayGames.Editor
                                       typeof(GPGSAndroidSetupUI), true, GPGSStrings.AndroidSetup.Title);
             window.minSize = new Vector2(500, 400);
         }
+
+		[MenuItem("Window/Google Play Games/Setup/Android setup...", true)]
+		public static bool EnableAndroidMenuItem() {
+#if UNITY_ANDROID
+			return true;
+#else
+			return false;
+#endif
+		}
 
         /// <summary>
         /// Performs setup using the Android resources downloaded XML file
@@ -159,12 +167,13 @@ namespace GooglePlayGames.Editor
                 return false;
             }
 
-            if (nearbySvcId != null)
-            {
+			if (nearbySvcId != null) {
+#if UNITY_ANDROID
                 if (!NearbyConnectionUI.PerformSetup(nearbySvcId, true))
                 {
                     return false;
                 }
+#endif
             }
 
             GPGSProjectSettings.Instance.Set(GPGSUtil.APPIDKEY, appId);
@@ -446,4 +455,3 @@ namespace GooglePlayGames.Editor
         }
     }
 }
-#endif
