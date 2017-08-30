@@ -54,6 +54,8 @@ namespace GooglePlayGames.Editor
 
                 prevVer = Upgrade935(prevVer);
 
+                prevVer = Upgrade941(prevVer);
+
                 // there is no migration needed to 930+
                 if (!prevVer.Equals(PluginVersion.VersionKey))
                 {
@@ -140,6 +142,27 @@ namespace GooglePlayGames.Editor
                 CleanDuplicates(s);
             }
         }
+
+    /// <summary> Upgrade to 0.9.41 </summary>
+    /// <remarks>This cleans up the Plugins/Android directory since
+    ///   the libraries where refactored into the .aar file.  This
+    ///   also renames MainLibProj to GooglePlayGamesManifest.
+    /// </remarks>
+    private static string Upgrade941 (string prevVer)
+    {
+      string[] obsoleteDirectories = {
+        "Assets/Plugins/Android/MainLibProj",
+      };
+
+      foreach (string directory in obsoleteDirectories) {
+        if (Directory.Exists (directory)) {
+          Debug.Log ("Deleting obsolete directory: " + directory);
+          Directory.Delete (directory, true);
+        }
+      }
+
+      return PluginVersion.VersionKey;
+    }
 
         /// <summary>
         /// Upgrade to 0.9.35

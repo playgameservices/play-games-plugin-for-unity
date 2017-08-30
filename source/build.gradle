@@ -216,6 +216,8 @@ sampleList.each { sampleName ->
             exec {
                 executable "${unity_exe}"
                 args "-batchmode",
+                    // This prevents the VersionHandler to preserve the plugin layout
+                    "-gvh_disable",
                      "-buildTarget", "android",
                      "-projectPath", "${buildPath}/Samples/${sampleName}",
                      "-logFile", "${buildPath}/ExportSample${sampleName}.log",
@@ -301,6 +303,8 @@ task export_package () {
     doLast {
         def argv = [
                 "-g.building",
+                // This prevents the VersionHandler to preserve the plugin layout
+                "-gvh_disable",
                 // NOTE: This doesn't target Android since we don't want to have
                 // dependencies on the Jar Resolver as they require the plugin to
                 // be enabled during the build process which would break the
@@ -311,9 +315,9 @@ task export_package () {
                 "-logFile", "build/unity.log",
                 "-exportPackage",
                     "Assets/GooglePlayGames",
+                    "Assets/GooglePlayGames/Plugins/Android/GooglePlayGamesManifest.plugin",
                     "Assets/PlayServicesResolver",
-                    "Assets/Plugins/Android/libs",
-                    "Assets/Plugins/Android/MainLibProj",
+                    "Assets/Plugins/Android/play-games-plugin-support.aar",
                     "Assets/Plugins/iOS",
                 "${exportPath}",
                 "-quit"
@@ -484,7 +488,7 @@ copy_gpg_sdk.ext.remoteTaskPhase = 'prebuild'
 task copy_libs (dependsOn: 'compile_gpg') << {
     copy {
         from {'build/libs'}
-        into {'build/PluginSrc/Assets/Plugins/Android/libs' }
+        into {'SupportLib/PlayGamesPluginSupport/src/main/jniLibs' }
     }
 }
 copy_libs.description = "Copies the compiled native libs to the plugin directory"
@@ -497,14 +501,13 @@ task build_java_support_lib(type: GradleBuild) {
     tasks = ['build']
 }
 build_java_support_lib.ext.remoteTaskPhase = 'prebuild'
+build_java_support_lib.dependsOn copy_libs
 
 task support_jar(dependsOn:'build_java_support_lib') << {
     copy {
-        from zipTree('SupportLib/PlayGamesPluginSupport/build/outputs/aar/PlayGamesPluginSupport-debug.aar')
-        into {'build/PluginSrc/Assets/Plugins/Android/MainLibProj/libs'}
-        include {'**/classes.jar'}
-        exclude { details -> !details.file.name.endsWith('.jar')}
-        rename ('classes.jar','play-games-plugin-support.jar')
+        from 'SupportLib/PlayGamesPluginSupport/build/outputs/aar/PlayGamesPluginSupport-debug.aar'
+        into {'build/PluginSrc/Assets/Plugins/Android'}
+        rename ('PlayGamesPluginSupport-debug.aar','play-games-plugin-support.aar')
     }
 }
 support_jar.description = "Copies the android support libs to the Plugin directory"

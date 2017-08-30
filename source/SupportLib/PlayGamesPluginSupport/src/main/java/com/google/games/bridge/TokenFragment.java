@@ -30,6 +30,9 @@ import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.auth.api.signin.GoogleSignInStatusCodes;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -42,7 +45,9 @@ import com.google.android.gms.games.Games;
  * the accessing of the player's email address and tokens.
  */
 public class TokenFragment extends Fragment
-        implements GoogleApiClient.ConnectionCallbacks {
+        implements GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener
+{
 
     private static final String TAG = "TokenFragment";
     private static final String FRAGMENT_TAG = "gpg.AuthTokenSupport";
@@ -225,11 +230,11 @@ public class TokenFragment extends Fragment
                         }
                 );
             } else {
-                Log.d(TAG,"No connected Games API,!!!!  Hoping for connection!");
+                Log.d(TAG,"No connected Games API, waiting for onConnected");
             }
         }
 
-        Log.d(TAG, "Done with processRequest!");
+        Log.d(TAG, "Done with processRequest, result is pending.");
     }
 
     private void buildClient(TokenRequest request) {
@@ -293,7 +298,8 @@ public class TokenFragment extends Fragment
                     .addApi(Auth.GOOGLE_SIGN_IN_API, options);
             clientBuilder.addApi(Games.API);
 
-            clientBuilder.addConnectionCallbacks(this);
+            clientBuilder.addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this);
 
             if (request.hidePopups) {
                 View invisible = new View(getActivity());
@@ -328,9 +334,12 @@ public class TokenFragment extends Fragment
                 GoogleSignInAccount acct =  result.getSignInAccount();
                 onSignedIn(result.getStatus().getStatusCode(), acct);
             } else if (result != null) {
+                Log.e(TAG,"GoogleSignInResult error: " + result.getStatus());
                 onSignedIn(result.getStatus().getStatusCode(), null);
             } else {
-                Log.e(TAG, "Google SignIn Result is null?");
+                Log.e(TAG, "Google SignIn Result is null, resultCode is " +
+                        resultCode + "(" +
+                GoogleSignInStatusCodes.getStatusCodeString(resultCode) + ")");
                 onSignedIn(CommonStatusCodes.ERROR, null);
             }
             return;
@@ -350,6 +359,7 @@ public class TokenFragment extends Fragment
                 request.setEmail(acct.getEmail());
                 request.setIdToken(acct.getIdToken());
             }
+            Log.e(TAG,"Setting result error code to: " + resultCode);
             request.setResult(resultCode);
         }
     }
@@ -395,6 +405,7 @@ public class TokenFragment extends Fragment
 
     @Override
     public void onConnected(@Nullable final Bundle bundle) {
+        Log.i(TAG,"onConnected called");
         if (mGoogleApiClient == null) {
             return;
         }
@@ -410,7 +421,7 @@ public class TokenFragment extends Fragment
                                                 .getStatusCode(),
                                         googleSignInResult.getSignInAccount());
                             } else {
-                                Log.e(TAG, "Error with silentSignIn: " +
+                                Log.e(TAG, "Error with silentSignIn when connected: " +
                                         googleSignInResult.getStatus());
                                 onSignedIn(googleSignInResult.getStatus()
                                         .getStatusCode(),googleSignInResult.getSignInAccount());
@@ -434,6 +445,20 @@ public class TokenFragment extends Fragment
     @Override
     public void onConnectionSuspended(int cause) {
         Log.d(TAG, "onConnectionSuspended() called: " + cause);
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.e(TAG,"onConnectionFailed: " + connectionResult.getErrorCode() +
+               ": " + connectionResult.getErrorMessage());
+        if (connectionResult.hasResolution()) {
+            // Just start the intent, it will be easier.
+            Intent signInIntent = Auth.GoogleSignInApi
+                    .getSignInIntent(mGoogleApiClient);
+            startActivityForResult(signInIntent, RC_ACCT);
+        } else {
+            onSignedIn(connectionResult.getErrorCode(), null);
+        }
     }
 
     /**
@@ -520,5 +545,10 @@ public class TokenFragment extends Fragment
         public boolean getForceRefresh() {
             return forceRefresh;
         }
+    }
+
+    public static boolean checkGooglePlayServicesAvailable() {
+        GooglePlayServicesUtil.isGooglePlayServicesAvailable(null);
+        return false;
     }
 }
