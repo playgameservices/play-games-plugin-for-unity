@@ -1,3 +1,10 @@
+Version 0.9.40
+    Bug Fixes:
+        * #1610 - Show menu items even if not on Android/iOS.
+        * #1764 - Jar Resolver conflicts with Firebase
+        * #1794 - Reduced warning spam about deprecations
+        * #1791 - Fixed typos in README.MD
+                - Added Jar resolver call when building just a nearby connections app.
 Version 0.9.39a
     Bug Fixes:
         * #1778 - Requesting Id Token error.

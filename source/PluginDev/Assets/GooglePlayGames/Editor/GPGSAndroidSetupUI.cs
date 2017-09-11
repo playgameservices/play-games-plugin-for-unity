@@ -14,7 +14,6 @@
 //    limitations under the License.
 // </copyright>
 
-#if UNITY_ANDROID
 
 namespace GooglePlayGames.Editor
 {
@@ -64,6 +63,15 @@ namespace GooglePlayGames.Editor
             EditorWindow window = EditorWindow.GetWindow(
                                       typeof(GPGSAndroidSetupUI), true, GPGSStrings.AndroidSetup.Title);
             window.minSize = new Vector2(500, 400);
+        }
+
+        [MenuItem("Window/Google Play Games/Setup/Android setup...", true)]
+        public static bool EnableAndroidMenuItem() {
+#if UNITY_ANDROID
+            return true;
+#else
+            return false;
+#endif
         }
 
         /// <summary>
@@ -159,12 +167,13 @@ namespace GooglePlayGames.Editor
                 return false;
             }
 
-            if (nearbySvcId != null)
-            {
+            if (nearbySvcId != null) {
+#if UNITY_ANDROID
                 if (!NearbyConnectionUI.PerformSetup(nearbySvcId, true))
                 {
                     return false;
                 }
+#endif
             }
 
             GPGSProjectSettings.Instance.Set(GPGSUtil.APPIDKEY, appId);
@@ -352,7 +361,7 @@ namespace GooglePlayGames.Editor
             if (!string.IsNullOrEmpty(packageName))
             {
                 if (string.IsNullOrEmpty(currentId) ||
-                    currentId == "com.Company.ProductName") 
+                    currentId == "com.Company.ProductName")
                 {
 #if UNITY_5_6_OR_NEWER
                     PlayerSettings.SetApplicationIdentifier(
@@ -446,4 +455,3 @@ namespace GooglePlayGames.Editor
         }
     }
 }
-#endif
