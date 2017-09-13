@@ -147,6 +147,77 @@ public class TokenFragment extends Fragment
         return request.getPendingResponse();
     }
 
+    /**
+     * This calls silent signin and gets the user info including the auth code.
+     * If silent sign-in fails, the failure is returned.
+     * @return PendingResult for waiting on result.
+     */
+    public static PendingResult getAnotherAuthCode(Activity parentActivity,
+                                                   final boolean reauthIfNeeded,
+                                                   String webClientId) {
+
+        TokenRequest request = new TokenRequest(true,
+                true, true, webClientId,
+                false, null, true, null);
+
+
+        final TokenFragment fragment = (TokenFragment)
+                parentActivity.getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+        if (fragment == null) {
+            // The fragment should already be here, so return an error.
+            Log.e(TAG,"Fragment is not found.  Could not be authenticated already?");
+            request.setResult(CommonStatusCodes.DEVELOPER_ERROR);
+        } else {
+            if (fragment.mGoogleApiClient != null &&
+                    fragment.mGoogleApiClient.hasConnectedApi(Games.API))  {
+
+                boolean ok = false;
+                synchronized (lock) {
+                    if (pendingTokenRequest == null) {
+                        pendingTokenRequest = request;
+                        ok = true;
+                    }
+                }
+                if(!ok) {
+                    Log.e(TAG, "Already a pending token request (requested == ): " + request);
+                    Log.e(TAG, "Already a pending token request: " + pendingTokenRequest);
+                    request.setResult(CommonStatusCodes.DEVELOPER_ERROR);
+                    return request.getPendingResponse();
+                }
+
+                Auth.GoogleSignInApi.silentSignIn(fragment.mGoogleApiClient)
+                        .setResultCallback(
+                        new ResultCallback<GoogleSignInResult>() {
+                            @Override
+                            public void onResult(
+                                    @NonNull GoogleSignInResult googleSignInResult) {
+                                if (googleSignInResult.isSuccess()) {
+                                    fragment.onSignedIn(googleSignInResult.getStatus().getStatusCode(),
+                                            googleSignInResult.getSignInAccount());
+                                } else if (
+                                        googleSignInResult.getStatus().getStatusCode() == CommonStatusCodes.SIGN_IN_REQUIRED
+                                        && reauthIfNeeded) {
+                                    Intent signInIntent = Auth.GoogleSignInApi
+                                            .getSignInIntent(fragment.mGoogleApiClient);
+                                    fragment.startActivityForResult(signInIntent, RC_ACCT);
+                                } else {
+                                    Log.e(TAG,"Error with " +
+                                            "silentSignIn: " +
+                                            googleSignInResult.getStatus());
+                                    fragment.onSignedIn(googleSignInResult.getStatus().getStatusCode(),
+                                            null);
+                                }
+                            }
+                        }
+                );
+            } else {
+                Log.d(TAG,"No connected Games API, waiting for onConnected");
+            }
+        }
+
+        return request.getPendingResponse();
+    }
+
     public static void signOut(Activity activity) {
 
         TokenFragment fragment = (TokenFragment)

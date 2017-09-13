@@ -118,6 +118,12 @@ namespace GooglePlayGames.IOS {
             throw new NotImplementedException();
         }
 
+        public void GetAnotherServerAuthCode(bool reAuthenticateIfNeeded, 
+                                             Action<string> callback)
+        {
+            throw new NotImplementedException();
+        }
+
         public string GetIdToken()
         {
             throw new NotImplementedException();

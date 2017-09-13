@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<dependencies>
+  <!-- Android dependencies are specified under the "androidPackages" element.
+       Each "androidPackage" element contains the attributes of an Android
+       dependency (e.g AAR, JAR reference). -->
+  <androidPackages>
+    <!-- The "spec" attribute is *required* and provides the Maven package
+         specification.
+
+         Currently this only supports group:artifact:version_specification where
+         group:artifact:version_specification references a Maven package that
+         can be located in:
+         * Maven central.
+         * Google's Maven repo.
+         * Local Android SDK Maven repo.
+
+         Additional repositories can be added using the "repositories" element.
+    -->
+
+    <!--- Depends on games. The version number must be at least 10.0.2, and
+    should be the latest possible that does not cause problems with other
+    dependencies.
+    -->
+    <androidPackage spec="com.google.android.gms:play-services-games:10+">
+      <!-- androidSdkPackageIds is optional and contains the set of Android
+           SDK package manager components (packages) this package requires.
+
+           If the package can't be found in any of the specified repositories,
+           the dependency resolver will attempt to install the set of Android
+           SDK packages specified here and then attempt resolution again.
+      -->
+      <androidSdkPackageIds>
+        <androidSdkPackageId>extra-google-m2repository</androidSdkPackageId>
+      </androidSdkPackageIds>
+      <!-- "repositories" are optional and contain the set of additional
+           repository URIs to search for this package. -->
+      <repositories>
+        <repository>https://maven.google.com</repository>
+      </repositories>
+    </androidPackage>
+
+    <!---
+    Nearby connections
+     -->
+
+        <androidPackage spec="com.google.android.gms:play-services-nearby:10+">
+      <!-- androidSdkPackageIds is optional and contains the set of Android
+           SDK package manager components (packages) this package requires.
+
+           If the package can't be found in any of the specified repositories,
+           the dependency resolver will attempt to install the set of Android
+           SDK packages specified here and then attempt resolution again.
+      -->
+      <androidSdkPackageIds>
+        <androidSdkPackageId>extra-google-m2repository</androidSdkPackageId>
+      </androidSdkPackageIds>
+      <!-- "repositories" are optional and contain the set of additional
+           repository URIs to search for this package. -->
+      <repositories>
+        <repository>https://maven.google.com</repository>
+      </repositories>
+    </androidPackage>
+
+
+
+    <!---
+    Auth
+     -->
+
+        <androidPackage spec="com.google.android.gms:play-services-auth:10+">
+      <!-- androidSdkPackageIds is optional and contains the set of Android
+           SDK package manager components (packages) this package requires.
+
+           If the package can't be found in any of the specified repositories,
+           the dependency resolver will attempt to install the set of Android
+           SDK packages specified here and then attempt resolution again.
+      -->
+      <androidSdkPackageIds>
+        <androidSdkPackageId>extra-google-m2repository</androidSdkPackageId>
+      </androidSdkPackageIds>
+      <!-- "repositories" are optional and contain the set of additional
+           repository URIs to search for this package. -->
+      <repositories>
+        <repository>https://maven.google.com</repository>
+      </repositories>
+    </androidPackage>
+
+      </androidPackages>
+
+  <!-- iOS Cocoapod dependencies can be specified by each iosPod element. -->
+  <iosPods>
+    <!-- iosPod supports the following attributes:
+         * "name" (required)
+           Name of the Cocoapod.
+         * "version" (optional)
+           Cocoapod version specification for the named pod.
+           If this is not specified the latest version is used.
+         * "bitcodeEnabled" (optional)
+           Whether this Cocoapod requires bitcode to be enabled in Unity's
+           generated Xcode project.  This is "true" by default.
+         * "minTargetSdk" (optional)
+           The minimum iOS SDK required by this Cocoapod. -->
+    <iosPod name="GooglePlayGames" version="5.1.2" bitcodeEnabled="false"
+            minTargetSdk="6.0">
+      <!-- Set of source URIs to search for this Cocoapod spec.
+           By default Cocoapods will attempt to fetch the pod specs from:
+           * $HOME/.cocoapods/repos
+           * https://github.com/CocoaPods/Specs
+           -->
+      <sources>
+        <source>https://github.com/CocoaPods/Specs</source>
+      </sources>
+    </iosPod>
+  </iosPods>
+</dependencies>

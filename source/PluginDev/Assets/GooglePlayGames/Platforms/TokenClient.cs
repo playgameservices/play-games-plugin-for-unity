@@ -35,6 +35,20 @@ namespace GooglePlayGames
         string GetAuthCode();
         string GetIdToken();
 
+        /// <summary>
+        /// Gets another server auth code.
+        /// </summary>
+        /// <remarks>This method should be called after authenticating, and exchanging
+        /// the initial server auth code for a token.  This is implemented by signing in
+        /// silently, which if successful returns almost immediately and with a new
+        /// server auth code.
+        /// </remarks>
+        /// <param name="reAuthenticateIfNeeded">Calls Authenticate if needed when
+        /// retrieving another auth code. </param>
+        /// <param name="callback">Callback.</param>
+        void GetAnotherServerAuthCode(bool reAuthenticateIfNeeded,
+                                      Action<string> callback);
+
         void Signout();
 
         void SetRequestAuthCode(bool flag, bool forceRefresh);

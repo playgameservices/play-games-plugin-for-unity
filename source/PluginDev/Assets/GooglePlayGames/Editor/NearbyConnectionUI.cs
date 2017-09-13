@@ -113,8 +113,6 @@ namespace GooglePlayGames.Editor
                 Google.VersionHandler.Enabled = true;
                 AssetDatabase.Refresh();
 
-                GPGSDependencies.RegisterDependencies();
-
                 Google.VersionHandler.InvokeStaticMethod(
                     Google.VersionHandler.FindClass(
                    "Google.JarResolver",

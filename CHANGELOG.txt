@@ -2,6 +2,10 @@ Version 0.9.41
     Bug Fixes:
         * #1785 - Cleaned up files in Plugins/Android.
         * #1867 - Added connection failure handling for auth failure edge cases.
+    New Features:
+        * Updated Play Services jar resolver uses xml file configuration.
+        * Added method GetAnotherServerAuthCode() to get additional server auth
+            codes without signing out.
 Version 0.9.40
     Bug Fixes:
         * #1610 - Show menu items even if not on Android/iOS.

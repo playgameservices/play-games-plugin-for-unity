@@ -100,6 +100,13 @@ namespace GooglePlayGames.BasicApi
             return null;
         }
 
+        public void GetAnotherServerAuthCode(bool reAuthenticateIfNeeded,
+                                             Action<string> callback)
+        {
+            LogUsage();
+            callback(null);
+        }
+
         /// <summary>
         /// Gets the user's email.
         /// </summary>

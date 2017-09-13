@@ -364,6 +364,13 @@ namespace GooglePlayGames.Native
             return mTokenClient.GetAuthCode();
         }
 
+        public void GetAnotherServerAuthCode(bool reAuthenticateIfNeeded,
+                                             Action<string> callback)
+        {
+            mTokenClient.GetAnotherServerAuthCode(reAuthenticateIfNeeded,
+                                                  callback);
+        }
+
         ///<summary></summary>
         /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.IsAuthenticated"/>
         public bool IsAuthenticated()

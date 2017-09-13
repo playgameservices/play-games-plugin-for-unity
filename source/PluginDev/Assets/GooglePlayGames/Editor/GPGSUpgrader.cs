@@ -154,10 +154,24 @@ namespace GooglePlayGames.Editor
         "Assets/Plugins/Android/MainLibProj",
       };
 
+      string[] obsoleteFiles = {
+        "Assets/GooglePlayGames/Editor/GPGSDependencies.cs",
+        "Assets/GooglePlayGames/Editor/GPGSDependencies.cs.meta"
+      };
+
       foreach (string directory in obsoleteDirectories) {
         if (Directory.Exists (directory)) {
           Debug.Log ("Deleting obsolete directory: " + directory);
           Directory.Delete (directory, true);
+        }
+      }
+
+      foreach (string file in obsoleteFiles)
+      {
+        if (File.Exists(file))
+        {
+          Debug.Log("Deleting obsolete file: " + file);
+          File.Delete(file);
         }
       }
 
