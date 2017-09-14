@@ -1017,7 +1017,7 @@ namespace SmokeTest
             {
                 mUi = Ui.Main;
             } else if (GUI.Button(CalcGrid(1,8), "New AuthCode")) {
-                PlayGamesPlatform.Instance.GetAnotherServerAuthCode(
+                PlayGamesPlatform.Instance.GetAnotherServerAuthCode(false,
                       (newAuthCode) => this.authCode = newAuthCode);
             }
         }
