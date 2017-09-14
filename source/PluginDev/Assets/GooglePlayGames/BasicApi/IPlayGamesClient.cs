@@ -109,6 +109,21 @@ namespace GooglePlayGames.BasicApi
     string GetServerAuthCode();
 
     /// <summary>
+    /// Gets another server auth code.
+    /// </summary>
+    /// <remarks>This method should be called after authenticating, and exchanging
+    /// the initial server auth code for a token.  This is implemented by signing in
+    /// silently, which if successful returns almost immediately and with a new
+    /// server auth code.
+    /// </remarks>
+    /// <param name="reAuthenticateIfNeeded">Calls Authenticate if needed when
+    /// retrieving another auth code. </param>
+    /// <param name="callback">Callback returning the auth code, or null if there
+    /// was a problem.  NOTE: This callback can be called immediately.</param>
+    void GetAnotherServerAuthCode(bool reAuthenticateIfNeeded,
+                                  Action<string> callback);
+
+    /// <summary>
     /// Gets the user's email.
     /// </summary>
     /// <remarks>The email address returned is selected by the user from the accounts present

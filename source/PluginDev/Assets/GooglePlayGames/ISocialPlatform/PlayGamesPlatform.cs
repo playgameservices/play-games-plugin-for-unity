@@ -528,9 +528,10 @@ namespace GooglePlayGames
         /// </summary>
         /// <remarks>This code is used by the server application in order to get
         /// an oauth token.  For how to use this acccess token please see:
-        /// https://developers.google.com/drive/v2/web/auth/web-server
+        /// https://developers.google.com/drive/v2/web/auth/web-server.
+        /// To get another server auth code after the initial one returned, call
+        /// GetAnotherServerAuthCode().
         /// </remarks>
-        /// <param name="callback">Callback.</param>
         public string GetServerAuthCode()
         {
             if (mClient != null && mClient.IsAuthenticated())
@@ -538,6 +539,42 @@ namespace GooglePlayGames
                 return mClient.GetServerAuthCode();
             }
             return null;
+        }
+
+        /// <summary>
+        /// Gets another server auth code.
+        /// </summary>
+        /// <remarks>This method should be called after authenticating, and exchanging
+        /// the initial server auth code for a token.  This is implemented by signing in
+        /// silently, which if successful returns almost immediately and with a new
+        /// server auth code.
+        /// </remarks>
+        /// <param name="reAuthenticateIfNeeded">Calls Authenticate if needed when
+        /// retrieving another auth code. </param>
+        /// <param name="callback">Callback returning the auth code or null
+        /// if there was an error.  NOTE: This callback can return immediately.</param>
+        public void GetAnotherServerAuthCode(bool reAuthenticateIfNeeded,
+                                             Action<string> callback)
+        {
+            if(mClient != null && mClient.IsAuthenticated()) {
+                mClient.GetAnotherServerAuthCode(reAuthenticateIfNeeded, callback);
+            }
+            else if (mClient != null && reAuthenticateIfNeeded)
+            {
+                mClient.Authenticate((success, msg) => {
+                        if (success) {
+                            callback(mClient.GetServerAuthCode());
+                        } else {
+                            OurUtils.Logger.e("Re-authentication failed: " + msg);
+                            callback(null);
+                        }
+                }, false);
+            }
+            else
+            {
+                OurUtils.Logger.e("Cannot call GetAnotherServerAuthCode: not authenticated");
+                callback(null);
+            }
         }
 
         /// <summary>

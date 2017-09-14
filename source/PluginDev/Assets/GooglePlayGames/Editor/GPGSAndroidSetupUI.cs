@@ -110,13 +110,10 @@ namespace GooglePlayGames.Editor
                 // check the bundle id and set it if needed.
                 CheckBundleId();
 
-
                 Google.VersionHandler.VerboseLoggingEnabled = true;
                 Google.VersionHandler.UpdateVersionedAssets(forceUpdate: true);
                 Google.VersionHandler.Enabled = true;
                 AssetDatabase.Refresh();
-
-                GPGSDependencies.RegisterDependencies();
 
                 Google.VersionHandler.InvokeStaticMethod(
                     Google.VersionHandler.FindClass(

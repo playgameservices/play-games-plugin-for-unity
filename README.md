@@ -953,6 +953,15 @@ Play Game Console.
 3. Call `PlayGamesPlatform.Instance.GetServerAuthCode()` once the player is authenticated.
 4. Pass this code to your server application.
 
+### Getting another server auth code after exchanging the first code
+If your back end server interactions requires you to send a server auth code
+more than once per authenticated session, you can call
+    `PlaPlayGamesPlatform.Instance.GetAnotherServerAuthCode(Action<string> callback)`
+This method requires the player to be aready authenticated and correctly configured to
+request server auth codes on this client.  This method is implemented by calling
+Google Sign-in silently which returns a new server auth code when already signed in.
+
+
 ## Retrieving player's email
 In order to access the player's email address:
 1. Call `PlayGamesClientConfiguration.Builder.RequestEmail()` when creating
