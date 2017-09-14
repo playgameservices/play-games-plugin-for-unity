@@ -35,6 +35,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.games.Games;
 
 /**
@@ -42,7 +43,7 @@ import com.google.android.gms.games.Games;
  * the accessing of the player's email address and tokens.
  */
 public class TokenFragment extends Fragment
-        implements GoogleApiClient.ConnectionCallbacks {
+        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = "TokenFragment";
     private static final String FRAGMENT_TAG = "gpg.AuthTokenSupport";
@@ -294,6 +295,7 @@ public class TokenFragment extends Fragment
             clientBuilder.addApi(Games.API);
 
             clientBuilder.addConnectionCallbacks(this);
+            clientBuilder.addOnConnectionFailedListener(this);
 
             if (request.hidePopups) {
                 View invisible = new View(getActivity());
@@ -422,6 +424,21 @@ public class TokenFragment extends Fragment
             Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
             startActivityForResult(signInIntent, RC_ACCT);
         }
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult result) {
+        Log.e(TAG, "Connection Failed: " +
+            result.getErrorCode() + ", " + result.hasResolution());
+        
+        if (!result.hasResolution()) {
+            onSignedIn(result.getErrorCode(), null);
+            return;
+        }
+
+        // INFO: You can't call ConnectionResult.startResolutionForResult() with a Fragment.
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        startActivityForResult(signInIntent, RC_ACCT);
     }
 
     /**
