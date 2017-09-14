@@ -1,6 +1,7 @@
 Version 0.9.41
     Bug Fixes:
         * #1785 - Cleaned up files in Plugins/Android.
+        * #1833 - Added RevealAchievement method to PlayGamesPlatform
         * #1867 - Added connection failure handling for auth failure edge cases.
     New Features:
         * Updated Play Services jar resolver uses xml file configuration.
