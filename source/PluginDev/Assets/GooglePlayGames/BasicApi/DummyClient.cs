@@ -100,6 +100,15 @@ namespace GooglePlayGames.BasicApi
             return null;
         }
 
+		public void GetServerAuthCode(Action<CommonStatusCodes, string> callback)
+		{
+			LogUsage();
+			if (callback != null)
+			{
+				callback(CommonStatusCodes.ApiNotConnected, "");
+			}
+		}
+
         public void GetAnotherServerAuthCode(bool reAuthenticateIfNeeded,
                                              Action<string> callback)
         {

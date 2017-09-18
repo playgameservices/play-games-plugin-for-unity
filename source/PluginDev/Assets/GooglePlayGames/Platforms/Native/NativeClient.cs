@@ -364,6 +364,21 @@ namespace GooglePlayGames.Native
             return mTokenClient.GetAuthCode();
         }
 
+		public void GetServerAuthCode(Action<CommonStatusCodes, string> callback)
+		{
+			PlayGamesHelperObject.RunOnGameThread(() =>
+				mTokenClient.FetchTokens((rc) =>
+				{
+					if (callback != null)
+					{
+						string authCode = mTokenClient.GetAuthCode();
+						PlayGamesHelperObject.RunOnGameThread(() =>
+							callback(CommonStatusCodes.Success, authCode));
+					}
+				}
+			));
+		}
+
         public void GetAnotherServerAuthCode(bool reAuthenticateIfNeeded,
                                              Action<string> callback)
         {
