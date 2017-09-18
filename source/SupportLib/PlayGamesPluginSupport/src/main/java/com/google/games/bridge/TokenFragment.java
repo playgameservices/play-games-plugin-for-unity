@@ -20,6 +20,8 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -40,6 +42,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.games.Games;
 
+
 /**
  * Activity fragment with no UI added to the parent activity in order to manage
  * the accessing of the player's email address and tokens.
@@ -53,6 +56,8 @@ public class TokenFragment extends Fragment
     private static final String FRAGMENT_TAG = "gpg.AuthTokenSupport";
     private static final int RC_ACCT = 9002;
 
+    private static final String PREF_DECLINED_KEY = TAG + ".userDeclined";
+
     // Pending token request.  There can be only one outstanding request at a
     // time.
     private static final Object lock = new Object();
@@ -60,7 +65,7 @@ public class TokenFragment extends Fragment
     private static TokenFragment helperFragment;
     private GoogleApiClient mGoogleApiClient;
 
-
+    private static boolean mStartUpSignInCheckPerformed = false;
     /**
      * External entry point for getting tokens and email address.  This
      * creates the fragment if needed and queues up the request.  The fragment, once
@@ -276,7 +281,15 @@ public class TokenFragment extends Fragment
             request = pendingTokenRequest;
         }
         if (request != null) {
-            if (mGoogleApiClient.hasConnectedApi(Games.API))  {
+
+            boolean signIn = true;
+            if (!mStartUpSignInCheckPerformed) {
+                mStartUpSignInCheckPerformed = true;
+                SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+                signIn = !sharedPref.getBoolean(PREF_DECLINED_KEY, false);
+            }
+
+            if (signIn || mGoogleApiClient.hasConnectedApi(Games.API))  {
 
                 Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient).setResultCallback(
                         new ResultCallback<GoogleSignInResult>() {
@@ -301,7 +314,10 @@ public class TokenFragment extends Fragment
                         }
                 );
             } else {
-                Log.d(TAG,"No connected Games API, waiting for onConnected");
+                Log.d(TAG,"No connected Games API");
+                synchronized (lock) {
+                    pendingTokenRequest = null;
+                }
             }
         }
 
@@ -404,6 +420,8 @@ public class TokenFragment extends Fragment
             if (result != null && result.isSuccess()) {
                 GoogleSignInAccount acct =  result.getSignInAccount();
                 onSignedIn(result.getStatus().getStatusCode(), acct);
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                onSignedIn(CommonStatusCodes.CANCELED, null);
             } else if (result != null) {
                 Log.e(TAG,"GoogleSignInResult error: " + result.getStatus());
                 onSignedIn(result.getStatus().getStatusCode(), null);
@@ -419,12 +437,20 @@ public class TokenFragment extends Fragment
     }
 
     private void onSignedIn(int resultCode, GoogleSignInAccount acct) {
+
+        if (resultCode == CommonStatusCodes.CANCELED) {
+            pendingTokenRequest.cancel();
+            pendingTokenRequest = null;
+            SaveDeclinedSignInPreference(true);
+        }
+
         TokenRequest request;
         synchronized (lock) {
             request = pendingTokenRequest;
             pendingTokenRequest = null;
         }
         if (request != null) {
+            SaveDeclinedSignInPreference(false);
             if (acct != null) {
                 request.setAuthCode(acct.getServerAuthCode());
                 request.setEmail(acct.getEmail());
@@ -435,6 +461,12 @@ public class TokenFragment extends Fragment
         }
     }
 
+    private void SaveDeclinedSignInPreference(boolean declined) {
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean(PREF_DECLINED_KEY, declined);
+        editor.commit();
+    }
 
     @Override
     public void onStart() {
@@ -500,9 +532,6 @@ public class TokenFragment extends Fragment
                         }
                     }
             );
-        } else {
-            Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-            startActivityForResult(signInIntent, RC_ACCT);
         }
     }
 

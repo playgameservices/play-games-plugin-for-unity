@@ -541,7 +541,39 @@ namespace GooglePlayGames
             return null;
         }
 
-        /// <summary>
+		/// <summary>
+		/// Gets the server auth code.
+		/// </summary>
+		/// <remarks>This code is used by the server application in order to get
+		/// an oauth token.  For how to use this acccess token please see:
+		/// https://developers.google.com/drive/v2/web/auth/web-server
+		/// </remarks>
+		/// <param name="callback">Callback.</param>
+		public void GetServerAuthCode(Action<CommonStatusCodes, string> callback)
+		{
+			if (mClient != null && mClient.IsAuthenticated())
+			{
+				if (GameInfo.WebClientIdInitialized())
+				{
+					mClient.GetServerAuthCode(callback);
+				}
+				else
+				{
+					GooglePlayGames.OurUtils.Logger.e(
+						"GetServerAuthCode requires a webClientId.");
+					callback(CommonStatusCodes.DeveloperError, "");
+				}
+			}
+			else
+			{
+				GooglePlayGames.OurUtils.Logger.e(
+					"GetServerAuthCode can only be called after authentication.");
+
+				callback(CommonStatusCodes.SignInRequired, "");
+			}
+		}
+
+		/// <summary>
         /// Gets another server auth code.
         /// </summary>
         /// <remarks>This method should be called after authenticating, and exchanging
