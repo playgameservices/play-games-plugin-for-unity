@@ -108,13 +108,13 @@ namespace GooglePlayGames.BasicApi
     /// </remarks>
     string GetServerAuthCode();
 
-	/// <summary>
-	/// Retrieves the server auth code for this client.
-	/// </summary>
-	/// <param name="callback">Callback for response.</param>
-	void GetServerAuthCode(Action<CommonStatusCodes, string> callback);
+    /// <summary>
+    /// Retrieves the server auth code for this client.
+    /// </summary>
+    /// <param name="callback">Callback for response.</param>
+    void GetServerAuthCode(Action<CommonStatusCodes, string> callback);
 
-	/// <summary>
+    /// <summary>
     /// Gets another server auth code.
     /// </summary>
     /// <remarks>This method should be called after authenticating, and exchanging
