@@ -1,11 +1,37 @@
+apply plugin: 'maven'
 apply plugin: 'com.android.library'
+
+group 'com.google.games'
+
+if (project.hasProperty("projVersion")) {
+    project.version = project.projVersion
+} else {
+    project.version '0-SNAPSHOT'
+}
+
+if (project.hasProperty("uploadDir")) {
+    project.ext.uploadDir = project.uploadDir
+} else {
+    project.ext.uploadDir = "${buildDir}/m2repository"
+}
+
 
 android {
     defaultConfig {
+        versionName  project.version
+        archivesBaseName = 'gpgs-plugin-support'
         minSdkVersion 14
     }
     compileSdkVersion 23
     buildToolsVersion "25.0.3"
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: uri(project.ext.uploadDir))
+        }
+    }
 }
 
 dependencies {

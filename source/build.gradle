@@ -44,7 +44,8 @@ project.ext {
     samplesBuildSrc = file('build/sampleSrc').absolutePath
     exportPath = file('build/plugin.unitypackage').absolutePath
     currentPluginPath = file('../current-build').absolutePath
-    currentPluginName = 'GooglePlayGamesPlugin-0.9.41.unitypackage'
+    currentPluginVersion = "0.9.42"
+    currentPluginName = 'GooglePlayGamesPlugin-' + currentPluginVersion + '.unitypackage'
     resolverDir = new File('build/jarresolver').absolutePath
 
     sampleList = ['CubicPilot', 'Minimal',
@@ -282,12 +283,22 @@ task import_jarresolver() {
 // on a machine with limited network connectivity.
 // import_jarresolver.dependsOn "copy_jarresolver"
 
-task copy_pluginProjSrc << {
-    copy {
+task copy_pluginProjSrc () {
+    doFirst {
+      copy {
         from {"${pluginBuildSrc}"}
         includes ["**/*"]
         duplicatesStrategy DuplicatesStrategy.INCLUDE
         into {"${pluginProj}"}
+      }
+    }
+    doLast {
+      copy {
+        from {"${buildDir}/m2repository"}
+        includes ["**/*"]
+        duplicatesStrategy DuplicatesStrategy.INCLUDE
+        into {"${pluginProj}/Assets/GooglePlayGames/Editor/m2repository"}
+      }
     }
 }
 copy_pluginProjSrc.dependsOn import_jarresolver
@@ -317,7 +328,6 @@ task export_package () {
                     "Assets/GooglePlayGames",
                     "Assets/GooglePlayGames/Plugins/Android/GooglePlayGamesManifest.plugin",
                     "Assets/PlayServicesResolver",
-                    "Assets/Plugins/Android/play-games-plugin-support.aar",
                     "Assets/Plugins/iOS",
                 "${exportPath}",
                 "-quit"
@@ -498,7 +508,10 @@ copy_libs.ext.remoteTaskPhase = 'prebuild'
 task build_java_support_lib(type: GradleBuild) {
     description = "Builds the client libraries for Android"
     buildFile = 'SupportLib/build.gradle'
-    tasks = ['build']
+    startParameter.projectProperties.put('projVersion',currentPluginVersion)
+    startParameter.projectProperties.put('uploadDir', "${buildDir}/m2repository")
+
+    tasks = ['build', 'uploadArchives']
 }
 build_java_support_lib.ext.remoteTaskPhase = 'prebuild'
 build_java_support_lib.dependsOn copy_libs
@@ -515,8 +528,16 @@ support_jar.dependsOn 'copy_plugin_source'
 
 support_jar.ext.remoteTaskPhase = 'prebuild'
 
+
+
+task clean_support_lib(type: GradleBuild) {
+    description = "cleans the client libraries for Android"
+    buildFile = 'SupportLib/build.gradle'
+    tasks = ['clean']
+}
 task clean() {
     doFirst {
         delete 'build'
         }
+    dependsOn clean_support_lib
 }

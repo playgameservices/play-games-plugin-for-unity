@@ -56,6 +56,8 @@ namespace GooglePlayGames.Editor
 
                 prevVer = Upgrade941(prevVer);
 
+                prevVer = Upgrade942 (prevVer);
+
                 // there is no migration needed to 930+
                 if (!prevVer.Equals(PluginVersion.VersionKey))
                 {
@@ -142,6 +144,17 @@ namespace GooglePlayGames.Editor
                 CleanDuplicates(s);
             }
         }
+
+    private static string Upgrade942(string prevVer)
+    {
+        string file = "Assets/Plugins/Android/play-games-plugin-support.aar";
+        if (File.Exists(file))
+        {
+            Debug.Log("Deleting obsolete file: " + file);
+            File.Delete(file);
+        }
+        return PluginVersion.VersionKey;
+    }
 
     /// <summary> Upgrade to 0.9.41 </summary>
     /// <remarks>This cleans up the Plugins/Android directory since
