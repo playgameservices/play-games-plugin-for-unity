@@ -1,5 +1,6 @@
 Version 0.9.42
     Bug Fixes:
+       * #1909 Account Picker displayed after backgrounding/foregrounding app.
        * #1922 Cannot build with Gradle: missing google_play_services_version.
        * #1940 Leaderboard and other activities do not work.
        * #1971 Cannot have separate builds for x86, arm7v.
