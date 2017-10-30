@@ -19,6 +19,8 @@ RUN mkdir -p "${ANDROID_HOME}/licenses"
 RUN chmod -R 777 $ANDROID_HOME
 RUN echo 2be0707768cdfbd4d05ab4bcbae066129ba66f5d > "${ANDROID_HOME}/licenses/Android SDK License"
 RUN echo 8933bad161af4178b1185d1a37fbf41ea5269c55 > "${ANDROID_HOME}/licenses/android-sdk-license"
+RUN echo d56f5187479451eabf01fb78af6dfcb131a6481e >> "${ANDROID_HOME}/licenses/android-sdk-license"
+
 # Install Android NDK
 ENV NDK_URL http://dl.google.com/android/ndk/android-ndk-r10d-linux-x86_64.bin
 RUN curl ${NDK_URL} -o /tmp/android-ndk-r10d-linux-x86_64.bin && chmod +x /tmp/android-ndk-r10d-linux-x86_64.bin && \
