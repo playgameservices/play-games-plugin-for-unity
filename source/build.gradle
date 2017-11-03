@@ -12,6 +12,11 @@ buildscript {
     Project level variables
 */
 project.ext {
+    os_name = System.getProperty("os.name").toLowerCase();
+    os_osx = os_name.contains("mac os x");
+    os_windows = os_name.contains("windows");
+    os_linux = os_name.contains("linux");
+
     ndk_root = System.getProperty("ANDROID_NDK_ROOT")
     if (ndk_root == null || ndk_root.isEmpty()) {
         ndk_root = System.getenv("ANDROID_NDK_ROOT")
@@ -401,9 +406,15 @@ check_ndk.ext.remoteTaskPhase = 'prebuild'
 // ndk environment.
 //
 task compile_gpg << {
+
+    def exe = "${ndk_root}/ndk-build"
+    if(os_windows) {
+      exe += ".cmd"
+    }
+
     exec {
         workingDir "build/jni"
-        executable "${ndk_root}/ndk-build"
+        executable exe
     }
 }
 compile_gpg.description = "Compiles the GPG SDK libs into .so files"
