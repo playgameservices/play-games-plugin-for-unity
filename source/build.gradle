@@ -29,8 +29,16 @@ project.ext {
     if (unity_exe == null || unity_exe.isEmpty()) {
         unity_exe = System.getenv("UNITY_EXE")
     }
+
+    // Take a guess at where Unity is located as a last resort.
     if (unity_exe == null || unity_exe.isEmpty()) {
+      if (os_osx) {
         unity_exe ='/Applications/Unity/Unity.app/Contents/MacOS/Unity'
+      } else if (os_windows) {
+        unity_exe ='c:\\program files\\unity\\editor\\unity.exe'
+      } else {
+        unity_exe = 'Unity'
+      }
     }
 
     git_exe = System.getProperty("GIT_EXE")
