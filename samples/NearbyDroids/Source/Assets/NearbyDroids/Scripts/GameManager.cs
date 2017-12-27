@@ -778,7 +778,7 @@ namespace NearbyDroids
                 foreach (PlayerInfo p in PlayerInfo.AllPlayers)
                 {
                     if (p.Player != null &&
-                        p.Player.EndpointId != PlayGamesPlatform.Nearby.LocalEndpointId())
+                        p.Player.DeviceId != NearbyPlayer.LocalDeviceId)
                     {
                         endpoints.Add(p.Player.EndpointId);
                     }

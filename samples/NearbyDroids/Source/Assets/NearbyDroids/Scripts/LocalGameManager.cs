@@ -22,7 +22,7 @@ namespace NearbyDroids
     using UnityEngine;
 
     /// <summary>
-    /// Local game manager. This manages standalone and hosting 
+    /// Local game manager. This manages standalone and hosting
     /// multiplayer games.  As such, it creates the scene layout and
     /// keeps track of player scores and overall game state.
     /// </summary>
@@ -88,7 +88,7 @@ namespace NearbyDroids
                     playerTurnTimer = playerTurnInterval;
                 }
 
-                // check the players for moving, and also 
+                // check the players for moving, and also
                 // reset the moved flag if the new value is true.
                 foreach (PlayerInfo p in PlayerInfo.AllPlayers)
                 {
@@ -156,7 +156,7 @@ namespace NearbyDroids
         }
 
         /// <summary>
-        /// Adds the enemy to list. so we can keep track of enemies that 
+        /// Adds the enemy to list. so we can keep track of enemies that
         /// need to move.
         /// </summary>
         /// <param name="enemy">Enemy.</param>
@@ -171,11 +171,12 @@ namespace NearbyDroids
         /// </summary>
         /// <param name="player">Player.</param>
         /// <param name="data">Data.</param>
-        internal void OnPlayerConnecting(NearbyPlayer player, byte[] data)
+        internal void OnPlayerConnecting(string endpointId, byte[] data)
         {
-            PlayerInfo p = PlayerInfo.AddPendingPlayer(player, data);
+            PlayerInfo p = PlayerInfo.AddPendingPlayer(endpointId, null, data);
+
             GameObject obj = owner.LevelManager.CreatePlayer(
-                                 p.AvatarIndex, 
+                                 p.AvatarIndex,
                                  p.DeviceId);
 
             PlayerController ctl = obj.GetComponent<PlayerController>();
@@ -184,7 +185,7 @@ namespace NearbyDroids
                 ctl.Player = p;
                 ctl.BroadcastMovement = true;
 
-                // force the  movement message so the remote player moves to the 
+                // force the  movement message so the remote player moves to the
                 // assigned, random position.
                 ItemState state = new ItemState();
                 state.Enabled = obj.activeSelf;
@@ -228,7 +229,7 @@ namespace NearbyDroids
                 owner.StartCoroutine(MoveEnemies());
             }
         }
-    
+
         // Coroutine to move enemies in sequence.
         internal IEnumerator MoveEnemies()
         {
@@ -258,13 +259,13 @@ namespace NearbyDroids
                         // Move this enemy
                         enemies[key].MoveEnemy();
 
-                        // Wait for Enemy's moveTime before moving next Enemy, 
+                        // Wait for Enemy's moveTime before moving next Enemy,
                         yield return new WaitForSeconds(enemies[key].moveTime);
                     }
                     else
                     {
                         // the enemy is dead - make sure the game object is
-                        // is still there (a destroyed game object will have 
+                        // is still there (a destroyed game object will have
                         // disabled scripts) and pass along the change to
                         // the other players.
                         if (enemies[key].gameObject != null)
@@ -308,7 +309,7 @@ namespace NearbyDroids
             // ther should be a pending player for the local player
             foreach (PlayerInfo p in PlayerInfo.AllPlayers)
             {
-                GameObject obj = 
+                GameObject obj =
                     owner.LevelManager.CreatePlayer(p.AvatarIndex, p.DeviceId);
                 PlayerController ctl = obj.GetComponent<PlayerController>();
                 if (ctl != null)

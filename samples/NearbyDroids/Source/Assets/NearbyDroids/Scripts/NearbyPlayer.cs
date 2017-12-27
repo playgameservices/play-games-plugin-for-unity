@@ -26,10 +26,10 @@ namespace NearbyDroids
     public class NearbyPlayer
     {
         // keep a dictionary of all the players so we can look
-        // them up when needed.
+        // them up when needed by device ID.
         private static Dictionary<string, NearbyPlayer> allPlayers =
             new Dictionary<string, NearbyPlayer>();
-    
+
         // device id is stably unique to a device.
         private string deviceId;
 
@@ -40,6 +40,19 @@ namespace NearbyDroids
         // the human friendly name of the player/room.
         private string name;
 
+    private static string localDeviceId;
+    public static string LocalDeviceId {
+        get {
+            localDeviceId = PlayerPrefs.GetString ("_NearbyLocalDeviceID_", null);
+            if (string.IsNullOrEmpty(localDeviceId)) {
+                localDeviceId = System.Guid.NewGuid ().ToString();
+                PlayerPrefs.SetString ("_NearbyLocalDeviceID_", localDeviceId);
+                PlayerPrefs.Save ();
+            }
+            return localDeviceId;
+        }
+    }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="NearbyDroids.NearbyPlayer"/> class.
         /// which is local to the game.
@@ -47,25 +60,16 @@ namespace NearbyDroids
         /// <param name="name">Name.</param>
         public NearbyPlayer(string name)
         {
-            string did;
-            string eid;
             if (PlayGamesPlatform.Nearby == null)
             {
                 Debug.Log("Whoa!!! Nearby is null!");
-                did = "local";
-                eid = "local";
-            }
-            else
-            {
-                did = PlayGamesPlatform.Nearby.LocalDeviceId();
-                eid = PlayGamesPlatform.Nearby.LocalEndpointId();
             }
 
             this.name = name;
-            this.deviceId = did;
-            this.endpointId = eid;
+            this.deviceId = LocalDeviceId;
+            this.endpointId = "_LOCAL_ENDPOINT_";
 
-            allPlayers[endpointId] = this;
+            allPlayers[deviceId] = this;
 
             Debug.Log("Creating local player " + name + "@" + deviceId + ":" + endpointId);
         }
@@ -84,7 +88,14 @@ namespace NearbyDroids
             this.deviceId = deviceId;
             this.endpointId = endpointId;
 
-            allPlayers[endpointId] = this;
+            if (deviceId != null)
+            {
+                allPlayers [deviceId] = this;
+            }
+            else
+            {
+                Debug.Log ("Skipping registering player: " + endpointId + " (" + name + ") with null device ID");
+            }
         }
 
         public string DeviceId
@@ -119,8 +130,7 @@ namespace NearbyDroids
         {
             get
             {
-                return deviceId == "local" ||
-                deviceId == PlayGamesPlatform.Nearby.LocalDeviceId();
+                return DeviceId == NearbyPlayer.LocalDeviceId;
             }
         }
 
@@ -131,11 +141,22 @@ namespace NearbyDroids
         /// <param name="key">Key.</param>
         public static NearbyPlayer FindByEndpointId(string key)
         {
-            if (allPlayers.ContainsKey(key))
+            foreach (NearbyPlayer p in allPlayers.Values)
             {
-                return allPlayers[key];
+                if (p.EndpointId == key)
+                {
+                    return p;
+                }
             }
+            return null;
+        }
 
+        public static NearbyPlayer FindByDeviceId(string key)
+        {
+            if (allPlayers.ContainsKey (key))
+            {
+                return allPlayers [key];
+            }
             return null;
         }
     }

@@ -26,7 +26,7 @@ namespace NearbyDroids
 
     /// <summary>
     /// Player info for the gamemanager.  This keeps track of the ids and
-    /// scores of the players, as well as references to UI elements for the 
+    /// scores of the players, as well as references to UI elements for the
     /// player.  The PlayerInfo is not passed to other players, but the
     /// PlayerData member object is passed around.
     /// </summary>
@@ -71,8 +71,7 @@ namespace NearbyDroids
         {
             get
             {
-                return GetPlayer(
-                    PlayGamesPlatform.Nearby.LocalDeviceId());
+                return GetPlayer(NearbyPlayer.LocalDeviceId);
             }
         }
 
@@ -195,7 +194,7 @@ namespace NearbyDroids
             get
             {
                 MemoryStream m = new MemoryStream();
-                bf.Serialize(m, dataState); 
+                bf.Serialize(m, dataState);
                 m.Flush();
                 return m.ToArray();
             }
@@ -206,6 +205,7 @@ namespace NearbyDroids
             if (data == null || data.Length == 0)
             {
                 dataState = new PlayerData();
+                dataState.deviceId = NearbyPlayer.LocalDeviceId;
             }
             else
             {
@@ -259,10 +259,11 @@ namespace NearbyDroids
             return null;
         }
 
-        public static PlayerInfo AddPendingPlayer(NearbyPlayer player, byte[] data)
+        public static PlayerInfo AddPendingPlayer(string endpointId, NearbyPlayer player, byte[] data)
         {
             PlayerInfo info;
-            if (allPlayers.ContainsKey(player.DeviceId))
+
+            if (player != null && player.DeviceId != null && allPlayers.ContainsKey(player.DeviceId))
             {
                 info = allPlayers[player.DeviceId];
             }
@@ -274,17 +275,22 @@ namespace NearbyDroids
             if (info == null)
             {
                 info = ScriptableObject.CreateInstance<PlayerInfo>();
-                allPlayers.Add(player.DeviceId, info);
             }
             else
             {
                 DestroyObject(info.scorePanel);
             }
-                
+
             info.SetDataState(data);
-            info.player = player;
-            info.dataState.Name = player.Name;
-            info.dataState.deviceId = player.DeviceId;
+            NearbyPlayer newPlayer = NearbyPlayer.FindByDeviceId(info.dataState.DeviceId);
+            if (newPlayer == null)
+            {
+                newPlayer = new NearbyPlayer (info.dataState.DeviceId, endpointId, info.DataState.Name);
+            }
+            info.player = newPlayer;
+            info.dataState.Name = newPlayer.Name;
+
+            allPlayers.Add(newPlayer.DeviceId, info);
 
             return info;
         }
@@ -292,7 +298,7 @@ namespace NearbyDroids
         public static PlayerInfo AddPendingPlayer(NearbyPlayer player, int charIndex)
         {
             PlayerInfo info;
-            if (allPlayers.ContainsKey(player.DeviceId))
+            if (player != null && player.DeviceId != null && allPlayers.ContainsKey(player.DeviceId))
             {
                 info = allPlayers[player.DeviceId];
             }

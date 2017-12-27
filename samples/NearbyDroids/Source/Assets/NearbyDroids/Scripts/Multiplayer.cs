@@ -243,7 +243,7 @@ namespace NearbyDroids
                 {
                     if (t.isOn)
                     {
-                        GameManager.Instance.Room = NearbyRoom.LookupRoom(t.name);
+                        GameManager.Instance.Room = NearbyRoom.LookupRoomByEndpoint(t.name);
                         break;
                     }
                 }
@@ -279,7 +279,7 @@ namespace NearbyDroids
                             PlayerInfo p = PlayerInfo.GetPlayer(t.gameObject.name);
                             if (p != null)
                             {
-                                GameManager.Instance.Room.AcceptRequest(p.Player);
+                                GameManager.Instance.Room.AcceptRequest(p.Player.EndpointId);
                             }
                             else
                             {
@@ -306,15 +306,15 @@ namespace NearbyDroids
         /// </summary>
         /// <param name="player">Player.</param>
         /// <param name="data">Data.</param>
-        internal void OnPlayerFound(NearbyPlayer player, byte[] data)
+        internal void OnPlayerFound(string endpointId, byte[] data)
         {
+            PlayerInfo player = PlayerInfo.AddPendingPlayer (endpointId, null, data);
             GameObject obj = Instantiate(itemChoicePrefab) as GameObject;
             obj.transform.SetParent(lobbyListArea.transform, false);
-            obj.GetComponentInChildren<Text>().text = player.Name;
+            obj.GetComponentInChildren<Text> ().text = player.Player.Name;
             Toggle t = obj.GetComponentInChildren<Toggle>();
             t.gameObject.name = player.DeviceId;
             t.isOn = true;
-            PlayerInfo.AddPendingPlayer(player, data);
         }
 
         /// <summary>

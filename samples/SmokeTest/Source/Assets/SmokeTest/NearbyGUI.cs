@@ -179,16 +179,15 @@ namespace SmokeTest
                 {
                     mOwner.SetUI(MainGui.Ui.Main);
                 }
-                    
                 return;
             }
-            
-            string topStatus = "Nearby: " + client.LocalDeviceId();
+
+            string topStatus = "Nearby: " + client.GetServiceId();
             string advertButton;
             bool advertising = mAdvertisingRemaining > 0;
             string discoveryButton;
             bool discovering = mDiscoveryRemaining > 0;
-        
+
             if (advertising)
             {
                 topStatus += string.Format(" Advertising({0})", (int)mAdvertisingRemaining);
@@ -198,7 +197,7 @@ namespace SmokeTest
             {
                 advertButton = "Start\nAdvertising";
             }
-            
+
             if (discovering)
             {
                 topStatus += string.Format(" Disovering({0})", (int)mDiscoveryRemaining);
@@ -208,7 +207,7 @@ namespace SmokeTest
             {
                 discoveryButton = "Start\nDiscovery";
             }
-            
+
             if (GUI.Button(CalcGrid(0, 1), advertButton))
             {
                 if (!advertising)
@@ -275,8 +274,8 @@ namespace SmokeTest
                         dest.Add(ep.Endpoint.EndpointId);
                     }
                 }
-                    
-                string msg = "Reliable from " + client.LocalDeviceId() + " " +
+
+                string msg = "Reliable from " + client.GetServiceId() + " " +
                          ((int)Time.realtimeSinceStartup);
                 client.SendReliable(dest, System.Text.Encoding.UTF8.GetBytes(msg));
             }
@@ -290,10 +289,10 @@ namespace SmokeTest
                         dest.Add(ep.Endpoint.EndpointId);
                     }
                 }
-                    
-                string msg = "Unreliable from " + client.LocalDeviceId() + " " +
+
+                string msg = "Unreliable from " + client.GetServiceId() + " " +
                          ((int)Time.realtimeSinceStartup);
-                client.SendUnreliable(dest, System.Text.Encoding.UTF8.GetBytes(msg));            
+                client.SendUnreliable(dest, System.Text.Encoding.UTF8.GetBytes(msg));
             }
             else if (GUI.Button(CalcGrid(2, 2), "Back"))
             {
@@ -372,7 +371,7 @@ namespace SmokeTest
                     {
                         List<string> dest = new List<string>();
                         dest.Add(endpt.Endpoint.EndpointId);
-                        string msg = "Reliable from " + client.LocalDeviceId() + " " +
+                        string msg = "Reliable from " + client.GetServiceId() + " " +
                                  ((int)Time.realtimeSinceStartup);
                         client.SendReliable(dest, System.Text.Encoding.UTF8.GetBytes(msg));
                     }
@@ -382,7 +381,7 @@ namespace SmokeTest
                         // client.SendReliable
                         List<string> dest = new List<string>();
                         dest.Add(endpt.Endpoint.EndpointId);
-                        string msg = "Unreliable from " + client.LocalDeviceId() + " " +
+                        string msg = "Unreliable from " + client.GetServiceId() + " " +
                                  ((int)Time.realtimeSinceStartup);
                         client.SendReliable(dest, System.Text.Encoding.UTF8.GetBytes(msg));
                     }

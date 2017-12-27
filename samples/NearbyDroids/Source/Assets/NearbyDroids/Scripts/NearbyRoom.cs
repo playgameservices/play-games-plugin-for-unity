@@ -32,7 +32,8 @@ namespace NearbyDroids
         // instance of class to implement discovery result interface.
         private static RoomListener roomListener = new RoomListener();
 
-        // all the rooms so we can look them up when needed.
+        // all the rooms so we can look them up when needed by endpoint ID
+        // we don't know the device id of the room.
         private static Dictionary<string, NearbyRoom> knownRooms =
             new Dictionary<string, NearbyRoom>();
 
@@ -65,11 +66,11 @@ namespace NearbyDroids
         /// the room.
         /// </summary>
         private volatile PlayerEventHandler playerHandler;
-       
+
         /// <summary>
         /// The player found callback. called when players are connected.
         /// </summary>
-        private volatile Action<NearbyPlayer, byte[]> playerFoundCallback;
+        private volatile Action<string, byte[]> playerFoundCallback;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NearbyDroids.NearbyRoom"/> class.
@@ -214,8 +215,20 @@ namespace NearbyDroids
         /// Lookups the room based on the endpoint id.
         /// </summary>
         /// <returns>The room.</returns>
-        /// <param name="endpointId">Endpoint identifier.</param>
-        public static NearbyRoom LookupRoom(string endpointId)
+        /// <param name="deviceId">Device identifier.</param>
+        public static NearbyRoom LookupRoomByDeviceId(string deviceId)
+        {
+            foreach (NearbyRoom r in knownRooms.Values)
+            {
+                if (r.Address.DeviceId == deviceId)
+                {
+                    return r;
+                }
+            }
+            return null;
+        }
+
+        public static NearbyRoom LookupRoomByEndpoint(string endpointId)
         {
             if (knownRooms.ContainsKey(endpointId))
             {
@@ -268,10 +281,10 @@ namespace NearbyDroids
         /// <summary>
         /// Waits for players. the callback is called when a player
         /// sends a connection request.
-        /// This also starts advertising the room via nearby connections. 
+        /// This also starts advertising the room via nearby connections.
         /// </summary>
         /// <param name="callback">Callback for when a player sends a connection request.</param>
-        public void WaitForPlayers(Action<NearbyPlayer, byte[]> callback)
+        public void WaitForPlayers(Action<string, byte[]> callback)
         {
             playerFoundCallback = callback;
             OpenRoom();
@@ -284,7 +297,7 @@ namespace NearbyDroids
         {
             Debug.Log("Advertising Room: " + Name);
             List<string> appIdentifiers = new List<string>();
-       
+
             appIdentifiers.Add(PlayGamesPlatform.Nearby.GetAppBundleId());
             PlayGamesPlatform.Nearby.StartAdvertising(
                 Name,
@@ -349,20 +362,15 @@ namespace NearbyDroids
         /// <param name="request">Request sent to join the room.</param>
         internal void OnConnectionRequest(ConnectionRequest request)
         {
-            NearbyPlayer player = new NearbyPlayer(
-                                      request.RemoteEndpoint.DeviceId,
-                                      request.RemoteEndpoint.EndpointId,
-                                      request.RemoteEndpoint.Name);
-        
             if (playerFoundCallback != null)
             {
-                playerFoundCallback.Invoke(player, request.Payload);
+                playerFoundCallback.Invoke(request.RemoteEndpoint.EndpointId, request.Payload);
             }
 
             if (AutoJoin)
             {
                 Debug.Log("Automatically connecting to " + request.RemoteEndpoint);
-                AcceptRequest(player);
+                AcceptRequest(request.RemoteEndpoint.EndpointId);
             }
         }
 
@@ -370,8 +378,9 @@ namespace NearbyDroids
         /// Accepts the request.
         /// </summary>
         /// <param name="player">Player to accept the request from.</param>
-        public void AcceptRequest(NearbyPlayer player)
+        public void AcceptRequest(string endpointId)
         {
+            NearbyPlayer player = NearbyPlayer.FindByEndpointId (endpointId);
             PlayGamesPlatform.Nearby.AcceptConnectionRequest(
                 player.EndpointId,
                 ConnectionData(),
@@ -439,7 +448,7 @@ namespace NearbyDroids
             {
                 Debug.Log("Found Endpoint!");
                 NearbyRoom room = new NearbyRoom(
-                                      discoveredEndpoint.DeviceId,
+                                      null,
                                       discoveredEndpoint.EndpointId,
                                       discoveredEndpoint.Name);
                 if (roomDiscoveredCallback != null)
@@ -458,7 +467,7 @@ namespace NearbyDroids
                 Debug.Log("Endpoint lost: " + lostEndpointId);
                 if (roomDiscoveredCallback != null)
                 {
-                    NearbyRoom room = NearbyRoom.LookupRoom(lostEndpointId);
+                    NearbyRoom room = NearbyRoom.LookupRoomByEndpoint(lostEndpointId);
                     if (room != null)
                     {
                         roomDiscoveredCallback.Invoke(room, false);
