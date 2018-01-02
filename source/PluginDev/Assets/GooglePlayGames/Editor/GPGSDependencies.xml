@@ -15,7 +15,7 @@
     should be the latest possible that does not cause problems with other
     dependencies.
     -->
-    <androidPackage spec="com.google.android.gms:play-services-games:10+">
+    <androidPackage spec="com.google.android.gms:play-services-games:11.6+">
       <!-- androidSdkPackageIds is optional and contains the set of Android
            SDK package manager components (packages) this package requires.
 

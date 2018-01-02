@@ -88,12 +88,27 @@ namespace GooglePlayGames.Editor
             // check for valid app id
             if (!GPGSUtil.LooksLikeValidServiceId(nearbyServiceId))
             {
-                GPGSUtil.Alert(GPGSStrings.Setup.ServiceIdError);
-                return false;
-            }
+                if (EditorUtility.DisplayDialog(
+                    "Remove Nearby connection permissions?  ",
+                    "The service Id is invalid.  It must follow package naming rules.  " +
+                    "Do you want to remove the AndroidManifest entries for Nearby connections?",
+                    "Yes",
+                    "No"))
+                {
+                    GPGSProjectSettings.Instance.Set(GPGSUtil.SERVICEIDKEY, null);
+                    GPGSProjectSettings.Instance.Save();
+                }
+                else
+                {
+                    return false;
+                }
 
-            GPGSProjectSettings.Instance.Set(GPGSUtil.SERVICEIDKEY, nearbyServiceId);
-            GPGSProjectSettings.Instance.Save();
+             }
+             else
+             {
+                 GPGSProjectSettings.Instance.Set(GPGSUtil.SERVICEIDKEY, nearbyServiceId);
+                 GPGSProjectSettings.Instance.Save();
+             }
 
             if (androidBuild)
             {

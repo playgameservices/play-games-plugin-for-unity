@@ -38,12 +38,6 @@ namespace GooglePlayGames.Native.PInvoke
                 (out_arg, out_size) => C.EndpointDetails_GetEndpointId(SelfPtr(), out_arg, out_size));
         }
 
-        internal string DeviceId()
-        {
-            return PInvokeUtilities.OutParamsToString(
-                (out_arg, out_size) => C.EndpointDetails_GetDeviceId(SelfPtr(), out_arg, out_size));
-        }
-
         internal string Name()
         {
             return PInvokeUtilities.OutParamsToString(
@@ -63,7 +57,7 @@ namespace GooglePlayGames.Native.PInvoke
 
         internal EndpointDetails ToDetails()
         {
-            return new EndpointDetails(EndpointId(), DeviceId(), Name(), ServiceId());
+            return new EndpointDetails(EndpointId(), Name(), ServiceId());
         }
 
         internal static NativeEndpointDetails FromPointer(IntPtr pointer)

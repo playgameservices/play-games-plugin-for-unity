@@ -246,16 +246,6 @@ namespace GooglePlayGames.Native
             mManager.StopAllConnections();
         }
 
-        public string LocalEndpointId()
-        {
-            return mManager.LocalEndpointId();
-        }
-
-        public string LocalDeviceId()
-        {
-            return mManager.LocalDeviceId();
-        }
-
         public string GetAppBundleId()
         {
             return mManager.AppBundleId;

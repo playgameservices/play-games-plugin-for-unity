@@ -49,24 +49,12 @@ namespace GooglePlayGames.Native.Cwrapper {
             /* from(size_t) */ UIntPtr payload_size);
 
         [DllImport(SymbolLocation.NativeSymbolLocation)]
-        internal static extern /* from(size_t) */ UIntPtr NearbyConnections_GetLocalDeviceId(
-            HandleRef self,
-            [In, Out] /* from(char *) */ byte[] out_arg,
-            /* from(size_t) */ UIntPtr out_size);
-
-        [DllImport(SymbolLocation.NativeSymbolLocation)]
         internal static extern void NearbyConnections_StopAdvertising(
             HandleRef self);
 
         [DllImport(SymbolLocation.NativeSymbolLocation)]
         internal static extern void NearbyConnections_Dispose(
             HandleRef self);
-
-        [DllImport(SymbolLocation.NativeSymbolLocation)]
-        internal static extern /* from(size_t) */ UIntPtr NearbyConnections_GetLocalEndpointId(
-            HandleRef self,
-            [In, Out] /* from(char *) */ byte[] out_arg,
-            /* from(size_t) */ UIntPtr out_size);
 
         [DllImport(SymbolLocation.NativeSymbolLocation)]
         internal static extern void NearbyConnections_SendReliableMessage(

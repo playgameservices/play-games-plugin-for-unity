@@ -20,7 +20,7 @@ namespace NearbyDroids
 
     /// <summary>
     /// Enemy controller.
-    /// Heavily inspired by 
+    /// Heavily inspired by
     /// http://unity3d.com/learn/tutorials/projects/2d-roguelike
     /// </summary>
     public class EnemyController : MovingObject
@@ -40,7 +40,7 @@ namespace NearbyDroids
         protected override void Start()
         {
             // Register this enemy with our instance of GameManager by adding
-            // it to a list of Enemy objects. 
+            // it to a list of Enemy objects.
             // This allows the GameManager to issue movement commands.
             GameManager.Instance.AddEnemyToList(this);
 
@@ -95,7 +95,7 @@ namespace NearbyDroids
             // Now that Enemy has moved, set skipMove to true to skip next move.
             skipMove = true;
         }
-            
+
         /// <summary>
         /// Moves the enemy.
         /// MoveEnemy is called by the GameManger each turn to tell each Enemy
@@ -103,9 +103,9 @@ namespace NearbyDroids
         /// </summary>
         public void MoveEnemy()
         {
-            // Declare variables for X and Y axis move directions, 
+            // Declare variables for X and Y axis move directions,
             // these range from -1 to 1.
-            // These values allow us to choose between the cardinal 
+            // These values allow us to choose between the cardinal
             // directions: up, down, left and right.
             int xDir = 0;
             int yDir = 0;
@@ -117,6 +117,7 @@ namespace NearbyDroids
             GameObject[] targets = GameObject.FindGameObjectsWithTag("Player");
             Transform target = null;
             float minDistMagnitude = float.MaxValue;
+
             foreach (GameObject targ in targets)
             {
                 PlayerController player = targ.GetComponent<PlayerController>();
@@ -131,30 +132,35 @@ namespace NearbyDroids
                 }
             }
 
-            // If the difference in positions is approximately zero 
+            if (target == null)
+            {
+                return;
+            }
+
+            // If the difference in positions is approximately zero
             // (Epsilon) do the following:
             float diff = Mathf.Abs(target.position.x - transform.position.x);
             if (diff < float.Epsilon)
             {
                 // If the y coordinate of the target's (player) position
                 // is greater than the y coordinate of this enemy's position
-                // set y direction 1 (to move up). If not, set it 
+                // set y direction 1 (to move up). If not, set it
                 // to -1 (to move down).
                 yDir = target.position.y > transform.position.y ? 1 : -1;
             }
             else
             {
-                // If the difference in positions is not approximately 
+                // If the difference in positions is not approximately
                 // zero (Epsilon) do the following:
-                // Check if target x position is greater than enemy's x 
-                // position, if so set x direction to 1 (move right), 
+                // Check if target x position is greater than enemy's x
+                // position, if so set x direction to 1 (move right),
                 // if not set to -1 (move left).
                 xDir = target.position.x > transform.position.x ? 1 : -1;
             }
 
-            // Call the AttemptMove function and pass in the generic 
+            // Call the AttemptMove function and pass in the generic
             // parameter Player,
-            // because Enemy is moving and expecting to potentially 
+            // because Enemy is moving and expecting to potentially
             // encounter a Player
             // We can also hit another enemy - so check for MovingObject
             AttemptMove<MovingObject>(xDir, yDir);
@@ -178,15 +184,15 @@ namespace NearbyDroids
             }
             else
             {
-                // Declare hitPlayer and set it to equal the 
+                // Declare hitPlayer and set it to equal the
                 // encountered component.
                 PlayerController hitPlayer = component as PlayerController;
 
-                // Call the LoseFood function of hitPlayer passing it 
+                // Call the LoseFood function of hitPlayer passing it
                 // playerDamage, the amount of foodpoints to be subtracted.
                 hitPlayer.LoseHealth(playerDamage);
 
-                // Set the attack trigger of animator to trigger 
+                // Set the attack trigger of animator to trigger
                 // Enemy attack animation.
                 // TODO(wilkinsonclay) - make the animation
                 //  animator.SetTrigger("enemyAttack");

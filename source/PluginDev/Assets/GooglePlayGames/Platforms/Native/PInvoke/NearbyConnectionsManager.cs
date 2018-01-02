@@ -160,18 +160,6 @@ namespace GooglePlayGames.Native.PInvoke
             C.NearbyConnections_Stop(SelfPtr());
         }
 
-        internal string LocalEndpointId()
-        {
-            return PInvokeUtilities.OutParamsToString((out_arg, out_size) =>
-            C.NearbyConnections_GetLocalEndpointId(SelfPtr(), out_arg, out_size));
-        }
-
-        internal string LocalDeviceId()
-        {
-            return PInvokeUtilities.OutParamsToString((out_arg, out_size) =>
-            C.NearbyConnections_GetLocalDeviceId(SelfPtr(), out_arg, out_size));
-        }
-
         public string AppBundleId
         {
             get
