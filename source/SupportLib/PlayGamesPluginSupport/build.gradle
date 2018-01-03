@@ -16,15 +16,17 @@ if (project.hasProperty("uploadDir")) {
     project.ext.uploadDir = "${buildDir}/m2repository"
 }
 
-
 android {
+    // TODO(claywilkinson): Clean up lint warnings
+    lintOptions {
+        abortOnError false
+    }
     defaultConfig {
         versionName  project.version
         archivesBaseName = project.ext.baseName
         minSdkVersion 14
     }
     compileSdkVersion 23
-    buildToolsVersion "25.0.3"
 }
 
 // Rename the .aar file to be .srcaar to work around
@@ -52,6 +54,7 @@ task renameLibrary() {
     }
   }
 
+
   doLast {
     configurations.archives.with   {
          artifacts.remove artifacts.find { it.extension == "aar"}
@@ -59,22 +62,22 @@ task renameLibrary() {
   }
 }
 
+tasks.whenTaskAdded { task ->
+  if (task.name == 'assembleRelease')
+    renameLibrary.dependsOn task
+}
+
 uploadArchives {
   dependsOn renameLibrary
   repositories {
     mavenDeployer {
       repository(url: uri(project.ext.uploadDir))
-
-      // Remove the dependencies from the pom file to simplify the
-      // the resolution process.
-      pom.whenConfigured {
-        p -> p.dependencies = []
-      }
     }
   }
 }
 
 dependencies {
-    compile 'com.google.android.gms:play-services-games:10.2.6'
-    compile 'com.google.android.gms:play-services-auth:10.2.6'
+    implementation 'com.google.android.gms:play-services-games:11.6+'
+    implementation 'com.google.android.gms:play-services-auth:11.6+'
+    implementation 'com.google.android.gms:play-services-nearby:11.6+'
 }

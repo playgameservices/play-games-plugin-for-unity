@@ -4,6 +4,7 @@
 
 buildscript {
     repositories {
+        google()
         jcenter()
         mavenLocal()
     }
@@ -37,7 +38,7 @@ project.ext {
       } else if (os_windows) {
         unity_exe ='c:\\program files\\unity\\editor\\unity.exe'
       } else {
-        unity_exe = 'Unity'
+        unity_exe = 'unity'
       }
     }
 
@@ -57,23 +58,29 @@ project.ext {
     samplesBuildSrc = file('build/sampleSrc').absolutePath
     exportPath = file('build/plugin.unitypackage').absolutePath
     currentPluginPath = file('../current-build').absolutePath
-    currentPluginVersion = "0.9.42"
-    currentPluginName = 'GooglePlayGamesPlugin-' + currentPluginVersion + '.unitypackage'
+    currentPluginVersion = "0.9.50"
+    currentPluginBasename = 'GooglePlayGamesPlugin'
+    currentPluginName = "${currentPluginBasename}-${currentPluginVersion}.unitypackage"
     resolverDir = new File('build/jarresolver').absolutePath
+
+    editorDir = "Assets/GooglePlayGames/Editor"
+    pluginRepoDir = "${pluginProj}/${editorDir}/m2repository"
 
     sampleList = ['CubicPilot', 'Minimal',
          'QuizRacer',  'TicTacToe',
          'NearbyDroids', 'SmokeTest', 'TrivialQuest']
 
-    gpg_sdk_link = 'https://developers.google.com/games/services/downloads/gpg-cpp-sdk.v2.3.zip'
+    gpg_sdk_link = System.getProperty("GPG_SDK_URL")
+    if (gpg_sdk_link == null || gpg_sdk_link.isEmpty()) {
+      gpg_sdk_link = 'https://developers.google.com/games/services/downloads/gpg-cpp-sdk.v3.0.zip'
+    }
 
     jarresolver_uri = System.getProperty("RESOLVER_PACKAGE_URI")
     jarresolver_repos = [
       'https://github.com/googlesamples/unity-jar-resolver.git'
     ]
-     jarresolver_tag = null;
+    jarresolver_tag = null;
 }
-
 
 if (!tasks.findByName('prebuild')) {
     task prebuild() {
@@ -156,23 +163,18 @@ sampleList.each { sampleName ->
     createTask.doFirst {
         delete "${buildPath}/Samples/${sampleName}"
 
-        exec {
-            executable "${unity_exe}"
-            args "-batchmode",
-                 "-createProject", "${buildPath}/Samples/${sampleName}",
-                 "-logFile", "${buildPath}/CreateSample${sampleName}.1.log",
-                 "-importPackage", "${exportPath}",
-                 "-quit"
-        }
-        // Activate the resolver.
-        exec {
-            executable "${unity_exe}"
-             args "-batchmode",
-                 "-projectPath", "${buildPath}/Samples/${sampleName}",
-                 "-logFile", "${buildPath}/CreateSample${sampleName}.2.log",
-                 "-executeMethod", "Google.VersionHandler.UpdateNow",
-                 "-quit"
-        }
+        def logFilename = "${buildPath}/CreateSample${sampleName}.log"
+        def argv = [
+          "-gvh_disable",
+          "-g.building",
+          "-batchmode",
+          "-createProject", "${buildPath}/Samples/${sampleName}",
+          "-importPackage", "${exportPath}",
+          "-logFile", logFilename,
+          "-quit"
+        ]
+        runUnity(argv, logFilename)
+
     }
     // This is a build task
     createTask.ext.remoteTaskPhase = 'build'
@@ -219,26 +221,21 @@ sampleList.each { sampleName ->
         packageTask.description = "Package ${sampleName} sample"
 
         packageTask.dependsOn createTask, copySrcTask
-        /*
-                Next, export the project
-                Target Android here since the plugin only works for
-                android or ios, otherwise the sample won't compile
-                and then can't be exported.
-        */
 
         packageTask.doLast {
-            exec {
-                executable "${unity_exe}"
-                args "-batchmode",
-                    // This prevents the VersionHandler to preserve the plugin layout
-                    "-gvh_disable",
-                     "-buildTarget", "android",
-                     "-projectPath", "${buildPath}/Samples/${sampleName}",
-                     "-logFile", "${buildPath}/ExportSample${sampleName}.log",
-                     "-exportPackage", "${sampleAssets}",
-                         "${buildPath}/Samples/${sampleName}.unitypackage",
-                     "-quit"
-            }
+            def logFilename = "${buildPath}/ExportSample${sampleName}.log"
+            def argv = [
+              "-gvh_disable",
+              "-g.building",
+              "-batchmode",
+              "-projectPath", "${buildPath}/Samples/${sampleName}",
+              "-buildTarget", "android",
+              "-logFile", logFilename,
+              "-exportPackage", "${sampleAssets}",
+                    "${buildPath}/Samples/${sampleName}.unitypackage",
+              "-quit"
+              ]
+            runUnity(argv, logFilename)
         }
         packageTask.ext.remoteTaskPhase = 'build'
 
@@ -272,22 +269,17 @@ task import_jarresolver() {
             }
         def jarresolver_package = tree.getSingleFile()
 
-        ext.execResult = exec {
-              executable "${unity_exe}"
-              args "-g.building",
-                   "-batchmode",
-                   "-createProject", "${pluginProj}",
-                   "-logFile", "build/import_resolver_unity.log",
-                   "-importPackage", "${jarresolver_package}", "-quit"
-              ignoreExitValue true
-        }
-        if (ext.execResult.exitValue != 0) {
-            println "***Error Running Unity:"
-            def src = file('build/import_resolver_unity.log').text
-            print src
-            throw new GradleException('error exporting plugin')
-        }
-
+        def logFilename = "${buildDir}/import_resolver_unity.log"
+        def argv = [
+            "-gvh_disable",
+            "-g.building",
+            "-batchmode",
+            "-createProject", "${pluginProj}",
+            "-logFile", logFilename,
+            "-importPackage", "${jarresolver_package}",
+            "-quit"
+            ]
+        runUnity(argv, logFilename)
     }
 
 }
@@ -310,13 +302,102 @@ task copy_pluginProjSrc () {
         from {"${buildDir}/m2repository"}
         includes ["**/*"]
         duplicatesStrategy DuplicatesStrategy.INCLUDE
-        into {"${pluginProj}/Assets/GooglePlayGames/Editor/m2repository"}
+        into {"${pluginRepoDir}"}
       }
     }
 }
 copy_pluginProjSrc.dependsOn import_jarresolver
 copy_pluginProjSrc.ext.remoteTaskPhase = 'build'
 
+
+
+task generate_dependency_xml() {
+  description "Generate the JarResolver dependency file for the support library"
+  dependsOn copy_pluginProjSrc
+  doFirst {
+    def xmlFile = file("${pluginProj}/${editorDir}/${currentPluginBasename}Dependencies.xml")
+    xmlFile << '<?xml version="1.0" encoding="UTF-8" ?>\n'
+    xmlFile << '<dependencies>\n'
+    xmlFile << '<!-- Internal library dependency generated at build time. \n'
+    xmlFile << '    It also defines the transitive dependencies on play-services\n'
+    xmlFile << '-->\n'
+    xmlFile << '  <androidPackages>\n'
+    xmlFile << '    <androidPackage spec="com.google.games:gpgs-plugin-support:'
+    xmlFile << "${currentPluginVersion}\">\n"
+    xmlFile << '      <repositories>\n'
+    xmlFile << '        <repository>Assets/GooglePlayGames/Editor/m2repository</repository>\n'
+    xmlFile << '      </repositories>\n'
+    xmlFile << '    </androidPackage>\n'
+    xmlFile << '  </androidPackages>\n'
+    xmlFile << '</dependencies>\n'
+  }
+}
+
+
+task inject_versionIntoMetaFiles() {
+  description 'Inject the version number into the plugin\'s meta files.'
+  dependsOn copy_pluginProjSrc, generate_dependency_xml, import_jarresolver
+  doLast {
+    def currentManifestFile = versionedAssetName("${currentPluginBasename}.txt", "${currentPluginVersion}")
+    for (fileobj in fileTree("${pluginProj}")) {
+      if (fileobj.path.endsWith('.meta')) {
+        // Skip the manifest files for any previous versions
+        if (fileobj.path.contains("Editor/${currentPluginBasename}") &&
+            !fileobj.path.contains(currentManifestFile)) {
+          continue
+        }
+        def lines = fileobj.text.split('\n')
+        def outputLines = []
+        def added = false
+        for (line in lines) {
+          outputLines.add(line)
+          if (line.contains('labels:')) {
+            outputLines.add("- gvh_v${currentPluginVersion}")
+            added = true
+          } else if (line.contains('folderAsset:') && line.contains('yes')) {
+            added = true
+          }
+        }
+        if (!added) {
+          outputLines.add("labels:\n- gvh_v${currentPluginVersion}")
+        }
+        fileobj.write(outputLines.join('\n') + '\n')
+      }
+    }
+  }
+}
+
+task generate_manifest(dependsOn: [ 'inject_versionIntoMetaFiles']) {
+  description 'Generate a manifest for the files in the plug-in.'
+  doLast {
+    def dir = file("${pluginProj}/Assets")
+    def list = []
+    dir.eachFileRecurse(groovy.io.FileType.FILES) { filename ->
+        def path = filename.path
+        if (!path.toLowerCase().endsWith('.meta')) {
+          list << filename.path.replace("${pluginProj}/", '')
+        }
+    }
+    def manifest = file("${pluginProj}/${editorDir}/" +
+          versionedAssetName(currentPluginBasename + '.txt', "${currentPluginVersion}"))
+    manifest.write(list.join('\n') + '\n')
+  }
+}
+
+
+task copy_manifestMetadata(dependsOn: generate_manifest, type: Copy) {
+  def manifestBasename = versionedAssetName(currentPluginBasename + '.txt',
+        null) + '.meta'
+  description 'Copy .meta file for the plugin manifest.'
+  from file("${pluginProj}/${editorDir}/" + manifestBasename)
+  into file("${pluginProj}/${editorDir}/")
+  rename {
+    String fn ->
+      return fn.replace(manifestBasename,
+          versionedAssetName(currentPluginBasename + '.txt',
+          "${currentPluginVersion}") + '.meta')
+  }
+}
 task export_package () {
     description = "Creates and exports the Plugin unity package"
     doFirst {
@@ -325,6 +406,7 @@ task export_package () {
     }
 
     doLast {
+        def logFilename = "${buildDir}/unity.log"
         def argv = [
                 "-g.building",
                 // This prevents the VersionHandler to preserve the plugin layout
@@ -336,7 +418,7 @@ task export_package () {
                 // the sample projects.
                 "-batchmode",
                 "-projectPath", "${pluginProj}",
-                "-logFile", "build/unity.log",
+                "-logFile", logFilename,
                 "-exportPackage",
                     "Assets/GooglePlayGames",
                     "Assets/GooglePlayGames/Plugins/Android/GooglePlayGamesManifest.plugin",
@@ -345,21 +427,10 @@ task export_package () {
                 "${exportPath}",
                 "-quit"
         ]
-
-        ext.execResult = exec {
-            executable "${unity_exe}"
-                args argv
-                ignoreExitValue true
-        }
-        if (ext.execResult.exitValue != 0) {
-            println "***Error Running Unity:"
-            def src = file('build/unity.log').text
-            print src
-            throw new GradleException('error exporting plugin')
-        }
+        runUnity(argv, logFilename)
     }
 }
-export_package.dependsOn import_jarresolver
+export_package.dependsOn generate_manifest, import_jarresolver, copy_manifestMetadata
 export_package.dependsOn copy_pluginProjSrc
 export_package.ext.remoteTaskPhase = 'build'
 /*
@@ -535,20 +606,6 @@ task build_java_support_lib(type: GradleBuild) {
 build_java_support_lib.ext.remoteTaskPhase = 'prebuild'
 build_java_support_lib.dependsOn copy_libs
 
-task support_jar(dependsOn:'build_java_support_lib') << {
-    copy {
-        from 'SupportLib/PlayGamesPluginSupport/build/outputs/aar/PlayGamesPluginSupport-debug.aar'
-        into {'build/PluginSrc/Assets/Plugins/Android'}
-        rename ('PlayGamesPluginSupport-debug.aar','play-games-plugin-support.aar')
-    }
-}
-support_jar.description = "Copies the android support libs to the Plugin directory"
-support_jar.dependsOn 'copy_plugin_source'
-
-support_jar.ext.remoteTaskPhase = 'prebuild'
-
-
-
 task clean_support_lib(type: GradleBuild) {
     description = "cleans the client libraries for Android"
     buildFile = 'SupportLib/build.gradle'
@@ -559,4 +616,38 @@ task clean() {
         delete 'build'
         }
     dependsOn clean_support_lib
+}
+
+
+// Construct the name of a versioned asset from the source filename and version
+// // string.
+// // The encoded string takes the form...
+// // ${filename}_v${version}_.${extension}
+// // where extension is derived from the specified filename.
+def versionedAssetName(filename, version) {
+  def extensionIndex = filename.lastIndexOf('.')
+  def basename = filename.substring(0, extensionIndex)
+  def extension = filename.substring(extensionIndex)
+  // Encode the DLL version and target names into the DLL in the form...
+  // ${dllname}_t${hypen_separated_target_names}_v${version}.dll
+  def targetName = basename
+  if (version != null && !version.isEmpty()) {
+    targetName += '_v' + version
+  }
+  return targetName + extension
+}
+
+def runUnity(argv, logFilename) {
+  def result = exec {
+    executable "${project.ext.unity_exe}"
+    args argv
+    ignoreExitValue true
+  }
+
+  if (result.exitValue != 0) {
+    println "***Error Running Unity: ${result}"
+    def src = file(logFileName).text
+    print src
+    throw new GradleException('error exporting sample')
+  }
 }
