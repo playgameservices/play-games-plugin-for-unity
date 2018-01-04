@@ -46,12 +46,6 @@ namespace GooglePlayGames.Editor
         public const string WEBCLIENTIDKEY = "and.ClientId";
 
         /// <summary>Property key for project settings.</summary>
-        public const string IOSCLIENTIDKEY = "ios.ClientId";
-
-        /// <summary>Property key for project settings.</summary>
-        public const string IOSBUNDLEIDKEY = "ios.BundleId";
-
-        /// <summary>Property key for project settings.</summary>
         public const string ANDROIDRESOURCEKEY = "and.ResourceData";
 
         /// <summary>Property key for project settings.</summary>
@@ -59,12 +53,6 @@ namespace GooglePlayGames.Editor
 
         /// <summary>Property key for project settings.</summary>
         public const string ANDROIDBUNDLEIDKEY = "and.BundleId";
-
-        /// <summary>Property key for project settings.</summary>
-        public const string IOSRESOURCEKEY = "ios.ResourceData";
-
-        /// <summary>Property key for project settings.</summary>
-        public const string IOSSETUPDONEKEY = "ios.SetupDone";
 
         /// <summary>Property key for plugin version.</summary>
         public const string PLUGINVERSIONKEY = "proj.pluginVersion";
@@ -90,12 +78,6 @@ namespace GooglePlayGames.Editor
 
         /// <summary>Constant for token replacement</summary>
         private const string WEBCLIENTIDPLACEHOLDER = "__WEB_CLIENTID__";
-
-        /// <summary>Constant for token replacement</summary>
-        private const string IOSCLIENTIDPLACEHOLDER = "__IOS_CLIENTID__";
-
-        /// <summary>Constant for token replacement</summary>
-        private const string IOSBUNDLEIDPLACEHOLDER = "__BUNDLEID__";
 
         /// <summary>Constant for token replacement</summary>
         private const string PLUGINVERSIONPLACEHOLDER = "__PLUGIN_VERSION__";
@@ -142,8 +124,6 @@ namespace GooglePlayGames.Editor
                 { APPIDPLACEHOLDER, APPIDKEY },
                 { CLASSNAMEPLACEHOLDER, CLASSNAMEKEY },
                 { WEBCLIENTIDPLACEHOLDER, WEBCLIENTIDKEY },
-                { IOSCLIENTIDPLACEHOLDER, IOSCLIENTIDKEY },
-                { IOSBUNDLEIDPLACEHOLDER, IOSBUNDLEIDKEY },
                 { PLUGINVERSIONPLACEHOLDER, PLUGINVERSIONKEY},
                 // Causes the placeholder to be replaced with overridden value at runtime.
                 {  NEARBY_PERMISSIONS_PLACEHOLDER, NEARBY_PERMISSIONS_PLACEHOLDER}
@@ -330,25 +310,6 @@ namespace GooglePlayGames.Editor
                 Debug.Log("GameInfo.cs does not exist.  Run Window > Google Play Games > Setup > Android Setup...");
                 return false;
             }
-            #elif (UNITY_IPHONE && !NO_GPGS)
-            doneSetup = GPGSProjectSettings.Instance.GetBool(IOSSETUPDONEKEY, false);
-            // check gameinfo
-            if (File.Exists(GameInfoPath))
-            {
-                string contents = ReadFile(GameInfoPath);
-                if (contents.Contains(IOSCLIENTIDPLACEHOLDER))
-                {
-                    Debug.Log("GameInfo not initialized with Client Id.  " +
-                        "Run Window > Google Play Games > Setup > iOS Setup...");
-                    return false;
-                }
-            }
-            else
-            {
-                Debug.Log("GameInfo.cs does not exist.  Run Window > Google Play Games > Setup > iOS Setup...");
-                return false;
-            }
-
             #endif
 
             return doneSetup;

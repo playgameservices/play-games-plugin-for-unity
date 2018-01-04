@@ -38,7 +38,7 @@ project.ext {
       } else if (os_windows) {
         unity_exe ='c:\\program files\\unity\\editor\\unity.exe'
       } else {
-        unity_exe = 'unity'
+        unity_exe = 'Unity'
       }
     }
 
@@ -423,7 +423,6 @@ task export_package () {
                     "Assets/GooglePlayGames",
                     "Assets/GooglePlayGames/Plugins/Android/GooglePlayGamesManifest.plugin",
                     "Assets/PlayServicesResolver",
-                    "Assets/Plugins/iOS",
                 "${exportPath}",
                 "-quit"
         ]
@@ -646,7 +645,7 @@ def runUnity(argv, logFilename) {
 
   if (result.exitValue != 0) {
     println "***Error Running Unity: ${result}"
-    def src = file(logFileName).text
+    def src = file(logFilename).text
     print src
     throw new GradleException('error exporting sample')
   }

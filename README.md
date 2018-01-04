@@ -23,12 +23,13 @@ following features of the Google Play Games API:<br/>
 * cloud save read/write
 * show built-in achievement/leaderboards UI
 * events and quests
+* video recording of gameplay
 * [nearby connections](NEARBY.md)
 * [turn-based multiplayer](TBMP.md)
 * [real-time multiplayer](RTMP.md)
 
 
-__NOTICE__: Google Play games services for iOS is deprecated,
+__NOTICE__: This version of the plugin no longer supports iOS.  Google Play games services for iOS is deprecated,
 and is not likely to function as expected. Do not use Google Play games
 services for iOS in new apps. See the [deprecation announcement](https://android-developers.googleblog.com/2017/04/focusing-our-google-play-games-services.html)
 blog post for more details.
@@ -36,25 +37,17 @@ blog post for more details.
 Features:
 
 * easy GUI-oriented project setup (integrated into the Unity GUI)
-* cross-platform support (Android and iOS) with no need for platform glue code.
-* (Android) no need to override/customize the player Activity
-* (Android) no need to override/customize AndroidManifest.xml
-* (iOS) integrates into XCode build using Cocoapods to manage the framework dependencies.
+* no need to override/customize the player Activity
+* no need to override/customize AndroidManifest.xml
 
 System requirements:
 
 * Unity&reg; 5 or above.
 
-  *Note:4.6.8 works at runtime, but some editor functionality does not work.
-  as a result, use of older version of Unity are at your own peril.*
 * To deploy on Android:
     * Android SDK
     * Android v4.0 or higher
-    * Google Play Services library, version 8.4 or above
-* To deploy on iOS:
-    * XCode 6 or above
-    * [Cocoapods](https://cocoapods.org/)
-
+    * Google Play Services library, version 11.6 or above
 
 ## Upgrading
 
@@ -66,9 +59,8 @@ plugin and wish to upgrade to a new version, please refer to the
 
 To use the plugin, you must first [configure your
 game](https://developers.google.com/games/services/console/enabling) in the
-Google Play Developer Console. Follow the instructions on creating a client ID
-for Android and/or iOS (depending on what platforms you intend to deploy or game
-on). Be particularly careful when entering your package name and your
+Google Play Developer Console. Follow the instructions on creating a client ID.
+Be particularly careful when entering your package name and your
 certificate fingerprints, since mistakes on those screens can be difficult to
 recover from.
 
@@ -85,8 +77,7 @@ tab, then click on "Get resources" on the bottom of the list.
 
 ![click Get Resources](source/docgen/resourcesLink.png "Show the resources data")
 
-If you are building for Android, copy the "Android resources".  If you are building
-for iOS, click "Objective-C" and copy those entries.
+Then click the "Android section".
 
 ![Android Resources](source/docgen/resources.png "Android resource data")
 
@@ -236,56 +227,6 @@ click **Environment Variables**. On Windows 8, press **Windows Key + W** and
 search for **environment variables**
 For more information, consult the documentation for your version of Windows.
 
-
-## iOS Setup
-
-__NOTICE__: Google Play games services for iOS is deprecated,
-and is not likely to function as expected. Do not use Google Play games
-services for iOS in new apps. See the [deprecation announcement](https://android-developers.googleblog.com/2017/04/focusing-our-google-play-games-services.html)
-blog post for more details.
-
-Install Cocoapods
-
-
-This plugin uses another plugin called the Unity Jar Resolver, which handles
-resolving the dependencies needed for this plugin.  When building for iOS in
-Unity, a post build step is executed that runs Cocoapods and then adds the required
-libraries and frameworks directly to the XCode project.  This is different from
-previous versions; you no longer need to open the workspace in XCode.
-
-**Note:** If you are using a version of Unity less than 5.0, you may encounter
-a linker error when building the Xcode application.  If you see the error:
-`ld: library not found for -lPods-Unity-iPhone`
-Then open the project tree, expand Frameworks, and delete libPods-Unity-iPhone.a
-and rebuild.
-
-Next, open the iOS build settings dialog. To do so, click **File > Build Settings**,
-select the **iOS** platform, and click **Player Settings**. Find the **Bundle Identifier**
-setting and enter your bundle identifier there.
-
-Next, click the **Window > Google Play Games > Setup  - iOS setup** menu item.
-
-Enter the Constants class name.  This is the name of the fully qualified class
-that will be updated (or created) which contains the IDs of the game resources.
-The format of the name is <namespace>.<classname>. For example, AwesomeGame.GPGSIds
-
-Enter the resource definition data.  This is the Objective-C  data from the Google Play Developer Console
-which contains the resource IDs as well as the Client ID.
-
-This data is found in the Google Play Developer Console by clicking "Get resources" on any of the
-resource pages (e.g. Achievements or Leaderboards), then clicking Objective-C.
-
-When ready, click the **Setup** button to finish the configuration process.
-
-**Important:** If you ever change your bundle ID, you must perform the iOS setup
-again in order to update the necessary files where this information gets replicated.
-
-**Note:**  If you are using a web application or backend server with your game,
-you can link the web application to the game to enable gettting the player's
-id token and/or email address.  To do this, link a web application to the
-game in the Google Play Developer Console, and enter the client id for the web application into
-the setup dialog.
-
 ## Run the Project
 
 If you are working with the **Minimal** sample, you should be able to build
@@ -295,13 +236,6 @@ and you should be able to sign in when you click it.
 To build and run on Android, click
 **File > Build Settings**, select the **Android** platform, then
 **Switch to Platform**, then **Build and Run**.
-
-To build and run on iOS, click **File > Build Settings**, select the **iOS** platform,
-then **Switch to Platform**, then **Build**. This will export an XCode project and
-will display additional instructions on completing the build.
-
-The remainder of this guide assumes you are now attempting to write your
-own code to integrate Play Games services into your game.
 
 ## ISocialPlatform Compliance
 
@@ -549,10 +483,6 @@ To show the built-in UI for all achievements, call
     // show achievements UI
     Social.ShowAchievementsUI();
 ```
-
-This will show a standard UI appropriate for the look and feel of the platform
-(Android or iOS).
-
 ## Showing the Leaderboard UI
 
 To show the built-in UI for all leaderboards, call **Social.ShowLeaderboardUI**.
@@ -1019,7 +949,7 @@ If you wish to integrate **real-time multiplayer** in your game, refer to the
 
 ## Video Recording
 
-If you wish to integrate the Play Games video capture functionality (Android only) into your game,
+If you wish to integrate the Play Games video capture functionality into your game,
 you can use the following features.
 
 ### Get Video Capture Capabilities ###
@@ -1128,155 +1058,6 @@ To sign the user out, use the **PlayGamesPlatform.SignOut** method.
 
 After signing out, no further API calls can be made until the user authenticates again.
 
-## Building for iOS
-
-__NOTICE__: Google Play games services for iOS is deprecated,
-and is not likely to function as expected. Do not use Google Play games
-services for iOS in new apps. See the [deprecation announcement](https://android-developers.googleblog.com/2017/04/focusing-our-google-play-games-services.html)
-blog post for more details.
-
-To build your game for iOS, do as you would normally do in Unity. Select **File > Build Settings**, then select the **iOS** platform.
-Click **Player Settings** and make sure that the target iOS platform is 7.0 or above.
-
-Then, click **Build** and select an output directory to save the XCode project. Do not use
-the **Build and Run** option, since there are some manual steps you must take in
-the XCode project before your project can run.
-
-After building the XCode project, the Play Games postprocessor will run to
-configure the Info.plist settings on your project. You will see a log of the
-operation, which if successful, will give you additional instructions to finish
-configuring your XCode project.
-
-In your xcode project directory, create a file named __Podfile__.  In this file
-add  the following lines (or merge them in if you have other Cocoapod dependencies).
-
-```
-# Uncomment this line to define a global platform for your project
-platform :ios, '7.0'
-
-target 'Unity-iPhone' do
-    pod 'GooglePlayGames', '5.1.2'
-end
-
-target 'Unity-iPhone Tests' do
-    pod 'GooglePlayGames', '5.1.2'
-end
-
-post_install do |installer|
-  installer.pods_project.targets.each do |target|
-    target.build_configurations.each do |config|
-      config.build_settings['ENABLE_BITCODE'] = 'NO'
-    end
-  end
-end
-```
-
-The final step that is run is adding the Podfile to the project and running
-`pod install`.  This creates a pod project containing the dependencies, and also
-a workspace configuration called Unity-iPhone.xcworkspace.
-
-To open and build the project open a terminal window in the project directory, and type
-`open Unity-iPhone.xcworkspace`. Alternatively, you can double click the file in Finder.
-
-**Notice:** GooglePlayGames is using a fixed version number, and may be incompatible
-with other pods.
-
-## Excluding all Google Play Game Services when building for iOS
-
-This plugin can be disabled for building on iOS.  What this means is that the libraries and references
-originating in the GooglePlayGames namespace are excluded from the build.  It does not affect code that
-has been written by you, such as calls to the GPGS API.
-
-To disable the Google Play Game Services in the iOS build, open the iOS player settings.  Then in the "Other Settings"
-panel, find the entry named "Scripting Define Symbol" and add a symbol named: NO_GPGS (case sensitive).
-
-## Common Build Errors on iOS
-
-**"The current deployment target does not support automated _weak references"**. Make sure your target iOS platform is 7.0 or above. If the target platform is below 7.0, this error will occur during build.
-
-**"Dsymutil error"**. Depending on your version of XCode, you may need to disable dSYM file generation.
-To do this, go to **File > Build Settings > Build Options > Debug Information Format > Debug**.
-Select **DWARF** instead of **DWARF with dSYM**.
-
-**URL errors while signing in.** This is often a sign that either the client ID or the Bundle Identifier is not correctly set up, or that your **Info.plist** file got corrupted. Check that your client ID and Bundle ID are correctly configured in the project and that they correspond to the data in the Developer Console.
-
-**ld: framework not found GoogleOpenSource**. In Xcode, remove the reference
-to the framework in the Pods project, then add it back.  This is a resolution for
-missing other frameworks as well.
-
-## Building for iOS to run on the simulator (pre-Unity 5.0)
-
-**Note:** If you are using Unity 5.0 or greater, no changes to the generated project
-is needed.
-
-To run your game in the simulator as opposed to a real device, you must export
-it from Unity with the "Simulator SDK" instead of the "Device SDK". To do this,
-open your game project in Unity, select **File > Build Settings**, select iOS,
-then click on **Player Settings**. Scroll down to find the **"SDK Version"**
-option, and change it to **"Simulator SDK".**
-
-Then, export your project and perform the post-export steps as described above.
-
-Next, you must manually enable some API entry points that are used by the
-plugin, but which are by default disabled in the Unity runtime code. To do
-this, open the **Libraries/RegisterMonoModule.cpp** file in your exported project.
-
-You will notice there are two sections near the top of the file that<br/>
-are delimited by **#if !(TARGET_IPHONE_SIMULATOR)** and** #endif**.
-
-```c
-    extern "C" {
-        ....
-        #if !(TARGET_IPHONE_SIMULATOR)
-            ...declarations... (zone A)
-        #endif
-    }
-
-    void RegisterMonoModules()
-    {
-        ...
-        #if !(TARGET_IPHONE_SIMULATOR)
-            ...function calls... (zone B)
-        #endif
-    }
-```
-
- <br/>
-To enable the simulator to make the necessary C function calls, you need to:
-
-1. Find the line that declares the **mono_dl_register_symbol()** function in
-   **Zone A**.
-2. Move it to the outside of **Zone A**, right after the **#endif** (but still
-   inside the **extern "C"** block)
-3. Find ALL the calls to **mono_dl_register_symbol()** in **Zone B**.
-4. Move them ALL outside **Zone B**, after the **#endif** (but still inside the
-   **RegisterMonoModules()** function).
-
-The final structure should be similar to the following:
-
-```c
-    extern "C" {
-        ....
-        #if !(TARGET_IPHONE_SIMULATOR)
-            .. declarations .. (zone A)
-        #endif
-        void mono_dl_register_symbol(const char* name, void *addr);
-    }
-
-    void RegisterMonoModules()
-    {
-        ...
-        #if !(TARGET_IPHONE_SIMULATOR)
-            ...function calls... (zone B)
-        #endif
-        mono_dl_register_symbol("GPGSFooBar1", (void*)&GPGSFooBar1);
-        mono_dl_register_symbol("GPGSFooBar2", (void*)&GPGSFooBar2);
-        mono_dl_register_symbol("GPGSFooBar3", (void*)&GPGSFooBar3);
-        mono_dl_register_symbol("GPGSFooBar4", (void*)&GPGSFooBar4);
-        ....
-    }
-```
-
 ## (Advanced) Using the Plugin Without Overriding the Default Social Platform
 
 When you call `PlayGamesPlatform.Activate`, Google Play Games becomes your default social platform implementation, which means that static calls to methods in `Social` and `Social.Active` will be carried out by the Google Play Games plugin. This is the desired behavior for most games using the plugin.
@@ -1295,27 +1076,6 @@ That way, you can even submit scores and achievements simultaneously to two or m
     // Submit achievement to Google Play
     PlayGamesPlatform.Instance.ReportProgress("MyGooglePlayAchievementIdHere", 100.0f, callback);
 
-## Using Production APNS Certificate (iOS)
-
-In the `GPGSAppController.m` file, you will notice within the `application:didRegisterForRemoteNotificationsWithDeviceToken` method that there is a comment discussing using the sandbox push server. Follow instructions there to switch between the production and sandbox environment and push notification.
-
-
-## Building iOS projects without Cocoapods
-
-Building without Cocoapods is not recommended.  The reason is there are a
-large set of dependencies.  Many of these dependencies are changing to keep
-pace with improvements and changes in the iOS eco-system.  GooglePlayGames is
-a framework with a low update frequency so sometimes finding the links to the
-correct versions of libraries is difficult.
-
-One alternative to always using Cocoapods to build is to use Cocapods once and
-create a library from the 'Pods' project and then integrate that into your project.
-
-But really, not using Cocapods is not recommended.
-
-**Note:** If you export the project a second time to the same XCode project
-directory, you can use Unity's **Append** option to avoid overwriting these
-settings. If you use **Replace**, however, you might have to reapply some settings.
 ## Special Thanks
 
 This section lists people who have contributed to this project by writing code, improving documentation or fixing bugs.
