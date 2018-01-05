@@ -1,8 +1,0 @@
-#!/bin/bash
-echo "Running post-process build scripts."
-for script in `/bin/ls -1 Assets/GooglePlayGames/Editor | grep -i ^postprocessbuildplayer_`; do
-    chmod +x "Assets/Editor/$script"
-    echo "[[[ $script ]]]"
-    "Assets/Editor/$script" "$@"
-done
-

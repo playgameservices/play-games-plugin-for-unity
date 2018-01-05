@@ -34,8 +34,7 @@ namespace GooglePlayGames.Editor
             public const string Text = "The Google Play Games Plugin for Unity version $VERSION " +
                                        "is now ready to use. If this is a new installation or of you have " +
                                        "just upgraded from a previous version, please click the 'Google Play Games' " +
-                                       "menu and select 'Android Setup' and/or 'iOS Setup' to set up your " +
-                                       "project to build for the corresponding platforms.";
+                                       "menu and select 'Android Setup' to set up your project.";
         }
 
         public class Setup
@@ -59,27 +58,6 @@ namespace GooglePlayGames.Editor
                                                      "nearby connections service scope";
 
             public const string SetupButton = "Setup";
-        }
-
-        public class IOSSetup
-        {
-            public const string Title = "Google Play Games - iOS Setup";
-            public const string Blurb = "To configure Google Play Games for iOS in this project,\n" +
-                                        "please enter the information below and click on the Setup button.";
-
-            public const string ClientIdTitle = "iOS App Client ID";
-            public const string ClientId = "Client ID";
-            public const string ClientIdBlurb = "Enter your oauth2 client ID below. To obtain this\n" +
-                                                "ID, generate an iOS linked app in Developer Console. Example:\n" +
-                                                "123456789012-jafwiawoijjfe.apps.googleusercontent.com";
-
-            public const string BundleIdTitle = "Bundle Identifier";
-            public const string BundleId = "Bundle ID";
-            public const string BundleIdBlurb = "Enter your application's bundle identifier below.\n" +
-                                                "(for example, com.example.lorem.ipsum).";
-
-            public const string BundleIdError = "The bundle ID does not appear to be valid.";
-            public const string SetupComplete = "Setup complete. Ready for iOS build.";
         }
 
         public class NearbyConnections
@@ -143,22 +121,6 @@ namespace GooglePlayGames.Editor
 
             public const string PlayGamesServicesApiURL =
                 "https://developers.google.com/games/services";
-
-            public const string GooglePlusSdkTitle = "Google+ SDK Download";
-            public const string GooglePlusSdkBlurb = "You will be taken to the download site for " +
-                                                     "the Google+ for iOS SDK. This is only necessary for iOS builds. Once you are " +
-                                                     "on that page, download the item named 'Google+ iOS SDK'.";
-
-            public const string GooglePlusSdkUrl =
-                "https://developers.google.com/+/downloads/";
-
-            public const string GooglePlayGamesSdkTitle = "Google Play Games C++ SDK Download";
-            public const string GooglePlayGamesSdkBlurb = "You will be taken to the download site for " +
-                                                          "the Google Play Games C++ SDK. This is only necessary for iOS builds. " +
-                                                          "Once you are on that page, download the item named 'Play Games C++ SDK Version X.Y.Z'.";
-
-            public const string GooglePlayGamesUrl =
-                "https://developers.google.com/games/services/downloads/";
 
             public const string GooglePlayGamesAndroidSdkTitle = "Google Play Games Android SDK Download";
             public const string GooglePlayGamesAndroidSdkBlurb = "The Google Play Games SDK for " +

@@ -221,3 +221,5 @@ Assets/GooglePlayGames/Platforms/Android/Gms/Games/Stats/PlayerStats.cs
 Assets/GooglePlayGames/Platforms/Android/Gms/Games/Games.cs
 Assets/GooglePlayGames/Platforms/Android/AndroidClient.cs
 Assets/Plugins/Android/play-games-plugin-support.aar
+Assets/Plugins/iOS/GPGSAppController.mm
+Assets/Plugins/iOS/GPGSAppController.h

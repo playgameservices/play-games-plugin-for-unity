@@ -33,68 +33,6 @@ namespace GooglePlayGames.Editor
             Application.OpenURL(GPGSStrings.ExternalLinks.PlayGamesServicesApiURL);
         }
 
-        [MenuItem("Window/Google Play Games/Downloads/Google+ SDK (iOS)...", false, 200)]
-        public static void MenuItemGooglePlusSdk()
-        {
-            EditorUtility.DisplayDialog(GPGSStrings.ExternalLinks.GooglePlusSdkTitle,
-                GPGSStrings.ExternalLinks.GooglePlusSdkBlurb, GPGSStrings.Ok);
-            Application.OpenURL(GPGSStrings.ExternalLinks.GooglePlusSdkUrl);
-        }
-
-        [MenuItem("Window/Google Play Games/Downloads/Google Play Games C++ SDK (iOS)...", false, 201)]
-        public static void MenuItemGooglePlayGamesSdk()
-        {
-            EditorUtility.DisplayDialog(GPGSStrings.ExternalLinks.GooglePlayGamesSdkTitle,
-                GPGSStrings.ExternalLinks.GooglePlayGamesSdkBlurb, GPGSStrings.Ok);
-            Application.OpenURL(GPGSStrings.ExternalLinks.GooglePlayGamesUrl);
-        }
-
-        [MenuItem("Window/Google Play Games/Downloads/Google Play Games SDK (Android)...", false, 203)]
-        public static void MenuItemGooglePlayGamesAndroidSdk()
-        {
-            // check that Android SDK is there
-            string sdkPath = GPGSUtil.GetAndroidSdkPath();
-            if (!GPGSUtil.HasAndroidSdk())
-            {
-                EditorUtility.DisplayDialog(GPGSStrings.AndroidSetup.SdkNotFound,
-                    GPGSStrings.AndroidSetup.SdkNotFoundBlurb, GPGSStrings.Ok);
-                return;
-            }
-
-            bool launch = EditorUtility.DisplayDialog(
-                              GPGSStrings.ExternalLinks.GooglePlayGamesAndroidSdkTitle,
-                              GPGSStrings.ExternalLinks.GooglePlayGamesAndroidSdkBlurb, GPGSStrings.Yes,
-                              GPGSStrings.No);
-            if (launch)
-            {
-                string exeName =
-                    sdkPath + GPGSUtil.SlashesToPlatformSeparator("/tools/android");
-                string altExeName =
-                    sdkPath + GPGSUtil.SlashesToPlatformSeparator("/tools/android.bat");
-
-                EditorUtility.DisplayDialog(
-                    GPGSStrings.ExternalLinks.GooglePlayGamesAndroidSdkTitle,
-                    GPGSStrings.ExternalLinks.GooglePlayGamesAndroidSdkInstructions,
-                    GPGSStrings.Ok);
-
-                if (System.IO.File.Exists(exeName))
-                {
-                    System.Diagnostics.Process.Start(exeName);
-                }
-                else if (System.IO.File.Exists(altExeName))
-                {
-                    System.Diagnostics.Process.Start(altExeName);
-                }
-                else
-                {
-                    EditorUtility.DisplayDialog(
-                        GPGSStrings.ExternalLinks.GooglePlayGamesSdkTitle,
-                        GPGSStrings.ExternalLinks.GooglePlayGamesAndroidSdkManagerFailed,
-                        GPGSStrings.Ok);
-                }
-            }
-        }
-
         [MenuItem("Window/Google Play Games/About/About the Plugin...", false, 300)]
         public static void MenuItemAbout()
         {

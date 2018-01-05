@@ -2,8 +2,10 @@ Version 0.9.50
     Bug Fixes:
       * Non-Fat APK including all native ABI libraries.
       * Nearby connections advertising JNI error.
+      * #2067 iOS Cocoapods added during iOS build.
     New Features:
       * Using GPGS C++ SDK 3.0
+      * Removed iOS menu items.
       * Adopted JarResolver version handler logic for plugin upgrades.
 Version 0.9.42
     Bug Fixes:

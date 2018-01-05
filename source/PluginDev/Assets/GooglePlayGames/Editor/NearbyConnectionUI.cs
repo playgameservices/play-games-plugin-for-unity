@@ -25,11 +25,20 @@ namespace GooglePlayGames.Editor
         private string mNearbyServiceId = string.Empty;
 
         [MenuItem("Window/Google Play Games/Setup/Nearby Connections setup...", false, 3)]
-        public static void MenuItemFileGPGSAndroidSetup()
+        public static void MenuItemNearbySetup()
         {
             EditorWindow window = EditorWindow.GetWindow(
                 typeof(NearbyConnectionUI), true, GPGSStrings.NearbyConnections.Title);
             window.minSize = new Vector2(400, 200);
+        }
+
+        [MenuItem("Window/Google Play Games/Setup/Nearby Connections setup...", true)]
+        public static bool EnableNearbyMenuItem() {
+        #if UNITY_ANDROID
+            return true;
+        #else
+            return false;
+        #endif
         }
 
         public void OnEnable()
