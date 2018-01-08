@@ -72,6 +72,9 @@ project.ext {
 
     gpg_sdk_link = System.getProperty("GPG_SDK_URL")
     if (gpg_sdk_link == null || gpg_sdk_link.isEmpty()) {
+        gpg_sdk_link = System.getenv("GPG_SDK_URL")
+    }
+    if (gpg_sdk_link == null || gpg_sdk_link.isEmpty()) {
       gpg_sdk_link = 'https://developers.google.com/games/services/downloads/gpg-cpp-sdk.v3.0.zip'
     }
 
