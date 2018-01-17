@@ -57,32 +57,5 @@
         <repository>https://maven.google.com</repository>
       </repositories>
     </androidPackage>
-
-      </androidPackages>
-
-  <!-- iOS Cocoapod dependencies can be specified by each iosPod element. -->
-  <iosPods>
-    <!-- iosPod supports the following attributes:
-         * "name" (required)
-           Name of the Cocoapod.
-         * "version" (optional)
-           Cocoapod version specification for the named pod.
-           If this is not specified the latest version is used.
-         * "bitcodeEnabled" (optional)
-           Whether this Cocoapod requires bitcode to be enabled in Unity's
-           generated Xcode project.  This is "true" by default.
-         * "minTargetSdk" (optional)
-           The minimum iOS SDK required by this Cocoapod. -->
-    <iosPod name="GooglePlayGames" version="5.1.2" bitcodeEnabled="false"
-            minTargetSdk="6.0">
-      <!-- Set of source URIs to search for this Cocoapod spec.
-           By default Cocoapods will attempt to fetch the pod specs from:
-           * $HOME/.cocoapods/repos
-           * https://github.com/CocoaPods/Specs
-           -->
-      <sources>
-        <source>https://github.com/CocoaPods/Specs</source>
-      </sources>
-    </iosPod>
-  </iosPods>
+  </androidPackages>
 </dependencies>
