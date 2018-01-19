@@ -24,6 +24,7 @@ namespace GooglePlayGames.Native.PInvoke
     using C = GooglePlayGames.Native.Cwrapper.SnapshotMetadataChange;
     using B = GooglePlayGames.Native.Cwrapper.SnapshotMetadataChangeBuilder;
     using GooglePlayGames.OurUtils;
+    using GooglePlayGames.BasicApi.SavedGame;
 
     internal class NativeSnapshotMetadataChange : BaseReferenceHolder
     {
@@ -79,6 +80,21 @@ namespace GooglePlayGames.Native.PInvoke
                 B.SnapshotMetadataChange_Builder_SetCoverImageFromPngData(SelfPtr(),
                     pngData, new UIntPtr((ulong)pngData.LongLength));
                 return this;
+            }
+
+            internal Builder From(SavedGameMetadataUpdate update)
+            {
+                Builder retval = this;
+                if (update.IsDescriptionUpdated) {
+                    retval = retval.SetDescription (update.UpdatedDescription);
+                }
+                if (update.IsCoverImageUpdated) {
+                    retval = retval.SetCoverImageFromPngData (update.UpdatedPngCoverImage);
+                }
+                if (update.IsPlayedTimeUpdated) {
+                    retval = retval.SetPlayedTime ((ulong)update.UpdatedPlayedTime.Value.TotalMilliseconds);
+                }
+                return retval;
             }
 
             internal NativeSnapshotMetadataChange Build()

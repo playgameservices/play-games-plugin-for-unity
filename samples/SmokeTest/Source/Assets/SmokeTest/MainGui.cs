@@ -394,6 +394,13 @@ namespace SmokeTest
                 SetStandBy("Choosing unmerged, retrying open");
                 SetUI(Ui.SavedGame);
             }
+            else if (GUI.Button (CalcGrid (0, 4), "Use new data"))
+            {
+                SavedGameMetadataUpdate.Builder builder = new SavedGameMetadataUpdate.Builder();
+                builder = builder.WithUpdatedDescription(mConflictOriginal.Description + " (resolved).");
+                mConflictResolver.ResolveConflict(mConflictOriginal,builder.Build(),
+                    System.Text.ASCIIEncoding.Default.GetBytes(mSavedGameFileContent + " resolved"));
+            }
 
             if (GUI.Button(CalcGrid(1, 7), "Back"))
             {

@@ -48,13 +48,28 @@ namespace GooglePlayGames.BasicApi.SavedGame
         /// or by overwriting it with conflicting value, Z (i.e. choose "unmerged" aka
         /// <see cref="UseUnmerged"/>).
         /// </summary>
-        /// 
+        ///
         UseOriginal,
 
         /// <summary>
         /// See the documentation for <see cref="UseOriginal"/>
         /// </summary>
-        UseUnmerged
+        UseUnmerged,
+
+        /// <summary>
+        /// Manual resolution, no automatic resolution is attempted.
+        /// </summary>
+        UseManual,
+
+        /// <summary>
+        /// The use last known good snapshot to resolve conflicts automatically.
+        /// </summary>
+        UseLastKnownGood,
+
+        /// <summary>
+        /// The use most recently saved snapshot to resolve conflicts automatically.
+        /// </summary>
+        UseMostRecentlySaved
     }
 
     public enum SavedGameRequestStatus
@@ -64,26 +79,26 @@ namespace GooglePlayGames.BasicApi.SavedGame
         /// <summary>
         /// The request failed due to a timeout.
         /// </summary>
-        /// 
+        ///
         TimeoutError = -1,
 
         /// <summary>
         /// An unexpected internal error. Check the log for error messages.
         /// </summary>
-        /// 
+        ///
         InternalError = -2,
 
         /// <summary>
         /// A error related to authentication. This is probably due to the user being signed out
         /// before the request could be issued.
         /// </summary>
-        /// 
+        ///
         AuthenticationError = -3,
 
         /// <summary>
         /// The request failed because it was given bad input (e.g. a filename with 200 characters).
         /// </summary>
-        /// 
+        ///
         BadInputError = -4
     }
 
@@ -97,36 +112,37 @@ namespace GooglePlayGames.BasicApi.SavedGame
         /// <summary>
         /// The user closed the UI without selecting a saved game.
         /// </summary>
-        /// 
+        ///
         UserClosedUI = 2,
 
         /// <summary>
         /// An unexpected internal error. Check the log for error messages.
         /// </summary>
-        /// 
+        ///
         InternalError = -1,
 
         /// <summary>
         /// There was a timeout while displaying the UI.
         /// </summary>
-        /// 
+        ///
         TimeoutError = -2,
 
         /// <summary>
         /// A error related to authentication. This is probably due to the user being signed out
         /// before the request could be issued.
         /// </summary>
-        /// 
+        ///
         AuthenticationError = -3,
 
         /// <summary>
         /// The request failed because it was given bad input (e.g. a filename with 200 characters).
         /// </summary>
-        /// 
+        ///
         BadInputError = -4
     }
-      
-    /// <summary>
+
+///
+/// <summary>
 /// A delegate that is invoked when we encounter a conflict during execution of
 /// <see cref="ISavedGameClient.OpenWithAutomaticConflictResolution"/>. The caller must resolve the
 /// conflict using the passed <see cref="ConflictResolver"/>. All passed metadata is open.
@@ -340,8 +356,17 @@ public delegate void ConflictCallback(IConflictResolver resolver, ISavedGameMeta
         /// <param name="chosenMetadata">The chosen metadata. This metadata must be open. If it is not
         /// open, the invokation of <see cref="OpenWithManualConflictResolution"/> that produced this
         /// ConflictResolver will immediately fail with <see cref="BadInputError"/>.</param>
-        /// <param name="callback">Callback.</param>
         void ChooseMetadata(ISavedGameMetadata chosenMetadata);
+
+        /// <summary>
+        /// Resolves the conflict and updates the data.
+        /// </summary>
+        /// <param name="chosenMetadata">Metadata for the chosen version.  This is either the
+        /// original or unmerged metadata provided when the callback is invoked.</param>
+        /// <param name="metadataUpdate">Metadata update, same as when committing changes.</param>
+        /// <param name="updatedData">Updated data to use when resolving the conflict.</param>
+        void ResolveConflict(ISavedGameMetadata chosenMetadata, SavedGameMetadataUpdate metadataUpdate,
+            byte[] updatedData);
     }
 }
 

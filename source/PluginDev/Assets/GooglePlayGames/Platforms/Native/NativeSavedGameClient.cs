@@ -47,51 +47,57 @@ namespace GooglePlayGames.Native
         }
 
         public void OpenWithAutomaticConflictResolution(string filename, DataSource source,
-                                                    ConflictResolutionStrategy resolutionStrategy,
-                                                    Action<SavedGameRequestStatus, ISavedGameMetadata> callback)
+            ConflictResolutionStrategy resolutionStrategy,
+            bool prefetchDataOnConflict, ConflictCallback conflictCallback,
+            Action<SavedGameRequestStatus, ISavedGameMetadata> completedCallback)
         {
             Misc.CheckNotNull(filename);
-            Misc.CheckNotNull(callback);
+            Misc.CheckNotNull(completedCallback);
+            completedCallback = ToOnGameThread(completedCallback);
 
-            callback = ToOnGameThread(callback);
+            if (conflictCallback == null) {
+                conflictCallback =
+                    (resolver, original, originalData, unmerged, unmergedData) => {
+                    switch (resolutionStrategy) {
+                    case ConflictResolutionStrategy.UseOriginal:
+                        resolver.ChooseMetadata (original);
+                        return;
+                    case ConflictResolutionStrategy.UseUnmerged:
+                        resolver.ChooseMetadata (unmerged);
+                        return;
+                    case ConflictResolutionStrategy.UseLongestPlaytime:
+                        if (original.TotalTimePlayed >= unmerged.TotalTimePlayed) {
+                            resolver.ChooseMetadata (original);
+                        } else {
+                            resolver.ChooseMetadata (unmerged);
+                        }
+                        return;
+                    default:
+                        Logger.e ("Unhandled strategy " + resolutionStrategy);
+                        completedCallback (SavedGameRequestStatus.InternalError, null);
+                        return;
+                    }
+                };
+            }
+
+             conflictCallback = ToOnGameThread(conflictCallback);
 
             if (!IsValidFilename(filename))
             {
                 Logger.e("Received invalid filename: " + filename);
-                callback(SavedGameRequestStatus.BadInputError, null);
+                completedCallback(SavedGameRequestStatus.BadInputError, null);
                 return;
             }
 
-            OpenWithManualConflictResolution(
-                filename, source, false,
-                (resolver, original, originalData, unmerged, unmergedData) =>
-                {
-                    switch (resolutionStrategy)
-                    {
-                        case ConflictResolutionStrategy.UseOriginal:
-                            resolver.ChooseMetadata(original);
-                            return;
-                        case ConflictResolutionStrategy.UseUnmerged:
-                            resolver.ChooseMetadata(unmerged);
-                            return;
-                        case ConflictResolutionStrategy.UseLongestPlaytime:
-                            if (original.TotalTimePlayed >= unmerged.TotalTimePlayed)
-                            {
-                                resolver.ChooseMetadata(original);
-                            }
-                            else
-                            {
-                                resolver.ChooseMetadata(unmerged);
-                            }
-                            return;
-                        default:
-                            Logger.e("Unhandled strategy " + resolutionStrategy);
-                            callback(SavedGameRequestStatus.InternalError, null);
-                            return;
-                    }
-                },
-                callback
-            );
+            InternalOpen(filename, source, resolutionStrategy, prefetchDataOnConflict, conflictCallback,
+                completedCallback);
+        }
+
+        public void OpenWithAutomaticConflictResolution(string filename, DataSource source,
+                                                    ConflictResolutionStrategy resolutionStrategy,
+                                                    Action<SavedGameRequestStatus, ISavedGameMetadata> completedCallback)
+        {
+             OpenWithAutomaticConflictResolution (filename, source, resolutionStrategy, false, null, completedCallback);
         }
 
         /// <summary>
@@ -110,7 +116,7 @@ namespace GooglePlayGames.Native
 
             internal NativeConflictResolver(SnapshotManager manager, string conflictId,
                                         NativeSnapshotMetadata original, NativeSnapshotMetadata unmerged,
-                                        Action<SavedGameRequestStatus, ISavedGameMetadata> completeCallback, Action retryOpen)
+                Action<SavedGameRequestStatus, ISavedGameMetadata> completeCallback, Action retryOpen)
             {
                 this.mManager = Misc.CheckNotNull(manager);
                 this.mConflictId = Misc.CheckNotNull(conflictId);
@@ -118,6 +124,37 @@ namespace GooglePlayGames.Native
                 this.mUnmerged = Misc.CheckNotNull(unmerged);
                 this.mCompleteCallback = Misc.CheckNotNull(completeCallback);
                 this.mRetryFileOpen = Misc.CheckNotNull(retryOpen);
+            }
+
+            public void ResolveConflict(ISavedGameMetadata chosenMetadata, SavedGameMetadataUpdate metadataUpdate,
+                byte[] updatedData)
+            {
+                NativeSnapshotMetadata convertedMetadata = chosenMetadata as NativeSnapshotMetadata;
+
+                if (convertedMetadata != mOriginal && convertedMetadata != mUnmerged)
+                {
+                    Logger.e("Caller attempted to choose a version of the metadata that was not part " +
+                        "of the conflict");
+                    mCompleteCallback(SavedGameRequestStatus.BadInputError, null);
+                    return;
+                }
+
+                NativeSnapshotMetadataChange convertedMetadataChange = new NativeSnapshotMetadataChange.Builder().From(metadataUpdate).Build();
+
+                mManager.Resolve(convertedMetadata,convertedMetadataChange,mConflictId,updatedData,
+                    response =>
+                    {
+                        // If the resolution didn't succeed, propagate the failure to the client.
+                        if (!response.RequestSucceeded())
+                        {
+                            mCompleteCallback(AsRequestStatus(response.ResponseStatus()), null);
+                            return;
+                        }
+
+                        // Otherwise, retry opening the file.
+                        mRetryFileOpen();
+                    });
+
             }
 
             public void ChooseMetadata(ISavedGameMetadata chosenMetadata)
@@ -178,16 +215,33 @@ namespace GooglePlayGames.Native
                 return;
             }
 
-            InternalManualOpen(filename, source, prefetchDataOnConflict, conflictCallback,
-                completedCallback);
+            InternalOpen(filename, source, ConflictResolutionStrategy.UseManual, prefetchDataOnConflict, conflictCallback, completedCallback);
         }
 
-        private void InternalManualOpen(string filename, DataSource source,
-                                    bool prefetchDataOnConflict, ConflictCallback conflictCallback,
-                                    Action<SavedGameRequestStatus, ISavedGameMetadata> completedCallback)
+        private void InternalOpen(string filename, DataSource source, ConflictResolutionStrategy resolutionStrategy,
+            bool prefetchDataOnConflict, ConflictCallback conflictCallback,
+            Action<SavedGameRequestStatus, ISavedGameMetadata> completedCallback)
         {
+            Types.SnapshotConflictPolicy policy;
+            switch (resolutionStrategy) {
+            case ConflictResolutionStrategy.UseLastKnownGood:
+                policy = Types.SnapshotConflictPolicy.LAST_KNOWN_GOOD;
+                break;
+            case ConflictResolutionStrategy.UseMostRecentlySaved:
+                policy = Types.SnapshotConflictPolicy.MOST_RECENTLY_MODIFIED;
+                break;
+            case ConflictResolutionStrategy.UseLongestPlaytime:
+                policy = Types.SnapshotConflictPolicy.LONGEST_PLAYTIME;
+                break;
+            case ConflictResolutionStrategy.UseManual:
+                policy = Types.SnapshotConflictPolicy.MANUAL;
+                break;
+            default:
+                policy = Types.SnapshotConflictPolicy.MOST_RECENTLY_MODIFIED;
+                break;
+            }
 
-            mSnapshotManager.Open(filename, AsDataSource(source), Types.SnapshotConflictPolicy.MANUAL,
+            mSnapshotManager.Open(filename, AsDataSource(source), policy,
                 response =>
                 {
                     if (!response.RequestSucceeded())
@@ -217,7 +271,8 @@ namespace GooglePlayGames.Native
                                                           original,
                                                           unmerged,
                                                           completedCallback,
-                                                          () => InternalManualOpen(filename, source, prefetchDataOnConflict,
+                                                           () => InternalOpen(filename, source, resolutionStrategy,
+                                                              prefetchDataOnConflict,
                                                               conflictCallback, completedCallback)
                                                       );
 
