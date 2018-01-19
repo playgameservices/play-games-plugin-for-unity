@@ -455,7 +455,7 @@ task copy_plugin() {
     ext.remoteTaskPhase = 'postbuild'
 }
 
-task get_gpg_cpp_sdk () {
+task get_gpg_cpp_sdk {
 
     doFirst {
         ant.get(src: gpg_sdk_link, dest: 'gpg_cpp_sdk.zip', skipexisting: 'true')
@@ -468,7 +468,11 @@ get_gpg_cpp_sdk.description = "Download the gpg sdk from the specified location"
 
 get_gpg_cpp_sdk.ext.remoteTaskPhase = 'prebuild'
 
-task check_ndk() << {
+task check_ndk  {
+  description = "Checks that the NDK is setup correctly"
+  ext.remoteTaskPhase = 'prebuild'
+
+  doFirst {
     if (ndk_root == null || ndk_root == "") {
         throw new GradleException('ANDROID_NDK_ROOT not set')
     }
@@ -478,16 +482,18 @@ task check_ndk() << {
         }
         println("OK");
     }
+  }
 }
-check_ndk.description = "Checks that the NDK is setup correctly"
-check_ndk.ext.remoteTaskPhase = 'prebuild'
-
 
 // The ndk work needs to happen in the jni directory - it is baked into the
 // ndk environment.
 //
-task compile_gpg << {
+task compile_gpg {
+  description = "Compiles the GPG SDK libs into .so files"
+  dependsOn 'check_ndk', 'copy_gpg_sdk', 'copy_native'
+  ext.remoteTaskPhase = 'prebuild'
 
+  doFirst {
     def exe = "${ndk_root}/ndk-build"
     if(os_windows) {
       exe += ".cmd"
@@ -497,33 +503,32 @@ task compile_gpg << {
         workingDir "build/jni"
         executable exe
     }
+  }
 }
-compile_gpg.description = "Compiles the GPG SDK libs into .so files"
-compile_gpg.dependsOn 'check_ndk'
-compile_gpg.dependsOn 'copy_gpg_sdk'
-compile_gpg.dependsOn 'copy_native'
 
-compile_gpg.ext.remoteTaskPhase = 'prebuild'
+task copy_native  {
+  description = "Copies the native code of the plugin into the build/jni dir for compiling"
+  ext.remoteTaskPhase = 'prebuild'
 
-task copy_native << {
+  doFirst {
     copy {
         from {'native'}
         into {'build/jni'}
     }
+  }
 }
-copy_native.description = "Copies the native code of the plugin into the build/jni dir for compiling"
-copy_native.ext.remoteTaskPhase = 'prebuild'
 
+task copy_plugin_source {
+  description = "Copies plugin source into build directory"
+  ext.remoteTaskPhase = 'prebuild'
 
-task copy_plugin_source << {
+  doFirst {
     copy {
         from {"${pluginSrc}"}
         into {"${pluginBuildSrc}"}
     }
+  }
 }
-copy_plugin_source.description = "Copies plugin source into build directory"
-copy_plugin_source.ext.remoteTaskPhase = 'prebuild'
-
 
 task copy_jarresolver() {
     description = "Clones the jar resolver project and copied into the build."
@@ -587,15 +592,18 @@ copy_gpg_sdk.description = "Unzips the GPG SDK into the correct dir for NDK"
 copy_gpg_sdk.dependsOn get_gpg_cpp_sdk
 copy_gpg_sdk.ext.remoteTaskPhase = 'prebuild'
 
-task copy_libs (dependsOn: 'compile_gpg') << {
+task copy_libs {
+  description = "Copies the compiled native libs to the plugin directory"
+  dependsOn 'copy_plugin_source', 'compile_gpg'
+  ext.remoteTaskPhase = 'prebuild'
+
+  doFirst {
     copy {
         from {'build/libs'}
         into {'SupportLib/PlayGamesPluginSupport/src/main/jniLibs' }
     }
+  }
 }
-copy_libs.description = "Copies the compiled native libs to the plugin directory"
-copy_libs.dependsOn 'copy_plugin_source'
-copy_libs.ext.remoteTaskPhase = 'prebuild'
 
 task build_java_support_lib(type: GradleBuild) {
     description = "Builds the client libraries for Android"
