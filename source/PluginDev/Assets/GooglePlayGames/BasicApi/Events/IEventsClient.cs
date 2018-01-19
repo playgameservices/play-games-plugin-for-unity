@@ -23,8 +23,8 @@ namespace GooglePlayGames.BasicApi.Events
     /// <summary>
     /// An interface for interacting with events.
     ///
-    /// <para>See online <a href="https://developers.google.com/games/services/common/concepts/quests">
-    /// documentation for Quests and Events</a> for more information.</para>
+    /// <para>See online <a href="https://developers.google.com/games/services/common/concepts/events">
+    /// documentation for Events</a> for more information.</para>
     ///
     /// All callbacks in this interface must be invoked on the game thread.
     /// </summary>

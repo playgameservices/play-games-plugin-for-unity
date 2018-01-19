@@ -68,7 +68,7 @@ project.ext {
 
     sampleList = ['CubicPilot', 'Minimal',
          'QuizRacer',  'TicTacToe',
-         'NearbyDroids', 'SmokeTest', 'TrivialQuest']
+         'NearbyDroids', 'SmokeTest']
 
     gpg_sdk_link = System.getProperty("GPG_SDK_URL")
     if (gpg_sdk_link == null || gpg_sdk_link.isEmpty()) {

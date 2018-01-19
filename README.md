@@ -22,7 +22,7 @@ following features of the Google Play Games API:<br/>
 * post score to leaderboard
 * cloud save read/write
 * show built-in achievement/leaderboards UI
-* events and quests
+* events
 * video recording of gameplay
 * [nearby connections](NEARBY.md)
 * [turn-based multiplayer](TBMP.md)
@@ -120,15 +120,12 @@ the corresponding **achievement ID** or **leaderboard ID**,
 as those will be needed when making the API calls.
 Achievement and leaderboard IDs are alphanumeric strings (e.g.  "Cgkx9eiuwi8_AQ").
 
-## Add Events and Quests
+## Add Events
 
-__Important__: The Google Play Games quests service will be deprecated as
-of March 31st 2018. Do not use the Google Play Games quests API in new apps.
-
-Events and Quests are a way to introduce new challenges for players to complete and
-incentivizing them with some in-game reward or benefit if they succeed.
-Read more about how to configure and use Events and Quests on
-[Game Concepts - Events and Quests](https://developers.google.com/games/services/common/concepts/quests)
+Events allow you to track user actions in your game and report on them with
+Analytics.
+Read more about how to configure and use Events on
+[Game Concepts - Events](https://developers.google.com/games/services/common/concepts/events)
 
 ## Load Your Game Project
 
@@ -639,68 +636,6 @@ Incrementing an event is very simple, just call the following method:
     PlayGamesPlatform.Instance.Events.IncrementEvent("YOUR_EVENT_ID", 1);
 ```
 This call is "fire and forget", it will handle batching and execution for you in the background.
-
-## Viewing/Accepting/Completing Quests
-
-__Important__: The Google Play Games quests service will be deprecated as
-of March 31st 2018. Do not use the Google Play Games quests API in new apps.
-
-In order to accept a quest, view quests in progress, or claim the reward for completing a quest
-your app must present the quests UI.  To bring up the UI, call the following method:
-
-```csharp
-    using GooglePlayGames;
-    ...
-    PlayGamesPlatform.Instance.Quests.ShowAllQuestsUI(
-        (QuestUiResult result, IQuest quest, IQuestMilestone milestone) => {
-        // ...
-    });
-```
-After the user dismisses the quests UI or takes some action within the UI, your application
-will receive a callback.  If the user has tried to accept a quest or claim a quest milestone
-reward, you should take the appropriate action.  The code below demonstrates one way to handle
-user actions:
-
-```csharp
-    public void ViewQuests()
-    {
-        PlayGamesPlatform.Instance.Quests.ShowAllQuestsUI(
-            (QuestUiResult result, IQuest quest, IQuestMilestone milestone) => {
-            if (result == QuestUiResult.UserRequestsQuestAcceptance)
-            {
-                AcceptQuest(quest);
-            }
-
-            if (result == QuestUiResult.UserRequestsMilestoneClaiming)
-            {
-                ClaimMilestone(milestone);
-            }
-        });
-    }
-
-    private void AcceptQuest(IQuest toAccept)
-    {
-        PlayGamesPlatform.Instance.Quests.Accept(toAccept,
-                                                  (QuestAcceptStatus status, IQuest quest) => {
-            if (status == QuestAcceptStatus.Success)
-            {
-                // ...
-            }
-        });
-    }
-
-    private void ClaimMilestone(IQuestMilestone toClaim)
-    {
-        PlayGamesPlatform.Instance.Quests.ClaimMilestone(toClaim,
-                                                          (QuestClaimMilestoneStatus status, IQuest quest, IQuestMilestone milestone) => {
-            if (status == QuestClaimMilestoneStatus.Success)
-            {
-                // ...
-            }
-        });
-    }
-```
-
 
 ## Saving Game State to the Cloud
 

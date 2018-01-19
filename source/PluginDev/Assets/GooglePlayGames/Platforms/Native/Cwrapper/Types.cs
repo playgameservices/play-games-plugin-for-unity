@@ -122,25 +122,7 @@ namespace GooglePlayGames.Native.Cwrapper
             CANCELED = 6,
             EXPIRED = 7,
         }
-
-        internal enum QuestState
-        {
-            UPCOMING = 1,
-            OPEN = 2,
-            ACCEPTED = 3,
-            COMPLETED = 4,
-            EXPIRED = 5,
-            FAILED = 6,
-        }
-
-        internal enum QuestMilestoneState
-        {
-            NOT_STARTED = 1,
-            NOT_COMPLETED = 2,
-            COMPLETED_NOT_CLAIMED = 3,
-            CLAIMED = 4,
-        }
-
+         
         internal enum MultiplayerEvent
         {
             UPDATED = 1,

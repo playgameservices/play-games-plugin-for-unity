@@ -123,20 +123,6 @@ namespace Com.Google.Android.Gms.Games
                 return JavaObjWrapper.GetStaticObjectField<object>(CLASS_NAME, "Notifications", "Lcom/google/android/gms/games/Notifications;");
             }
         }
-        public static object Quests
-        {
-            get
-            {
-                return JavaObjWrapper.GetStaticObjectField<object>(CLASS_NAME, "Quests", "Lcom/google/android/gms/games/quest/Quests;");
-            }
-        }
-        public static object Requests
-        {
-            get
-            {
-                return JavaObjWrapper.GetStaticObjectField<object>(CLASS_NAME, "Requests", "Lcom/google/android/gms/games/request/Requests;");
-            }
-        }
         public static object Snapshots
         {
             get

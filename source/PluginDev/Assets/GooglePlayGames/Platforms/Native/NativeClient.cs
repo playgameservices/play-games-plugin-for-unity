@@ -27,7 +27,6 @@ namespace GooglePlayGames.Native
     using System;
     using System.Collections.Generic;
     using GooglePlayGames.BasicApi.Events;
-    using GooglePlayGames.BasicApi.Quests;
     using GooglePlayGames.BasicApi.Video;
     using Types = GooglePlayGames.Native.Cwrapper.Types;
     using Status = GooglePlayGames.Native.Cwrapper.CommonErrorStatus;
@@ -55,8 +54,6 @@ namespace GooglePlayGames.Native
         private volatile NativeRealtimeMultiplayerClient mRealTimeClient;
         private volatile ISavedGameClient mSavedGameClient;
         private volatile IEventsClient mEventsClient;
-        [Obsolete("Quests are being removed in 2018.")]
-        private volatile IQuestsClient mQuestsClient;
         private volatile IVideoClient mVideoClient;
         private volatile TokenClient mTokenClient;
         private volatile Action<Invitation, bool> mInvitationDelegate;
@@ -231,9 +228,6 @@ namespace GooglePlayGames.Native
                         mAuthState = AuthState.SilentPending;
                         mServices = builder.Build(config);
                         mEventsClient = new NativeEventClient(new EventManager(mServices));
-#pragma warning disable 0618 // Warning CS0618  'IQuestMilestone' is obsolete: 'Quests are being removed in 2018.'
-                        mQuestsClient = new NativeQuestClient(new QuestManager(mServices));
-#pragma warning restore
                         mVideoClient = new NativeVideoClient(new VideoManager(mServices));
                         mTurnBasedClient =
                         new NativeTurnBasedMultiplayerClient(this, new TurnBasedManager(mServices));
@@ -1126,17 +1120,6 @@ namespace GooglePlayGames.Native
             lock (GameServicesLock)
             {
                 return mEventsClient;
-            }
-        }
-
-        ///<summary></summary>
-        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.GetQuestsClient"/>
-        [Obsolete("Quests are being removed in 2018.")]
-        public IQuestsClient GetQuestsClient()
-        {
-            lock (GameServicesLock)
-            {
-                return mQuestsClient;
             }
         }
 

@@ -23,7 +23,6 @@ namespace GooglePlayGames
     using GooglePlayGames.BasicApi.Events;
     using GooglePlayGames.BasicApi.Multiplayer;
     using GooglePlayGames.BasicApi.Nearby;
-    using GooglePlayGames.BasicApi.Quests;
     using GooglePlayGames.BasicApi.SavedGame;
     using GooglePlayGames.BasicApi.Video;
     using GooglePlayGames.OurUtils;
@@ -184,17 +183,6 @@ namespace GooglePlayGames
             get
             {
                 return mClient.GetEventsClient();
-            }
-        }
-
-        /// <summary>Gets the quests client object.</summary>
-        /// <value>The quests client.</value>
-        [Obsolete("Quests are being removed in 2018.")]
-        public IQuestsClient Quests
-        {
-            get
-            {
-                return mClient.GetQuestsClient();
             }
         }
 

@@ -7,6 +7,10 @@ Version 0.9.50
       * Using GPGS C++ SDK 3.0
       * Removed iOS menu items.
       * Adopted JarResolver version handler logic for plugin upgrades.
+      * Removed the Quests API.
+      * Added Support for SaveGames conflict resolution with updated
+          data and metadata changes.  This matches the changes in the
+          C++ API.
 Version 0.9.42
     Bug Fixes:
        * #1909 Account Picker displayed after backgrounding/foregrounding app.

@@ -20,7 +20,6 @@ using System.Linq;
 using GooglePlayGames;
 using GooglePlayGames.BasicApi;
 using GooglePlayGames.BasicApi.Multiplayer;
-using GooglePlayGames.BasicApi.Quests;
 using GooglePlayGames.BasicApi.SavedGame;
 using GooglePlayGames.OurUtils;
 using UnityEngine;
@@ -73,8 +72,6 @@ namespace SmokeTest
         private bool loadedFriends = false;
 
         private volatile TurnBasedMatch mMatch = null;
-        private volatile IQuest mQuest = null;
-        private volatile IQuestMilestone mQuestMilestone = null;
 
         private string statsMessage = string.Empty;
 
@@ -96,7 +93,7 @@ namespace SmokeTest
             ResolveSaveConflict,
             Tbmp,
             TbmpMatch,
-            QuestsAndEvents,
+            Events,
             NearbyConnections,
             Achievements,
             Leaderboards,
@@ -294,9 +291,9 @@ namespace SmokeTest
             {
                 SetUI(Ui.Achievements);
             }
-            if (GUI.Button(this.CalcGrid(1, 1), "Quests / Events"))
+            if (GUI.Button(this.CalcGrid(1, 1), "Events"))
             {
-                SetUI(Ui.QuestsAndEvents);
+                SetUI(Ui.Events);
             }
             else if (GUI.Button(CalcGrid(0, 2), "Leaderboards"))
             {
@@ -810,20 +807,10 @@ namespace SmokeTest
             }
         }
 
-        internal void ShowQuestsAndEventsUi()
+        internal void ShowEventsUi()
         {
-            if (mQuest != null)
-            {
-                Status = "Selected Quest: " + mQuest.Id + "\n";
-            }
-
-            if (mQuestMilestone != null)
-            {
-                Status += "Selected Milestone: " + mQuestMilestone.Id;
-            }
-
             DrawStatus();
-            DrawTitle("Quests and Events");
+            DrawTitle("Events");
 
             if (GUI.Button(CalcGrid(0, 1), "Fetch All Events"))
             {
@@ -863,100 +850,6 @@ namespace SmokeTest
             {
                 PlayGamesPlatform.Instance.Events.IncrementEvent(
                     GPGSIds.event_smokingevent, 10);
-            }
-
-            if (GUI.Button(CalcGrid(1, 2), "Fetch Open Quests"))
-            {
-                FetchQuestList(QuestFetchFlags.Open);
-            }
-            else if (GUI.Button(CalcGrid(0, 3), "Fetch Upcoming Quests"))
-            {
-                FetchQuestList(QuestFetchFlags.Upcoming);
-            }
-            else if (GUI.Button(CalcGrid(1, 3), "Fetch Accepted Quests"))
-            {
-                FetchQuestList(QuestFetchFlags.Accepted);
-            }
-            else if (GUI.Button(CalcGrid(0, 4), "Show All Quests UI"))
-            {
-                SetStandBy("Showing all Quest UI");
-                mQuest = null;
-                mQuestMilestone = null;
-                PlayGamesPlatform.Instance.Quests.ShowAllQuestsUI(HandleQuestUI);
-            }
-            else if (GUI.Button(CalcGrid(1, 4), "Show Quest UI"))
-            {
-                if (mQuest == null)
-                {
-                    Status = "Could not show Quest UI - no quest selected";
-                }
-                else
-                {
-                    PlayGamesPlatform.Instance.Quests.ShowSpecificQuestUI(mQuest, HandleQuestUI);
-                }
-            }
-            else if (GUI.Button(CalcGrid(0, 5), "Fetch Quest"))
-            {
-                if (mQuest == null)
-                {
-                    Status = "Could not fetch Quest - no quest selected";
-                }
-                else
-                {
-                    SetStandBy("Fetching Quest");
-                    PlayGamesPlatform.Instance.Quests.Fetch(
-                        DataSource.ReadNetworkOnly,
-                        mQuest.Id,
-                        (status, quest) =>
-                        {
-                            Status = "Fetch Quest Status: " + status + "\n";
-                            mQuest = quest;
-                            GooglePlayGames.OurUtils.Logger.d("Fetched quest " + quest);
-                            EndStandBy();
-                        });
-                }
-            }
-            else if (GUI.Button(CalcGrid(1, 5), "Accept Quest"))
-            {
-                if (mQuest == null)
-                {
-                    Status = "Could not accept Quest - no quest selected";
-                }
-                else
-                {
-                    SetStandBy("Accepting quest");
-                    PlayGamesPlatform.Instance.Quests.Accept(
-                        mQuest,
-                        (status, quest) =>
-                        {
-                            Status = "Accept Quest Status: " + status + "\n";
-                            mQuest = quest;
-                            GooglePlayGames.OurUtils.Logger.d("Accepted quest " + quest);
-                            EndStandBy();
-                        });
-                }
-            }
-            else if (GUI.Button(CalcGrid(0, 6), "Claim Milestone"))
-            {
-                if (mQuestMilestone == null)
-                {
-                    Status = "Could not claim milestone - no milestone selected";
-                }
-                else
-                {
-                    SetStandBy("Claiming milestone");
-                    PlayGamesPlatform.Instance.Quests.ClaimMilestone(
-                        mQuestMilestone,
-                        (status, quest, milestone) =>
-                        {
-                            Status = "Claim milestone Status: " + status + "\n";
-                            mQuest = quest;
-                            mQuestMilestone = milestone;
-                            GooglePlayGames.OurUtils.Logger.d("Claim quest: " + quest);
-                            GooglePlayGames.OurUtils.Logger.d("Claim milestone: " + milestone);
-                            EndStandBy();
-                        });
-                }
             }
 
             if (GUI.Button(CalcGrid(1, 6), "Back"))
@@ -1053,54 +946,6 @@ namespace SmokeTest
             GUI.Label(this.CalcGrid(0, 8, 2, 2), this.Status);
         }
 
-        internal void FetchQuestList(QuestFetchFlags flags)
-        {
-            SetStandBy("Fetching Quests, flags: " + flags);
-            PlayGamesPlatform.Instance.Quests.FetchMatchingState(
-                DataSource.ReadNetworkOnly,
-                flags,
-                (status, quests) =>
-                {
-                    string statusText;
-                    statusText = "Fetch Status: " + status + "\n";
-                    statusText += "Quests: [" +
-                    string.Join(",", quests.Select(g => g.Id).ToArray()) + "]";
-
-                    Status = statusText;
-
-                    if (quests.Count != 0)
-                    {
-                        mQuest = quests[0];
-                    }
-
-                    quests.ForEach(q =>
-                        GooglePlayGames.OurUtils.Logger.d("Retrieved quest: " + q));
-                    EndStandBy();
-                });
-        }
-
-        internal void HandleQuestUI(QuestUiResult result, IQuest quest, IQuestMilestone milestone)
-        {
-            Status = "Show UI Status: " + Status + "\n";
-            GooglePlayGames.OurUtils.Logger.d("UI Status: " + result);
-            if (quest != null)
-            {
-                mQuest = quest;
-                Status += "User wanted to accept quest " + quest.Id;
-                GooglePlayGames.OurUtils.Logger.d("User Accepted quest " + quest.ToString());
-            }
-            else if (milestone != null)
-            {
-                mQuestMilestone = milestone;
-                Status += "User wanted to claim milestone " + milestone.Id;
-                GooglePlayGames.OurUtils.Logger.d("Claimed milestone " + milestone.ToString());
-                GooglePlayGames.OurUtils.Logger.d("Completion data: " +
-                    System.Text.ASCIIEncoding.Default.GetString(milestone.CompletionRewardData));
-            }
-
-            EndStandBy();
-        }
-
         internal void ShowEffect(bool success)
         {
             Camera.main.backgroundColor = success ?
@@ -1169,8 +1014,8 @@ namespace SmokeTest
                     case Ui.TbmpMatch:
                         ShowTbmpMatchUi();
                         break;
-                    case Ui.QuestsAndEvents:
-                        ShowQuestsAndEventsUi();
+                    case Ui.Events:
+                        ShowEventsUi();
                         break;
                     case Ui.NearbyConnections:
                         mNearbyGui.OnGUI();
