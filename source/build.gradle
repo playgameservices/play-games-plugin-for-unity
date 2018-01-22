@@ -458,32 +458,15 @@ task copy_plugin() {
 task get_gpg_cpp_sdk {
 
     doFirst {
-        ant.get(src: gpg_sdk_link, dest: 'gpg_cpp_sdk.zip', skipexisting: 'true')
+        ant.get(src: gpg_sdk_link, dest: "${buildDir}/gpg_cpp_sdk.zip", skipexisting: 'true')
     }
     doLast {
-        println "Got ${gpg_sdk_link} as gpg_cpp_sdk.zip"
+        println "Got ${gpg_sdk_link} as ${buildDir}/gpg_cpp_sdk.zip"
     }
 }
 get_gpg_cpp_sdk.description = "Download the gpg sdk from the specified location"
 
 get_gpg_cpp_sdk.ext.remoteTaskPhase = 'prebuild'
-
-task check_ndk  {
-  description = "Checks that the NDK is setup correctly"
-  ext.remoteTaskPhase = 'prebuild'
-
-  doFirst {
-    if (ndk_root == null || ndk_root == "") {
-        throw new GradleException('ANDROID_NDK_ROOT not set')
-    }
-    else {
-        if (System.getenv("ANDROID_HOME") == null) {
-            throw new GradleException('ANDROID_HOME not set')
-        }
-        println("OK");
-    }
-  }
-}
 
 task copy_plugin_source {
   description = "Copies plugin source into build directory"
@@ -542,29 +525,23 @@ task copy_jarresolver() {
 }
 
 task copy_gpg_sdk {
+  description = "Unzips the GPG SDK into the correct dir for NDK"
+  dependsOn get_gpg_cpp_sdk
+  ext.remoteTaskPhase = 'prebuild'
     doFirst {
-        if (file('build/jni/gpg-cpp-sdk').exists()) {
-            delete 'build/jni/gpg-cpp-sdk'
-        }
-    }
-    doLast {
         copy {
-            from zipTree('gpg_cpp_sdk.zip')
-            // Determine the destination directory later
-            into {'build/jni' }
+            from zipTree("${buildDir}/gpg_cpp_sdk.zip")
+            into {"${buildDir}/gpg_sdk"}
         }
     }
 }
-copy_gpg_sdk.description = "Unzips the GPG SDK into the correct dir for NDK"
-copy_gpg_sdk.dependsOn get_gpg_cpp_sdk
-copy_gpg_sdk.ext.remoteTaskPhase = 'prebuild'
 
 task build_java_support_lib(type: GradleBuild) {
     description = "Builds the client libraries for Android"
     buildFile = 'SupportLib/build.gradle'
     startParameter.projectProperties.put('projVersion',currentPluginVersion)
     startParameter.projectProperties.put('uploadDir', "${buildDir}/m2repository")
-    startParameter.projectProperties.put('gpgSdkDir', "${buildDir}/jni/gpg-cpp-sdk/android")
+    startParameter.projectProperties.put('gpgSdkDir', "${buildDir}/gpg_sdk/gpg-cpp-sdk/android")
 
     tasks = ['build', 'uploadArchives']
 }
