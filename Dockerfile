@@ -9,7 +9,7 @@ RUN curl -L ${GRADLE_URL} -o /tmp/${GRADLE_ZIP} && unzip /tmp/${GRADLE_ZIP} -d /
 ENV GRADLE_HOME /usr/local/gradle-4.1
 # Download and untar SDK
 ENV ANDROID_SDK_URL https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip
-RUN curl -L ${ANDROID_SDK_URL} | tar xz -C /usr/local
+RUN curl -L ${ANDROID_SDK_URL} > /tmp/tools_zip.zip && unzip /tmp/tools_zip.zip -d /usr/local/android-sdk-linux
 ENV ANDROID_SDK_HOME /usr/local/android-sdk-linux
 ENV ANDROID_HOME /usr/local/android-sdk-linux
 RUN chmod g+rwxs $ANDROID_HOME
