@@ -485,39 +485,6 @@ task check_ndk  {
   }
 }
 
-// The ndk work needs to happen in the jni directory - it is baked into the
-// ndk environment.
-//
-task compile_gpg {
-  description = "Compiles the GPG SDK libs into .so files"
-  dependsOn 'check_ndk', 'copy_gpg_sdk', 'copy_native'
-  ext.remoteTaskPhase = 'prebuild'
-
-  doFirst {
-    def exe = "${ndk_root}/ndk-build"
-    if(os_windows) {
-      exe += ".cmd"
-    }
-
-    exec {
-        workingDir "build/jni"
-        executable exe
-    }
-  }
-}
-
-task copy_native  {
-  description = "Copies the native code of the plugin into the build/jni dir for compiling"
-  ext.remoteTaskPhase = 'prebuild'
-
-  doFirst {
-    copy {
-        from {'native'}
-        into {'build/jni'}
-    }
-  }
-}
-
 task copy_plugin_source {
   description = "Copies plugin source into build directory"
   ext.remoteTaskPhase = 'prebuild'
@@ -592,29 +559,17 @@ copy_gpg_sdk.description = "Unzips the GPG SDK into the correct dir for NDK"
 copy_gpg_sdk.dependsOn get_gpg_cpp_sdk
 copy_gpg_sdk.ext.remoteTaskPhase = 'prebuild'
 
-task copy_libs {
-  description = "Copies the compiled native libs to the plugin directory"
-  dependsOn 'copy_plugin_source', 'compile_gpg'
-  ext.remoteTaskPhase = 'prebuild'
-
-  doFirst {
-    copy {
-        from {'build/libs'}
-        into {'SupportLib/PlayGamesPluginSupport/src/main/jniLibs' }
-    }
-  }
-}
-
 task build_java_support_lib(type: GradleBuild) {
     description = "Builds the client libraries for Android"
     buildFile = 'SupportLib/build.gradle'
     startParameter.projectProperties.put('projVersion',currentPluginVersion)
     startParameter.projectProperties.put('uploadDir', "${buildDir}/m2repository")
+    startParameter.projectProperties.put('gpgSdkDir', "${buildDir}/jni/gpg-cpp-sdk/android")
 
     tasks = ['build', 'uploadArchives']
 }
 build_java_support_lib.ext.remoteTaskPhase = 'prebuild'
-build_java_support_lib.dependsOn copy_libs
+build_java_support_lib.dependsOn copy_gpg_sdk
 
 task clean_support_lib(type: GradleBuild) {
     description = "cleans the client libraries for Android"

@@ -16,6 +16,12 @@ if (project.hasProperty("uploadDir")) {
     project.ext.uploadDir = "${buildDir}/m2repository"
 }
 
+if (project.hasProperty("gpgSdkDir")) {
+    project.ext.gpgSdkDir = project.gpgSdkDir
+} else {
+    project.ext.gpgSdkDir = "${projectDir}/gpg-cpp-sdk/android"
+}
+
 android {
     // TODO(claywilkinson): Clean up lint warnings
     lintOptions {
@@ -25,8 +31,23 @@ android {
         versionName  project.version
         archivesBaseName = project.ext.baseName
         minSdkVersion 14
+
+        ndk.abiFilters 'x86', 'armeabi-v7a'
+
+
+        externalNativeBuild {
+            cmake {
+                cppFlags "-std=c++11 -frtti -Wall -Werror"
+                arguments "-DGPG_SDK_PATH=${gpgSdkDir}",
+                        "-DANDROID_STL=c++_static",
+                        "-DANDROID_TOOLCHAIN=clang"
+            }
+        }
     }
-    compileSdkVersion 23
+    compileSdkVersion 27
+    externalNativeBuild {
+        cmake.path "CMakeLists.txt"
+    }
 }
 
 // Rename the .aar file to be .srcaar to work around
