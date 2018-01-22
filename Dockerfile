@@ -8,7 +8,7 @@ ENV GRADLE_URL https://services.gradle.org/distributions/${GRADLE_ZIP}
 RUN curl -L ${GRADLE_URL} -o /tmp/${GRADLE_ZIP} && unzip /tmp/${GRADLE_ZIP} -d /usr/local && rm /tmp/${GRADLE_ZIP}
 ENV GRADLE_HOME /usr/local/gradle-4.1
 # Download and untar SDK
-ENV ANDROID_SDK_URL http://dl.google.com/android/android-sdk_r24.4.1-linux.tgz
+ENV ANDROID_SDK_URL https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip
 RUN curl -L ${ANDROID_SDK_URL} | tar xz -C /usr/local
 ENV ANDROID_SDK_HOME /usr/local/android-sdk-linux
 ENV ANDROID_HOME /usr/local/android-sdk-linux
