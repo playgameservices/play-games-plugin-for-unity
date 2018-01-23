@@ -528,12 +528,19 @@ task copy_gpg_sdk {
   description = "Unzips the GPG SDK into the correct dir for NDK"
   dependsOn get_gpg_cpp_sdk
   ext.remoteTaskPhase = 'prebuild'
-    doFirst {
+  doFirst {
+    if(os_linux || os_osx) {
+            def result = exec {
+                executable "unzip"
+                args "${buildDir}/gpg_cpp_sdk.zip", "-d", "${buildDir}/gpg_sdk"
+            }
+    } else {
         copy {
             from zipTree("${buildDir}/gpg_cpp_sdk.zip")
             into {"${buildDir}/gpg_sdk"}
         }
     }
+  }
 }
 
 task build_java_support_lib(type: GradleBuild) {
