@@ -19,11 +19,16 @@ namespace GooglePlayGames.Editor
     using System.Collections;
     using System.Collections.Generic;
     using UnityEngine;
+    #if UNITY_2017
     using UnityEditor.Build;
+    #endif
     using UnityEditor;
 
     [InitializeOnLoad]
-    public class ForceNoGpgsForIOS : IActiveBuildTargetChanged
+    public class ForceNoGpgsForIOS 
+    #if UNITY_2017
+        : IActiveBuildTargetChanged
+    #endif
     {
         static ForceNoGpgsForIOS ()
         {
