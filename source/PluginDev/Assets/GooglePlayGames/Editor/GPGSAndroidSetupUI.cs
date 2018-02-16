@@ -246,12 +246,12 @@ namespace GooglePlayGames.Editor
             mConstantDirectory = EditorGUILayout.TextField(
                 "Directory to save constants",
                 mConstantDirectory,
-                GUILayout.Width(480));
+                GUILayout.MinWidth(480));
 
             mClassName = EditorGUILayout.TextField(
                 "Constants class name",
                 mClassName,
-                GUILayout.Width(480));
+                GUILayout.MinWidth(480));
 
             GUILayout.Label("Resources Definition", EditorStyles.boldLabel);
             GUILayout.Label("Paste in the Android Resources from the Play Console");
@@ -260,7 +260,7 @@ namespace GooglePlayGames.Editor
             scroll = GUILayout.BeginScrollView(scroll);
             mConfigData = EditorGUILayout.TextArea(
                 mConfigData,
-                GUILayout.Width(475),
+                GUILayout.MinWidth(475),
                 GUILayout.Height(Screen.height));
             GUILayout.EndScrollView();
             GUILayout.Space(10);
@@ -272,7 +272,7 @@ namespace GooglePlayGames.Editor
             mWebClientId = EditorGUILayout.TextField(
                 GPGSStrings.Setup.ClientId,
                 mWebClientId,
-                GUILayout.Width(450));
+                GUILayout.MinWidth(450));
 
             GUILayout.Space(10);
 
