@@ -1004,13 +1004,13 @@ However, if for some reason you wish to keep the default implementation accessib
 3. Do not use `Social.Active` when interacting with Google Play Games. Instead, use `PlayGamesPlatform.Instance`.
 
 That way, you can even submit scores and achievements simultaneously to two or more social platforms:
-
+```csharp
     // Submit achievement to original default social platform
     Social.ReportProgress("MyAchievementIdHere", 100.0f, callback);
 
     // Submit achievement to Google Play
     PlayGamesPlatform.Instance.ReportProgress("MyGooglePlayAchievementIdHere", 100.0f, callback);
-
+```
 ## Special Thanks
 
 This section lists people who have contributed to this project by writing code, improving documentation or fixing bugs.
