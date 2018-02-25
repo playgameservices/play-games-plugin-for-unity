@@ -122,8 +122,6 @@ namespace GooglePlayGames.Editor
 		/// <summary>
 		/// The root directory of the plugin
 		/// </summary> 
-		/// <remarks>
-		///     file. </remarks>
 		private static string GooglePlayGamesRootDirectory {
 			get {				
 				string[] res = System.IO.Directory.GetFiles (Application.dataPath, "GPGSUtil.cs", SearchOption.AllDirectories);
