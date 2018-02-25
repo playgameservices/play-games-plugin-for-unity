@@ -97,18 +97,40 @@ namespace GooglePlayGames.Editor
         /// <summary>Constant for token replacement</summary>
         private const string CONSTANTSPLACEHOLDER = "__Constant_Properties__";
 
-        /// <summary>
-        /// The game info file path.  This is a generated file.
-        /// </summary>
-        private const string GameInfoPath = "Assets/GooglePlayGames/GameInfo.cs";
+		/// <summary>
+		/// The game info file path.  This is a generated file.
+		/// </summary>
+		private static string GameInfoPath {
+			get {
+				return GooglePlayGamesRootDirectory + "GameInfo.cs";
+			}
+		}
 
-        /// <summary>
-        /// The manifest path.
-        /// </summary>
-        /// <remarks>The Games SDK requires additional metadata in the AndroidManifest.xml
-        ///     file. </remarks>
-        private const string ManifestPath =
-           "Assets/GooglePlayGames/Plugins/Android/GooglePlayGamesManifest.plugin/AndroidManifest.xml";
+
+		/// <summary>
+		/// The manifest path.
+		/// </summary>
+		/// <remarks>The Games SDK requires additional metadata in the AndroidManifest.xml
+		///     file. </remarks>
+		private static string ManifestPath {
+			get {
+				return 	GooglePlayGamesRootDirectory + "Plugins/Android/GooglePlayGamesManifest.plugin/AndroidManifest.xml";
+			}
+		}
+
+
+		/// <summary>
+		/// The root directory of the plugin
+		/// </summary> 
+		/// <remarks>
+		///     file. </remarks>
+		private static string GooglePlayGamesRootDirectory {
+			get {				
+				string[] res = System.IO.Directory.GetFiles (Application.dataPath, "GPGSUtil.cs", SearchOption.AllDirectories);
+				string path = res [0].Replace ("Editor/GPGSUtil.cs", "").Replace ("\\", "/");
+				return path;
+			}
+		}
 
         /// <summary>
         /// The map of replacements for filling in code templates.  The
@@ -166,7 +188,7 @@ namespace GooglePlayGames.Editor
         /// <param name="name">Name of the template in the editor directory.</param>
         public static string ReadEditorTemplate(string name)
         {
-            return ReadFile(SlashesToPlatformSeparator("Assets/GooglePlayGames/Editor/" + name + ".txt"));
+			return ReadFile (SlashesToPlatformSeparator (GooglePlayGamesRootDirectory + "Editor/" + name + ".txt"));
         }
 
         /// <summary>
