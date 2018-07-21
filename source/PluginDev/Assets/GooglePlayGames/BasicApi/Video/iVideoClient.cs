@@ -42,7 +42,6 @@ namespace GooglePlayGames.BasicApi.Video
         /// <summary>
         /// Launches the video capture overlay.
         /// </summary>
-        /// <param name="callback">The callback, with a <see cref="ResponseStatus"/> when the overlay closes or has an error.</param>
         void ShowCaptureOverlay();
 
         /// <summary>
@@ -67,6 +66,7 @@ namespace GooglePlayGames.BasicApi.Video
         /// Do not use this call to check if capture is supported, instead use
         /// <see cref="IsCaptureSupported"/> or <see cref="GetCaptureCapabilities"/>.
         /// </remarks>
+        /// <param name="captureMode"></param>
         /// <param name="callback">The callback for the results.
         /// This callback will be invoked on the game thread.</param>
         void IsCaptureAvailable(VideoCaptureMode captureMode, Action<ResponseStatus, bool> callback);

@@ -41,7 +41,7 @@ namespace GooglePlayGames.BasicApi
         ReadNetworkOnly
       }
 
-      /// <summary> Native response status codes</status>
+      /// <summary> Native response status codes</summary>
       /// <remarks> These values are returned by the native SDK API.
       /// NOTE: These values are different than the CommonStatusCodes.
       /// </remarks>
@@ -63,7 +63,7 @@ namespace GooglePlayGames.BasicApi
         Timeout = -5,
       }
 
-      /// <summary> Native response status codes for UI operations.</status>
+      /// <summary> Native response status codes for UI operations.</summary>
       /// <remarks> These values are returned by the native SDK API.
       /// </remarks>
       public enum UIStatus

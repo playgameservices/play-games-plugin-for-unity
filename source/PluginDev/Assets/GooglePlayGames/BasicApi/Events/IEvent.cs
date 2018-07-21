@@ -16,7 +16,7 @@
 
 namespace GooglePlayGames.BasicApi.Events
 {
-
+    using GooglePlayGames.Native.PInvoke;
     public enum EventVisibility
     {
         Hidden = 1,
