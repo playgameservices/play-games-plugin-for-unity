@@ -116,7 +116,7 @@ namespace Google.Developers
         /// found and use the raw pointer.
         /// </summary>
         /// <returns>The argument array.</returns>
-        /// <param name="args">Arguments.</param>
+        /// <param name="theArgs">Arguments.</param>
         protected static jvalue[] ConstructArgArray(object[] theArgs)
         {
 
