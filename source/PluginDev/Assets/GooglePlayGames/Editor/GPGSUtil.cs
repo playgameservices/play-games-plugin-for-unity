@@ -177,6 +177,12 @@ namespace GooglePlayGames.Editor
         public static void WriteFile(string file, string body)
         {
             file = SlashesToPlatformSeparator(file);
+            
+            // shouldn't we create directory if not exist? because it can cause error
+            var dir = Path.GetDirectoryName(file);
+            if(!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+            
             using (var wr = new StreamWriter(file, false))
             {
                 wr.Write(body);
