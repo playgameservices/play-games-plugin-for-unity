@@ -8,7 +8,18 @@ buildscript {
         jcenter()
         mavenLocal()
     }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.1.2'
+    }
 }
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
+}
+
 /*
     Project level variables
 */
@@ -53,7 +64,6 @@ project.ext {
     pluginSrc = file('PluginDev').absolutePath
     pluginBuildSrc = file('build/PluginSrc').absolutePath
     pluginProj = file('build/PluginProject').absolutePath
-    buildPath = file('build').absolutePath
     samplesPath = file('../samples').absolutePath
     samplesBuildSrc = file('build/sampleSrc').absolutePath
     exportPath = file('build/plugin.unitypackage').absolutePath
@@ -147,8 +157,10 @@ sampleList.each { sampleName ->
     // this is the path to the source code in the build dir
     def sampleBuildSrcDir = samplesBuildSrc + '/' + sampleName + '/Source/Assets/' + sampleName
 
+    def buildPath = file('build').absolutePath
+
     // this is the path to build the sample package
-    def sampleDestSrcDir = buildPath + '/Samples/' + sampleName + '/Assets/' + sampleName
+    def sampleDestSrcDir = file("${buildPath}/Samples/${sampleName}/Assets/${sampleName}").absolutePath
 
     // the relative path to the sample assets within the project.
     def sampleAssets = "Assets/${sampleName}"
