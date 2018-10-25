@@ -180,8 +180,10 @@ namespace GooglePlayGames.Editor
             
             // shouldn't we create directory if not exist? because it can cause error
             var dir = Path.GetDirectoryName(file);
-            if(!Directory.Exists(dir))
+            if (!Directory.Exists(dir))
+            {
                 Directory.CreateDirectory(dir);
+            }
             
             using (var wr = new StreamWriter(file, false))
             {
