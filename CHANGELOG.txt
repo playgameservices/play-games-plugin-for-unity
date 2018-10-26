@@ -1,3 +1,14 @@
+Version 0.9.51
+    Bug Fixes:
+      * #2324 Please update the plugin to support new version of gms！！！please！！！！
+      * #2325 Google play services sdk and facebook sdk creating build issues
+      * #2327 Libgpg not included with arm64
+      * #2330 Play-games-plugin-for-unity vs google-play-services.jar
+      * #2334 Forced Resolution Failed for plugin 0.9.50
+    New Features:
+      * Using GPGS C++ SDK 3.0.1.
+      * Using play-services 15.01+.
+      * Added arm64-v8a support.
 Version 0.9.50
     Bug Fixes:
       * Non-Fat APK including all native ABI libraries.
