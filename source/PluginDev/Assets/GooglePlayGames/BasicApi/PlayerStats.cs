@@ -25,7 +25,6 @@ namespace GooglePlayGames.BasicApi
     public class PlayerStats
     {
         private static float UNSET_VALUE = -1.0f;
-        private static float TOLERANCE = 0.001f;
 
         /// <summary>
         /// If this PlayerStats object is valid (i.e. successfully retrieved from games services).
@@ -175,7 +174,7 @@ namespace GooglePlayGames.BasicApi
         /// <returns><c>true</c> if this instance has AvgSessonLength; otherwise, <c>false</c>.</returns>
         public bool HasAvgSessonLength()
         {
-            return Math.Abs(AvgSessonLength - UNSET_VALUE) > TOLERANCE;
+            return AvgSessonLength != UNSET_VALUE;
         }
 
         /// <summary>
@@ -202,7 +201,7 @@ namespace GooglePlayGames.BasicApi
         /// <returns><c>true</c> if this instance has SessPercentile; otherwise, <c>false</c>.</returns>
         public bool HasSessPercentile()
         {
-            return Math.Abs(SessPercentile - UNSET_VALUE) > TOLERANCE;
+            return SessPercentile != UNSET_VALUE;
         }
 
         /// <summary>
@@ -211,7 +210,7 @@ namespace GooglePlayGames.BasicApi
         /// <returns><c>true</c> if this instance has SpendPercentile; otherwise, <c>false</c>.</returns>
         public bool HasSpendPercentile()
         {
-            return Math.Abs(SpendPercentile - UNSET_VALUE) > TOLERANCE;
+            return SpendPercentile != UNSET_VALUE;
         }
 
         /// <summary>
@@ -220,7 +219,7 @@ namespace GooglePlayGames.BasicApi
         /// <returns><c>true</c> if this instance has ChurnProbability; otherwise, <c>false</c>.</returns>
         public bool HasChurnProbability()
         {
-            return Math.Abs(ChurnProbability - UNSET_VALUE) > TOLERANCE;
+            return ChurnProbability != UNSET_VALUE;
         }
 
         /// <summary>
@@ -229,7 +228,7 @@ namespace GooglePlayGames.BasicApi
         /// <returns><c>true</c> if this instance has HighSpenderProbability; otherwise, <c>false</c>.</returns>
         public bool HasHighSpenderProbability()
         {
-            return Math.Abs(HighSpenderProbability - UNSET_VALUE) > TOLERANCE;
+            return HighSpenderProbability != UNSET_VALUE;
         }
 
         /// <summary>
@@ -238,7 +237,7 @@ namespace GooglePlayGames.BasicApi
         /// <returns><c>true</c> if this instance has TotalSpendNext28Days; otherwise, <c>false</c>.</returns>
         public bool HasTotalSpendNext28Days()
         {
-            return Math.Abs(TotalSpendNext28Days - UNSET_VALUE) > TOLERANCE;
+            return TotalSpendNext28Days != UNSET_VALUE;
         }
 
     }
