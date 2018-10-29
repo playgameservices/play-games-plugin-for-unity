@@ -335,7 +335,7 @@ If `mIncomingInvitation` is not `null`, show an in-game invitation popup on the 
             if (GUI.Button(declineButtonRect, "Decline")) {
                 // user wants to decline the invitation
                 PlayGamesPlatform.Instance.RealTime.DeclineInvitation(
-                    mIncomingInvitation.InvitationId, listener);
+                    mIncomingInvitation.InvitationId);
             }
         }
     }
