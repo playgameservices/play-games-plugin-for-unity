@@ -317,16 +317,16 @@ namespace Google.Developers
         {
             Type t = typeof(T);
             IntPtr method = AndroidJNI.GetMethodID(RawClass, name, sig);
+
+            if (method == IntPtr.Zero) {
+                Debug.LogError("Cannot get method for " + name);
+                throw new Exception("Cannot get method for " + name);
+            }
+
             jvalue[] jArgs = ConstructArgArray(args);
 
             try 
             {
-                if (method == IntPtr.Zero)
-                {
-                    Debug.LogError("Cannot get method for " + name);
-                    throw new Exception("Cannot get method for " + name);
-                }
-
                 if (t == typeof(bool))
                 {
                     return (T)(object)AndroidJNI.CallBooleanMethod(raw, method, jArgs);
