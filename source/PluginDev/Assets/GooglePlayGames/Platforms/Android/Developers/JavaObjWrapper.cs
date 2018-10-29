@@ -181,10 +181,10 @@ namespace Google.Developers
             IntPtr rawClass = AndroidJNI.FindClass(type);
             IntPtr method = AndroidJNI.GetStaticMethodID(rawClass, name, sig);
             jvalue[] jArgs = ConstructArgArray(args);
-            IntPtr val = AndroidJNI.CallStaticObjectMethod(rawClass, method, jArgs);
-
+            
             try 
             {
+                IntPtr val = AndroidJNI.CallStaticObjectMethod(rawClass, method, jArgs);
                 ConstructorInfo c = typeof(T).GetConstructor(new Type[] { val.GetType() });
                 if (c != null)
                 {
