@@ -18,6 +18,7 @@ namespace GooglePlayGames.BasicApi.SavedGame
 {
     using System;
     using System.Collections.Generic;
+    using GooglePlayGames.Native;
 
     /// <summary>
     /// An enum for the different strategies that can be used to resolve saved game conflicts (i.e.
@@ -145,7 +146,7 @@ namespace GooglePlayGames.BasicApi.SavedGame
 /// <summary>
 /// A delegate that is invoked when we encounter a conflict during execution of
 /// <see cref="ISavedGameClient.OpenWithAutomaticConflictResolution"/>. The caller must resolve the
-/// conflict using the passed <see cref="ConflictResolver"/>. All passed metadata is open.
+/// conflict using the passed <see cref="IConflictResolver"/>. All passed metadata is open.
 /// If <see cref="ISavedGameClient.OpenWithAutomaticConflictResolution"/> was invoked with
 /// <c>prefetchDataOnConflict</c> set to <c>true</c>, the <paramref name="originalData"/> and
 /// <paramref name="unmergedData"/> will be equal to the binary data of the "original" and
@@ -193,7 +194,7 @@ public delegate void ConflictCallback(IConflictResolver resolver, ISavedGameMeta
     /// OpenWithAutomaticConflictResolution</description></item>
     /// <item><description>Read the binary data of the saved game using ReadBinaryData handle it
     /// as appropriate for your game.</description></item>
-    /// </item><description>When you have updates, persist them in the cloud using CommitUpdate. Note
+    /// <item><description>When you have updates, persist them in the cloud using CommitUpdate. Note
     /// that writing to the cloud is relatively expensive, and shouldn't be done frequently.
     /// </description></item>
     /// </list>
@@ -261,10 +262,10 @@ public delegate void ConflictCallback(IConflictResolver resolver, ISavedGameMeta
         /// </summary>
         /// <param name="metadata">The metadata for the saved game whose binary data we want to read.
         /// This metadata must be open. If it is not open, the method will immediately fail with status
-        /// <see cref="BadInputError"/>.
+        /// <see cref="SelectUIStatus.BadInputError"/>.
         /// </param>
         /// <param name="completedCallback">The callback that is invoked when the read finishes. If the
-        /// read completed without error, the passed status will be <see cref="Success"/> and the passed
+        /// read completed without error, the passed status will be <see cref="SavedGameRequestStatus.Success"/> and the passed
         /// bytes will correspond to the binary data for the file. In the case of
         /// </param>
         void ReadBinaryData(ISavedGameMetadata metadata,
@@ -286,7 +287,7 @@ public delegate void ConflictCallback(IConflictResolver resolver, ISavedGameMeta
         /// delete a saved game.</param>
         /// <param name="callback">The callback that is invoked when an error occurs or if the user
         /// finishes interacting with the UI. If the user selected a saved game, this will be passed
-        /// into the callback along with the <see cref="SavedGameSelected"/> status. This saved game
+        /// into the callback along with the <see cref="SelectUIStatus.SavedGameSelected"/> status. This saved game
         /// will not be Open, and must be opened before it can be written to or its binary data can be
         /// read. If the user backs out of the UI without selecting a saved game, this callback will
         /// receive <see cref="UserClosedUI"/> and a null saved game. This callback will always execute
@@ -305,8 +306,8 @@ public delegate void ConflictCallback(IConflictResolver resolver, ISavedGameMeta
         /// <see cref="OpenWithAutomaticConflictResolution"/> for more information.
         /// </summary>
         /// <param name="metadata">The metadata for the saved game to update. This metadata must be
-        /// Open (i.e. <see cref="ISavedGameMetadata.IsOpen/> returns true)."/> If it is not open, the
-        /// method will immediately fail with status <see cref="BadInputError"/></param>
+        /// Open (i.e. <see cref="ISavedGameMetadata.IsOpen"/> returns true)."/> If it is not open, the
+        /// method will immediately fail with status <see cref="SelectUIStatus.BadInputError"/></param>
         /// <param name="updateForMetadata">All updates that should be applied to the saved game
         /// metadata.</param>
         /// <param name="updatedBinaryData">The new binary content of the saved game</param>
@@ -354,8 +355,8 @@ public delegate void ConflictCallback(IConflictResolver resolver, ISavedGameMeta
         /// this instance will be kept as the cannonical value in the cloud.
         /// </summary>
         /// <param name="chosenMetadata">The chosen metadata. This metadata must be open. If it is not
-        /// open, the invokation of <see cref="OpenWithManualConflictResolution"/> that produced this
-        /// ConflictResolver will immediately fail with <see cref="BadInputError"/>.</param>
+        /// open, the invokation of <see cref="NativeSavedGameClient.OpenWithManualConflictResolution"/> that produced this
+        /// ConflictResolver will immediately fail with <see cref="SelectUIStatus.BadInputError"/>.</param>
         void ChooseMetadata(ISavedGameMetadata chosenMetadata);
 
         /// <summary>
