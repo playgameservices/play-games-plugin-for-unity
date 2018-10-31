@@ -437,10 +437,12 @@ public class TokenFragment extends Fragment
     private void onSignedIn(int resultCode, GoogleSignInAccount acct) {
 
         if (resultCode == CommonStatusCodes.CANCELED) {
-            if (pendingTokenRequest != null)
-            {
-                pendingTokenRequest.cancel();
-            }
+			synchronized (lock) {
+			    if (pendingTokenRequest != null) {
+					pendingTokenRequest.cancel();
+				}
+			}
+
             SaveDeclinedSignInPreference(true);
         }
 
