@@ -42,7 +42,7 @@ namespace GooglePlayGames.BasicApi.Multiplayer
         }
 
         private string mDisplayName = string.Empty;
-        private string mParticipantId = string.Empty;
+        private readonly string mParticipantId = string.Empty;
         private ParticipantStatus mStatus = ParticipantStatus.Unknown;
         private Player mPlayer = null;
         private bool mIsConnectedToRoom = false;
@@ -134,7 +134,7 @@ namespace GooglePlayGames.BasicApi.Multiplayer
 
         public int CompareTo(Participant other)
         {
-            return mParticipantId.CompareTo(other.mParticipantId);
+            return String.Compare(mParticipantId, other.mParticipantId, StringComparison.Ordinal);
         }
 
         public override bool Equals(object obj)

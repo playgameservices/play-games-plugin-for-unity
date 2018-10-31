@@ -13,13 +13,13 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
+
 #if (UNITY_ANDROID || (UNITY_IPHONE && !NO_GPGS))
 
 namespace GooglePlayGames.BasicApi
 {
   using System;
-  using GooglePlayGames.BasicApi.Multiplayer;
-  using UnityEngine;
+  using Multiplayer;
   using UnityEngine.SocialPlatforms;
 
   /// <summary>
@@ -45,7 +45,7 @@ namespace GooglePlayGames.BasicApi
   ///
   /// <para>CALLBACKS: all callbacks must be invoked in Unity's main thread.
   /// Implementors of this interface must guarantee that (suggestion: use
-  /// <see cref="GooglePlayGames.OurUtils.RunOnGameThread(System.Action action)"/>).</para>
+  /// <see cref="PlayGamesHelperObject.RunOnGameThread(System.Action)"/>).</para>
   /// </remarks>
   public interface IPlayGamesClient
   {
@@ -61,7 +61,7 @@ namespace GooglePlayGames.BasicApi
     /// </remarks>
     /// <param name="callback">Callback.</param>
     /// <param name="silent">If set to <c>true</c> silent.</param>
-    void Authenticate(System.Action<bool, string> callback, bool silent);
+    void Authenticate(Action<bool, string> callback, bool silent);
 
     /// <summary>
     /// Returns whether or not user is authenticated.
@@ -257,9 +257,9 @@ namespace GooglePlayGames.BasicApi
     /// <param name="leaderboardId">Leaderboard identifier.</param>
     /// <param name="start">Start indicating the top scores or player centric</param>
     /// <param name="rowCount">max number of scores to return. non-positive indicates
-    // no rows should be returned.  This causes only the summary info to
+    /// no rows should be returned.  This causes only the summary info to
     /// be loaded. This can be limited
-    // by the SDK.</param>
+    /// by the SDK.</param>
     /// <param name="collection">leaderboard collection: public or social</param>
     /// <param name="timeSpan">leaderboard timespan</param>
     /// <param name="callback">callback with the scores, and a page token.
@@ -306,16 +306,16 @@ namespace GooglePlayGames.BasicApi
     /// Submits the score for the currently signed-in player.
     /// </summary>
     /// <param name="score">Score.</param>
-    /// <param name="board">leaderboard id.</param>
+    /// <param name="leaderboardId">leaderboard id.</param>
     /// <param name="metadata">metadata about the score.</param>
-    /// <param name="callback">Callback upon completion.</param>
+    /// <param name="successOrFailureCalllback">Callback upon completion.</param>
     void SubmitScore(string leaderboardId, long score, string metadata,
-            Action<bool> successOrFailureCalllback);
+    Action<bool> successOrFailureCalllback);
 
     /// <summary>
     /// Returns a real-time multiplayer client.
     /// </summary>
-    /// <seealso cref="GooglePlayGames.Multiplayer.IRealTimeMultiplayerClient"/>
+    /// <seealso cref="GooglePlayGames.BasicApi.Multiplayer.IRealTimeMultiplayerClient"/>
     /// <returns>The rtmp client.</returns>
     IRealTimeMultiplayerClient GetRtmpClient();
 
