@@ -1191,7 +1191,7 @@ namespace GooglePlayGames
         /// Shows the standard Google Play Games leaderboards user interface,
         /// which allows the player to browse their leaderboards. If you have
         /// configured a specific leaderboard as the default through a call to
-        /// <see cref="SetDefaultLeaderboardForUi" />, the UI will show that
+        /// <see cref="SetDefaultLeaderboardForUI" />, the UI will show that
         /// specific leaderboard only. Otherwise, a list of all the leaderboards
         /// will be shown.
         /// </summary>
