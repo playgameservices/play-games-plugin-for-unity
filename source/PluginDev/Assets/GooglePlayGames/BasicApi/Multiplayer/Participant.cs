@@ -134,7 +134,7 @@ namespace GooglePlayGames.BasicApi.Multiplayer
 
         public int CompareTo(Participant other)
         {
-            return mParticipantId.CompareTo(other.mParticipantId);
+            return String.Compare(mParticipantId, other.mParticipantId, StringComparison.Ordinal);
         }
 
         public override bool Equals(object obj)
