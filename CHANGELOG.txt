@@ -1,3 +1,8 @@
+Version 0.9.53
+    Bug Fixes:
+      #2348 pragma UNITY_2017 should be UNITY_2017_1_OR_NEWER.
+      #1581 Solve namespace error when importing to Unity project with existing Result class.
+      Annotations fixes.
 Version 0.9.52
     Bug Fixes:
       #2319 Not Working with Unity 2018.2
