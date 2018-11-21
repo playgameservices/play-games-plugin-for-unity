@@ -1,3 +1,8 @@
+Version 0.9.54
+    Bug Fixes:
+      #2361 Failing to silently login - auth fails on request - initialisation order problem?
+      #2350 Remove unused import that breaks iOS builds
+      #2339 GetAnotherServerAuthCode Nothing Happens
 Version 0.9.53
     Bug Fixes:
       #2348 pragma UNITY_2017 should be UNITY_2017_1_OR_NEWER.
