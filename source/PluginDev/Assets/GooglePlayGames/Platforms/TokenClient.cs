@@ -61,13 +61,11 @@ namespace GooglePlayGames
 
         void SetAccountName(string accountName);
 
-        void AddOauthScopes(string[] scopes);
+        void AddOauthScopes(params string[] scopes);
 
         void SetHidePopups(bool flag);
 
-        bool NeedsToRun();
-
-        void FetchTokens(Action<int> callback);
+        void FetchTokens(bool silent, Action<int> callback);
     }
 }
 #endif

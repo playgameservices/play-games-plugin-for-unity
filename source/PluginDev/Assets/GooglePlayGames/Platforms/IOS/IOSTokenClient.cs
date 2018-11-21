@@ -159,7 +159,7 @@ namespace GooglePlayGames.IOS {
             throw new NotImplementedException();
         }
 
-        public void AddOauthScopes(string[] scopes)
+        public void AddOauthScopes(params string[] scopes)
         {
             throw new NotImplementedException();
         }
@@ -169,17 +169,12 @@ namespace GooglePlayGames.IOS {
             throw new NotImplementedException();
         }
 
-        public bool NeedsToRun()
-        {
-            throw new NotImplementedException();
-        }
-
         public void FetchTokens(Action callback)
         {
             throw new NotImplementedException();
         }
 
-        public void FetchTokens(Action<int> callback) {
+        public void FetchTokens(bool silent, Action<int> callback) {
             throw new NotImplementedException();
         }
     }

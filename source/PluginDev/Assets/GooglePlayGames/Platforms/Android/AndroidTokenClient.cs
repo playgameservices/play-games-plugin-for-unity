@@ -30,17 +30,18 @@ namespace GooglePlayGames.Android
 
         /*
          * fetchToken(Activity parentActivity,
-                                           boolean requestAuthCode,
-                                           boolean requestEmail,
-                                           boolean requestIdToken,
-                                           String webClientId,
-                                           boolean forceRefreshToken,
-                                           String[] additionalScopes,
-                                           boolean hidePopups,
-                                           String accountName)
+                      boolean silent,
+                      boolean requestAuthCode,
+                      boolean requestEmail,
+                      boolean requestIdToken,
+                      String webClientId,
+                      boolean forceRefreshToken,
+                      String[] additionalScopes,
+                      boolean hidePopups,
+                      String accountName)
          */
         private const string FetchTokenSignature =
-            "(Landroid/app/Activity;ZZZLjava/lang/String;Z[Ljava/lang/String;ZLjava/lang/String;)Lcom/google/android/gms/common/api/PendingResult;";
+            "(Landroid/app/Activity;ZZZZLjava/lang/String;Z[Ljava/lang/String;ZLjava/lang/String;)Lcom/google/android/gms/common/api/PendingResult;";
 
         private const string FetchTokenMethod = "fetchToken";
 
@@ -102,7 +103,7 @@ namespace GooglePlayGames.Android
             this.accountName = accountName;
         }
 
-        public void AddOauthScopes(string[] scopes)
+        public void AddOauthScopes(params string[] scopes)
         {
             if (scopes != null)
             {
@@ -126,21 +127,14 @@ namespace GooglePlayGames.Android
             });
         }
 
-        public bool NeedsToRun()
+        public void FetchTokens(bool silent, Action<int> callback)
         {
-            return requestAuthCode ||
-                        requestEmail ||
-                        requestIdToken;
+            PlayGamesHelperObject.RunOnGameThread(() => DoFetchToken(silent, callback));
         }
 
-        public void FetchTokens(Action<int> callback)
+        internal void DoFetchToken(bool silent, Action<int> callback)
         {
-            PlayGamesHelperObject.RunOnGameThread(() => DoFetchToken(callback));
-        }
-
-        internal void DoFetchToken(Action<int> callback)
-        {
-            object[] objectArray = new object[9];
+            object[] objectArray = new object[10];
             jvalue[] jArgs = AndroidJNIHelper.CreateJNIArgArray(objectArray);
 
             try
@@ -155,14 +149,15 @@ namespace GooglePlayGames.Android
                                               FetchTokenMethod,
                                               FetchTokenSignature);
                         jArgs[0].l = currentActivity.GetRawObject();
-                        jArgs[1].z = requestAuthCode;
-                        jArgs[2].z = requestEmail;
-                        jArgs[3].z = requestIdToken;
-                        jArgs[4].l = AndroidJNI.NewStringUTF(webClientId);
-                        jArgs[5].z = forceRefresh;
-                        jArgs[6].l = AndroidJNIHelper.ConvertToJNIArray(oauthScopes.ToArray());
-                        jArgs[7].z = hidePopups;
-                        jArgs[8].l = AndroidJNI.NewStringUTF(accountName);
+                        jArgs[1].z = silent;
+                        jArgs[2].z = requestAuthCode;
+                        jArgs[3].z = requestEmail;
+                        jArgs[4].z = requestIdToken;
+                        jArgs[5].l = AndroidJNI.NewStringUTF(webClientId);
+                        jArgs[6].z = forceRefresh;
+                        jArgs[7].l = AndroidJNIHelper.ConvertToJNIArray(oauthScopes.ToArray());
+                        jArgs[8].z = hidePopups;
+                        jArgs[9].l = AndroidJNI.NewStringUTF(accountName);
 
                         IntPtr ptr =
                             AndroidJNI.CallStaticObjectMethod(bridgeClass.GetRawClass(), methodId, jArgs);
