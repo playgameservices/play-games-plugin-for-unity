@@ -15,8 +15,7 @@
 // </copyright>
 
 // Android only feature
-#if (UNITY_ANDROID)
-
+#if UNITY_ANDROID
 namespace GooglePlayGames.Native.Cwrapper {
 
     using System;
@@ -103,4 +102,5 @@ namespace GooglePlayGames.Native.Cwrapper {
             /* from(MessageListenerHelper_t) */ IntPtr helper);
     }
 }
-#endif // (UNITY_ANDROID || UNITY_IPHONE)
+#endif //UNITY_ANDROID
+

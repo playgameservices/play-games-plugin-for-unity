@@ -15,8 +15,7 @@
 // </copyright>
 
 // Android only feature
-#if (UNITY_ANDROID)
-
+#if UNITY_ANDROID
 namespace GooglePlayGames.Native.PInvoke
 {
     using GooglePlayGames.BasicApi.Nearby;
@@ -72,4 +71,5 @@ namespace GooglePlayGames.Native.PInvoke
 
     }
 }
-#endif // #if (UNITY_ANDROID || UNITY_IPHONE)
+#endif //UNITY_ANDROID
+

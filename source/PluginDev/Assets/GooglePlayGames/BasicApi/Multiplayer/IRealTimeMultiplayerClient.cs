@@ -17,7 +17,7 @@
 namespace GooglePlayGames.BasicApi.Multiplayer
 {
 // move inside the namespace so the namespace is declared if not using GPGS
-#if (UNITY_ANDROID || (UNITY_IPHONE && !NO_GPGS))
+#if UNITY_ANDROID
   using System;
   using System.Collections.Generic;
   using GooglePlayGames.BasicApi.Multiplayer;

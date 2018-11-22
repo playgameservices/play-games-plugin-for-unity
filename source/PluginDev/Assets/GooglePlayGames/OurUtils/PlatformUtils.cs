@@ -13,8 +13,8 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
-#if (UNITY_ANDROID || (UNITY_IPHONE && !NO_GPGS))
 
+#if UNITY_ANDROID
 namespace GooglePlayGames.OurUtils
 {
   using UnityEngine;
@@ -32,8 +32,6 @@ namespace GooglePlayGames.OurUtils
             {
     #if UNITY_EDITOR
                 return false;
-    #elif UNITY_IOS
-                return true;
     #else
                 var up = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
                 var ca = up.GetStatic<AndroidJavaObject>("currentActivity");
@@ -56,4 +54,5 @@ namespace GooglePlayGames.OurUtils
         }
   }
 }
-#endif
+#endif //UNITY_ANDROID
+

@@ -16,7 +16,6 @@
 
 // Android only feature
 #if (UNITY_ANDROID)
-
 namespace GooglePlayGames
 {
     using UnityEngine;
@@ -35,16 +34,8 @@ namespace GooglePlayGames
                 GooglePlayGames.OurUtils.Logger.d("Creating INearbyConnection in editor, using DummyClient.");
                 callback.Invoke(new GooglePlayGames.BasicApi.Nearby.DummyNearbyConnectionClient());
             }
-#if (UNITY_ANDROID)
             GooglePlayGames.OurUtils.Logger.d("Creating real INearbyConnectionClient");
             GooglePlayGames.Native.NativeNearbyConnectionClientFactory.Create(callback);
-#elif (UNITY_IPHONE && !NO_GPGS)
-            GooglePlayGames.OurUtils.Logger.e("Nearby connections not supported in iOS... Using Dummy client");
-            callback.Invoke(new GooglePlayGames.BasicApi.Nearby.DummyNearbyConnectionClient());
-#else
-            GooglePlayGames.OurUtils.Logger.e("Cannot create IPlayGamesClient for unknown platform, returning DummyClient");
-            return new GooglePlayGames.BasicApi.DummyClient();
-#endif
         }
 
         private static InitializationStatus ToStatus(S.InitializationStatus status)
@@ -64,4 +55,5 @@ namespace GooglePlayGames
         }
     }
 }
-#endif
+#endif //UNITY_ANDROID
+

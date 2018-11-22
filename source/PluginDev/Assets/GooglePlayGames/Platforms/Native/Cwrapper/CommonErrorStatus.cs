@@ -14,8 +14,7 @@
 //    limitations under the License.
 // </copyright>
 
-#if (UNITY_ANDROID || (UNITY_IPHONE && !NO_GPGS))
-
+#if UNITY_ANDROID
 namespace GooglePlayGames.Native.Cwrapper
 {
     internal static class CommonErrorStatus
@@ -107,4 +106,5 @@ namespace GooglePlayGames.Native.Cwrapper
         }
     }
 }
-#endif // (UNITY_ANDROID || UNITY_IPHONE)
+#endif //UNITY_ANDROID
+

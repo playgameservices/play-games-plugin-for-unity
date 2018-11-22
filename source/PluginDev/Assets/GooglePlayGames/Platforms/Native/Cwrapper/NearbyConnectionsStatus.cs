@@ -15,9 +15,7 @@
 // </copyright>
 
 // Android only feature
-#if (UNITY_ANDROID)
-
-
+#if UNITY_ANDROID
 namespace GooglePlayGames.Native.Cwrapper {
 using System;
 using System.Collections.Generic;
@@ -31,4 +29,5 @@ internal static class NearbyConnectionsStatus {
     }
 }
 }
-#endif // (UNITY_ANDROID || UNITY_IPHONE)
+#endif //UNITY_ANDROID
+
