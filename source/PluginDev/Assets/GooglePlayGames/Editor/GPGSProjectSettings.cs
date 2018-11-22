@@ -45,8 +45,7 @@ namespace GooglePlayGames.Editor
 
         private GPGSProjectSettings()
         {
-            string ds = Path.DirectorySeparatorChar.ToString();
-            mFile = "ProjectSettings/GooglePlayGameSettings.txt".Replace("/", ds);
+            mFile = GPGSUtil.SlashesToPlatformSeparator("ProjectSettings/GooglePlayGameSettings.txt");
 
             StreamReader rd = null;
 
@@ -54,8 +53,8 @@ namespace GooglePlayGames.Editor
             string[] fileLocations =
                 {
                     mFile,
-                    "Assets/GooglePlayGames/Editor/projsettings.txt".Replace("/", ds),
-                    "Assets/Editor/projsettings.txt".Replace("/", ds)
+                    GPGSUtil.SlashesToPlatformSeparator(Path.Combine(GPGSUtil.RootPath, "Editor/projsettings.txt")),
+                    GPGSUtil.SlashesToPlatformSeparator("Assets/Editor/projsettings.txt")
                 };
 
             foreach (string f in fileLocations)
