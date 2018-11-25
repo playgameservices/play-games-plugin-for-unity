@@ -628,6 +628,78 @@ namespace GooglePlayGames.Editor
         }
 
         /// <summary>
+        /// Checks the dependencies file and fixes repository paths
+        /// if they are incorrect (for example if the user moved plugin
+        /// into some subdirectory). This is a generated file containing
+        /// the list of dependencies that are needed for the plugin to work.
+        /// </summary>
+        public static void CheckAndFixDependencies()
+        {
+            string depPath = SlashesToPlatformSeparator(Path.Combine(GPGSUtil.RootPath, "Editor/GooglePlayGamesPluginDependencies.xml"));
+
+            XmlDocument doc = new XmlDocument();
+            doc.Load(depPath);
+
+            XmlNodeList repos = doc.SelectNodes("//androidPackage[contains(@spec,'com.google.games')]//repository"); 
+            foreach (XmlNode repo in repos)
+            {
+                if (!Directory.Exists(repo.InnerText))
+                {
+                    int pos = repo.InnerText.IndexOf(RootFolderName);
+                    if (pos != -1)
+                    {
+                        repo.InnerText = Path.Combine(RootPath, repo.InnerText.Substring(pos + RootFolderName.Length + 1)).Replace("\\", "/");
+                    }
+                }
+            }
+
+            doc.Save(depPath);
+        }
+
+        /// <summary>
+        /// Checks the file containing the list of versioned assets and fixes
+        /// paths to them if they are incorrect (for example if the user moved
+        /// plugin into some subdirectory). This is a generated file.
+        /// </summary>
+        public static void CheckAndFixVersionedAssestsPaths()
+        {
+            string[] foundPaths = Directory.GetFiles(RootPath, "GooglePlayGamesPlugin_v*.txt", SearchOption.AllDirectories);
+
+            if (foundPaths.Length == 1)
+            {
+                string tmpFilePath = Path.GetTempFileName();
+                
+                StreamWriter writer = new StreamWriter(tmpFilePath);
+                using (StreamReader reader = new StreamReader(foundPaths[0]))
+                {
+                    string assetPath;
+                    while ((assetPath = reader.ReadLine()) != null)
+                    {
+                        int pos = assetPath.IndexOf(RootFolderName);
+                        if (pos != -1)
+                        {
+                            assetPath = Path.Combine(RootPath, assetPath.Substring(pos + RootFolderName.Length + 1)).Replace("\\", "/");
+                        }
+
+                        writer.WriteLine(assetPath);
+                    }
+                }
+
+                writer.Flush();
+                writer.Close();
+
+                try
+                {
+                    File.Copy(tmpFilePath, foundPaths[0], true);
+                }
+                finally
+                {
+                    File.Delete(tmpFilePath);
+                }
+            }
+        }
+
+        /// <summary>
         /// Ensures the dir exists.
         /// </summary>
         /// <param name="dir">Directory to check.</param>
