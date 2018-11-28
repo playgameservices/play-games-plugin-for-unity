@@ -42,6 +42,7 @@ import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.games.Games;
+import com.google.android.gms.games.GamesClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
@@ -375,11 +376,7 @@ public class TokenFragment extends Fragment
             if (statusCode != CommonStatusCodes.SUCCESS) {
                 Log.e(TAG,"Setting result error status code to: " + statusCode);
             }
-            if (statusCode == CommonStatusCodes.CANCELED) {
-                request.cancel();
-            } else {
-                request.setResult(statusCode);
-            }
+            request.setResult(statusCode);
         }
     }
 

@@ -101,7 +101,7 @@ namespace GooglePlayGames.Native
 
             Debug.Log("Starting Auth with token client.");
             mTokenClient.FetchTokens(silent, (int result) => {
-                bool succeed = result == 0;
+                bool succeed = result == 0 /* CommonStatusCodes.SUCCEED */;
                 if (succeed) {
                     if (callback != null) {
                       mPendingAuthCallbacks += callback;
@@ -110,7 +110,13 @@ namespace GooglePlayGames.Native
                     GameServices().StartAuthorizationUI();
                 } else {
                     Action<bool, string> localCallback = callback;
-                    InvokeCallbackOnGameThread(localCallback, false, "Authentication failed");
+                    if (result == 16 /* CommonStatusCodes.CANCELED */) {
+                        InvokeCallbackOnGameThread(localCallback, false, "Authentication canceled");
+                    } else if (result == 8 /* CommonStatusCodes.DEVELOPER_ERROR */) {
+                        InvokeCallbackOnGameThread(localCallback, false, "Authentication failed - developer error");
+                    } else {
+                        InvokeCallbackOnGameThread(localCallback, false, "Authentication failed");
+                    }
                 }
             });
         }
