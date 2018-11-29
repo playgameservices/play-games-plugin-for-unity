@@ -64,39 +64,11 @@ namespace GooglePlayGames.Android
         private string authCode;
         private string idToken;
 
-        public static IntPtr CreateInvisibleView() {
-            object[] objectArray = new object[1];
-            jvalue[] jArgs = AndroidJNIHelper.CreateJNIArgArray(objectArray);
-
-            try
+        public static AndroidJavaObject CreateInvisibleView() {
+            using (var jc = new AndroidJavaClass(TokenFragmentClass))
             {
-                using (var bridgeClass = new AndroidJavaClass(TokenFragmentClass))
-                {
-                    using (var currentActivity = GetActivity())
-                    {
-                        // Unity no longer supports constructing an AndroidJavaObject using an IntPtr,
-                        // so I have to manually munge with JNI here.
-                        IntPtr methodId = AndroidJNI.GetStaticMethodID(bridgeClass.GetRawClass(),
-                                              "createInvisibleView",
-                                              "(Landroid/app/Activity;)Landroid/view/View;");
-                        jArgs[0].l = currentActivity.GetRawObject();
-
-                        IntPtr view =
-                            AndroidJNI.CallStaticObjectMethod(bridgeClass.GetRawClass(), methodId, jArgs);
-                        return view;
-                    }
-                }
+                return jc.CallStatic<AndroidJavaObject>("createInvisibleView", GetActivity());
             }
-            catch (Exception e)
-            {
-                OurUtils.Logger.e("Exception creating invisible view: " + e.Message);
-                OurUtils.Logger.e(e.ToString());
-            }
-            finally
-            {
-                AndroidJNIHelper.DeleteJNIArgArray(objectArray, jArgs);
-            }
-            return IntPtr.Zero;
         }
 
         public static AndroidJavaObject GetActivity()
