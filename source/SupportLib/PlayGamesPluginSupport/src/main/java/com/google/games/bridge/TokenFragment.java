@@ -497,4 +497,11 @@ public class TokenFragment extends Fragment
         GooglePlayServicesUtil.isGooglePlayServicesAvailable(null);
         return false;
     }
+
+    public static View createInvisibleView(Activity parentActivity) {
+        View view = new View(parentActivity);
+        view.setVisibility(View.INVISIBLE);
+        view.setClickable(false);    
+        return view;
+    }
 }

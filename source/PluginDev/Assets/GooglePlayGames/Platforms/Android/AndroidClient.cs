@@ -65,9 +65,9 @@ namespace GooglePlayGames.Android
                                 }
                             });
                     });
-                if (clientConfig.IsHidingPopups)
+                if (clientConfig.IsHidingPopups) 
                 {
-                    config.SetOptionalViewForPopups(CreateHiddenView(activity.GetRawObject()));
+                    config.SetOptionalViewForPopups(AndroidTokenClient.CreateInvisibleView());
                 }
             }
             return config;
@@ -87,20 +87,6 @@ namespace GooglePlayGames.Android
 
             return tokenClient;
         }
-
-        private IntPtr CreateHiddenView(IntPtr activity)
-        {
-            // Keep it static so it will always be referenced.
-            if (invisible == null || invisible.GetRawObject() == IntPtr.Zero) {
-              invisible = new AndroidJavaObject("android.view.View", activity);
-              invisible.Call("setVisibility",/*View.INVISIBLE*/(int)0x00000004);
-              invisible.Call("setClickable", false);
-            }
-
-            return invisible.GetRawObject();
-            
-        }
-
 
         // Must be launched from the game thread (otherwise the classloader cannot locate the unity
         // java classes we require).
