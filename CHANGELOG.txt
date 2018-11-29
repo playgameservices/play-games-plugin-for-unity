@@ -1,3 +1,7 @@
+Version 0.9.55
+    Bug Fixes:
+      #2371 Authenticate callback is not called if sign-in was canceled.
+      #1983, #2078, #2167 Android 8+ sign in fails when using EnableHidePopups.
 Version 0.9.54
     Bug Fixes:
       #2361 Failing to silently login - auth fails on request - initialisation order problem?
