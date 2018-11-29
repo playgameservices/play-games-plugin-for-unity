@@ -98,17 +98,92 @@ namespace GooglePlayGames.Editor
         private const string CONSTANTSPLACEHOLDER = "__Constant_Properties__";
 
         /// <summary>
+        /// The game info file path, relative to the plugin root directory.  This is a generated file.
+        /// </summary>
+        private const string GameInfoRelativePath = "GameInfo.cs";
+
+        /// <summary>
+        /// The manifest path, relative to the plugin root directory.
+        /// </summary>
+        /// <remarks>The Games SDK requires additional metadata in the AndroidManifest.xml
+        ///     file. </remarks>
+        private const string ManifestRelativePath =
+           "Plugins/Android/GooglePlayGamesManifest.plugin/AndroidManifest.xml";
+
+        private const string RootFolderName = "GooglePlayGames";
+
+        /// <summary>
+        /// The root path of the Google Play Games plugin
+        /// </summary>
+        public static string RootPath
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(mRootPath))
+                {
+                    string[] dirs = Directory.GetDirectories("Assets", RootFolderName, SearchOption.AllDirectories);
+                    switch (dirs.Length)
+                    {
+                        case 0:
+                            Alert("Plugin error: GooglePlayGames folder was renamed");
+                            throw new Exception("GooglePlayGames folder was renamed");
+
+                        case 1:
+                            mRootPath = SlashesToPlatformSeparator(dirs[0]);
+                            break;
+
+                        default:
+                            for (int i = 0; i < dirs.Length; i++)
+                            {
+                                if (File.Exists(SlashesToPlatformSeparator(Path.Combine(dirs[i], GameInfoRelativePath))))
+                                {
+                                    mRootPath = SlashesToPlatformSeparator(dirs[i]);
+                                    break;
+                                }
+                            }
+
+                            if (string.IsNullOrEmpty(mRootPath))
+                            {
+                                Alert("Plugin error: GooglePlayGames folder was renamed");
+                                throw new Exception("GooglePlayGames folder was renamed");
+                            }
+
+                            break;
+                    }
+                }
+
+                return mRootPath;
+            }
+        }
+
+        /// <summary>
         /// The game info file path.  This is a generated file.
         /// </summary>
-        private const string GameInfoPath = "Assets/GooglePlayGames/GameInfo.cs";
+        private static string GameInfoPath
+        {
+            get
+            {
+                return SlashesToPlatformSeparator(Path.Combine(RootPath, GameInfoRelativePath));
+            }
+        }
 
         /// <summary>
         /// The manifest path.
         /// </summary>
         /// <remarks>The Games SDK requires additional metadata in the AndroidManifest.xml
         ///     file. </remarks>
-        private const string ManifestPath =
-           "Assets/GooglePlayGames/Plugins/Android/GooglePlayGamesManifest.plugin/AndroidManifest.xml";
+        private static string ManifestPath
+        {
+            get
+            {
+                return SlashesToPlatformSeparator(Path.Combine(RootPath, ManifestRelativePath));
+            }
+        }
+
+        /// <summary>
+        /// The root path of the Google Play Games plugin
+        /// </summary>
+        private static string mRootPath = "";
 
         /// <summary>
         /// The map of replacements for filling in code templates.  The
@@ -166,7 +241,7 @@ namespace GooglePlayGames.Editor
         /// <param name="name">Name of the template in the editor directory.</param>
         public static string ReadEditorTemplate(string name)
         {
-            return ReadFile(SlashesToPlatformSeparator("Assets/GooglePlayGames/Editor/" + name + ".txt"));
+            return ReadFile(Path.Combine(RootPath, string.Format("Editor{0}{1}.txt", Path.DirectorySeparatorChar, name)));
         }
 
         /// <summary>
@@ -419,7 +494,7 @@ namespace GooglePlayGames.Editor
         /// <returns><c>true</c>, if the file exists <c>false</c> otherwise.</returns>
         public static bool AndroidManifestExists()
         {
-            string destFilename = GPGSUtil.SlashesToPlatformSeparator(ManifestPath);
+            string destFilename = ManifestPath;
 
             return File.Exists(destFilename);
         }
@@ -430,7 +505,7 @@ namespace GooglePlayGames.Editor
         public static void GenerateAndroidManifest()
         {
 
-            string destFilename = GPGSUtil.SlashesToPlatformSeparator(ManifestPath);
+            string destFilename = ManifestPath;
 
             // Generate AndroidManifest.xml
             string manifestBody = GPGSUtil.ReadEditorTemplate("template-AndroidManifest");
@@ -550,6 +625,78 @@ namespace GooglePlayGames.Editor
             }
 
             GPGSUtil.WriteFile(GameInfoPath, fileBody);
+        }
+
+        /// <summary>
+        /// Checks the dependencies file and fixes repository paths
+        /// if they are incorrect (for example if the user moved plugin
+        /// into some subdirectory). This is a generated file containing
+        /// the list of dependencies that are needed for the plugin to work.
+        /// </summary>
+        public static void CheckAndFixDependencies()
+        {
+            string depPath = SlashesToPlatformSeparator(Path.Combine(GPGSUtil.RootPath, "Editor/GooglePlayGamesPluginDependencies.xml"));
+
+            XmlDocument doc = new XmlDocument();
+            doc.Load(depPath);
+
+            XmlNodeList repos = doc.SelectNodes("//androidPackage[contains(@spec,'com.google.games')]//repository"); 
+            foreach (XmlNode repo in repos)
+            {
+                if (!Directory.Exists(repo.InnerText))
+                {
+                    int pos = repo.InnerText.IndexOf(RootFolderName);
+                    if (pos != -1)
+                    {
+                        repo.InnerText = Path.Combine(RootPath, repo.InnerText.Substring(pos + RootFolderName.Length + 1)).Replace("\\", "/");
+                    }
+                }
+            }
+
+            doc.Save(depPath);
+        }
+
+        /// <summary>
+        /// Checks the file containing the list of versioned assets and fixes
+        /// paths to them if they are incorrect (for example if the user moved
+        /// plugin into some subdirectory). This is a generated file.
+        /// </summary>
+        public static void CheckAndFixVersionedAssestsPaths()
+        {
+            string[] foundPaths = Directory.GetFiles(RootPath, "GooglePlayGamesPlugin_v*.txt", SearchOption.AllDirectories);
+
+            if (foundPaths.Length == 1)
+            {
+                string tmpFilePath = Path.GetTempFileName();
+                
+                StreamWriter writer = new StreamWriter(tmpFilePath);
+                using (StreamReader reader = new StreamReader(foundPaths[0]))
+                {
+                    string assetPath;
+                    while ((assetPath = reader.ReadLine()) != null)
+                    {
+                        int pos = assetPath.IndexOf(RootFolderName);
+                        if (pos != -1)
+                        {
+                            assetPath = Path.Combine(RootPath, assetPath.Substring(pos + RootFolderName.Length + 1)).Replace("\\", "/");
+                        }
+
+                        writer.WriteLine(assetPath);
+                    }
+                }
+
+                writer.Flush();
+                writer.Close();
+
+                try
+                {
+                    File.Copy(tmpFilePath, foundPaths[0], true);
+                }
+                finally
+                {
+                    File.Delete(tmpFilePath);
+                }
+            }
         }
 
         /// <summary>

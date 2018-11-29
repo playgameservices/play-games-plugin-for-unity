@@ -83,7 +83,7 @@ namespace GooglePlayGames.Editor
             {
                 string[] paths =
                     {
-                        "Assets/GooglePlayGames",
+                        GPGSUtil.RootPath,
                         "Assets/Plugins/Android",
                         "Assets/PlayServicesResolver"
                     };
