@@ -5,7 +5,7 @@ buildscript {
         mavenLocal()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.2'
+        classpath 'com.android.tools.build:gradle:3.2.1'
     }
 }
 
@@ -41,9 +41,9 @@ if (project.hasProperty("gpgSdkDir")) {
 }
 
 android {
-    // TODO(claywilkinson): Clean up lint warnings
     lintOptions {
-        abortOnError false
+        abortOnError true
+        warningsAsErrors true
     }
     defaultConfig {
         versionName  project.version
@@ -116,7 +116,7 @@ uploadArchives {
 }
 
 dependencies {
-    implementation 'com.google.android.gms:play-services-games:15.0+'
-    implementation 'com.google.android.gms:play-services-auth:15.0+'
-    implementation 'com.google.android.gms:play-services-nearby:15.0+'
+    implementation 'com.google.android.gms:play-services-games:16.0.0'
+    implementation 'com.google.android.gms:play-services-auth:16.0.1'
+    implementation 'com.google.android.gms:play-services-nearby:16.0.0'
 }
