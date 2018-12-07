@@ -102,11 +102,11 @@ namespace GooglePlayGames.Native
             Debug.Log("Starting Auth with token client.");
             mTokenClient.FetchTokens(silent, (int result) => {
                 bool succeed = result == 0 /* CommonStatusCodes.SUCCEED */;
+                InitializeGameServices();
                 if (succeed) {
                     if (callback != null) {
                       mPendingAuthCallbacks += callback;
                     }
-                    InitializeGameServices();
                     GameServices().StartAuthorizationUI();
                 } else {
                     Action<bool, string> localCallback = callback;
