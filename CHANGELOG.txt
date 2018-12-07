@@ -1,20 +1,24 @@
+Version 0.9.56
+    Bug Fixes:
+      * #2387 ISavedGameClient null if Authentication Failed.
+      * Non silent Authenticate in some cases failed silently.
 Version 0.9.55
     Bug Fixes:
-      #2371 Authenticate callback is not called if sign-in was canceled.
-      #1983, #2078, #2167 Android 8+ sign in fails when using EnableHidePopups.
+      * #2371 Authenticate callback is not called if sign-in was canceled.
+      * #1983, #2078, #2167 Android 8+ sign in fails when using EnableHidePopups.
 Version 0.9.54
     Bug Fixes:
-      #2361 Failing to silently login - auth fails on request - initialisation order problem?
-      #2350 Remove unused import that breaks iOS builds
-      #2339 GetAnotherServerAuthCode Nothing Happens
+      * #2361 Failing to silently login - auth fails on request - initialisation order problem?
+      * #2350 Remove unused import that breaks iOS builds
+      * #2339 GetAnotherServerAuthCode Nothing Happens
 Version 0.9.53
     Bug Fixes:
-      #2348 pragma UNITY_2017 should be UNITY_2017_1_OR_NEWER.
-      #1581 Solve namespace error when importing to Unity project with existing Result class.
-      Annotations fixes.
+      * #2348 pragma UNITY_2017 should be UNITY_2017_1_OR_NEWER.
+      * #1581 Solve namespace error when importing to Unity project with existing Result class.
+      * Annotations fixes.
 Version 0.9.52
     Bug Fixes:
-      #2319 Not Working with Unity 2018.2
+      * #2319 Not Working with Unity 2018.2
 Version 0.9.51
     Bug Fixes:
       * #2324 Please update the plugin to support new version of gms！！！please！！！！
