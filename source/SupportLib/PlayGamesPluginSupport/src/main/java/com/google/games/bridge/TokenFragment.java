@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import com.google.android.gms.auth.api.Auth;
@@ -35,8 +36,11 @@ import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.games.Games;
+import com.google.android.gms.games.GamesClient;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
 /**
  * Activity fragment with no UI added to the parent activity in order to manage
@@ -195,10 +199,34 @@ public class TokenFragment extends Fragment
 
         if (mGoogleSignInClient != null && request != null) {
             if (request.canReuseAccount()) { 
-                GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
+                final GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
                 if (GoogleSignIn.hasPermissions(account, request.scopes)) {
-                    Log.d(TAG, "Signed-in by reusing last signed-in account.");
-                    onSignedIn(CommonStatusCodes.SUCCESS, account);
+                    Log.d(TAG, "Checking the last signed-in account if it can be used.");
+                    Games.getGamesClient(getActivity(), account).getAppId()
+                        .addOnCompleteListener(new OnCompleteListener<String>() {
+                            @Override
+                            public void onComplete(@NonNull Task<String> task) {
+                                if (task.isSuccessful()) {
+                                    Log.d(TAG, "Signed-in with the last signed-in account.");
+                                    onSignedIn(CommonStatusCodes.SUCCESS, account);
+                                } else {
+                                    mGoogleSignInClient.signOut().addOnCompleteListener(
+                                        new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    Log.d(TAG, "Can't reuse the last signed-in account. Second attempt after sing out.");
+                                                    // Last signed account should be null now
+                                                    signIn();
+                                                } else {
+                                                    Log.e(TAG, "Can't reuse the last signed-in account and sign out failed.");
+                                                    onSignedIn(CommonStatusCodes.SIGN_IN_REQUIRED, null);
+                                                }
+                                            }
+                                        });
+                                }
+                            }
+                        });
                     return;
                 }
             }
