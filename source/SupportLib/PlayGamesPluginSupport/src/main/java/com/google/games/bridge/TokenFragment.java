@@ -252,7 +252,8 @@ public class TokenFragment extends Fragment
                             if (exception instanceof ApiException) {
                                 statusCode = ((ApiException) exception).getStatusCode();
                             }
-                            if (statusCode == CommonStatusCodes.SIGN_IN_REQUIRED) {
+                            // INTERNAL_ERROR will be returned if the user has the outdated PlayServices
+                            if (statusCode == CommonStatusCodes.SIGN_IN_REQUIRED || statusCode == CommonStatusCodes.INTERNAL_ERROR) {
                                 if (!request.getSilent()) {
                                     Intent signInIntent = mGoogleSignInClient.getSignInIntent();
                                     startActivityForResult(signInIntent, RC_ACCT);
@@ -520,7 +521,7 @@ public class TokenFragment extends Fragment
     public static View createInvisibleView(Activity parentActivity) {
         View view = new View(parentActivity);
         view.setVisibility(View.INVISIBLE);
-        view.setClickable(false);    
+        view.setClickable(false);
         return view;
     }
 }
