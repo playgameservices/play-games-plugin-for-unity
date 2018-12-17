@@ -20,7 +20,7 @@ using System;
 using GooglePlayGames.BasicApi;
 using GooglePlayGames.Native.PInvoke;
 
-namespace GooglePlayGames
+namespace GooglePlayGames.Native
 {
     /// <summary>
     /// Interface defining platform specific functionality.

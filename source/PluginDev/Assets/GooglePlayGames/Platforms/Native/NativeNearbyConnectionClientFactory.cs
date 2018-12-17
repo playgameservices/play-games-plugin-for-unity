@@ -20,9 +20,9 @@
 namespace GooglePlayGames.Native {
 
     using UnityEngine;
-    using GooglePlayGames.Android;
     using GooglePlayGames.BasicApi.Nearby;
     using GooglePlayGames.Native.PInvoke;
+    using GooglePlayGames.Native.Android;
     using GooglePlayGames.OurUtils;
     using System;
     using N = GooglePlayGames.Native.Cwrapper.NearbyConnectionsStatus;

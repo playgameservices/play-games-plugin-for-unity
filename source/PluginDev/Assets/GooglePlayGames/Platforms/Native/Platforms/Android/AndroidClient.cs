@@ -15,13 +15,14 @@
 // </copyright>
 
 #if UNITY_ANDROID
-namespace GooglePlayGames.Android
+namespace GooglePlayGames.Native.Android
 {
     using System;
     using Com.Google.Android.Gms.Common.Api;
     using Com.Google.Android.Gms.Games.Stats;
     using Com.Google.Android.Gms.Games;
     using UnityEngine;
+    using GooglePlayGames.Android;
     using GooglePlayGames.BasicApi;
     using GooglePlayGames.OurUtils;
     using C = GooglePlayGames.Native.Cwrapper.InternalHooks;
