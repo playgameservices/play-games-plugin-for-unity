@@ -220,6 +220,11 @@ namespace GooglePlayGames.Android
         /// <param name="callback">Callback.</param>
         public void GetAnotherServerAuthCode(bool reAuthenticateIfNeeded, Action<string> callback)
         {
+            PlayGamesHelperObject.RunOnGameThread(() => DoGetAnotherServerAuthCode(reAuthenticateIfNeeded, callback));
+        }
+
+        internal void DoGetAnotherServerAuthCode(bool reAuthenticateIfNeeded, Action<string> callback)
+        {
             object[] objectArray = new object[3];
             jvalue[] jArgs = AndroidJNIHelper.CreateJNIArgArray(objectArray);
 
