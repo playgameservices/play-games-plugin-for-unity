@@ -154,12 +154,14 @@ public class TokenFragment extends Fragment
      */
     public static PendingResult getAnotherAuthCode(Activity parentActivity,
                                                    final boolean reauthIfNeeded,
-                                                   String webClientId) {
+                                                   final boolean requestEmail,
+                                                   final boolean requestIdToken,
+                                                   final String webClientId) {
         return fetchToken(parentActivity,
                           /* silent= */!reauthIfNeeded,
                           /* requestAuthCode= */true,
-                          /* requestEmail= */true,
-                          /* requestIdToken= */true,
+                          /* requestEmail= */requestEmail,
+                          /* requestIdToken= */requestIdToken,
                           /* webClientId= */webClientId,
                           /* forceRefreshToken= */false,
                           /* additionalScopes= */null,

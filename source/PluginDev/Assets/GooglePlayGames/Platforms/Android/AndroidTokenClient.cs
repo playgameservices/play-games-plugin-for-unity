@@ -47,7 +47,7 @@ namespace GooglePlayGames.Android
 
         private const string GetAnotherAuthCodeMethod = "getAnotherAuthCode";
         private const string GetAnotherAuthCodeSignature =
-              "(Landroid/app/Activity;ZLjava/lang/String;)Lcom/google/android/gms/common/api/PendingResult;";
+              "(Landroid/app/Activity;ZZZLjava/lang/String;)Lcom/google/android/gms/common/api/PendingResult;";
 
         // These are the configuration values.
         private bool requestEmail;
@@ -225,7 +225,7 @@ namespace GooglePlayGames.Android
 
         internal void DoGetAnotherServerAuthCode(bool reAuthenticateIfNeeded, Action<string> callback)
         {
-            object[] objectArray = new object[3];
+            object[] objectArray = new object[5];
             jvalue[] jArgs = AndroidJNIHelper.CreateJNIArgArray(objectArray);
 
             try
@@ -241,7 +241,9 @@ namespace GooglePlayGames.Android
                                 GetAnotherAuthCodeSignature);
                         jArgs[0].l = currentActivity.GetRawObject();
                         jArgs[1].z = reAuthenticateIfNeeded;
-                        jArgs[2].l = AndroidJNI.NewStringUTF(webClientId);
+                        jArgs[2].z = requestEmail;
+                        jArgs[3].z = requestIdToken;
+                        jArgs[4].l = AndroidJNI.NewStringUTF(webClientId);
 
                         IntPtr ptr =
                             AndroidJNI.CallStaticObjectMethod(bridgeClass.GetRawClass(), methodId, jArgs);
