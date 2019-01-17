@@ -28,27 +28,6 @@ namespace GooglePlayGames.Android
     {
         private const string TokenFragmentClass = "com.google.games.bridge.TokenFragment";
 
-        /*
-         * fetchToken(Activity parentActivity,
-                      boolean silent,
-                      boolean requestAuthCode,
-                      boolean requestEmail,
-                      boolean requestIdToken,
-                      String webClientId,
-                      boolean forceRefreshToken,
-                      String[] additionalScopes,
-                      boolean hidePopups,
-                      String accountName)
-         */
-        private const string FetchTokenSignature =
-            "(Landroid/app/Activity;ZZZZLjava/lang/String;Z[Ljava/lang/String;ZLjava/lang/String;)Lcom/google/android/gms/common/api/PendingResult;";
-
-        private const string FetchTokenMethod = "fetchToken";
-
-        private const string GetAnotherAuthCodeMethod = "getAnotherAuthCode";
-        private const string GetAnotherAuthCodeSignature =
-              "(Landroid/app/Activity;ZLjava/lang/String;)Lcom/google/android/gms/common/api/PendingResult;";
-
         // These are the configuration values.
         private bool requestEmail;
         private bool requestAuthCode;
@@ -134,63 +113,6 @@ namespace GooglePlayGames.Android
             });
         }
 
-        public void FetchTokens(bool silent, Action<int> callback)
-        {
-            PlayGamesHelperObject.RunOnGameThread(() => DoFetchToken(silent, callback));
-        }
-
-        internal void DoFetchToken(bool silent, Action<int> callback)
-        {
-            object[] objectArray = new object[10];
-            jvalue[] jArgs = AndroidJNIHelper.CreateJNIArgArray(objectArray);
-
-            try
-            {
-                using (var bridgeClass = new AndroidJavaClass(TokenFragmentClass))
-                {
-                    using (var currentActivity = GetActivity())
-                    {
-                        // Unity no longer supports constructing an AndroidJavaObject using an IntPtr,
-                        // so I have to manually munge with JNI here.
-                        IntPtr methodId = AndroidJNI.GetStaticMethodID(bridgeClass.GetRawClass(),
-                                              FetchTokenMethod,
-                                              FetchTokenSignature);
-                        jArgs[0].l = currentActivity.GetRawObject();
-                        jArgs[1].z = silent;
-                        jArgs[2].z = requestAuthCode;
-                        jArgs[3].z = requestEmail;
-                        jArgs[4].z = requestIdToken;
-                        jArgs[5].l = AndroidJNI.NewStringUTF(webClientId);
-                        jArgs[6].z = forceRefresh;
-                        jArgs[7].l = AndroidJNIHelper.ConvertToJNIArray(oauthScopes.ToArray());
-                        jArgs[8].z = hidePopups;
-                        jArgs[9].l = AndroidJNI.NewStringUTF(accountName);
-
-                        IntPtr ptr =
-                            AndroidJNI.CallStaticObjectMethod(bridgeClass.GetRawClass(), methodId, jArgs);
-
-                        PendingResult<TokenResult> pr = new PendingResult<TokenResult>(ptr);
-                        pr.setResultCallback(new TokenResultCallback((rc, authCode, email, idToken) =>
-                        {
-                            this.authCode = authCode;
-                            this.email = email;
-                            this.idToken = idToken;
-                            callback(rc);
-                            }));
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                OurUtils.Logger.e("Exception launching token request: " + e.Message);
-                OurUtils.Logger.e(e.ToString());
-            }
-            finally
-            {
-                AndroidJNIHelper.DeleteJNIArgArray(objectArray, jArgs);
-            }
-        }
-
         /// <summary>Gets the email selected by the current player.</summary>
         /// <remarks>This is not necessarily the email address of the player.  It
         /// is just the account selected by the player from a list of accounts
@@ -207,6 +129,60 @@ namespace GooglePlayGames.Android
             return authCode;
         }
 
+        /// <summary>Gets the OpenID Connect ID token for authentication with a server backend.</summary>
+        /// <param name="serverClientId">Server client ID from console.developers.google.com or the Play Games
+        /// services console.</param>
+        /// <param name="idTokenCallback"> A callback to be invoked after token is retrieved. Will be passed null value
+        /// on failure. </param>
+        public string GetIdToken()
+        {
+            return idToken;
+        }
+
+        public void FetchTokens(bool silent, Action<int> callback)
+        {
+            PlayGamesHelperObject.RunOnGameThread(() => DoFetchToken(silent, callback));
+        }
+
+        private void DoFetchToken(bool silent, Action<int> callback)
+        {
+            try
+            {
+                using (var bridgeClass = new AndroidJavaClass(TokenFragmentClass))
+                {
+                    using (var currentActivity = GetActivity())
+                    {
+                        using (var pendingResult = bridgeClass.CallStatic<AndroidJavaObject>(
+                            "fetchToken",
+                            currentActivity,
+                            silent,
+                            requestAuthCode,
+                            requestEmail,
+                            requestIdToken, 
+                            webClientId,
+                            forceRefresh,
+                            oauthScopes.ToArray(),
+                            hidePopups,
+                            accountName))
+                        {
+                            pendingResult.Call("setResultCallback", new ResultCallbackProxy(
+                                tokenResult => {
+                                    authCode = tokenResult.Call<string>("getAuthCode");
+                                    email = tokenResult.Call<string>("getEmail");
+                                    idToken = tokenResult.Call<string>("getIdToken");
+                                    callback(tokenResult.Call<int>("getStatusCode"));
+                                }));
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                OurUtils.Logger.e("Exception launching token request: " + e.Message);
+                OurUtils.Logger.e(e.ToString());
+            }
+        }
+        
         /// <summary>
         /// Gets another server auth code.
         /// </summary>
@@ -223,128 +199,48 @@ namespace GooglePlayGames.Android
             PlayGamesHelperObject.RunOnGameThread(() => DoGetAnotherServerAuthCode(reAuthenticateIfNeeded, callback));
         }
 
-        internal void DoGetAnotherServerAuthCode(bool reAuthenticateIfNeeded, Action<string> callback)
+        private void DoGetAnotherServerAuthCode(bool reAuthenticateIfNeeded, Action<string> callback)
         {
-            object[] objectArray = new object[3];
-            jvalue[] jArgs = AndroidJNIHelper.CreateJNIArgArray(objectArray);
-
             try
             {
                 using (var bridgeClass = new AndroidJavaClass(TokenFragmentClass))
                 {
                     using (var currentActivity = GetActivity())
                     {
-                        // Unity no longer supports constructing an AndroidJavaObject using an IntPtr,
-                        // so I have to manually munge with JNI here.
-                        IntPtr methodId = AndroidJNI.GetStaticMethodID(bridgeClass.GetRawClass(),
-                                GetAnotherAuthCodeMethod,
-                                GetAnotherAuthCodeSignature);
-                        jArgs[0].l = currentActivity.GetRawObject();
-                        jArgs[1].z = reAuthenticateIfNeeded;
-                        jArgs[2].l = AndroidJNI.NewStringUTF(webClientId);
-
-                        IntPtr ptr =
-                            AndroidJNI.CallStaticObjectMethod(bridgeClass.GetRawClass(), methodId, jArgs);
-
-                        PendingResult<TokenResult> pr = new PendingResult<TokenResult>(ptr);
-                        pr.setResultCallback(new TokenResultCallback((rc, authCode, email, idToken) =>
+                        using (var pendingResult = bridgeClass.CallStatic<AndroidJavaObject>(
+                            "getAnotherAuthCode", currentActivity, reAuthenticateIfNeeded, webClientId))
                         {
-                            this.authCode = authCode;
-                            callback(authCode);
-                        }));
-                     }
+                            pendingResult.Call("setResultCallback", new ResultCallbackProxy(
+                                tokenResult => {
+                                    callback(tokenResult.Call<string>("getAuthCode"));
+                                }));
+                        }
+                    }
                 }
             }
             catch (Exception e)
             {
-                OurUtils.Logger.e("Exception launching auth code request: " + e.Message);
+                OurUtils.Logger.e("Exception launching token request: " + e.Message);
                 OurUtils.Logger.e(e.ToString());
-            }
-            finally
+            }              
+        }
+
+        private class ResultCallbackProxy : AndroidJavaProxy
+        {
+            private Action<AndroidJavaObject> mCallback;
+
+            public ResultCallbackProxy(Action<AndroidJavaObject> callback) 
+            : base("com/google/android/gms/common/api/ResultCallback")
             {
-                AndroidJNIHelper.DeleteJNIArgArray(objectArray, jArgs);
+                mCallback = callback;
+            }
+
+            public void onResult(AndroidJavaObject tokenResult)
+            {
+                mCallback(tokenResult);
             }
         }
 
-        /// <summary>Gets the OpenID Connect ID token for authentication with a server backend.</summary>
-        /// <param name="serverClientId">Server client ID from console.developers.google.com or the Play Games
-        /// services console.</param>
-        /// <param name="idTokenCallback"> A callback to be invoked after token is retrieved. Will be passed null value
-        /// on failure. </param>
-        public string GetIdToken()
-        {
-            return idToken;
-        }
-
-    }
-
-    class TokenResult : Google.Developers.JavaObjWrapper, Result
-    {
-        #region Result implementation
-
-        public TokenResult(IntPtr ptr)
-            : base(ptr)
-        {
-        }
-
-        public Status getStatus()
-        {
-            IntPtr obj = InvokeCall<IntPtr>("getStatus", "()Lcom/google/android/gms/common/api/Status;");
-            return new Status(obj);
-        }
-
-        #endregion
-
-        public int getStatusCode()
-        {
-            return InvokeCall<int>("getStatusCode", "()I");
-
-        }
-
-        public String getAuthCode()
-        {
-            return InvokeCall<string>("getAuthCode", "()Ljava/lang/String;");
-        }
-
-        public String getEmail()
-        {
-            return InvokeCall<string>("getEmail", "()Ljava/lang/String;");
-        }
-
-        public String getIdToken()
-        {
-            return InvokeCall<string>("getIdToken", "()Ljava/lang/String;");
-        }
-
-    }
-
-    class TokenResultCallback : ResultCallbackProxy<TokenResult>
-    {
-        private Action<int, string, string, string> callback;
-
-        public TokenResultCallback(Action<int, string, string, string> callback)
-        {
-            this.callback = callback;
-        }
-
-        public override void OnResult(TokenResult arg_Result_1)
-        {
-            if (callback != null) {
-                    callback(arg_Result_1.getStatusCode(),
-                             arg_Result_1.getAuthCode(),
-                             arg_Result_1.getEmail(),
-                             arg_Result_1.getIdToken());
-            }
-        }
-
-        public
-#if UNITY_2017_1_OR_NEWER
-        override
-#endif
-        string toString()
-        {
-            return ToString();
-        }
     }
 }
 #endif
