@@ -215,7 +215,7 @@ public class TokenFragment extends Fragment
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
-                                                    Log.d(TAG, "Can't reuse the last signed-in account. Second attempt after sing out.");
+                                                    Log.d(TAG, "Can't reuse the last signed-in account. Second attempt after sign out.");
                                                     // Last signed account should be null now
                                                     signIn();
                                                 } else {
@@ -380,7 +380,7 @@ public class TokenFragment extends Fragment
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void onSignedIn(int statusCode, GoogleSignInAccount acct) {
+    private void onSignedIn(int statusCode, GoogleSignInAccount account) {
         TokenRequest request;
         synchronized (lock) {
             request = pendingTokenRequest;
@@ -388,15 +388,10 @@ public class TokenFragment extends Fragment
         }
 
         if (request != null) {
-            if (acct != null) {
-                request.setAuthCode(acct.getServerAuthCode());
-                request.setEmail(acct.getEmail());
-                request.setIdToken(acct.getIdToken());
-            }
             if (statusCode != CommonStatusCodes.SUCCESS) {
                 Log.e(TAG,"Setting result error status code to: " + statusCode);
             }
-            request.setResult(statusCode);
+            request.setResult(statusCode, account);
         }
     }
 
@@ -435,23 +430,23 @@ public class TokenFragment extends Fragment
                             boolean fetchIdToken, String webClientId, boolean
                             forceRefresh, String[] oAuthScopes,
                             boolean hidePopups, String accountName) {
-            pendingResponse = new TokenPendingResult();
+            this.pendingResponse = new TokenPendingResult();
             this.silent = silent;
-            doAuthCode = fetchAuthCode;
-            doEmail = fetchEmail;
-            doIdToken = fetchIdToken;
+            this.doAuthCode = fetchAuthCode;
+            this.doEmail = fetchEmail;
+            this.doIdToken = fetchIdToken;
             this.webClientId = webClientId;
             this.forceRefresh = forceRefresh;
-            if(oAuthScopes != null && oAuthScopes.length > 0) {
-                scopes = new Scope[oAuthScopes.length];
-                for (int i = 0; i < oAuthScopes.length; ++i) {
-                    scopes[i] = new Scope(oAuthScopes[i]);
-                }
-            } else {
-                scopes = null;
-            }
             this.hidePopups = hidePopups;
             this.accountName = accountName;
+            if(oAuthScopes != null && oAuthScopes.length > 0) {
+                this.scopes = new Scope[oAuthScopes.length];
+                for (int i = 0; i < oAuthScopes.length; ++i) {
+                    this.scopes[i] = new Scope(oAuthScopes[i]);
+                }
+            } else {
+                this.scopes = null;
+            }
         }
 
         public boolean canReuseAccount() {
@@ -465,36 +460,25 @@ public class TokenFragment extends Fragment
             return silent;
         }
 
-        public void setResult(int code) {
-            pendingResponse.setStatus(code);
+        public String getWebClientId() {
+            return webClientId==null?"":webClientId;
         }
 
-        public void setEmail(String email) {
-            pendingResponse.setEmail(email);
+        public boolean getForceRefresh() {
+            return forceRefresh;
+        }
+
+        public void setResult(int code) {
+            setResult(code, /* account= */ null);
+        }
+
+        public void setResult(int code, GoogleSignInAccount account) {
+            pendingResponse.setAccount(account);
+            pendingResponse.setStatus(code);
         }
 
         public void cancel() {
             pendingResponse.cancel();
-        }
-
-        public void setAuthCode(String authCode) {
-            pendingResponse.setAuthCode(authCode);
-        }
-
-        public void setIdToken(String idToken) {
-            pendingResponse.setIdToken(idToken);
-        }
-
-        public String getEmail() {
-            return pendingResponse.result.getEmail();
-        }
-
-        public String getIdToken() {
-            return pendingResponse.result.getIdToken();
-        }
-
-        public String getAuthCode() {
-            return pendingResponse.result.getAuthCode();
         }
 
         @Override
@@ -502,14 +486,6 @@ public class TokenFragment extends Fragment
             return Integer.toHexString(hashCode()) + " (a:" +
                     doAuthCode + " e:" + doEmail + " i:" + doIdToken +
                     " wc: " + webClientId + " f: " + forceRefresh +")";
-        }
-
-        public String getWebClientId() {
-            return webClientId==null?"":webClientId;
-        }
-
-        public boolean getForceRefresh() {
-            return forceRefresh;
         }
     }
 

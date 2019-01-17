@@ -80,13 +80,6 @@ project.ext {
          'QuizRacer',  'TicTacToe',
          'NearbyDroids', 'SmokeTest']
 
-    gpg_sdk_link = System.getProperty("GPG_SDK_URL")
-    if (gpg_sdk_link == null || gpg_sdk_link.isEmpty()) {
-        gpg_sdk_link = System.getenv("GPG_SDK_URL")
-    }
-    if (gpg_sdk_link == null || gpg_sdk_link.isEmpty()) {
-      gpg_sdk_link = 'https://developers.google.com/games/services/downloads/gpg-cpp-sdk.v3.0.1.zip'
-    }
 
     jarresolver_uri = System.getProperty("RESOLVER_PACKAGE_URI")
     jarresolver_repos = [
@@ -467,19 +460,6 @@ task copy_plugin() {
     ext.remoteTaskPhase = 'postbuild'
 }
 
-task get_gpg_cpp_sdk {
-
-    doFirst {
-        ant.get(src: gpg_sdk_link, dest: "${buildDir}/gpg_cpp_sdk.zip", skipexisting: 'true')
-    }
-    doLast {
-        println "Got ${gpg_sdk_link} as ${buildDir}/gpg_cpp_sdk.zip"
-    }
-}
-get_gpg_cpp_sdk.description = "Download the gpg sdk from the specified location"
-
-get_gpg_cpp_sdk.ext.remoteTaskPhase = 'prebuild'
-
 task copy_plugin_source {
   description = "Copies plugin source into build directory"
   ext.remoteTaskPhase = 'prebuild'
@@ -536,36 +516,15 @@ task copy_jarresolver() {
     }
 }
 
-task copy_gpg_sdk {
-  description = "Unzips the GPG SDK into the correct dir for NDK"
-  dependsOn get_gpg_cpp_sdk
-  ext.remoteTaskPhase = 'prebuild'
-  doFirst {
-    if(os_linux || os_osx) {
-            def result = exec {
-                executable "unzip"
-                args "${buildDir}/gpg_cpp_sdk.zip", "-d", "${buildDir}/gpg_sdk"
-            }
-    } else {
-        copy {
-            from zipTree("${buildDir}/gpg_cpp_sdk.zip")
-            into {"${buildDir}/gpg_sdk"}
-        }
-    }
-  }
-}
-
 task build_java_support_lib(type: GradleBuild) {
     description = "Builds the client libraries for Android"
     buildFile = 'SupportLib/build.gradle'
     startParameter.projectProperties.put('projVersion',currentPluginVersion)
     startParameter.projectProperties.put('uploadDir', "${buildDir}/m2repository")
-    startParameter.projectProperties.put('gpgSdkDir', "${buildDir}/gpg_sdk/gpg-cpp-sdk/android")
 
     tasks = ['build', 'uploadArchives']
 }
 build_java_support_lib.ext.remoteTaskPhase = 'prebuild'
-build_java_support_lib.dependsOn copy_gpg_sdk
 
 task clean_support_lib(type: GradleBuild) {
     description = "cleans the client libraries for Android"
