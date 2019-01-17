@@ -158,8 +158,8 @@ public class TokenFragment extends Fragment
         return fetchToken(parentActivity,
                           /* silent= */!reauthIfNeeded,
                           /* requestAuthCode= */true,
-                          /* requestEmail= */true,
-                          /* requestIdToken= */true,
+                          /* requestEmail= */false,
+                          /* requestIdToken= */false,
                           /* webClientId= */webClientId,
                           /* forceRefreshToken= */false,
                           /* additionalScopes= */null,
@@ -215,7 +215,7 @@ public class TokenFragment extends Fragment
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
-                                                    Log.d(TAG, "Can't reuse the last signed-in account. Second attempt after sing out.");
+                                                    Log.d(TAG, "Can't reuse the last signed-in account. Second attempt after sign out.");
                                                     // Last signed account should be null now
                                                     signIn();
                                                 } else {
