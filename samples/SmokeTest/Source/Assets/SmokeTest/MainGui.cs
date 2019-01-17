@@ -70,6 +70,7 @@ namespace SmokeTest
         private string idToken = "";
         private string authCode = "";
         private bool loadedFriends = false;
+        private bool loadingFriends = false;
 
         private volatile TurnBasedMatch mMatch = null;
 
@@ -888,7 +889,8 @@ namespace SmokeTest
                     friendString = "No Friends found!";
                 }
             }
-            else {
+            else if (!loadingFriends) {
+                loadingFriends = true;
                 Social.localUser.LoadFriends((ok) =>
                     {
                         loadedFriends = ok;
