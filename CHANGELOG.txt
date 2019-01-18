@@ -1,8 +1,18 @@
+Version 0.9.58
+    Bug Fixes:
+      * #2409 GetAnotherServerAuthCode always requests email permission
+      * #2406 IL2CPP managed stripping level 
+      * #2401 Fix for missing TokenFragment class
+      * #2400 Many crash in Unity 2018.3.0f2
+      * #2395 Not working with Unity 2018.3.0f2
+    New Features:
+      * Updated PlayServicesResolver to 1.2.98.0
+      * Updated gradle version to 3.3.0
+
 Version 0.9.57
     Bug Fixes:
       * Fixed issue with unable to sign-in if Google Play Services or Google Play Games need to be updated.
       * #2388 IVideoClient not in package
-
 Version 0.9.56
     Bug Fixes:
       * #2387 ISavedGameClient null if Authentication Failed.
