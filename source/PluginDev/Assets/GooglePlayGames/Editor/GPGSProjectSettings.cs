@@ -135,7 +135,7 @@ namespace GooglePlayGames.Editor
 
         public void Set(string key, string val)
         {
-            string escaped = UnityWebRequest.UnEscapeURL(val);
+            string escaped = UnityWebRequest.EscapeURL(val);
             mDict[key] = escaped;
             mDirty = true;
         }
