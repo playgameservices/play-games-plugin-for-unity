@@ -20,6 +20,7 @@ namespace GooglePlayGames
     using System;
     using GooglePlayGames.BasicApi;
     using UnityEngine;
+    using UnityEngine.Networking;
     using UnityEngine.SocialPlatforms;
 
     internal delegate void ReportProgress(string id, double progress, Action<bool> callback);
@@ -42,7 +43,7 @@ namespace GooglePlayGames
         private string mTitle = string.Empty;
         private string mRevealedImageUrl = string.Empty;
         private string mUnlockedImageUrl = string.Empty;
-        private WWW mImageFetcher = null;
+        private UnityWebRequest mImageFetcher = null;
         private Texture2D mImage = null;
         private string mDescription = string.Empty;
         private ulong mPoints = 0;
@@ -123,7 +124,7 @@ namespace GooglePlayGames
             {
                 if (mImageFetcher == null || mImageFetcher.url != url)
                 {
-                    mImageFetcher = new WWW(url);
+                    mImageFetcher = UnityWebRequestTexture.GetTexture(url);
                     mImage = null;
                 }
 
@@ -136,7 +137,7 @@ namespace GooglePlayGames
 
                 if (mImageFetcher.isDone)
                 {
-                    mImage = mImageFetcher.texture;
+                    mImage = DownloadHandlerTexture.GetContent(mImageFetcher);
                     return mImage;
                 }
             }
