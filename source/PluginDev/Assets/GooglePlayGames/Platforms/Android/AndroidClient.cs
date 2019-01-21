@@ -18,11 +18,9 @@
 
 namespace GooglePlayGames.Android
 {
-
     using GooglePlayGames.BasicApi;
     using GooglePlayGames.BasicApi.Multiplayer;
     using GooglePlayGames.BasicApi.SavedGame;
-    using GooglePlayGames.Native.PInvoke;
     using GooglePlayGames.OurUtils;
     using System;
     using System.Collections.Generic;
@@ -100,6 +98,11 @@ namespace GooglePlayGames.Android
                             string playerId = player.Call<String>("getPlayerId");
                             string avatarUrl = player.Call<String>("getIconImageUrl");
                             mUser = new Player(displayName, playerId, avatarUrl);
+                            lock (GameServicesLock)
+                            {
+//                                mSavedGameClient = new AndroidSavedGameClient(mTokenClient.GetAccount());
+                            }
+
                             lock (AuthStateLock)
                             {
                                 mAuthState = AuthState.Authenticated;
@@ -109,6 +112,7 @@ namespace GooglePlayGames.Android
                     ));
                     task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
                         exception => {
+                            SignOut();
                             lock (AuthStateLock)
                             {
                                 InvokeCallbackOnGameThread(callback, false, "Authentication failed");
@@ -307,7 +311,6 @@ namespace GooglePlayGames.Android
 
         public void LoadFriends(Action<bool> callback)
         {
-
             if (!IsAuthenticated())
             {
                 GooglePlayGames.OurUtils.Logger.d("Cannot loadFriends when not authenticated");
@@ -580,8 +583,6 @@ namespace GooglePlayGames.Android
             }
             else
             {
-                mInvitationDelegate = Callbacks.AsOnGameThreadCallback<Invitation, bool>(
-                    (invitation, autoAccept) => invitationDelegate(invitation, autoAccept));
             }
         }
 
