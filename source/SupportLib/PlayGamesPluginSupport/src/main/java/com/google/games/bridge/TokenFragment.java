@@ -489,11 +489,6 @@ public class TokenFragment extends Fragment
         }
     }
 
-    public static boolean checkGooglePlayServicesAvailable() {
-        GooglePlayServicesUtil.isGooglePlayServicesAvailable(null);
-        return false;
-    }
-
     public static View createInvisibleView(Activity parentActivity) {
         View view = new View(parentActivity);
         view.setVisibility(View.INVISIBLE);
