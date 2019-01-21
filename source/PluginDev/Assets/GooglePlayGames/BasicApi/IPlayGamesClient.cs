@@ -352,12 +352,6 @@ namespace GooglePlayGames.BasicApi
     IUserProfile[] GetFriends();
 
     /// <summary>
-    /// Gets the Android API client.  Returns null on non-Android players.
-    /// </summary>
-    /// <returns>The API client.</returns>
-    IntPtr GetApiClient();
-
-    /// <summary>
     /// Sets the gravity for popups (Android only).
     /// </summary>
     /// <remarks>This can only be called after authentication.  It affects

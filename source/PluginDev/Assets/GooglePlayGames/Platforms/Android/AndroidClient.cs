@@ -585,11 +585,6 @@ namespace GooglePlayGames.Android
             {
             }
         }
-
-        public IntPtr GetApiClient()
-        {
-            return  IntPtr.Zero;
-        }
     }
 }
 #endif

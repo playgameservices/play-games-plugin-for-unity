@@ -288,16 +288,6 @@ namespace GooglePlayGames
             return PlayGamesPlatform.Instance;
         }
 
-        /// <summary>Gets pointer to the Google API client.</summary>
-        /// <remarks>This is provided as a helper to making additional JNI calls.
-        /// This connection is initialized and controlled by the underlying SDK.
-        /// </remarks>
-        /// <returns>The pointer of the client.  Zero on non-android platforms.</returns>
-        public IntPtr GetApiClient()
-        {
-            return mClient.GetApiClient();
-        }
-
         /// <summary>
         /// Sets the gravity for popups (Android only).
         /// </summary>
