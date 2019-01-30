@@ -1,3 +1,11 @@
+Version 0.9.59
+    Bug Fixes:
+      * #2430 Fixed sign-in issues with Android version 7 and less
+      * #2417 Windows. System.UnauthorizedAccessException: Access to the path is denied
+      * Replaces WWW with UnityWebRequest
+    New Features:
+      * Updated PlayServicesResolver to 1.2.100.0
+
 Version 0.9.58
     Bug Fixes:
       * #2409 GetAnotherServerAuthCode always requests email permission
@@ -8,7 +16,6 @@ Version 0.9.58
     New Features:
       * Updated PlayServicesResolver to 1.2.98.0
       * Updated gradle version to 3.3.0
-
 Version 0.9.57
     Bug Fixes:
       * Fixed issue with unable to sign-in if Google Play Services or Google Play Games need to be updated.

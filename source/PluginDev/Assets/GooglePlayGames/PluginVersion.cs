@@ -35,8 +35,8 @@ namespace GooglePlayGames
 
     // Current Version.
     public const int VersionInt = 0x0958;
-    public const string VersionString = "0.9.58";
-    public const string VersionKey = "00958";
+    public const string VersionString = "0.9.59";
+    public const string VersionKey = "00959";
 
     // used to check for the correct min version or play services: 10.2
     public const int MinGmsCoreVersionCode = 10200000;
