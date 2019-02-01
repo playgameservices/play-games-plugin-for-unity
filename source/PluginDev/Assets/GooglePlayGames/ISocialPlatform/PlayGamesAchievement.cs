@@ -20,7 +20,9 @@ namespace GooglePlayGames
     using System;
     using GooglePlayGames.BasicApi;
     using UnityEngine;
+#if UNITY_2017_1_OR_NEWER
     using UnityEngine.Networking;
+#endif
     using UnityEngine.SocialPlatforms;
 
     internal delegate void ReportProgress(string id, double progress, Action<bool> callback);
