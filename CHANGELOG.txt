@@ -1,3 +1,7 @@
+Version 0.9.60
+    Bug Fixes:
+      * #2439 UnityWebRequestTexture class is not contained at unity 5.6
+
 Version 0.9.59
     Bug Fixes:
       * #2430 Fixed sign-in issues with Android version 7 and less
@@ -5,7 +9,6 @@ Version 0.9.59
       * Replaces WWW with UnityWebRequest
     New Features:
       * Updated PlayServicesResolver to 1.2.100.0
-
 Version 0.9.58
     Bug Fixes:
       * #2409 GetAnotherServerAuthCode always requests email permission
