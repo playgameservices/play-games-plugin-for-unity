@@ -26,6 +26,48 @@ namespace GooglePlayGames.BasicApi
     {
         private static float UNSET_VALUE = -1.0f;
 
+        public PlayerStats(
+            int numberOfPurchases,
+            float avgSessionLength,
+            int daysSinceLastPlayed,
+            int numberOfSessions,
+            float sessPercentile,
+            float spendPercentile,
+            float spendProbability,
+            float churnProbability,
+            float highSpenderProbability,
+            float totalSpendNext28Days)
+        {
+            mValid = true;
+            mNumberOfPurchases = numberOfPurchases;
+            mAvgSessionLength = avgSessionLength;
+            mDaysSinceLastPlayed = daysSinceLastPlayed;
+            mNumberOfSessions = numberOfSessions;
+            mSessPercentile = sessPercentile;
+            mSpendPercentile = spendPercentile;
+            mSpendProbability = spendProbability;
+            mChurnProbability = churnProbability;
+            mHighSpenderProbability = highSpenderProbability;
+            mTotalSpendNext28Days = totalSpendNext28Days;
+        }
+
+        public PlayerStats() 
+        {
+            mValid = false;
+        }
+
+        private bool mValid;
+        private int mNumberOfPurchases;
+        private float mAvgSessionLength;
+        private int mDaysSinceLastPlayed;
+        private int mNumberOfSessions;
+        private float mSessPercentile;
+        private float mSpendPercentile;
+        private float mSpendProbability;
+        private float mChurnProbability;
+        private float mHighSpenderProbability;
+        private float mTotalSpendNext28Days;
+
         /// <summary>
         /// If this PlayerStats object is valid (i.e. successfully retrieved from games services).
         /// </summary>
@@ -34,8 +76,10 @@ namespace GooglePlayGames.BasicApi
         /// </remarks>
         public bool Valid
         {
-            get;
-            set;
+            get
+            {
+                return mValid;
+            } 
         }
 
         /// <summary>
@@ -43,8 +87,10 @@ namespace GooglePlayGames.BasicApi
         /// </summary>
         public int NumberOfPurchases
         {
-            get;
-            set;
+            get
+            {
+                return mNumberOfPurchases;
+            }
         }
 
         /// <summary>
@@ -52,8 +98,10 @@ namespace GooglePlayGames.BasicApi
         /// </summary>
         public float AvgSessonLength
         {
-            get;
-            set;
+            get
+            {
+                return mAvgSessionLength;
+            }
         }
 
         /// <summary>
@@ -61,8 +109,10 @@ namespace GooglePlayGames.BasicApi
         /// </summary>
         public int DaysSinceLastPlayed
         {
-            get;
-            set;
+            get
+            {
+                return mDaysSinceLastPlayed;
+            }
         }
 
         /// <summary>
@@ -70,8 +120,10 @@ namespace GooglePlayGames.BasicApi
         /// </summary>
         public int NumberOfSessions
         {
-            get;
-            set;
+            get
+            {
+                return mNumberOfSessions;
+            }
         }
 
         /// <summary>
@@ -86,8 +138,10 @@ namespace GooglePlayGames.BasicApi
         /// </remarks>
         public float SessPercentile
         {
-            get;
-            set;
+            get
+            {
+                return mSessPercentile;
+            }
         }
 
         /// <summary>
@@ -102,8 +156,10 @@ namespace GooglePlayGames.BasicApi
         /// </remarks>
         public float SpendPercentile
         {
-            get;
-            set;
+            get
+            {
+                return mSpendPercentile;
+            }
         }
 
         /// <summary>
@@ -116,8 +172,10 @@ namespace GooglePlayGames.BasicApi
         /// </remarks>
         public float SpendProbability
         {
-            get;
-            set;
+            get
+            {
+                return mSpendProbability;
+            }
         }
 
         /// <summary>
@@ -129,8 +187,10 @@ namespace GooglePlayGames.BasicApi
         /// </remarks>
         public float ChurnProbability
         {
-            get;
-            set;
+            get
+            {
+                return mChurnProbability;
+            }
         }
 
         /// <summary>
@@ -138,8 +198,10 @@ namespace GooglePlayGames.BasicApi
         /// </summary>
         public float HighSpenderProbability
         {
-            get;
-            set;
+            get
+            {
+                return mHighSpenderProbability;
+            }
         }
 
         /// <summary>
@@ -147,16 +209,10 @@ namespace GooglePlayGames.BasicApi
         /// </summary>
         public float TotalSpendNext28Days
         {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="GooglePlayGames.BasicApi.PlayerStats"/> class.
-        /// Sets all values to -1.
-        /// </summary>
-        public PlayerStats() {
-            Valid = false;
+            get
+            {
+                return mTotalSpendNext28Days;
+            }
         }
 
         /// <summary>

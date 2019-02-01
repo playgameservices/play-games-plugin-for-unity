@@ -35,12 +35,16 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.games.Games;
+import com.google.android.gms.games.AchievementsClient;
+import com.google.android.gms.games.GamesActivityResultCodes;
 import com.google.android.gms.games.GamesClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.TaskCompletionSource;
 
 /**
  * Activity fragment with no UI added to the parent activity in order to manage
@@ -51,12 +55,13 @@ public class TokenFragment extends Fragment
 
     private static final String TAG = "TokenFragment";
     private static final String FRAGMENT_TAG = "gpg.AuthTokenSupport";
-    private static final int RC_ACCT = 9002;
+    private static final int RC_SIGN_IN = 9002;
+    private static final int RC_ACHIEVEMENT_UI = 9003;
 
     // Pending token request.  There can be only one outstanding request at a
     // time.
     private static final Object lock = new Object();
-    private static TokenRequest pendingTokenRequest;
+    private static Request pendingRequest;
     private static TokenFragment helperFragment;
     private GoogleSignInClient mGoogleSignInClient;
 
@@ -103,49 +108,25 @@ public class TokenFragment extends Fragment
                                            String[] additionalScopes,
                                            boolean hidePopups,
                                            String accountName) {
-        TokenRequest request = new TokenRequest(silent,
-                requestAuthCode, requestEmail, requestIdToken, webClientId,
-                forceRefreshToken, additionalScopes, hidePopups, accountName);
+        SignInRequest request = new SignInRequest(silent, requestAuthCode, requestEmail, 
+                requestIdToken, webClientId, forceRefreshToken, additionalScopes, hidePopups,
+                accountName);
 
-        boolean ok = false;
-        synchronized (lock) {
-            if (pendingTokenRequest == null) {
-                pendingTokenRequest = request;
-                ok = true;
-            }
-        }
-        if(!ok) {
-            Log.e(TAG, "Already a pending token request (requested == ): " + request);
-            Log.e(TAG, "Already a pending token request: " + pendingTokenRequest);
-            request.setResult(CommonStatusCodes.DEVELOPER_ERROR);
-            return request.getPendingResponse();
-        }
-
-
-        TokenFragment fragment = (TokenFragment)
-                parentActivity.getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
-
-        if (fragment == null) {
-            try {
-                Log.d(TAG, "Creating fragment");
-                fragment = new TokenFragment();
-                FragmentTransaction trans = parentActivity.getFragmentManager().beginTransaction();
-                trans.add(fragment, FRAGMENT_TAG);
-                trans.commit();
-            } catch (Throwable th) {
-                Log.e(TAG, "Cannot launch token fragment:" + th.getMessage(), th);
-                request.setResult(CommonStatusCodes.ERROR);
-                synchronized (lock) {
-                    pendingTokenRequest = null;
-                }
-            }
-        } else {
-            Log.d(TAG, "Fragment exists.. calling processRequests");
-            fragment.processRequest();
+        if(!TokenFragment.startRequest(parentActivity, request)) {
+            request.setFailure(CommonStatusCodes.DEVELOPER_ERROR);
         }
 
         return request.getPendingResponse();
     }
+
+    /** 
+     * Should be aligned to:
+     * PluginDev/Assets/GooglePlayGames/BasicApi/CommonTypes.cs enum UIStatus
+     * */ 
+    private static final int UI_STATUS_VALID = 1;
+    private static final int UI_STATUS_INTERNAL_ERROR = -2;
+    private static final int UI_STATUS_NOT_AUTHORIZED = -3;
+    private static final int UI_STATUS_UI_BUSY = -12;
 
     /**
      * This calls silent signin and gets the user info including the auth code.
@@ -158,8 +139,8 @@ public class TokenFragment extends Fragment
         return fetchToken(parentActivity,
                           /* silent= */!reauthIfNeeded,
                           /* requestAuthCode= */true,
-                          /* requestEmail= */true,
-                          /* requestIdToken= */true,
+                          /* requestEmail= */false,
+                          /* requestIdToken= */false,
                           /* webClientId= */webClientId,
                           /* forceRefreshToken= */false,
                           /* additionalScopes= */null,
@@ -167,180 +148,73 @@ public class TokenFragment extends Fragment
                           /* accountName= */null);
     }
 
+    public static Task<Integer> showAchievementUi(Activity parentActivity) {
+        AchievementUiRequest request = new AchievementUiRequest();
+
+        if(!TokenFragment.startRequest(parentActivity, request)) {
+            request.setResult(UI_STATUS_UI_BUSY);
+        }
+
+        return request.getTask();
+    }
+
     public static void signOut(Activity activity) {
-        TokenFragment fragment = (TokenFragment)
-                activity.getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
-        if (fragment != null) {
-            fragment.reset();
-        }
+        GoogleSignInClient signInClient = GoogleSignIn.getClient(activity, GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
+        signInClient.signOut();
         synchronized (lock) {
-            pendingTokenRequest = null;
-        }
-   }
-
-    /**
-     * signs out and disconnects the client.
-     */
-    private void reset() {
-        if (mGoogleSignInClient != null) {
-           mGoogleSignInClient.signOut();
-           mGoogleSignInClient = null;   
+            pendingRequest = null;
         }
     }
 
-    private void signIn() {
-        Log.d(TAG, "signIn");
-        
-        TokenRequest request_;
+    private static boolean startRequest(Activity parentActivity, Request request) {
+        boolean ok = false;
         synchronized (lock) {
-            request_ = pendingTokenRequest;
-        }
-        final TokenRequest request = request_;
-
-        if (mGoogleSignInClient != null && request != null) {
-            if (request.canReuseAccount()) { 
-                final GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
-                if (GoogleSignIn.hasPermissions(account, request.scopes)) {
-                    Log.d(TAG, "Checking the last signed-in account if it can be used.");
-                    Games.getGamesClient(getActivity(), account).getAppId()
-                        .addOnCompleteListener(new OnCompleteListener<String>() {
-                            @Override
-                            public void onComplete(@NonNull Task<String> task) {
-                                if (task.isSuccessful()) {
-                                    Log.d(TAG, "Signed-in with the last signed-in account.");
-                                    onSignedIn(CommonStatusCodes.SUCCESS, account);
-                                } else {
-                                    mGoogleSignInClient.signOut().addOnCompleteListener(
-                                        new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
-                                                if (task.isSuccessful()) {
-                                                    Log.d(TAG, "Can't reuse the last signed-in account. Second attempt after sign out.");
-                                                    // Last signed account should be null now
-                                                    signIn();
-                                                } else {
-                                                    Log.e(TAG, "Can't reuse the last signed-in account and sign out failed.");
-                                                    onSignedIn(CommonStatusCodes.SIGN_IN_REQUIRED, null);
-                                                }
-                                            }
-                                        });
-                                }
-                            }
-                        });
-                    return;
-                }
+            if (pendingRequest == null) {
+                pendingRequest = request;
+                ok = true;
             }
-
-            Log.d(TAG, "mGoogleSignInClient.silentSignIn");
-            mGoogleSignInClient.silentSignIn()
-                .addOnSuccessListener(
-                    getActivity(),
-                    new OnSuccessListener<GoogleSignInAccount>() {
-                        @Override
-                        public void onSuccess(GoogleSignInAccount result) {
-                            Log.d(TAG, "silentSignIn.onSuccess");
-                            onSignedIn(CommonStatusCodes.SUCCESS, result);
-                        }
-                    })
-                .addOnFailureListener(
-                    getActivity(),
-                    new OnFailureListener() {
-                        @Override
-                        public void onFailure(Exception exception) {
-                            Log.d(TAG, "silentSignIn.onFailure");
-                            int statusCode = CommonStatusCodes.INTERNAL_ERROR;
-                            if (exception instanceof ApiException) {
-                                statusCode = ((ApiException) exception).getStatusCode();
-                            }
-                            // INTERNAL_ERROR will be returned if the user has the outdated PlayServices
-                            if (statusCode == CommonStatusCodes.SIGN_IN_REQUIRED || statusCode == CommonStatusCodes.INTERNAL_ERROR) {
-                                if (!request.getSilent()) {
-                                    Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-                                    startActivityForResult(signInIntent, RC_ACCT);
-                                } else {
-                                    Log.i(TAG, "Sign-in failed. Run in silent mode and UI sign-in required.");
-                                    onSignedIn(CommonStatusCodes.SIGN_IN_REQUIRED, null);
-                                }
-                            } else {
-                                Log.e(TAG, "Sign-in failed with status code: " + statusCode);
-                                onSignedIn(statusCode, null);
-                            }
-                        }
-                    });
         }
+        if (ok) {
+            TokenFragment helperFragment = TokenFragment.getHelperFragment(parentActivity);
+            if (helperFragment.isResumed()) {
+                helperFragment.processRequest();
+            }
+        }
+        return ok;
     }
 
+    private static TokenFragment getHelperFragment(Activity parentActivity) {
+        TokenFragment fragment = (TokenFragment)
+                parentActivity.getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+
+        if (fragment == null) {
+            try {
+                Log.d(TAG, "Creating fragment");
+                fragment = new TokenFragment();
+                FragmentTransaction trans = parentActivity.getFragmentManager().beginTransaction();
+                trans.add(fragment, FRAGMENT_TAG);
+                trans.commit();
+            } catch (Throwable th) {
+                Log.e(TAG, "Cannot launch token fragment:" + th.getMessage(), th);
+                return null;
+            }
+        }
+        return fragment;
+    }
     /**
      * Processes the token requests that are queued up.
      */
     private void processRequest() {     
-        TokenRequest request;
+        Request request;
         synchronized (lock) {
-            request = pendingTokenRequest;
+            request = pendingRequest;
         }
         // no request, no need to continue.
         if (request == null) {
             return;
         }
 
-        // Build the GoogleSignInClient
-        if (buildClient(getActivity(), request)) {
-            signIn();
-        } else {
-            synchronized (lock) {
-                pendingTokenRequest = null;
-            }
-        }
-        Log.d(TAG, "Done with processRequest, result is pending.");
-    }
-
-    private boolean buildClient(Activity activity, TokenRequest request) {
-        Log.d(TAG,"Building client for: " + request);
-        GoogleSignInOptions.Builder builder = new GoogleSignInOptions.Builder();
-        if (request.doAuthCode) {
-            if (!request.getWebClientId().isEmpty() && !request.getWebClientId().equals("__WEB_CLIENTID__")) {
-                builder.requestServerAuthCode(request.getWebClientId(),
-                        request.getForceRefresh());
-            } else {
-                Log.e(TAG, "Web client ID is needed for Auth Code");
-                request.setResult(CommonStatusCodes.DEVELOPER_ERROR);
-                return false;
-            }
-        }
-
-        if (request.doEmail) {
-            builder.requestEmail();
-        }
-
-        if (request.doIdToken) {
-            if (!request.getWebClientId().isEmpty() && !request.getWebClientId().equals("__WEB_CLIENTID__")) {
-                builder.requestIdToken(request.getWebClientId());
-            } else {
-                Log.e(TAG, "Web client ID is needed for ID Token");
-                request.setResult(CommonStatusCodes.DEVELOPER_ERROR);
-                return false;
-            }
-        }
-        if (request.scopes != null) {
-            for (Scope s : request.scopes) {
-                builder.requestScopes(s);
-            }
-        }
-
-        if (request.hidePopups) {
-            Log.d(TAG, "hiding popup views for games API");
-            builder.addExtension(
-                    Games.GamesOptions.builder().setShowConnectingPopup(false)
-                            .build());
-        }
-
-        if (request.accountName != null && !request.accountName.isEmpty()) {
-            builder.setAccountName(request.accountName);
-        }
-
-        GoogleSignInOptions options = builder.build();
-        mGoogleSignInClient = GoogleSignIn.getClient(activity, options);
-        return true;
+        request.process(this);
     }
 
     /**
@@ -358,41 +232,18 @@ public class TokenFragment extends Fragment
      */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == RC_ACCT) {
-            GoogleSignInResult result =
-                    Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            if (result != null && result.isSuccess()) {
-                GoogleSignInAccount account = result.getSignInAccount();
-                onSignedIn(result.getStatus().getStatusCode(), account);
-            } else if (resultCode == Activity.RESULT_CANCELED) {
-                onSignedIn(CommonStatusCodes.CANCELED, null);
-            } else if (result != null) {
-                Log.e(TAG,"GoogleSignInResult error status code: " + result.getStatus());
-                onSignedIn(result.getStatus().getStatusCode(), null);
-            } else {
-                Log.e(TAG, "Google SignIn Result is null, resultCode is " +
-                        resultCode + "(" +
-                GoogleSignInStatusCodes.getStatusCodeString(resultCode) + ")");
-                onSignedIn(CommonStatusCodes.ERROR, null);
+        if (requestCode == RC_SIGN_IN || requestCode == RC_ACHIEVEMENT_UI) {
+            Request request;
+            synchronized (lock) {
+                request = pendingRequest;
             }
-            return;
+            // no request, no need to continue.
+            if (request == null) {
+                return;
+            }
+            request.onActivityResult(requestCode, resultCode, data);
         }
         super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    private void onSignedIn(int statusCode, GoogleSignInAccount account) {
-        TokenRequest request;
-        synchronized (lock) {
-            request = pendingTokenRequest;
-            pendingTokenRequest = null;
-        }
-
-        if (request != null) {
-            if (statusCode != CommonStatusCodes.SUCCESS) {
-                Log.e(TAG,"Setting result error status code to: " + statusCode);
-            }
-            request.setResult(statusCode, account);
-        }
     }
 
     /**
@@ -411,26 +262,98 @@ public class TokenFragment extends Fragment
         processRequest();
     }
 
-    /**
-     * Helper class containing the request for information.
-     */
-    private static class TokenRequest {
-        private TokenPendingResult pendingResponse;
-        private boolean silent;
-        private boolean doAuthCode;
-        private boolean doEmail;
-        private boolean doIdToken;
-        private String webClientId;
-        private boolean forceRefresh;
-        private boolean hidePopups;
-        private String accountName;
-        private Scope[] scopes;
+    private static void finishRequest(Request request) {
+        synchronized (lock) {
+            if(pendingRequest == request) {
+                pendingRequest = null;
+            }
+        }
+    }
 
-        public TokenRequest(boolean silent, boolean fetchAuthCode, boolean fetchEmail,
+    private interface Request {
+        void process(TokenFragment helperFragment);
+        void onActivityResult(int requestCode, int resultCode, Intent data);
+    };
+
+    private static class AchievementUiRequest implements Request {
+        private final TaskCompletionSource<Integer> resultTaskSource = new TaskCompletionSource<>();
+
+        public Task<Integer> getTask() {
+            return resultTaskSource.getTask();
+        }
+
+        public void process(final TokenFragment helperFragment) {
+            final Activity activity = helperFragment.getActivity();
+            GoogleSignInAccount account = TokenFragment.getAccount(activity);
+            AchievementsClient achievementClient = Games.getAchievementsClient(activity, account);
+            achievementClient
+                .getAchievementsIntent()
+                .addOnSuccessListener(
+                    activity,
+                        new OnSuccessListener<Intent>() {
+                            @Override
+                            public void onSuccess(Intent intent) {
+                                helperFragment.startActivityForResult(intent, RC_ACHIEVEMENT_UI);
+                            }
+                        })
+                .addOnFailureListener(
+                    activity,
+                        new OnFailureListener() {
+                            @Override
+                            public void onFailure(Exception e) {
+                                setFailure(e);
+                            }
+                        });
+          
+
+        }
+
+        public void onActivityResult(int requestCode, int resultCode, Intent data) {
+            if (requestCode == RC_ACHIEVEMENT_UI) {
+                if (resultCode == Activity.RESULT_OK || resultCode == Activity.RESULT_CANCELED) {
+                    setResult(UI_STATUS_VALID);
+                } else if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) {
+                    setResult(UI_STATUS_NOT_AUTHORIZED);
+                } else {
+                    Log.d(TAG, "AchievementUiRequest.onActivityResult unknown resultCode: " + resultCode);
+                    setResult(UI_STATUS_INTERNAL_ERROR);
+                }
+            }
+        }
+
+        void setResult(Integer result) {
+            resultTaskSource.setResult(result);
+            TokenFragment.finishRequest(this);
+        }
+
+        void setFailure(Exception e) {
+            resultTaskSource.setException(e);
+            TokenFragment.finishRequest(this);
+        }
+    }
+
+    /**
+     * Sign-in request.
+     */
+    private static class SignInRequest implements Request {
+        private final TaskCompletionSource<GoogleSignInAccount> resultTaskSource = new TaskCompletionSource<>();
+        private final TokenPendingResult pendingResponse = new TokenPendingResult();
+        private final boolean silent;
+        private final boolean doAuthCode;
+        private final boolean doEmail;
+        private final boolean doIdToken;
+        private final String webClientId;
+        private final boolean forceRefresh;
+        private final boolean hidePopups;
+        private final String accountName;
+        private final Scope[] scopes;
+
+        private TokenFragment helperFragment;
+
+        public SignInRequest(boolean silent, boolean fetchAuthCode, boolean fetchEmail,
                             boolean fetchIdToken, String webClientId, boolean
                             forceRefresh, String[] oAuthScopes,
                             boolean hidePopups, String accountName) {
-            this.pendingResponse = new TokenPendingResult();
             this.silent = silent;
             this.doAuthCode = fetchAuthCode;
             this.doEmail = fetchEmail;
@@ -449,36 +372,183 @@ public class TokenFragment extends Fragment
             }
         }
 
-        public boolean canReuseAccount() {
-            return !doAuthCode && !doIdToken;
+        public Task<GoogleSignInAccount> getTask() {
+            return resultTaskSource.getTask();
         }
 
         public PendingResult<TokenResult> getPendingResponse() {
             return pendingResponse;
         }
-        public boolean getSilent() {
-            return silent;
+
+        public void process(TokenFragment helperFragment) {
+            this.helperFragment = helperFragment;
+            signIn();
         }
 
-        public String getWebClientId() {
-            return webClientId==null?"":webClientId;
+        public void onActivityResult(int requestCode, int resultCode, Intent data) {
+            if (requestCode == RC_SIGN_IN) {
+                GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+                if (result != null && result.isSuccess()) {
+                    GoogleSignInAccount account = result.getSignInAccount();
+                    setSuccess(account);
+                } else if (resultCode == Activity.RESULT_CANCELED) {
+                    setFailure(CommonStatusCodes.CANCELED);
+                } else if (result != null) {
+                    Log.e(TAG,"GoogleSignInResult error status code: " + result.getStatus());
+                    setFailure(result.getStatus().getStatusCode());
+                } else {
+                    Log.e(TAG, "Google SignIn Result is null, resultCode is " +
+                            resultCode + "(" +
+                    GoogleSignInStatusCodes.getStatusCodeString(resultCode) + ")");
+                    setFailure(CommonStatusCodes.ERROR);
+                }
+            }
         }
 
-        public boolean getForceRefresh() {
-            return forceRefresh;
+        private void signIn() {
+            Log.d(TAG, "signIn");
+
+            final GoogleSignInClient signInClient = buildClient();
+    
+            if (signInClient != null) {
+                Activity activity = helperFragment.getActivity();
+                if (canReuseAccount()) { 
+                    final GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(activity);
+                    if (GoogleSignIn.hasPermissions(account, scopes)) {
+                        Log.d(TAG, "Checking the last signed-in account if it can be used.");
+                        Games.getGamesClient(activity, account).getAppId()
+                            .addOnCompleteListener(new OnCompleteListener<String>() {
+                                @Override
+                                public void onComplete(@NonNull Task<String> task) {
+                                    if (task.isSuccessful()) {
+                                        Log.d(TAG, "Signed-in with the last signed-in account.");
+                                        setSuccess(account);
+                                    } else {
+                                        signInClient.signOut().addOnCompleteListener(
+                                            new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if (task.isSuccessful()) {
+                                                        Log.d(TAG, "Can't reuse the last signed-in account. Second attempt after sign out.");
+                                                        // Last signed account should be null now
+                                                        signIn();
+                                                    } else {
+                                                        Log.e(TAG, "Can't reuse the last signed-in account and sign out failed.");
+                                                        setFailure(CommonStatusCodes.SIGN_IN_REQUIRED);
+                                                    }
+                                                }
+                                            });
+                                    }
+                                }
+                            });
+                        return;
+                    }
+                }
+    
+                Log.d(TAG, "signInClient.silentSignIn");
+                signInClient.silentSignIn()
+                    .addOnSuccessListener(
+                        activity,
+                        new OnSuccessListener<GoogleSignInAccount>() {
+                            @Override
+                            public void onSuccess(GoogleSignInAccount result) {
+                                Log.d(TAG, "silentSignIn.onSuccess");
+                                setSuccess(result);
+                            }
+                        })
+                    .addOnFailureListener(
+                        activity,
+                        new OnFailureListener() {
+                            @Override
+                            public void onFailure(Exception exception) {
+                                Log.d(TAG, "silentSignIn.onFailure");
+                                int statusCode = CommonStatusCodes.INTERNAL_ERROR;
+                                if (exception instanceof ApiException) {
+                                    statusCode = ((ApiException) exception).getStatusCode();
+                                }
+                                // INTERNAL_ERROR will be returned if the user has the outdated PlayServices
+                                if (statusCode == CommonStatusCodes.SIGN_IN_REQUIRED || statusCode == CommonStatusCodes.INTERNAL_ERROR) {
+                                    if (!silent) {
+                                        Intent signInIntent = signInClient.getSignInIntent();
+                                        helperFragment.startActivityForResult(signInIntent, RC_SIGN_IN);
+                                    } else {
+                                        Log.i(TAG, "Sign-in failed. Run in silent mode and UI sign-in required.");
+                                        setFailure(CommonStatusCodes.SIGN_IN_REQUIRED);
+                                    }
+                                } else {
+                                    Log.e(TAG, "Sign-in failed with status code: " + statusCode);
+                                    setFailure(statusCode);
+                                }
+                            }
+                        });
+            }
         }
 
-        public void setResult(int code) {
-            setResult(code, /* account= */ null);
+        private GoogleSignInClient buildClient() {
+            Log.d(TAG,"Building client for: " + this);
+            GoogleSignInOptions.Builder builder = new GoogleSignInOptions.Builder();
+            if (doAuthCode) {
+                if (!getWebClientId().isEmpty() && !getWebClientId().equals("__WEB_CLIENTID__")) {
+                    builder.requestServerAuthCode(getWebClientId(), forceRefresh);
+                } else {
+                    Log.e(TAG, "Web client ID is needed for Auth Code");
+                    setFailure(CommonStatusCodes.DEVELOPER_ERROR);
+                    return null;
+                }
+            }
+    
+            if (doEmail) {
+                builder.requestEmail();
+            }
+    
+            if (doIdToken) {
+                if (!getWebClientId().isEmpty() && !getWebClientId().equals("__WEB_CLIENTID__")) {
+                    builder.requestIdToken(getWebClientId());
+                } else {
+                    Log.e(TAG, "Web client ID is needed for ID Token");
+                    setFailure(CommonStatusCodes.DEVELOPER_ERROR);
+                    return null;
+                }
+            }
+            if (scopes != null) {
+                for (Scope s : scopes) {
+                    builder.requestScopes(s);
+                }
+            }
+    
+            if (hidePopups) {
+                Log.d(TAG, "hiding popup views for games API");
+                builder.addExtension(Games.GamesOptions.builder().setShowConnectingPopup(false).build());
+            }
+    
+            if (accountName != null && !accountName.isEmpty()) {
+                builder.setAccountName(accountName);
+            }
+    
+            GoogleSignInOptions options = builder.build();
+            return GoogleSignIn.getClient(helperFragment.getActivity(), options);
         }
 
-        public void setResult(int code, GoogleSignInAccount account) {
-            pendingResponse.setAccount(account);
+        private boolean canReuseAccount() {
+            return !doAuthCode && !doIdToken;
+        }
+
+        private String getWebClientId() {
+            return webClientId == null ? "" : webClientId;
+        }
+
+        void setFailure(int code) {
+            Log.e(TAG,"Setting result error status code to: " + code);
             pendingResponse.setStatus(code);
+            resultTaskSource.setException(new ApiException(new Status(code)));
+            TokenFragment.finishRequest(this);
         }
 
-        public void cancel() {
-            pendingResponse.cancel();
+        private void setSuccess(GoogleSignInAccount account) {
+            resultTaskSource.setResult(account);
+            pendingResponse.setAccount(account);
+            pendingResponse.setStatus(CommonStatusCodes.SUCCESS);
+            TokenFragment.finishRequest(this);
         }
 
         @Override
@@ -487,6 +557,10 @@ public class TokenFragment extends Fragment
                     doAuthCode + " e:" + doEmail + " i:" + doIdToken +
                     " wc: " + webClientId + " f: " + forceRefresh +")";
         }
+    }
+
+    public static GoogleSignInAccount getAccount(Activity activity) {
+        return GoogleSignIn.getLastSignedInAccount(activity);
     }
 
     public static View createInvisibleView(Activity parentActivity) {
