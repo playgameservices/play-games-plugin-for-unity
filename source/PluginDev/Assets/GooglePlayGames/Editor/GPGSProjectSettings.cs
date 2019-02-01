@@ -20,7 +20,11 @@ namespace GooglePlayGames.Editor
 {
     using System.Collections.Generic;
     using System.IO;
+#if UNITY_2017_1_OR_NEWER
     using UnityEngine.Networking;
+#else
+    using UnityEngine;
+#endif
 
     public class GPGSProjectSettings
     {
@@ -97,7 +101,11 @@ namespace GooglePlayGames.Editor
             }
             else if (mDict.ContainsKey(key))
             {
+#if UNITY_2017_1_OR_NEWER
                 return UnityWebRequest.UnEscapeURL(mDict[key]);
+#else
+                return WWW.UnEscapeURL(mDict[key]);
+#endif
             }
             else
             {
@@ -109,8 +117,11 @@ namespace GooglePlayGames.Editor
         {
             if (mDict.ContainsKey(key))
             {
-                string val = UnityWebRequest.UnEscapeURL(mDict[key]);
-                return val;
+#if UNITY_2017_1_OR_NEWER
+                return UnityWebRequest.UnEscapeURL(mDict[key]);
+#else
+                return WWW.UnEscapeURL(mDict[key]);
+#endif
             }
             else
             {
@@ -135,7 +146,11 @@ namespace GooglePlayGames.Editor
 
         public void Set(string key, string val)
         {
+#if UNITY_2017_1_OR_NEWER
             string escaped = UnityWebRequest.EscapeURL(val);
+#else
+            string escaped = WWW.EscapeURL(val);
+#endif
             mDict[key] = escaped;
             mDirty = true;
         }
