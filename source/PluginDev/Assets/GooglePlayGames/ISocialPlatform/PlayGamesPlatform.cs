@@ -583,28 +583,6 @@ namespace GooglePlayGames
         }
 
         /// <summary>
-        /// Returns the achievement corresponding to the passed achievement identifier.
-        /// </summary>
-        /// <returns>
-        /// The achievement corresponding to the identifer. <code>null</code> if no such
-        /// achievement is found or if the user is not authenticated.
-        /// </returns>
-        /// <param name="achievementId">
-        /// The identifier of the achievement.
-        /// </param>
-        public Achievement GetAchievement(string achievementId)
-        {
-            if (!IsAuthenticated())
-            {
-                GooglePlayGames.OurUtils.Logger.e(
-                    "GetAchievement can only be called after authentication.");
-                return null;
-            }
-
-            return mClient.GetAchievement(achievementId);
-        }
-
-        /// <summary>
         /// Returns the user's display name.
         /// </summary>
         /// <returns>
@@ -702,7 +680,7 @@ namespace GooglePlayGames
                 {
                     if (ach[i].Id == achievementID) 
                     {
-                        if(ach.IsIncremental)
+                        if(ach[i].IsIncremental)
                         {
                             GooglePlayGames.OurUtils.Logger.d("Progress " + progress +
                                 " interpreted as incremental target (approximate).");

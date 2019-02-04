@@ -465,18 +465,6 @@ namespace GooglePlayGames.Android
         }
 
         ///<summary></summary>
-        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.GetAchievement"/>
-        public Achievement GetAchievement(string achId)
-        {
-            if (mAchievements == null || !mAchievements.ContainsKey(achId))
-            {
-                return null;
-            }
-
-            return mAchievements[achId];
-        }
-
-        ///<summary></summary>
         /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.LoadAchievements"/>
         public void LoadAchievements(Action<Achievement[]> callback)
         {
@@ -489,7 +477,6 @@ namespace GooglePlayGames.Android
                             using (var achievementBuffer = annotatedData.Call<AndroidJavaObject>("get")) 
                             {
                                 int count = achievementBuffer.Call<int>("getCount");
-                                Debug.Log("LoadAchievements count: " + count);
                                 Achievement[] result = new Achievement[count];
                                 for(int i = 0; i < count; ++i) 
                                 {
@@ -503,7 +490,8 @@ namespace GooglePlayGames.Android
 
                                         System.DateTime lastModifiedTime = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
                                         long timestamp = javaAchievement.Call<long>("getLastUpdatedTimestamp");
-                                        lastModifiedTime.AddSeconds(timestamp);
+                                        // Java timestamp is in milliseconds
+                                        lastModifiedTime.AddSeconds(timestamp / 1000);
                                         achievement.LastModifiedTime = lastModifiedTime;
                                         
                                         achievement.RevealedImageUrl = javaAchievement.Call<string>("getRevealedImageUrl");
