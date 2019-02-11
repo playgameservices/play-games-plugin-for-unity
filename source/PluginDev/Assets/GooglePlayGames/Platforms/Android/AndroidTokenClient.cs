@@ -208,7 +208,17 @@ namespace GooglePlayGames.Android
                     using (var currentActivity = GetActivity())
                     {
                         using (var pendingResult = bridgeClass.CallStatic<AndroidJavaObject>(
-                            "getAnotherAuthCode", currentActivity, reAuthenticateIfNeeded, webClientId))
+                            "fetchToken",
+                            currentActivity,
+                            /* silent= */!reAuthenticateIfNeeded,
+                            /* requestAuthCode= */true,
+                            /* requestEmail= */false,
+                            /* requestIdToken= */false, 
+                            webClientId,
+                            /* forceRefresh= */false,
+                            oauthScopes.ToArray(),
+                            /* hidePopups= */true,
+                            /* accountName= */""))
                         {
                             pendingResult.Call("setResultCallback", new ResultCallbackProxy(
                                 tokenResult => {

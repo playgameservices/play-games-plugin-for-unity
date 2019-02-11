@@ -147,26 +147,6 @@ public class TokenFragment extends Fragment
         return request.getPendingResponse();
     }
 
-    /**
-     * This calls silent signin and gets the user info including the auth code.
-     * If silent sign-in fails, the failure is returned.
-     * @return PendingResult for waiting on result.
-     */
-    public static PendingResult getAnotherAuthCode(Activity parentActivity,
-                                                   final boolean reauthIfNeeded,
-                                                   String webClientId) {
-        return fetchToken(parentActivity,
-                          /* silent= */!reauthIfNeeded,
-                          /* requestAuthCode= */true,
-                          /* requestEmail= */false,
-                          /* requestIdToken= */false,
-                          /* webClientId= */webClientId,
-                          /* forceRefreshToken= */false,
-                          /* additionalScopes= */null,
-                          /* hidePopups= */true,
-                          /* accountName= */null);
-    }
-
     public static void signOut(Activity activity) {
         TokenFragment fragment = (TokenFragment)
                 activity.getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
@@ -196,8 +176,9 @@ public class TokenFragment extends Fragment
             request_ = pendingTokenRequest;
         }
         final TokenRequest request = request_;
+        final GoogleSignInClient signInClient = mGoogleSignInClient;
 
-        if (mGoogleSignInClient != null && request != null) {
+        if (signInClient != null && request != null) {
             if (request.canReuseAccount()) { 
                 final GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(getActivity());
                 if (GoogleSignIn.hasPermissions(account, request.scopes)) {
@@ -210,7 +191,7 @@ public class TokenFragment extends Fragment
                                     Log.d(TAG, "Signed-in with the last signed-in account.");
                                     onSignedIn(CommonStatusCodes.SUCCESS, account);
                                 } else {
-                                    mGoogleSignInClient.signOut().addOnCompleteListener(
+                                    signInClient.signOut().addOnCompleteListener(
                                         new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
@@ -231,8 +212,8 @@ public class TokenFragment extends Fragment
                 }
             }
 
-            Log.d(TAG, "mGoogleSignInClient.silentSignIn");
-            mGoogleSignInClient.silentSignIn()
+            Log.d(TAG, "signInClient.silentSignIn");
+            signInClient.silentSignIn()
                 .addOnSuccessListener(
                     getActivity(),
                     new OnSuccessListener<GoogleSignInAccount>() {
@@ -255,7 +236,7 @@ public class TokenFragment extends Fragment
                             // INTERNAL_ERROR will be returned if the user has the outdated PlayServices
                             if (statusCode == CommonStatusCodes.SIGN_IN_REQUIRED || statusCode == CommonStatusCodes.INTERNAL_ERROR) {
                                 if (!request.getSilent()) {
-                                    Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+                                    Intent signInIntent = signInClient.getSignInIntent();
                                     startActivityForResult(signInIntent, RC_ACCT);
                                 } else {
                                     Log.i(TAG, "Sign-in failed. Run in silent mode and UI sign-in required.");
