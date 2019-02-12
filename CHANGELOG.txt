@@ -1,7 +1,11 @@
+Version 0.9.61
+    Bug Fixes:
+      * #2442 GetAnotherServerAuthCode doesn't honor OAuth scope
+      * #2444 Crash during sign-in failure at TokenFragment line 258
+
 Version 0.9.60
     Bug Fixes:
       * #2439 UnityWebRequestTexture class is not contained at unity 5.6
-
 Version 0.9.59
     Bug Fixes:
       * #2430 Fixed sign-in issues with Android version 7 and less
