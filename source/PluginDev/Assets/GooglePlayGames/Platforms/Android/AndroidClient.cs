@@ -102,7 +102,7 @@ namespace GooglePlayGames.Android
                                 mUser = new Player(displayName, playerId, avatarUrl);
                                 lock (GameServicesLock)
                                 {
-    //                                mSavedGameClient = new AndroidSavedGameClient(mTokenClient.GetAccount());
+                                    mSavedGameClient = new AndroidSavedGameClient(mTokenClient.GetAccount());
                                 }
 
                                 lock (AuthStateLock)
