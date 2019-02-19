@@ -35,6 +35,34 @@ namespace GooglePlayGames.Android
                 return jc.GetStatic<AndroidJavaObject>("currentActivity");
             }
         }
+
+        public static void ShowAchievementsUI(Action<UIStatus> cb)
+        {
+            using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
+            {
+                using(var task = helperFragment.CallStatic<AndroidJavaObject>("showAchievementUi", AndroidHelperFragment.GetActivity()))
+                {
+                    task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<int>(
+                        uiCode => {
+                            Debug.Log("ShowAchievementsUI result " + uiCode);
+                            if (cb != null) 
+                            {
+                                PlayGamesHelperObject.RunOnGameThread(() => cb.Invoke((UIStatus)uiCode));
+                            }
+                        }
+                    ));
+                    task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                        exception => {
+                            Debug.Log("ShowAchievementsUI failed with exception");
+                            if (cb != null) 
+                            {
+                                PlayGamesHelperObject.RunOnGameThread(() => cb.Invoke(UIStatus.InternalError));
+                            }
+                        }
+                    ));
+                }
+            }
+        }
     }
 }
 #endif
