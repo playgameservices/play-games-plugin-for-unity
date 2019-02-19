@@ -26,7 +26,7 @@ namespace GooglePlayGames.Android
 
     internal class AndroidTokenClient : TokenClient
     {
-        private const string TokenFragmentClass = "com.google.games.bridge.TokenFragment";
+        private const string HelperFragmentClass = "com.google.games.bridge.HelperFragment";
 
         // These are the configuration values.
         private bool requestEmail;
@@ -43,21 +43,6 @@ namespace GooglePlayGames.Android
         private string email;
         private string authCode;
         private string idToken;
-
-        public static AndroidJavaObject CreateInvisibleView() {
-            using (var jc = new AndroidJavaClass(TokenFragmentClass))
-            {
-                return jc.CallStatic<AndroidJavaObject>("createInvisibleView", GetActivity());
-            }
-        }
-
-        public static AndroidJavaObject GetActivity()
-        {
-            using (var jc = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
-            {
-                return jc.GetStatic<AndroidJavaObject>("currentActivity");
-            }
-        }
 
         public void SetRequestAuthCode(bool flag, bool forceRefresh)
         {
@@ -110,8 +95,8 @@ namespace GooglePlayGames.Android
             idToken = null;
             PlayGamesHelperObject.RunOnGameThread(() => {
                 Debug.Log("Calling Signout in token client");
-                AndroidJavaClass cls = new AndroidJavaClass(TokenFragmentClass);
-                cls.CallStatic("signOut", GetActivity());
+                AndroidJavaClass cls = new AndroidJavaClass(HelperFragmentClass);
+                cls.CallStatic("signOut", AndroidHelperFragment.GetActivity());
             });
         }
 
@@ -124,9 +109,9 @@ namespace GooglePlayGames.Android
         {
             try
             {
-                using (var bridgeClass = new AndroidJavaClass(TokenFragmentClass))
+                using (var bridgeClass = new AndroidJavaClass(HelperFragmentClass))
                 {
-                    using (var currentActivity = GetActivity())
+                    using (var currentActivity = AndroidHelperFragment.GetActivity())
                     {
                         using (var pendingResult = bridgeClass.CallStatic<AndroidJavaObject>(
                             "fetchToken",
@@ -211,9 +196,9 @@ namespace GooglePlayGames.Android
         {
             try
             {
-                using (var bridgeClass = new AndroidJavaClass(TokenFragmentClass))
+                using (var bridgeClass = new AndroidJavaClass(HelperFragmentClass))
                 {
-                    using (var currentActivity = GetActivity())
+                    using (var currentActivity = AndroidHelperFragment.GetActivity())
                     {
                         using (var pendingResult = bridgeClass.CallStatic<AndroidJavaObject>(
                             "getAnotherAuthCode", currentActivity, reAuthenticateIfNeeded, webClientId))

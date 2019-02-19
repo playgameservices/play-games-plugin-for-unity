@@ -56,8 +56,8 @@ namespace GooglePlayGames.Android
         private volatile uint mAuthGeneration = 0;
         private volatile bool friendsLoading = false;
 
-        AndroidJavaClass mHelperFragmentClass = new AndroidJavaClass("com.google.games.bridge.TokenFragment");
-        AndroidJavaClass mGamesClient = new AndroidJavaClass("com/google/android/gms/games/Games");
+        AndroidJavaClass mHelperFragmentClass = new AndroidJavaClass("com.google.games.bridge.HelperFragment");
+        AndroidJavaClass mGamesClient = new AndroidJavaClass("com.google.android.gms.games.Games");
         AndroidJavaObject mPlayersClient;
 
         internal AndroidClient(PlayGamesClientConfiguration configuration)
@@ -91,7 +91,7 @@ namespace GooglePlayGames.Android
                 bool succeed = result == 0 /* CommonStatusCodes.SUCCEED */;
                 InitializeGameServices();
                 if (succeed) {
-                    mPlayersClient = mGamesClient.CallStatic<AndroidJavaObject>("getPlayersClient", AndroidTokenClient.GetActivity(), mTokenClient.GetAccount());
+                    mPlayersClient = mGamesClient.CallStatic<AndroidJavaObject>("getPlayersClient", AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
                     using(var task = mPlayersClient.Call<AndroidJavaObject>("getCurrentPlayer"))
                     {   // Task<Player> task
                         task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
@@ -135,54 +135,6 @@ namespace GooglePlayGames.Android
                     }
                 }
             });
-        }
-
-        private class TaskOnCompleteProxy<T> : AndroidJavaProxy
-        {
-            private Action<T> mCallback;
-
-            public TaskOnCompleteProxy(Action<T> callback) 
-            : base("com/google/android/gms/tasks/OnCompleteListener")
-            {
-                mCallback = callback;
-            }
-
-            public void onComplete(T result)
-            {
-                mCallback(result);
-            }
-        }
-
-        private class TaskOnSuccessProxy<T> : AndroidJavaProxy
-        {
-            private Action<T> mCallback;
-
-            public TaskOnSuccessProxy(Action<T> callback) 
-            : base("com/google/android/gms/tasks/OnSuccessListener")
-            {
-                mCallback = callback;
-            }
-
-            public void onSuccess(T result)
-            {
-                mCallback(result);
-            }
-        }
-
-        private class TaskOnFailedProxy : AndroidJavaProxy
-        {
-            private Action<AndroidJavaObject> mCallback;
-
-            public TaskOnFailedProxy(Action<AndroidJavaObject> callback) 
-            : base("com/google/android/gms/tasks/OnFailureListener")
-            {
-                mCallback = callback;
-            }
-
-            public void onFailure(AndroidJavaObject exception)
-            {
-                mCallback(exception);
-            }
         }
 
         private static Action<T> AsOnGameThreadCallback<T>(Action<T> callback)
@@ -623,7 +575,7 @@ namespace GooglePlayGames.Android
         /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.ShowAchievementsUI"/>
         public void ShowAchievementsUI(Action<UIStatus> cb)
         {
-            using(var task = mHelperFragmentClass.CallStatic<AndroidJavaObject>("showAchievementUi", AndroidTokenClient.GetActivity()))
+            using(var task = mHelperFragmentClass.CallStatic<AndroidJavaObject>("showAchievementUi", AndroidHelperFragment.GetActivity()))
             {
                 task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<int>(
                     uiCode => {
@@ -772,12 +724,12 @@ namespace GooglePlayGames.Android
 
         private AndroidJavaObject getAchievementsClient()
         {
-            return mGamesClient.CallStatic<AndroidJavaObject>("getAchievementsClient", AndroidTokenClient.GetActivity(), mTokenClient.GetAccount());
+            return mGamesClient.CallStatic<AndroidJavaObject>("getAchievementsClient", AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
         }
 
         private AndroidJavaObject getPlayerStatsClient()
         {
-            return mGamesClient.CallStatic<AndroidJavaObject>("getPlayerStatsClient", AndroidTokenClient.GetActivity(), mTokenClient.GetAccount());
+            return mGamesClient.CallStatic<AndroidJavaObject>("getPlayerStatsClient", AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
         }
     }
 }
