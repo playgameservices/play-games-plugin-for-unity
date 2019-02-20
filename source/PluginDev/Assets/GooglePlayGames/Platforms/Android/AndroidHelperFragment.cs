@@ -17,11 +17,12 @@
 #if UNITY_ANDROID
 namespace GooglePlayGames.Android
 {
-    using System;
-    using BasicApi;
-    using OurUtils;
     using Com.Google.Android.Gms.Common.Api;
+    using GooglePlayGames.BasicApi;
+    using GooglePlayGames.BasicApi.SavedGame;
+    using OurUtils;
     using UnityEngine;
+    using System;
     using System.Collections.Generic;
 
     internal class AndroidHelperFragment
@@ -57,6 +58,37 @@ namespace GooglePlayGames.Android
                             if (cb != null) 
                             {
                                 PlayGamesHelperObject.RunOnGameThread(() => cb.Invoke(UIStatus.InternalError));
+                            }
+                        }
+                    ));
+                }
+            }
+        }
+
+        public static void ShowSelectSnapshotUI(bool showCreateSaveUI, bool showDeleteSaveUI,
+                int maxDisplayedSavedGames, string uiTitle, Action<SelectUIStatus, ISavedGameMetadata> cb)
+        {
+            using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
+            {
+                using(var task = helperFragment.CallStatic<AndroidJavaObject>("showSelectSnapshotUi", 
+                    AndroidHelperFragment.GetActivity(), uiTitle, showCreateSaveUI, showDeleteSaveUI, maxDisplayedSavedGames))
+                {
+                    task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                        // SelectSnapshotUiRequest.Result result
+                        result => {
+                            SelectUIStatus status = (SelectUIStatus)result.Get<int>("status");
+                            AndroidJavaObject javaMetadata = result.Get<AndroidJavaObject>("metadata");
+                            AndroidSnapshotMetadata metadata = javaMetadata == null ? null : new AndroidSnapshotMetadata(javaMetadata, /* contents= */null);
+                            Debug.Log("ShowSelectSnapshotUI result " + status);
+                            PlayGamesHelperObject.RunOnGameThread(() => cb.Invoke(status, metadata));
+                        }
+                    ));
+                    task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                        exception => {
+                            Debug.Log("ShowSelectSnapshotUI failed with exception");
+                            if (cb != null) 
+                            {
+                                PlayGamesHelperObject.RunOnGameThread(() => cb.Invoke(SelectUIStatus.InternalError, null));
                             }
                         }
                     ));

@@ -49,6 +49,7 @@ public class HelperFragment extends Fragment
     private static final String FRAGMENT_TAG = "gpg.HelperFragment";
     static final int RC_SIGN_IN = 9002;
     static final int RC_ACHIEVEMENT_UI = 9003;
+    static final int RC_SELECT_SNAPSHOT_UI = 9003;
 
     // Pending token request.  There can be only one outstanding request at a
     // time.
@@ -135,6 +136,17 @@ public class HelperFragment extends Fragment
 
         if(!HelperFragment.startRequest(parentActivity, request)) {
             request.setResult(AchievementUiRequest.UI_STATUS_UI_BUSY);
+        }
+
+        return request.getTask();
+    }
+
+    public static Task<SelectSnapshotUiRequest.Result> showSelectSnapshotUi(
+            Activity parentActivity, @NonNull String title, boolean allowAddButton, boolean allowDelete, int maxSnapshots) {
+        SelectSnapshotUiRequest request = new SelectSnapshotUiRequest(title, allowAddButton, allowDelete, maxSnapshots);
+
+        if(!HelperFragment.startRequest(parentActivity, request)) {
+            request.setResult(SelectSnapshotUiRequest.SELECT_UI_STATUS_UI_BUSY);
         }
 
         return request.getTask();

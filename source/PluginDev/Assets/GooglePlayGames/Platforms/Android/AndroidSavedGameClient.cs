@@ -205,8 +205,6 @@ namespace GooglePlayGames.Android
             Misc.CheckNotNull(uiTitle);
             Misc.CheckNotNull(callback);
 
-            callback = ToOnGameThread(callback);
-
             if (!(maxDisplayedSavedGames > 0))
             {
                 OurUtils.Logger.e("maxDisplayedSavedGames must be greater than 0");
@@ -214,39 +212,8 @@ namespace GooglePlayGames.Android
                 return;
             }
 
-/*          AndroidTokenClient.showSelectSnapshotUi(showCreateSaveUI, showDeleteSaveUI,
-                maxDisplayedSavedGames, uiTitle,
-                response => callback(
-                    AsUIStatus(response.RequestStatus()),
-                    response.RequestSucceeded() ? response.Data() : null));
-*/                    
-
-/*
-            using (var helperFragmentClass = new AndroidJavaClass("com.google.games.bridge.HelperFragment"))
-            {
-                using(var task = helperFragmentClass.CallStatic<AndroidJavaObject>("showSelectSnapshotUi", AndroidHelperFragment.GetActivity()))
-                {
-                    task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
-                        metadataAndResultCode => callback(
-                            metadataAndResultCode.Call<long>("getResultCode"), 
-                            new AndroidSnapshotMetadata(metadataAndResultCode.Call<long>("getMetadata"), null));
-                    ));
-                    task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
-                        exception => {
-                            Debug.Log("ShowAchievementsUI failed with exception");
-                            callback(SelectUIStatus.InternalError, null);
-                        }
-                    ));
-                }
-            }
-*/            
-/*
-            mSnapshotManager.SnapshotSelectUI(showCreateSaveUI, showDeleteSaveUI,
-                maxDisplayedSavedGames, uiTitle,
-                response => callback(
-                    AsUIStatus(response.RequestStatus()),
-                    response.RequestSucceeded() ? response.Data() : null));
-*/                    
+            AndroidHelperFragment.ShowSelectSnapshotUI(
+                showCreateSaveUI, showDeleteSaveUI, (int)maxDisplayedSavedGames, uiTitle, callback);
         }
 
         public void CommitUpdate(ISavedGameMetadata metadata, SavedGameMetadataUpdate updateForMetadata,
