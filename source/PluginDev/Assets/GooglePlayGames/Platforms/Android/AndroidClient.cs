@@ -56,9 +56,10 @@ namespace GooglePlayGames.Android
         private volatile uint mAuthGeneration = 0;
         private volatile bool friendsLoading = false;
 
-        AndroidJavaClass mHelperFragmentClass = new AndroidJavaClass("com.google.games.bridge.HelperFragment");
         AndroidJavaClass mGamesClient = new AndroidJavaClass("com.google.android.gms.games.Games");
         AndroidJavaObject mPlayersClient;
+
+        private readonly int mLeaderboardMaxResults = 25; // can be from 1 to 25
 
         internal AndroidClient(PlayGamesClientConfiguration configuration)
         {
@@ -575,6 +576,12 @@ namespace GooglePlayGames.Android
         /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.ShowAchievementsUI"/>
         public void ShowAchievementsUI(Action<UIStatus> cb)
         {
+            cb = AsOnGameThreadCallback(cb);
+            if (!IsAuthenticated())
+            {
+                cb.Invoke(UIStatus.NotAuthorized);
+                return;
+            }
             AndroidHelperFragment.ShowAchievementsUI(cb);
         }
 
@@ -582,17 +589,27 @@ namespace GooglePlayGames.Android
         /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.LeaderboardMaxResults"/>
         public int LeaderboardMaxResults()
         {
-            return 0;
+            return mLeaderboardMaxResults;
         }
 
         ///<summary></summary>
         /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.ShowLeaderboardUI"/>
         public void ShowLeaderboardUI(string leaderboardId, LeaderboardTimeSpan span, Action<UIStatus> cb)
         {
+            cb = AsOnGameThreadCallback(cb);
             if (!IsAuthenticated())
             {
+                cb.Invoke(UIStatus.NotAuthorized);
                 return;
             }
+            if (leaderboardId == null)
+            {
+                AndroidHelperFragment.ShowAllLeaderboardsUI(cb);
+            }
+            else
+            {
+                AndroidHelperFragment.ShowLeaderboardUI(leaderboardId, span, cb);
+            }            
         }
 
         ///<summary></summary>
@@ -602,6 +619,12 @@ namespace GooglePlayGames.Android
             LeaderboardTimeSpan timeSpan,
             Action<LeaderboardScoreData> callback)
         {
+            callback = AsOnGameThreadCallback(callback);
+            using (var client = getLeaderboardsClient())
+            {
+                // "loadTopScores"
+                // "loadPlayerCenteredScores"
+            }
         }
 
         ///<summary></summary>
@@ -705,6 +728,11 @@ namespace GooglePlayGames.Android
         private AndroidJavaObject getAchievementsClient()
         {
             return mGamesClient.CallStatic<AndroidJavaObject>("getAchievementsClient", AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
+        }
+
+        private AndroidJavaObject getLeaderboardsClient()
+        {
+            return mGamesClient.CallStatic<AndroidJavaObject>("getLeaderboardsClient", AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
         }
 
         private AndroidJavaObject getPlayerStatsClient()

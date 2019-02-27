@@ -48,8 +48,8 @@ public class HelperFragment extends Fragment
 
     private static final String FRAGMENT_TAG = "gpg.HelperFragment";
     static final int RC_SIGN_IN = 9002;
-    static final int RC_ACHIEVEMENT_UI = 9003;
-    static final int RC_SELECT_SNAPSHOT_UI = 9003;
+    static final int RC_SIMPLE_UI = 9003;
+    static final int RC_SELECT_SNAPSHOT_UI = 9004;
 
     // Pending token request.  There can be only one outstanding request at a
     // time.
@@ -135,7 +135,27 @@ public class HelperFragment extends Fragment
         AchievementUiRequest request = new AchievementUiRequest();
 
         if(!HelperFragment.startRequest(parentActivity, request)) {
-            request.setResult(AchievementUiRequest.UI_STATUS_UI_BUSY);
+            request.setResult(SimpleUiRequest.UI_STATUS_UI_BUSY);
+        }
+
+        return request.getTask();
+    }
+
+    public static Task<Integer> showAllLeaderboardsUi(Activity parentActivity) {
+        AllLeaderboardsUiRequest request = new AllLeaderboardsUiRequest();
+
+        if(!HelperFragment.startRequest(parentActivity, request)) {
+            request.setResult(SimpleUiRequest.UI_STATUS_UI_BUSY);
+        }
+
+        return request.getTask();
+    }
+
+    public static Task<Integer> showLeaderboardUi(Activity parentActivity, String leaderboardId, int timeSpan) {
+        LeaderboardUiRequest request = new LeaderboardUiRequest(leaderboardId, timeSpan);
+
+        if(!HelperFragment.startRequest(parentActivity, request)) {
+            request.setResult(SimpleUiRequest.UI_STATUS_UI_BUSY);
         }
 
         return request.getTask();
@@ -226,18 +246,16 @@ public class HelperFragment extends Fragment
      */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == RC_SIGN_IN || requestCode == RC_ACHIEVEMENT_UI) {
-            Request request;
-            synchronized (lock) {
-                request = pendingRequest;
-            }
-            // no request, no need to continue.
-            if (request == null) {
-                return;
-            }
-            request.onActivityResult(requestCode, resultCode, data);
-        }
         super.onActivityResult(requestCode, resultCode, data);
+        Request request;
+        synchronized (lock) {
+            request = pendingRequest;
+        }
+        // no request, no need to continue.
+        if (request == null) {
+            return;
+        }
+        request.onActivityResult(requestCode, resultCode, data);
     }
 
     /**

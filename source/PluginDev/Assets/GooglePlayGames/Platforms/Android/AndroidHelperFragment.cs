@@ -41,24 +41,63 @@ namespace GooglePlayGames.Android
         {
             using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
             {
-                using(var task = helperFragment.CallStatic<AndroidJavaObject>("showAchievementUi", AndroidHelperFragment.GetActivity()))
+                using (var task = helperFragment.CallStatic<AndroidJavaObject>("showAchievementUi", AndroidHelperFragment.GetActivity()))
                 {
                     task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<int>(
                         uiCode => {
                             Debug.Log("ShowAchievementsUI result " + uiCode);
-                            if (cb != null) 
-                            {
-                                PlayGamesHelperObject.RunOnGameThread(() => cb.Invoke((UIStatus)uiCode));
-                            }
+                            cb.Invoke((UIStatus)uiCode);
                         }
                     ));
                     task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
                         exception => {
                             Debug.Log("ShowAchievementsUI failed with exception");
-                            if (cb != null) 
-                            {
-                                PlayGamesHelperObject.RunOnGameThread(() => cb.Invoke(UIStatus.InternalError));
-                            }
+                            cb.Invoke(UIStatus.InternalError);
+                        }
+                    ));
+                }
+            }
+        }
+
+        public static void ShowAllLeaderboardsUI(Action<UIStatus> cb)
+        {
+            using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
+            {
+                using (var task = helperFragment.CallStatic<AndroidJavaObject>("showAllLeaderboardsUi", AndroidHelperFragment.GetActivity()))
+                {
+                    task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<int>(
+                        uiCode => {
+                            Debug.Log("ShowAllLeaderboardsUI result " + uiCode);
+                            cb.Invoke((UIStatus)uiCode);
+                        }
+                    ));
+                    task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                        exception => {
+                            Debug.Log("ShowAllLeaderboardsUI failed with exception");
+                            cb.Invoke(UIStatus.InternalError);
+                        }
+                    ));
+                }
+            }
+        }
+
+        public static void ShowLeaderboardUI(string leaderboardId, LeaderboardTimeSpan timeSpan, Action<UIStatus> cb)
+        {
+            using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
+            {
+                using (var task = helperFragment.CallStatic<AndroidJavaObject>("showLeaderboardUi",
+                    AndroidHelperFragment.GetActivity(), leaderboardId, AsJavaLeaderboardTimeSpan(timeSpan)))
+                {
+                    task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<int>(
+                        uiCode => {
+                            Debug.Log("ShowLeaderboardUI result " + uiCode);
+                            cb.Invoke((UIStatus)uiCode);
+                        }
+                    ));
+                    task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                        exception => {
+                            Debug.Log("ShowLeaderboardUI failed with exception");
+                            cb.Invoke(UIStatus.InternalError);
                         }
                     ));
                 }
@@ -80,19 +119,31 @@ namespace GooglePlayGames.Android
                             AndroidJavaObject javaMetadata = result.Get<AndroidJavaObject>("metadata");
                             AndroidSnapshotMetadata metadata = javaMetadata == null ? null : new AndroidSnapshotMetadata(javaMetadata, /* contents= */null);
                             Debug.Log("ShowSelectSnapshotUI result " + status);
-                            PlayGamesHelperObject.RunOnGameThread(() => cb.Invoke(status, metadata));
+                            cb.Invoke(status, metadata);
                         }
                     ));
                     task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
                         exception => {
                             Debug.Log("ShowSelectSnapshotUI failed with exception");
-                            if (cb != null) 
-                            {
-                                PlayGamesHelperObject.RunOnGameThread(() => cb.Invoke(SelectUIStatus.InternalError, null));
-                            }
+                            cb.Invoke(SelectUIStatus.InternalError, null);
                         }
                     ));
                 }
+            }
+        }
+
+        // Convert to LeaderboardVariant.java#TimeSpan
+        private static int AsJavaLeaderboardTimeSpan(LeaderboardTimeSpan span) 
+        {
+            switch(span)
+            {
+                case LeaderboardTimeSpan.Daily:
+                return 0 /* TIME_SPAN_DAILY */;
+                case LeaderboardTimeSpan.Weekly:
+                return 1 /* TIME_SPAN_WEEKLY */;
+                case LeaderboardTimeSpan.AllTime:
+                default:
+                return 2 /* TIME_SPAN_ALL_TIME */;
             }
         }
     }

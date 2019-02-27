@@ -205,6 +205,8 @@ namespace GooglePlayGames.Android
             Misc.CheckNotNull(uiTitle);
             Misc.CheckNotNull(callback);
 
+            callback = ToOnGameThread(callback);
+
             if (!(maxDisplayedSavedGames > 0))
             {
                 OurUtils.Logger.e("maxDisplayedSavedGames must be greater than 0");
