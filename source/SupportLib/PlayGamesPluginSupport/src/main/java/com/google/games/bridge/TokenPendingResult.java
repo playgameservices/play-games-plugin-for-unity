@@ -153,7 +153,7 @@ public class TokenPendingResult extends PendingResult<TokenResult> {
         ResultCallback<? super TokenResult> cb = getCallback();
         TokenResult res = getResult();
         if (cb != null) {
-            Log.d(TAG," Calling onResult for callback: " + cb + " result: " + res);
+            Log.d(TAG,"Calling onResult for result: " + res);
             getCallback().onResult(res);
         }
 
