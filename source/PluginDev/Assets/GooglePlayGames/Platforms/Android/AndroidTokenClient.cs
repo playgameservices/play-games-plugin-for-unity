@@ -212,13 +212,13 @@ namespace GooglePlayGames.Android
                             currentActivity,
                             /* silent= */!reAuthenticateIfNeeded,
                             /* requestAuthCode= */true,
-                            /* requestEmail= */false,
-                            /* requestIdToken= */false, 
+                            requestEmail,
+                            requestIdToken, 
                             webClientId,
                             /* forceRefresh= */false,
                             oauthScopes.ToArray(),
                             /* hidePopups= */true,
-                            /* accountName= */""))
+                            accountName))
                         {
                             pendingResult.Call("setResultCallback", new ResultCallbackProxy(
                                 tokenResult => {
