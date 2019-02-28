@@ -233,8 +233,11 @@ public class TokenFragment extends Fragment
                             if (exception instanceof ApiException) {
                                 statusCode = ((ApiException) exception).getStatusCode();
                             }
-                            // INTERNAL_ERROR will be returned if the user has the outdated PlayServices
-                            if (statusCode == CommonStatusCodes.SIGN_IN_REQUIRED || statusCode == CommonStatusCodes.INTERNAL_ERROR) {
+                            // INTERNAL_ERROR in some PlayServices versions will be returned instead RESOLUTION_REQUIRED 
+                            // if the user has the outdated PlayServices or Play Games app is not installed
+                            if (statusCode == CommonStatusCodes.SIGN_IN_REQUIRED 
+                                    || statusCode == CommonStatusCodes.INTERNAL_ERROR
+                                    || statusCode == CommonStatusCodes.RESOLUTION_REQUIRED) {
                                 if (!request.getSilent()) {
                                     Intent signInIntent = signInClient.getSignInIntent();
                                     startActivityForResult(signInIntent, RC_ACCT);
