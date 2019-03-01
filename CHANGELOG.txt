@@ -4,8 +4,6 @@ Version 0.9.62
       * #2473 GetAnotherServerAuthCode email scope not granted
       * #2465 Crash during sign-in failure at TokenFragment
       * Additional check if Play Games is installed.
-      * Log DateTime guard
-      * Fix DirectoryNotFoundException in GPGSUtil.GenerateAndroidManifest
 
 Version 0.9.61
     Bug Fixes:
