@@ -17,7 +17,7 @@ API through Unity's [social interface](http://docs.unity3d.com/Documentation/Scr
 The plugin provides support for the
 following features of the Google Play Games API:<br/>
 
-* sign in
+* sign-in
 * unlock/reveal/increment achievement
 * post score to leaderboard
 * cloud save read/write
