@@ -17,6 +17,12 @@
 
 namespace GooglePlayGames.BasicApi
 {
+    public enum ScorePageDirection
+    {
+      Forward = 1,
+      Backward = 2,
+    }
+
     /// <summary>
     /// Score page token. This holds the internal token used
     /// to page through the score pages.  The id, collection, and
@@ -30,14 +36,17 @@ namespace GooglePlayGames.BasicApi
         private object mInternalObject;
         private LeaderboardCollection mCollection;
         private LeaderboardTimeSpan mTimespan;
+        private ScorePageDirection mDirection;
 
         internal ScorePageToken(object internalObject, string id,
-            LeaderboardCollection collection, LeaderboardTimeSpan timespan)
+            LeaderboardCollection collection, LeaderboardTimeSpan timespan,
+            ScorePageDirection direction)
         {
             mInternalObject = internalObject;
             mId = id;
             mCollection = collection;
             mTimespan = timespan;
+            mDirection = direction;
         }
 
         public LeaderboardCollection Collection
@@ -53,6 +62,14 @@ namespace GooglePlayGames.BasicApi
             get
             {
                 return mTimespan;
+            }
+        }
+
+        public ScorePageDirection Direction
+        {
+            get
+            {
+                return mDirection;
             }
         }
 
