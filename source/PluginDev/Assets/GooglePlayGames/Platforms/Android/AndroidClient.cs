@@ -431,7 +431,7 @@ namespace GooglePlayGames.Android
                             {
                                 int count = achievementBuffer.Call<int>("getCount");
                                 Achievement[] result = new Achievement[count];
-                                for(int i = 0; i < count; ++i) 
+                                for (int i = 0; i < count; ++i) 
                                 {
                                     Achievement achievement = new Achievement();
                                     using (var javaAchievement = achievementBuffer.Call<AndroidJavaObject>("get", i)) 
@@ -622,8 +622,36 @@ namespace GooglePlayGames.Android
             callback = AsOnGameThreadCallback(callback);
             using (var client = getLeaderboardsClient())
             {
-                // "loadTopScores"
-                // "loadPlayerCenteredScores"
+                string loadScoresMethod = start == LeaderboardStart.TopScores ? "loadTopScores" : "loadPlayerCenteredScores";
+                using (var task = client.Call<AndroidJavaObject>(
+                    loadScoresMethod,
+                    leaderboardId,
+                    AndroidJavaEnums.ToLeaderboardVariantTimeSpan(timeSpan), 
+                    AndroidJavaEnums.ToLeaderboardVariantCollection(collection), 
+                    rowCount))
+                {   // Task<AnnotatedData<LeaderboardScores>> task
+                    task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                        annotatedData => {
+                            using (var leaderboardScores = annotatedData.Call<AndroidJavaObject>("get")) 
+                            {
+                                callback(CreateFromJavaResponse(
+                                    leaderboardId, 
+                                    collection,
+                                    timeSpan,
+                                    annotatedData.Call<bool>("isStale") ? ResponseStatus.SuccessWithStale : ResponseStatus.Success,
+                                    leaderboardScores));
+                                leaderboardScores.Call("release");
+                            }
+                        }
+                    ));
+                    task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                        exception => {
+                            Debug.Log("LoadScores failed");
+                            callback(new LeaderboardScoreData(leaderboardId, ResponseStatus.InternalError));
+                        }
+                    ));
+                }
+
             }
         }
 
@@ -632,6 +660,97 @@ namespace GooglePlayGames.Android
         public void LoadMoreScores(ScorePageToken token, int rowCount,
             Action<LeaderboardScoreData> callback)
         {
+            callback = AsOnGameThreadCallback(callback);
+            using (var client = getLeaderboardsClient())
+            {
+                using (var task = client.Call<AndroidJavaObject>("loadMoreScores", 
+                    token.InternalObject, token.rowCount, AndroidJavaEnums.ToPageDirection(token.Direction)))
+                {   // Task<AnnotatedData<LeaderboardScores>> task
+                    task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                        annotatedData => {
+                            using (var leaderboardScores = annotatedData.Call<AndroidJavaObject>("get")) 
+                            {
+                                callback(CreateLeaderboardScoreData(
+                                    token.LeaderboardId, 
+                                    token.Collection,
+                                    token.TimeSpan,
+                                    annotatedData.Call<bool>("isStale") ? ResponseStatus.SuccessWithStale : ResponseStatus.Success,
+                                    leaderboardScores));
+                                leaderboardScores.Call("release");
+                            }
+                        }
+                    ));
+                    task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                        exception => {
+                            Debug.Log("LoadMoreScores failed");
+                            callback(new LeaderboardScoreData(token.LeaderboardId, ResponseStatus.InternalError));
+                        }
+                    ));
+                }
+            }
+        }
+
+        private LeaderboardScoreData CreateLeaderboardScoreData(
+            string leaderboardId, 
+            LeaderboardCollection collection, 
+            LeaderboardTimeSpan timespan, 
+            ResponseStatus status, 
+            AndroidJavaObject leaderboardScoresJava)
+        {
+            LeaderboardScoreData leaderboardScoreData = new LeaderboardScoreData(leaderboardId, status);
+            using (var scoresBuffer = leaderboardScoresJava.Call<AndroidJavaObject>("getScores"))
+            {
+                int count = scoresBuffer.Call<int>("getCount");
+                for (int i = 0; i < count; ++i) 
+                {
+                    using (var leaderboardScore = scoresBuffer.Call<AndroidJavaObject>("get", i)) 
+                    {
+                        System.DateTime date = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
+                        long timestamp = leaderboardScore.Call<long>("getTimestampMillis");
+                        // Java timestamp is in milliseconds
+                        date.AddSeconds(timestamp / 1000);
+
+                        ulong rank = (ulong)leaderboardScore.Call<long>("getRank");
+                        string scoreHolderId = "";
+                        using (var scoreHolder = leaderboardScore.Call<AndroidJavaObject>("getScoreHolder"))
+                        {
+                            scoreHolderId = scoreHolder.Call<string>("getPlayerId");
+                        }
+                        
+                        ulong score = (ulong)leaderboardScore.Call<long>("getRawScore");
+                        string metadata = leaderboardScore.Call<string>("getScoreTag");
+
+                        leaderboardScoreData.AddScore(new PlayGamesScore(date, leaderboardId,
+                            rank, scoreHolderId, score, metadata));
+                    }
+                }
+
+                leaderboardScoreData.NextPageToken = new ScorePageToken(scoresBuffer, leaderboardId, collection, timespan, ScorePageDirection.Forward);
+                leaderboardScoreData.NextPageToken = new ScorePageToken(scoresBuffer, leaderboardId, collection, timespan, ScorePageDirection.Backward);
+            }
+            using (var leaderboard = leaderboardScoresJava.Call<AndroidJavaObject>("getLeaderboard"))
+            {
+                leaderboardScoreData.Title = leaderboard.Call<string>("getDisplayName");
+                using (var variants = leaderboard.Call<AndroidJavaObject>("getVariants"))
+                {
+                    using (var variant = variants.Call<AndroidJavaObject>("get", 0))
+                    {
+                        if (variant.Call<bool>("hasPlayerInfo"))
+                        {
+                            System.DateTime date = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
+                            ulong rank = (ulong)variant.Call<long>("getPlayerRank");
+                            string scoreHolderId = "me";                          
+                            ulong score = (ulong)variant.Call<long>("getRawPlayerScore");
+                            string metadata = variant.Call<string>("getPlayerScoreTag");
+                            leaderboardScoreData.PlayerScore = new PlayGamesScore(date, leaderboardId,
+                                rank, scoreHolderId, score, metadata);
+                        }
+                        leaderboardScoreData.ApproximateCount = (ulong)variant.Call<long>("getNumScores");
+                    }
+                }               
+            }
+
+            return leaderboardScoreData;
         }
 
         ///<summary></summary>
