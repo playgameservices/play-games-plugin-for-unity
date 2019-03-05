@@ -86,7 +86,7 @@ namespace GooglePlayGames.Android
             using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
             {
                 using (var task = helperFragment.CallStatic<AndroidJavaObject>("showLeaderboardUi",
-                    AndroidHelperFragment.GetActivity(), leaderboardId, AsJavaLeaderboardTimeSpan(timeSpan)))
+                    AndroidHelperFragment.GetActivity(), leaderboardId, AndroidJavaEnums.ToLeaderboardVariantTimeSpan(timeSpan)))
                 {
                     task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<int>(
                         uiCode => {
@@ -129,21 +129,6 @@ namespace GooglePlayGames.Android
                         }
                     ));
                 }
-            }
-        }
-
-        // Convert to LeaderboardVariant.java#TimeSpan
-        private static int AsJavaLeaderboardTimeSpan(LeaderboardTimeSpan span) 
-        {
-            switch(span)
-            {
-                case LeaderboardTimeSpan.Daily:
-                return 0 /* TIME_SPAN_DAILY */;
-                case LeaderboardTimeSpan.Weekly:
-                return 1 /* TIME_SPAN_WEEKLY */;
-                case LeaderboardTimeSpan.AllTime:
-                default:
-                return 2 /* TIME_SPAN_ALL_TIME */;
             }
         }
     }
