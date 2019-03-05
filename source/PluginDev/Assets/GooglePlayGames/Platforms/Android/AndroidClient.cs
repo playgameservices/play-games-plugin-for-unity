@@ -643,6 +643,11 @@ namespace GooglePlayGames.Android
             {
                 callback(false);
             }
+            using (var client = getLeaderboardsClient())
+            {
+                client.Call("submitScore", leaderboardId, score);
+                callback(true);
+            }
         }
 
         ///<summary></summary>
@@ -654,6 +659,11 @@ namespace GooglePlayGames.Android
             if (!IsAuthenticated())
             {
                 callback(false);
+            }
+            using (var client = getLeaderboardsClient())
+            {
+                client.Call("submitScore", leaderboardId, score, metadata);
+                callback(true);
             }
         }
 
