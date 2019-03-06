@@ -267,8 +267,7 @@ namespace GooglePlayGames.Android
         public void GetAnotherServerAuthCode(bool reAuthenticateIfNeeded,
                                              Action<string> callback)
         {
-            mTokenClient.GetAnotherServerAuthCode(reAuthenticateIfNeeded,
-                                                  callback);
+            mTokenClient.GetAnotherServerAuthCode(reAuthenticateIfNeeded, AsOnGameThreadCallback(callback));
         }
 
         ///<summary></summary>
@@ -286,15 +285,14 @@ namespace GooglePlayGames.Android
             if (!IsAuthenticated())
             {
                 GooglePlayGames.OurUtils.Logger.d("Cannot loadFriends when not authenticated");
-                PlayGamesHelperObject.RunOnGameThread(() => callback(false));
+                InvokeCallbackOnGameThread(callback, false);
                 return;
             }
 
             // avoid calling excessively
             if (mFriends != null)
             {
-                PlayGamesHelperObject.RunOnGameThread(() =>
-                    callback(true));
+                InvokeCallbackOnGameThread(callback, true);
                 return;
             }
 
@@ -394,17 +392,14 @@ namespace GooglePlayGames.Android
                                     highSpenderProbability,
                                     totalSpendNext28Days);
 
-                                PlayGamesHelperObject.RunOnGameThread(() => callback.Invoke(CommonStatusCodes.Success, result));
+                                InvokeCallbackOnGameThread(callback, CommonStatusCodes.Success, result);
                             }
                         }
                     ));
                     task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
                         exception => {
                             Debug.Log("GetPlayerStats failed");
-                            if (callback != null) 
-                            {
-                              PlayGamesHelperObject.RunOnGameThread(() => callback.Invoke(CommonStatusCodes.InternalError, new PlayerStats()));
-                            }
+                            InvokeCallbackOnGameThread(callback, CommonStatusCodes.InternalError, new PlayerStats());
                         }
                     ));
                 }
@@ -463,17 +458,14 @@ namespace GooglePlayGames.Android
                                     result[i] = achievement;
                                 }
                                 achievementBuffer.Call("release");
-                                PlayGamesHelperObject.RunOnGameThread(() => callback.Invoke(result));
+                                InvokeCallbackOnGameThread(callback, result);
                             }
                         }
                     ));
                     task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
                         exception => {
                             Debug.Log("LoadAchievements failed");
-                            if (callback != null) 
-                            {
-                              PlayGamesHelperObject.RunOnGameThread(() => callback.Invoke(new Achievement[0]));
-                            }
+                            InvokeCallbackOnGameThread(callback, new Achievement[0]);
                         }
                     ));
                 }
@@ -486,20 +478,14 @@ namespace GooglePlayGames.Android
         {
             if (!IsAuthenticated())
             {
-                if (callback != null) 
-                {
-                    PlayGamesHelperObject.RunOnGameThread(() => callback(false));
-                }
+                InvokeCallbackOnGameThread(callback, false);
                 return;
             }
 
             using (var achievementsClient = getAchievementsClient())
             {
                 achievementsClient.Call("unlock", achId);
-                if (callback != null) 
-                {
-                    PlayGamesHelperObject.RunOnGameThread(() => callback.Invoke(true));
-                }
+                InvokeCallbackOnGameThread(callback, true);
             }
         }
 
@@ -509,20 +495,14 @@ namespace GooglePlayGames.Android
         {
             if (!IsAuthenticated())
             {
-                if (callback != null) 
-                {
-                    PlayGamesHelperObject.RunOnGameThread(() => callback(false));
-                }
+                InvokeCallbackOnGameThread(callback, false);
                 return;
             }
 
             using (var achievementsClient = getAchievementsClient())
             {
                 achievementsClient.Call("reveal", achId);
-                if (callback != null) 
-                {
-                    PlayGamesHelperObject.RunOnGameThread(() => callback.Invoke(true));
-                }
+                InvokeCallbackOnGameThread(callback, true);
             }
         }
 
@@ -532,20 +512,14 @@ namespace GooglePlayGames.Android
         {
             if (!IsAuthenticated())
             {
-                if (callback != null) 
-                {
-                    PlayGamesHelperObject.RunOnGameThread(() => callback(false));
-                }
+                InvokeCallbackOnGameThread(callback, false);
                 return;
             }
 
             using (var achievementsClient = getAchievementsClient())
             {
                 achievementsClient.Call("increment", achId, steps);
-                if (callback != null) 
-                {
-                    PlayGamesHelperObject.RunOnGameThread(() => callback.Invoke(true));
-                }
+                InvokeCallbackOnGameThread(callback, true);
             }
         }
 
@@ -555,34 +529,27 @@ namespace GooglePlayGames.Android
         {
             if (!IsAuthenticated())
             {
-                if (callback != null) 
-                {
-                    PlayGamesHelperObject.RunOnGameThread(() => callback(false));
-                }
+                InvokeCallbackOnGameThread(callback, false);
                 return;
             }
 
             using (var achievementsClient = getAchievementsClient())
             {
                 achievementsClient.Call("setSteps", achId, steps);
-                if (callback != null) 
-                {
-                    PlayGamesHelperObject.RunOnGameThread(() => callback.Invoke(true));
-                }
+                InvokeCallbackOnGameThread(callback, true);
             }
         }
 
         ///<summary></summary>
         /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.ShowAchievementsUI"/>
-        public void ShowAchievementsUI(Action<UIStatus> cb)
+        public void ShowAchievementsUI(Action<UIStatus> callback)
         {
-            cb = AsOnGameThreadCallback(cb);
             if (!IsAuthenticated())
             {
-                cb.Invoke(UIStatus.NotAuthorized);
+                InvokeCallbackOnGameThread(callback, UIStatus.NotAuthorized);
                 return;
             }
-            AndroidHelperFragment.ShowAchievementsUI(cb);
+            AndroidHelperFragment.ShowAchievementsUI(AsOnGameThreadCallback(callback));
         }
 
         ///<summary></summary>
@@ -594,21 +561,20 @@ namespace GooglePlayGames.Android
 
         ///<summary></summary>
         /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.ShowLeaderboardUI"/>
-        public void ShowLeaderboardUI(string leaderboardId, LeaderboardTimeSpan span, Action<UIStatus> cb)
+        public void ShowLeaderboardUI(string leaderboardId, LeaderboardTimeSpan span, Action<UIStatus> callback)
         {
-            cb = AsOnGameThreadCallback(cb);
             if (!IsAuthenticated())
             {
-                cb.Invoke(UIStatus.NotAuthorized);
+                InvokeCallbackOnGameThread(callback, UIStatus.NotAuthorized);
                 return;
             }
             if (leaderboardId == null)
             {
-                AndroidHelperFragment.ShowAllLeaderboardsUI(cb);
+                AndroidHelperFragment.ShowAllLeaderboardsUI(AsOnGameThreadCallback(callback));
             }
             else
             {
-                AndroidHelperFragment.ShowLeaderboardUI(leaderboardId, span, cb);
+                AndroidHelperFragment.ShowLeaderboardUI(leaderboardId, span, AsOnGameThreadCallback(callback));
             }            
         }
 
@@ -619,7 +585,6 @@ namespace GooglePlayGames.Android
             LeaderboardTimeSpan timeSpan,
             Action<LeaderboardScoreData> callback)
         {
-            callback = AsOnGameThreadCallback(callback);
             using (var client = getLeaderboardsClient())
             {
                 string loadScoresMethod = start == LeaderboardStart.TopScores ? "loadTopScores" : "loadPlayerCenteredScores";
@@ -634,7 +599,7 @@ namespace GooglePlayGames.Android
                         annotatedData => {
                             using (var leaderboardScores = annotatedData.Call<AndroidJavaObject>("get")) 
                             {
-                                callback(CreateFromJavaResponse(
+                                InvokeCallbackOnGameThread(callback, CreateLeaderboardScoreData(
                                     leaderboardId, 
                                     collection,
                                     timeSpan,
@@ -647,7 +612,7 @@ namespace GooglePlayGames.Android
                     task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
                         exception => {
                             Debug.Log("LoadScores failed");
-                            callback(new LeaderboardScoreData(leaderboardId, ResponseStatus.InternalError));
+                            InvokeCallbackOnGameThread(callback, new LeaderboardScoreData(leaderboardId, ResponseStatus.InternalError));
                         }
                     ));
                 }
@@ -660,17 +625,16 @@ namespace GooglePlayGames.Android
         public void LoadMoreScores(ScorePageToken token, int rowCount,
             Action<LeaderboardScoreData> callback)
         {
-            callback = AsOnGameThreadCallback(callback);
             using (var client = getLeaderboardsClient())
             {
                 using (var task = client.Call<AndroidJavaObject>("loadMoreScores", 
-                    token.InternalObject, token.rowCount, AndroidJavaEnums.ToPageDirection(token.Direction)))
+                    token.InternalObject, rowCount, AndroidJavaEnums.ToPageDirection(token.Direction)))
                 {   // Task<AnnotatedData<LeaderboardScores>> task
                     task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
                         annotatedData => {
                             using (var leaderboardScores = annotatedData.Call<AndroidJavaObject>("get")) 
                             {
-                                callback(CreateLeaderboardScoreData(
+                                InvokeCallbackOnGameThread(callback, CreateLeaderboardScoreData(
                                     token.LeaderboardId, 
                                     token.Collection,
                                     token.TimeSpan,
@@ -683,7 +647,7 @@ namespace GooglePlayGames.Android
                     task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
                         exception => {
                             Debug.Log("LoadMoreScores failed");
-                            callback(new LeaderboardScoreData(token.LeaderboardId, ResponseStatus.InternalError));
+                            InvokeCallbackOnGameThread(callback, new LeaderboardScoreData(token.LeaderboardId, ResponseStatus.InternalError));
                         }
                     ));
                 }
@@ -757,15 +721,14 @@ namespace GooglePlayGames.Android
         /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.SubmitScore"/>
         public void SubmitScore(string leaderboardId, long score, Action<bool> callback)
         {
-            callback = AsOnGameThreadCallback(callback);
             if (!IsAuthenticated())
             {
-                callback(false);
+                InvokeCallbackOnGameThread(callback, false);
             }
             using (var client = getLeaderboardsClient())
             {
                 client.Call("submitScore", leaderboardId, score);
-                callback(true);
+                InvokeCallbackOnGameThread(callback, true);
             }
         }
 
@@ -774,15 +737,14 @@ namespace GooglePlayGames.Android
         public void SubmitScore(string leaderboardId, long score, string metadata,
                                 Action<bool> callback)
         {
-            callback = AsOnGameThreadCallback(callback);
             if (!IsAuthenticated())
             {
-                callback(false);
+                InvokeCallbackOnGameThread(callback, false);
             }
             using (var client = getLeaderboardsClient())
             {
                 client.Call("submitScore", leaderboardId, score, metadata);
-                callback(true);
+                InvokeCallbackOnGameThread(callback, true);
             }
         }
 
