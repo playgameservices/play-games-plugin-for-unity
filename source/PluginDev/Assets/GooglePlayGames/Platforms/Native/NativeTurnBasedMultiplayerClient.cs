@@ -157,6 +157,25 @@ namespace GooglePlayGames.Native
                     callback(matches);
                 });
         }
+        
+        public void GetMatch(string matchId, Action<bool, TurnBasedMatch> callback)
+        {
+            mTurnBasedManager.GetMatch(matchId, response =>
+            {
+                using (var foundMatch = response.Match())
+                {
+                    if (foundMatch == null)
+                    {
+                        Logger.e(string.Format("Could not find match {0}", matchId));
+                        callback(false, null);
+                    }
+                    else
+                    {
+                        callback(true, foundMatch.AsTurnBasedMatch(mNativeClient.GetUserId()));
+                    }
+                }
+            });
+        }
 
         private Action<TurnBasedManager.TurnBasedMatchResponse> BridgeMatchToUserCallback(
             Action<UIStatus, TurnBasedMatch> userCallback)
