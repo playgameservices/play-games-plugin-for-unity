@@ -114,7 +114,7 @@ namespace GooglePlayGames.Native.PInvoke
         internal bool HasRematchId()
         {
             string rematchId = RematchId();
-            return string.IsNullOrEmpty(rematchId) ||  !rematchId.Equals("(null)");
+            return !string.IsNullOrEmpty(rematchId) && !rematchId.Equals("(null)");
         }
 
         internal string RematchId()
