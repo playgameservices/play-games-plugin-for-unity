@@ -57,7 +57,6 @@ namespace GooglePlayGames.Android
         private volatile bool friendsLoading = false;
 
         AndroidJavaClass mGamesClient = new AndroidJavaClass("com.google.android.gms.games.Games");
-        AndroidJavaObject mPlayersClient;
 
         private readonly int mLeaderboardMaxResults = 25; // can be from 1 to 25
 
@@ -92,36 +91,38 @@ namespace GooglePlayGames.Android
                 bool succeed = result == 0 /* CommonStatusCodes.SUCCEED */;
                 InitializeGameServices();
                 if (succeed) {
-                    mPlayersClient = mGamesClient.CallStatic<AndroidJavaObject>("getPlayersClient", AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
-                    using(var task = mPlayersClient.Call<AndroidJavaObject>("getCurrentPlayer"))
-                    {   // Task<Player> task
-                        task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
-                            player => {
-                                string displayName = player.Call<String>("getDisplayName");
-                                string playerId = player.Call<String>("getPlayerId");
-                                string avatarUrl = player.Call<String>("getIconImageUrl");
-                                mUser = new Player(displayName, playerId, avatarUrl);
-                                lock (GameServicesLock)
-                                {
-                                    mSavedGameClient = new AndroidSavedGameClient(mTokenClient.GetAccount());
-                                }
+                    using (var playersClient = getPlayersClient())
+                    {
+                        using(var task = playersClient.Call<AndroidJavaObject>("getCurrentPlayer"))
+                        {   // Task<Player> task
+                            task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                                player => {
+                                    string displayName = player.Call<String>("getDisplayName");
+                                    string playerId = player.Call<String>("getPlayerId");
+                                    string avatarUrl = player.Call<String>("getIconImageUrl");
+                                    mUser = new Player(displayName, playerId, avatarUrl);
+                                    lock (GameServicesLock)
+                                    {
+                                        mSavedGameClient = new AndroidSavedGameClient(mTokenClient.GetAccount());
+                                    }
 
-                                lock (AuthStateLock)
-                                {
-                                    mAuthState = AuthState.Authenticated;
-                                    InvokeCallbackOnGameThread(callback, true, "Authentication succeed");
-                                }    
-                            }
-                        ));
-                        task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
-                            exception => {
-                                SignOut();
-                                lock (AuthStateLock)
-                                {
-                                    InvokeCallbackOnGameThread(callback, false, "Authentication failed");
+                                    lock (AuthStateLock)
+                                    {
+                                        mAuthState = AuthState.Authenticated;
+                                        InvokeCallbackOnGameThread(callback, true, "Authentication succeed");
+                                    }    
                                 }
-                            }
-                        ));
+                            ));
+                            task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                                exception => {
+                                    SignOut();
+                                    lock (AuthStateLock)
+                                    {
+                                        InvokeCallbackOnGameThread(callback, false, "Authentication failed");
+                                    }
+                                }
+                            ));
+                        }
                     }
                 } else {
                     lock (AuthStateLock)
@@ -410,6 +411,62 @@ namespace GooglePlayGames.Android
         /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.LoadUsers"/>
         public void LoadUsers(string[] userIds, Action<IUserProfile[]> callback)
         {
+            if (!IsAuthenticated())
+            {
+                InvokeCallbackOnGameThread(callback, new IUserProfile[0]);
+                return;
+            }
+
+            using (var playersClient = getPlayersClient())
+            {
+                object countLock = new object();
+                int count = userIds.Length;
+                int resultCount = 0;
+                IUserProfile[] users = new IUserProfile[count];
+                for (int i = 0; i < count; ++i)
+                {
+                    using (var task = playersClient.Call<AndroidJavaObject>("loadPlayer", userIds[i]))
+                    {   // Task<AnnotatedData<Player>> task
+                        task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                            annotatedData => {
+                                using (var player = annotatedData.Call<AndroidJavaObject>("get")) 
+                                {
+                                    string playerId = player.Call<string>("getPlayerId");
+                                    for (int j = 0; j < count; ++j)
+                                    {
+                                        if (playerId == userIds[j])
+                                        {
+                                            string displayName = player.Call<String>("getDisplayName");
+                                            string avatarUrl = player.Call<String>("getIconImageUrl");
+                                            users[j] = new Player(displayName, playerId, avatarUrl);
+                                            break;
+                                        }
+                                    }
+                                    lock (countLock)
+                                    {
+                                        ++resultCount;
+                                        if(resultCount == count) {
+                                            InvokeCallbackOnGameThread(callback, users);
+                                        }
+                                    }
+                                }
+                            }
+                        ));
+                        task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                            exception => {
+                                Debug.Log("LoadUsers failed for index " + i);
+                                lock (countLock)
+                                {
+                                    ++resultCount;
+                                    if(resultCount == count) {
+                                        InvokeCallbackOnGameThread(callback, users);
+                                    }
+                                }
+                            }
+                        ));
+                    }
+                }
+            }
         }
 
         ///<summary></summary>
@@ -819,6 +876,11 @@ namespace GooglePlayGames.Android
         private AndroidJavaObject getAchievementsClient()
         {
             return mGamesClient.CallStatic<AndroidJavaObject>("getAchievementsClient", AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
+        }
+
+        private AndroidJavaObject getPlayersClient()
+        {
+            return mGamesClient.CallStatic<AndroidJavaObject>("getPlayersClient", AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
         }
 
         private AndroidJavaObject getLeaderboardsClient()
