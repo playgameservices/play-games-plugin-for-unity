@@ -56,7 +56,7 @@ namespace GooglePlayGames.Android
         private volatile uint mAuthGeneration = 0;
         private volatile bool friendsLoading = false;
 
-        AndroidJavaClass mGamesClient = new AndroidJavaClass("com.google.android.gms.games.Games");
+        AndroidJavaClass mGamesClass = new AndroidJavaClass("com.google.android.gms.games.Games");
 
         private readonly int mLeaderboardMaxResults = 25; // can be from 1 to 25
 
@@ -877,27 +877,27 @@ namespace GooglePlayGames.Android
 
         private AndroidJavaObject getAchievementsClient()
         {
-            return mGamesClient.CallStatic<AndroidJavaObject>("getAchievementsClient", AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
+            return mGamesClass.CallStatic<AndroidJavaObject>("getAchievementsClient", AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
         }
 
         private AndroidJavaObject getGamesClient()
         {
-            return mGamesClient.CallStatic<AndroidJavaObject>("getGamesClient", AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
+            return mGamesClass.CallStatic<AndroidJavaObject>("getGamesClient", AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
         }
 
         private AndroidJavaObject getPlayersClient()
         {
-            return mGamesClient.CallStatic<AndroidJavaObject>("getPlayersClient", AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
+            return mGamesClass.CallStatic<AndroidJavaObject>("getPlayersClient", AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
         }
 
         private AndroidJavaObject getLeaderboardsClient()
         {
-            return mGamesClient.CallStatic<AndroidJavaObject>("getLeaderboardsClient", AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
+            return mGamesClass.CallStatic<AndroidJavaObject>("getLeaderboardsClient", AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
         }
 
         private AndroidJavaObject getPlayerStatsClient()
         {
-            return mGamesClient.CallStatic<AndroidJavaObject>("getPlayerStatsClient", AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
+            return mGamesClass.CallStatic<AndroidJavaObject>("getPlayerStatsClient", AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
         }
     }
 }
