@@ -290,13 +290,7 @@ namespace GooglePlayGames.Android
                 return;
             }
 
-            // avoid calling excessively
-            if (mFriends != null)
-            {
-                InvokeCallbackOnGameThread(callback, true);
-                return;
-            }
-
+            InvokeCallbackOnGameThread(callback, true);
         }
 
         public IUserProfile[] GetFriends()
@@ -355,8 +349,16 @@ namespace GooglePlayGames.Android
 
         public void SetGravityForPopups(Gravity gravity)
         {
-        }
+            if (!IsAuthenticated())
+            {
+                GooglePlayGames.OurUtils.Logger.d("Cannot call SetGravityForPopups when not authenticated");
+            }
 
+            using (var gamesClient = getGamesClient())
+            {
+                gamesClient.Call<AndroidJavaObject>("setGravityForPopups", (int)gravity | (int)Gravity.CENTER_HORIZONTAL);
+            }
+        }
 
         ///<summary></summary>
         /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.GetPlayerStats"/>
@@ -876,6 +878,11 @@ namespace GooglePlayGames.Android
         private AndroidJavaObject getAchievementsClient()
         {
             return mGamesClient.CallStatic<AndroidJavaObject>("getAchievementsClient", AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
+        }
+
+        private AndroidJavaObject getGamesClient()
+        {
+            return mGamesClient.CallStatic<AndroidJavaObject>("getGamesClient", AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
         }
 
         private AndroidJavaObject getPlayersClient()
