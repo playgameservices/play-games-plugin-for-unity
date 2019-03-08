@@ -512,6 +512,14 @@ namespace GooglePlayGames.Native
                 });
         }
 
+        public void Dismiss(TurnBasedMatch match)
+        {
+            FindEqualVersionMatch(match, success => {
+                // actually just called on failure
+                Logger.e(string.Format("Could not find match {0}", match.MatchId));
+            }, mTurnBasedManager.DismissMatch);
+        }
+        
         public void Rematch(TurnBasedMatch match, Action<bool, TurnBasedMatch> callback)
         {
             callback = Callbacks.AsOnGameThreadCallback(callback);
