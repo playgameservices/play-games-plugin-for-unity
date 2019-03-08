@@ -197,6 +197,19 @@ namespace GooglePlayGames.BasicApi.Multiplayer
         void Cancel(TurnBasedMatch match, Action<bool> callback);
 
         /// <summary>
+        /// Dismiss a match.
+        /// </summary>
+        /// <remarks>Dismissing a match hides it from the dismisser's match list UI
+        /// and causes the match to eventually expire. Other match participants can continue 
+        /// to play until the dismissed match expires after two weeks, or until the match is 
+        /// played to completion or canceled (whichever happens first). To other participants, 
+        /// the dismisser still appears as a participant in the match. Another player cannot 
+        /// take the dismisser's place.
+        /// </remarks>
+        /// <param name="match">Match identifier.</param>
+        void Dismiss(TurnBasedMatch match);
+
+        /// <summary>
         /// Request a rematch.</summary>
         /// <remarks>
         /// This can be used on a finished match in order to start a new
