@@ -117,6 +117,7 @@ namespace GooglePlayGames.Android
                                             completeTask => {
 
                                                 mSavedGameClient = new AndroidSavedGameClient(mTokenClient.GetAccount());
+                                                mEventsClient = new AndroidEventsClient(mTokenClient.GetAccount());
 
                                                 mAuthState = AuthState.Authenticated;
                                                 InvokeCallbackOnGameThread(callback, true, "Authentication succeed");
