@@ -20,6 +20,7 @@ namespace GooglePlayGames.Android
     using Com.Google.Android.Gms.Common.Api;
     using GooglePlayGames.BasicApi;
     using GooglePlayGames.BasicApi.SavedGame;
+    using GooglePlayGames.BasicApi.Multiplayer;
     using OurUtils;
     using UnityEngine;
     using System;
@@ -66,6 +67,42 @@ namespace GooglePlayGames.Android
                 return 1 /* PREV */;
                 default:
                 return -1 /* NONE */;
+            }
+        }
+
+        internal static Invitation.InvType FromInvitationType(int invitationTypeJava)
+        {
+            switch(invitationTypeJava)
+            {
+                case 0: // INVITATION_TYPE_REAL_TIME
+                return Invitation.InvType.RealTime;
+                case 1: // INVITATION_TYPE_TURN_BASED
+                return Invitation.InvType.TurnBased;
+                default:
+                return Invitation.InvType.Unknown; 
+            }
+        }
+
+        internal static Participant.ParticipantStatus FromParticipantStatus(int participantStatusJava)
+        {
+            switch(participantStatusJava)
+            {
+                case 0: // STATUS_NOT_INVITED_YET
+                return Participant.ParticipantStatus.NotInvitedYet;
+                case 1: // STATUS_INVITED
+                return Participant.ParticipantStatus.Invited;
+                case 2: // STATUS_JOINED
+                return Participant.ParticipantStatus.Joined;
+                case 3: // STATUS_DECLINED
+                return Participant.ParticipantStatus.Declined;
+                case 4: // STATUS_LEFT
+                return Participant.ParticipantStatus.Left;
+                case 5: // STATUS_FINISHED
+                return Participant.ParticipantStatus.Finished;
+                case 6: // STATUS_UNRESPONSIVE
+                return Participant.ParticipantStatus.Unresponsive;
+                default:
+                return Participant.ParticipantStatus.Unknown;
             }
         }
     }
