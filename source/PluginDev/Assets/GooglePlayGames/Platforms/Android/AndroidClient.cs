@@ -57,6 +57,7 @@ namespace GooglePlayGames.Android
         private volatile bool friendsLoading = false;
 
         AndroidJavaClass mGamesClass = new AndroidJavaClass("com.google.android.gms.games.Games");
+        private static string TasksClassName = "com.google.android.gms.tasks.Tasks";
 
         private AndroidJavaObject mInvitationCallback = null;
 
@@ -94,69 +95,66 @@ namespace GooglePlayGames.Android
                 bool succeed = result == 0 /* CommonStatusCodes.SUCCEED */;
                 InitializeGameServices();
                 if (succeed) {
+                    AndroidJavaObject signInTasks = new AndroidJavaObject("java.util.ArrayList");
                     if (mInvitationDelegate != null)
                     {
                         mInvitationCallback = new AndroidJavaObject("com.google.games.bridge.InvitationCallbackProxy",
                             new InvitationCallbackProxy(mInvitationDelegate));
                         using (var invitationsClient = getInvitationsClient())
                         {
-                            invitationsClient.Call<AndroidJavaObject>(
-                                "registerInvitationCallback", mInvitationCallback);
+                            signInTasks.Call<bool>("add", invitationsClient.Call<AndroidJavaObject>("registerInvitationCallback", mInvitationCallback));
                         }
                     }
-                    using (var playersClient = getPlayersClient())
+                    AndroidJavaObject taskGetPlayer = getPlayersClient().Call<AndroidJavaObject>("getCurrentPlayer");
+                    AndroidJavaObject taskGetActivationHint = getGamesClient().Call<AndroidJavaObject>("getActivationHint");
+                    AndroidJavaObject taskIsCaptureSupported = getVideosClient().Call<AndroidJavaObject>("isCaptureSupported");
+                    signInTasks.Call<bool>("add", taskGetPlayer);
+                    signInTasks.Call<bool>("add", taskGetActivationHint);
+                    signInTasks.Call<bool>("add", taskIsCaptureSupported);
+                    using (var tasks = new AndroidJavaClass(TasksClassName))
                     {
-                        using (var taskGetPlayer = playersClient.Call<AndroidJavaObject>("getCurrentPlayer"))
-                        {   // Task<Player> task
-                            taskGetPlayer.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
-                                player => {
-                                    mUser = CreatePlayer(player);
-                                    using (var taskGetHint = getGamesClient().Call<AndroidJavaObject>("getActivationHint"))
+                        using (var allTask = tasks.CallStatic<AndroidJavaObject>("whenAll", signInTasks))
+                        {
+                            allTask.Call<AndroidJavaObject>("addOnCompleteListener", new TaskOnCompleteProxy<AndroidJavaObject>(
+                                completeTask => 
+                                {
+                                    if (completeTask.Call<bool>("isSuccessful"))
                                     {
-                                        taskGetHint.Call<AndroidJavaObject>("addOnCompleteListener", new TaskOnCompleteProxy<AndroidJavaObject>(
-                                            completeTask => {
+                                        mUser = CreatePlayer(taskGetPlayer.Call<AndroidJavaObject>("getResult"));
 
-                                                mSavedGameClient = new AndroidSavedGameClient(mTokenClient.GetAccount());
-                                                mEventsClient = new AndroidEventsClient(mTokenClient.GetAccount());
-
-                                                mAuthState = AuthState.Authenticated;
-                                                InvokeCallbackOnGameThread(callback, true, "Authentication succeed");
-
-                                                try
+                                        AndroidJavaObject account = mTokenClient.GetAccount();
+                                        mSavedGameClient = new AndroidSavedGameClient(account);
+                                        mEventsClient = new AndroidEventsClient(account);
+                                        bool isCaptureSupported = (taskIsCaptureSupported.Call<AndroidJavaObject>("getResult")).Call<bool>("booleanValue");
+                                        mVideoClient = new AndroidVideoClient(isCaptureSupported, account);
+                                        mAuthState = AuthState.Authenticated;
+                                        InvokeCallbackOnGameThread(callback, true, "Authentication succeed");
+                                        try
+                                        {
+                                            using (var activationHint = taskGetActivationHint.Call<AndroidJavaObject>("getResult"))
+                                            {
+                                                if (mInvitationDelegate != null) 
                                                 {
-                                                    using (var activationHint = completeTask.Call<AndroidJavaObject>("getResult"))
+                                                    try
                                                     {
-                                                        if (mInvitationDelegate != null) 
-                                                        {
-                                                            try
-                                                            {
-                                                                Invitation invitation = CreateInvitation(activationHint.Call<AndroidJavaObject>("getParcelable", "invitation" /* Multiplayer.EXTRA_INVITATION */));
-                                                                mInvitationDelegate(invitation, /* shouldAutoAccept= */ true);
-                                                            }
-                                                            catch (Exception e)
-                                                            {  // handle null invitation
-                                                            }
-                                                        }
+                                                        Invitation invitation = CreateInvitation(activationHint.Call<AndroidJavaObject>("getParcelable", "invitation" /* Multiplayer.EXTRA_INVITATION */));
+                                                        mInvitationDelegate(invitation, /* shouldAutoAccept= */ true);
+                                                    }
+                                                    catch (Exception e)
+                                                    {  // handle null return
                                                     }
                                                 }
-                                                catch (Exception e)
-                                                {  // handle null bundle
-                                                }
                                             }
-                                        ));
-                                        taskGetHint.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
-                                            exception => {
-                                                SignOut();
-                                                InvokeCallbackOnGameThread(callback, false, "Authentication failed");
-                                            }
-                                        ));
+                                        }
+                                        catch (Exception e)
+                                        {  // handle null return
+                                        }
                                     }
-                                }
-                            ));
-                            taskGetPlayer.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
-                                exception => {
-                                    SignOut();
-                                    InvokeCallbackOnGameThread(callback, false, "Authentication failed");
+                                    else
+                                    {
+                                        SignOut();
+                                        InvokeCallbackOnGameThread(callback, false, "Authentication failed");
+                                    }
                                 }
                             ));
                         }
@@ -953,6 +951,7 @@ namespace GooglePlayGames.Android
             public InvitationCallbackProxy(Action<Invitation, bool> invitationDelegate) 
             : base("com/google/games/bridge/InvitationCallbackProxy$Callback")
             {
+                mInvitationDelegate = invitationDelegate;
             }
 
             public void onInvitationReceived(AndroidJavaObject invitation)
@@ -1032,6 +1031,11 @@ namespace GooglePlayGames.Android
         private AndroidJavaObject getPlayerStatsClient()
         {
             return mGamesClass.CallStatic<AndroidJavaObject>("getPlayerStatsClient", AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
+        }
+
+        private AndroidJavaObject getVideosClient()
+        {
+            return mGamesClass.CallStatic<AndroidJavaObject>("getVideosClient", AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
         }
     }
 }

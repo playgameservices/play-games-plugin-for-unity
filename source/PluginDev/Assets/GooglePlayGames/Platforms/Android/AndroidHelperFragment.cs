@@ -59,6 +59,14 @@ namespace GooglePlayGames.Android
             }
         }
 
+        public static void ShowCaptureOverlayUI()
+        {
+            using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
+            {
+                helperFragment.CallStatic("showCaptureOverlayUi", AndroidHelperFragment.GetActivity());
+            }
+        }
+
         public static void ShowAllLeaderboardsUI(Action<UIStatus> cb)
         {
             using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))

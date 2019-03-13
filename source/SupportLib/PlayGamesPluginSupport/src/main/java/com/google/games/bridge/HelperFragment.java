@@ -50,6 +50,7 @@ public class HelperFragment extends Fragment
     static final int RC_SIGN_IN = 9002;
     static final int RC_SIMPLE_UI = 9003;
     static final int RC_SELECT_SNAPSHOT_UI = 9004;
+    static final int RC_CAPTURE_OVERLAY_UI = 9005;
 
     // Pending token request.  There can be only one outstanding request at a
     // time.
@@ -139,6 +140,12 @@ public class HelperFragment extends Fragment
         }
 
         return request.getTask();
+    }
+
+    public static void showCaptureOverlayUi(Activity parentActivity) {
+        CaptureOverlayUiRequest request = new CaptureOverlayUiRequest();
+
+        HelperFragment.startRequest(parentActivity, request);
     }
 
     public static Task<Integer> showAllLeaderboardsUi(Activity parentActivity) {
