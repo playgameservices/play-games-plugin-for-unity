@@ -127,6 +127,8 @@ namespace GooglePlayGames.Android
                                         mEventsClient = new AndroidEventsClient(account);
                                         bool isCaptureSupported = (taskIsCaptureSupported.Call<AndroidJavaObject>("getResult")).Call<bool>("booleanValue");
                                         mVideoClient = new AndroidVideoClient(isCaptureSupported, account);
+                                        mRealTimeClient = new AndroidRealTimeMultiplayerClient(account);
+                                        
                                         mAuthState = AuthState.Authenticated;
                                         InvokeCallbackOnGameThread(callback, true, "Authentication succeed");
                                         try
