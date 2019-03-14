@@ -123,11 +123,15 @@ namespace GooglePlayGames.Android
                                         mUser = CreatePlayer(taskGetPlayer.Call<AndroidJavaObject>("getResult"));
 
                                         AndroidJavaObject account = mTokenClient.GetAccount();
-                                        mSavedGameClient = new AndroidSavedGameClient(account);
-                                        mEventsClient = new AndroidEventsClient(account);
-                                        bool isCaptureSupported = (taskIsCaptureSupported.Call<AndroidJavaObject>("getResult")).Call<bool>("booleanValue");
-                                        mVideoClient = new AndroidVideoClient(isCaptureSupported, account);
-                                        mRealTimeClient = new AndroidRealTimeMultiplayerClient(account);
+                                        lock (GameServicesLock)
+                                        {
+                                            mSavedGameClient = new AndroidSavedGameClient(account);
+                                            mEventsClient = new AndroidEventsClient(account);
+                                            bool isCaptureSupported = (taskIsCaptureSupported.Call<AndroidJavaObject>("getResult")).Call<bool>("booleanValue");
+                                            mVideoClient = new AndroidVideoClient(isCaptureSupported, account);
+                                            mRealTimeClient = new AndroidRealTimeMultiplayerClient(account);
+                                            mTurnBasedClient = new AndroidTurnBasedMultiplayerClient(account);
+                                        }
                                         
                                         mAuthState = AuthState.Authenticated;
                                         InvokeCallbackOnGameThread(callback, true, "Authentication succeed");
