@@ -724,8 +724,8 @@ namespace GooglePlayGames.Android
                 using (var task = client.Call<AndroidJavaObject>(
                     loadScoresMethod,
                     leaderboardId,
-                    AndroidJavaEnums.ToLeaderboardVariantTimeSpan(timeSpan), 
-                    AndroidJavaEnums.ToLeaderboardVariantCollection(collection), 
+                    AndroidJavaConverter.ToLeaderboardVariantTimeSpan(timeSpan), 
+                    AndroidJavaConverter.ToLeaderboardVariantCollection(collection), 
                     rowCount))
                 {   // Task<AnnotatedData<LeaderboardScores>> task
                     task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
@@ -761,7 +761,7 @@ namespace GooglePlayGames.Android
             using (var client = getLeaderboardsClient())
             {
                 using (var task = client.Call<AndroidJavaObject>("loadMoreScores", 
-                    token.InternalObject, rowCount, AndroidJavaEnums.ToPageDirection(token.Direction)))
+                    token.InternalObject, rowCount, AndroidJavaConverter.ToPageDirection(token.Direction)))
                 {   // Task<AnnotatedData<LeaderboardScores>> task
                     task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
                         annotatedData => {
@@ -977,7 +977,7 @@ namespace GooglePlayGames.Android
             int invitationType = invitation.Call<int>("getInvitationType");
             int variant = invitation.Call<int>("getVariant");
             return new Invitation(
-                AndroidJavaEnums.FromInvitationType(invitationType),
+                AndroidJavaConverter.FromInvitationType(invitationType),
                 invitationId,
                 CreateParticipant(participant),
                 variant);
@@ -988,7 +988,7 @@ namespace GooglePlayGames.Android
             string displayName = participant.Call<string>("getDisplayName");
             string participantId = participant.Call<string>("getParticipantId");
             Participant.ParticipantStatus status = 
-                AndroidJavaEnums.FromParticipantStatus(participant.Call<int>("getStatus"));
+                AndroidJavaConverter.FromParticipantStatus(participant.Call<int>("getStatus"));
             bool connectedToRoom = participant.Call<bool>("isConnectedToRoom");
             Player player = null;
             try

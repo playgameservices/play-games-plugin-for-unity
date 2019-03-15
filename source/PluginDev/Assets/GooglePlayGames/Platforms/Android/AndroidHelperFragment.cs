@@ -94,7 +94,7 @@ namespace GooglePlayGames.Android
             using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
             {
                 using (var task = helperFragment.CallStatic<AndroidJavaObject>("showLeaderboardUi",
-                    AndroidHelperFragment.GetActivity(), leaderboardId, AndroidJavaEnums.ToLeaderboardVariantTimeSpan(timeSpan)))
+                    AndroidHelperFragment.GetActivity(), leaderboardId, AndroidJavaConverter.ToLeaderboardVariantTimeSpan(timeSpan)))
                 {
                     task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<int>(
                         uiCode => {

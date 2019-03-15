@@ -26,7 +26,7 @@ namespace GooglePlayGames.Android
     using System;
     using System.Collections.Generic;
 
-    internal class AndroidJavaEnums
+    internal class AndroidJavaConverter
     {
         // Convert to LeaderboardVariant.java#TimeSpan
         internal static int ToLeaderboardVariantTimeSpan(LeaderboardTimeSpan span) 
