@@ -46,6 +46,11 @@ namespace GooglePlayGames.Native.PInvoke
             return C.TurnBasedMatch_CreationTime(SelfPtr());
         }
 
+        internal ulong LastUpdateTime()
+        {
+            return C.TurnBasedMatch_LastUpdateTime(SelfPtr());
+        }
+
         internal IEnumerable<MultiplayerParticipant> Participants()
         {
             return PInvokeUtilities.ToEnumerable(
@@ -199,7 +204,9 @@ namespace GooglePlayGames.Native.PInvoke
                 ToTurnStatus(MatchStatus()),
                 ToMatchStatus(pendingParticipantId, MatchStatus()),
                 Variant(),
-                Version()
+                Version(),
+                CreationTime(),
+                LastUpdateTime()
             );
         }
 
