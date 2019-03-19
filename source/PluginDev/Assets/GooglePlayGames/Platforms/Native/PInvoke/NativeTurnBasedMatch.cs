@@ -46,6 +46,11 @@ namespace GooglePlayGames.Native.PInvoke
             return C.TurnBasedMatch_CreationTime(SelfPtr());
         }
 
+        internal ulong LastUpdateTime()
+        {
+            return C.TurnBasedMatch_LastUpdateTime(SelfPtr());
+        }
+
         internal IEnumerable<MultiplayerParticipant> Participants()
         {
             return PInvokeUtilities.ToEnumerable(
@@ -105,6 +110,7 @@ namespace GooglePlayGames.Native.PInvoke
             return C.TurnBasedMatch_Status(SelfPtr());
         }
 
+
         internal string Description()
         {
             return PInvokeUtilities.OutParamsToString(
@@ -114,7 +120,7 @@ namespace GooglePlayGames.Native.PInvoke
         internal bool HasRematchId()
         {
             string rematchId = RematchId();
-            return string.IsNullOrEmpty(rematchId) ||  !rematchId.Equals("(null)");
+            return !string.IsNullOrEmpty(rematchId) &&  !rematchId.Equals("(null)");
         }
 
         internal string RematchId()
@@ -199,7 +205,9 @@ namespace GooglePlayGames.Native.PInvoke
                 ToTurnStatus(MatchStatus()),
                 ToMatchStatus(pendingParticipantId, MatchStatus()),
                 Variant(),
-                Version()
+                Version(),
+                CreationTime(),
+                LastUpdateTime()
             );
         }
 
