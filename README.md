@@ -31,8 +31,7 @@ following features of the Google Play Games API:<br/>
 
 __NOTICE__: This version of the plugin no longer supports iOS.  Google Play games services for iOS is deprecated,
 and is not likely to function as expected. Do not use Google Play games
-services for iOS in new apps. See the [deprecation announcement](https://android-developers.googleblog.com/2017/04/focusing-our-google-play-games-services.html)
-blog post for more details.
+services for iOS in new apps. See the [deprecation announcement](https://android-developers.googleblog.com/2017/04/focusing-our-google-play-games-services.html) blog post for more details.
 
 Features:
 
