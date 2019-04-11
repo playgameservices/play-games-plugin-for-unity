@@ -53,10 +53,6 @@ namespace GooglePlayGames.UnitTests {
                 RevealedCallback = callback;
             }
 
-            public override Achievement GetAchievement(string achId) {
-                return CurrentAchievement;
-            }
-
             public override void UnlockAchievement(string achId, Action<bool> callback) {
                 UnlockedId = achId;
                 UnlockedCallback = callback;

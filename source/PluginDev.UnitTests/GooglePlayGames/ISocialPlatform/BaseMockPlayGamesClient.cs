@@ -54,14 +54,6 @@ class BaseMockPlayGamesClient : IPlayGamesClient {
         throw new NotImplementedException("unsupported");
     }
 
-    public List<Achievement> GetAchievements() {
-        throw new NotSupportedException("unsupported");
-    }
-
-    public virtual Achievement GetAchievement(string achId) {
-        throw new NotSupportedException("unsupported");
-    }
-
     public virtual void UnlockAchievement(string achId, Action<bool> callback) {
         throw new NotSupportedException("unsupported");
     }
