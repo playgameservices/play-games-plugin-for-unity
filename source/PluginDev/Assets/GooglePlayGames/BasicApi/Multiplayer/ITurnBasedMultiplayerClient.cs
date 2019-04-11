@@ -95,6 +95,13 @@ namespace GooglePlayGames.BasicApi.Multiplayer
         void GetAllMatches(Action<TurnBasedMatch[]> callback);
 
         /// <summary>
+        /// Gets match for given match id.
+        /// </summary>
+        /// <param name="matchId">Match id</param>
+        /// <param name="callback">Callback.</param>
+        void GetMatch(string matchId, Action<bool, TurnBasedMatch> callback);
+        
+        /// <summary>
         /// Starts a game by showing the match inbox.</summary>
         /// <remarks> The player's match inbox will be
         /// shown, allowing the player to pick an ongoing match or accept an outstanding
