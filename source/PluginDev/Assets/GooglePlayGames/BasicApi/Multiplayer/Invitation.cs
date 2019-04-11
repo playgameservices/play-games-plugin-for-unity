@@ -15,14 +15,21 @@
 // </copyright>
 #if UNITY_ANDROID
 
+using System;
+
 namespace GooglePlayGames.BasicApi.Multiplayer
 {
+
     /// <summary>
     /// Represents an invitation to a multiplayer game. The invitation may be for
     /// a turn-based or real-time game.
     /// </summary>
     public class Invitation
     {
+        static readonly DateTime UnixEpoch =
+                new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+
+
         public enum InvType
         {
             RealTime,
@@ -34,13 +41,15 @@ namespace GooglePlayGames.BasicApi.Multiplayer
         private string mInvitationId;
         private Participant mInviter;
         private int mVariant;
+        private long mCreationTime;
 
-        internal Invitation(InvType invType, string invId, Participant inviter, int variant)
+        internal Invitation(InvType invType, string invId, Participant inviter, int variant, long creationTime)
         {
             mInvitationType = invType;
             mInvitationId = invId;
             mInviter = inviter;
             mVariant = variant;
+            mCreationTime = creationTime;
         }
 
         /// <summary>
@@ -92,6 +101,19 @@ namespace GooglePlayGames.BasicApi.Multiplayer
                 return mVariant;
             }
         }
+
+        /// <summary>
+        /// Gets the creation time of the invitation
+        /// </summary>
+        /// <value>The creation timestamp (UTC)</value>
+        public DateTime CreationTime
+        {
+            get
+            {
+                return UnixEpoch.AddMilliseconds(mCreationTime);
+            }
+        }
+
 
         public override string ToString()
         {
