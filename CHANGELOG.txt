@@ -1,10 +1,28 @@
+Version 0.9.63
+    New Features:     
+      * Updated gradle version to 3.3.2
+      * Updated play-services-games version to 17.0
+      * [TBMP] Added GetMatch method
+      * [TBMP] Added Dismiss method
+      * [TBMP] Expose creation and update timestamps of match
+      * [TBMP] Expose creation time of invitation
+    Bug Fixes:
+      * Improved sign-in time.
+      * Refactored achievements implementation. Now it uses less server calls and massive achievement increement will not block Achievement UI.
+      * Log DateTime guard	
+      * Fix DirectoryNotFoundException in GPGSUtil.GenerateAndroidManifest
+      * Fixed readme
+      * #2482 Warning in AndroidTokenClient when building for device 
+      * #2486 CanRematch in TBM always false
+    Other:
+      * Removed GetAchievement method. Use LoadAchievements instead.
+
 Version 0.9.62
     Bug Fixes:
       * #2475 ANRs 0.9.61 TokenFragment
       * #2473 GetAnotherServerAuthCode email scope not granted
       * #2465 Crash during sign-in failure at TokenFragment
       * Additional check if Play Games is installed.
-
 Version 0.9.61
     Bug Fixes:
       * #2442 GetAnotherServerAuthCode doesn't honor OAuth scope
