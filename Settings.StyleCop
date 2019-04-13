@@ -4,7 +4,7 @@
       <Rules>
         <Rule Name="ElementsMustBeOrderedByAccess">
           <RuleSettings>
-            <BooleanProperty Name="Enabled">False</BooleanProperty>
+            <BooleanProperty Name="Enabled">True</BooleanProperty>
           </RuleSettings>
         </Rule>
       </Rules>
@@ -22,7 +22,7 @@
       <Rules>
         <Rule Name="FieldsMustBePrivate">
           <RuleSettings>
-            <BooleanProperty Name="Enabled">False</BooleanProperty>
+            <BooleanProperty Name="Enabled">True</BooleanProperty>
           </RuleSettings>
         </Rule>
       </Rules>
