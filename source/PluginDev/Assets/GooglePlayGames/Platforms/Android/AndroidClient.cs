@@ -976,11 +976,15 @@ namespace GooglePlayGames.Android
             AndroidJavaObject participant = invitation.Call<AndroidJavaObject>("getInviter");
             int invitationType = invitation.Call<int>("getInvitationType");
             int variant = invitation.Call<int>("getVariant");
+            long creationTimestamp = invitation.Call<long>("getCreationTimestamp");
+            System.DateTime creationTime = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
+            creationTime.AddMilliseconds(creationTimestamp);
             return new Invitation(
                 AndroidJavaConverter.FromInvitationType(invitationType),
                 invitationId,
                 CreateParticipant(participant),
-                variant);
+                variant,
+                creationTime);
         }
 
         private static Participant CreateParticipant(AndroidJavaObject participant)
