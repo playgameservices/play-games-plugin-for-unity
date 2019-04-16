@@ -95,6 +95,13 @@ namespace GooglePlayGames.BasicApi.Multiplayer
         void GetAllMatches(Action<TurnBasedMatch[]> callback);
 
         /// <summary>
+        /// Gets match for given match id.
+        /// </summary>
+        /// <param name="matchId">Match id</param>
+        /// <param name="callback">Callback.</param>
+        void GetMatch(string matchId, Action<bool, TurnBasedMatch> callback);
+        
+        /// <summary>
         /// Starts a game by showing the match inbox.</summary>
         /// <remarks> The player's match inbox will be
         /// shown, allowing the player to pick an ongoing match or accept an outstanding
@@ -195,6 +202,19 @@ namespace GooglePlayGames.BasicApi.Multiplayer
         /// <param name="match">Match identifier.</param>
         /// <param name="callback">Callback.</param>
         void Cancel(TurnBasedMatch match, Action<bool> callback);
+
+        /// <summary>
+        /// Dismiss a match.
+        /// </summary>
+        /// <remarks>Dismissing a match hides it from the dismisser's match list UI
+        /// and causes the match to eventually expire. Other match participants can continue 
+        /// to play until the dismissed match expires after two weeks, or until the match is 
+        /// played to completion or canceled (whichever happens first). To other participants, 
+        /// the dismisser still appears as a participant in the match. Another player cannot 
+        /// take the dismisser's place.
+        /// </remarks>
+        /// <param name="match">Match identifier.</param>
+        void Dismiss(TurnBasedMatch match);
 
         /// <summary>
         /// Request a rematch.</summary>

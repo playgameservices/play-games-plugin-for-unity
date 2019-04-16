@@ -61,6 +61,11 @@ namespace GooglePlayGames.Android
             // Task<AnnotatedData<LoadMatchesResponse>> loadMatchesByStatus(@InvitationSortOrder int invitationSortOrder, @NonNull @MatchTurnStatus int[] matchTurnStatuses))
         }
 
+        public void GetMatch(string matchId, Action<bool, TurnBasedMatch> callback)
+        {
+            callback = ToOnGameThread(callback);
+        }
+
         public void AcceptFromInbox(Action<bool, TurnBasedMatch> callback)
         {
             callback = ToOnGameThread(callback);
@@ -121,6 +126,11 @@ namespace GooglePlayGames.Android
         {
             callback = ToOnGameThread(callback);
             // Task<String> cancelMatch(@NonNull String matchId)
+        }
+
+        public void Dismiss(TurnBasedMatch match)
+        {
+
         }
 
         public void Rematch(TurnBasedMatch match, Action<bool, TurnBasedMatch> callback)
