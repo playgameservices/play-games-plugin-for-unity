@@ -89,7 +89,7 @@ namespace GooglePlayGames.Android
 
         public void Signout()
         {
-            account = new AndroidJavaObject("com.google.android.gms.auth.api.signin.GoogleSignInAccount");
+            account = null;
             authCode = null;
             email = null;
             idToken = null;
