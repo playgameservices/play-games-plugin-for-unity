@@ -94,9 +94,9 @@ namespace GooglePlayGames.BasicApi
         }
 
         /// <summary>
-        /// The length of the avg sesson in minutes.
+        /// The length of the avg session in minutes.
         /// </summary>
-        public float AvgSessonLength
+        public float AvgSessionLength
         {
             get
             {
@@ -225,12 +225,12 @@ namespace GooglePlayGames.BasicApi
         }
 
         /// <summary>
-        /// Determines whether this instance has AvgSessonLength.
+        /// Determines whether this instance has AvgSessionLength.
         /// </summary>
-        /// <returns><c>true</c> if this instance has AvgSessonLength; otherwise, <c>false</c>.</returns>
-        public bool HasAvgSessonLength()
+        /// <returns><c>true</c> if this instance has AvgSessionLength; otherwise, <c>false</c>.</returns>
+        public bool HasAvgSessionLength()
         {
-            return AvgSessonLength != UNSET_VALUE;
+            return AvgSessionLength != UNSET_VALUE;
         }
 
         /// <summary>
