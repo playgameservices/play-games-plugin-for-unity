@@ -49,12 +49,8 @@ namespace GooglePlayGames.Android
         private volatile IVideoClient mVideoClient;
         private volatile AndroidTokenClient mTokenClient;
         private volatile Action<Invitation, bool> mInvitationDelegate;
-        private volatile Dictionary<String, Achievement> mAchievements = null;
         private volatile Player mUser = null;
-        private volatile List<Player> mFriends = null;
         private volatile AuthState mAuthState = AuthState.Unauthenticated;
-        private volatile uint mAuthGeneration = 0;
-        private volatile bool friendsLoading = false;
 
         AndroidJavaClass mGamesClass = new AndroidJavaClass("com.google.android.gms.games.Games");
         private static string TasksClassName = "com.google.android.gms.tasks.Tasks";
@@ -84,9 +80,6 @@ namespace GooglePlayGames.Android
                     return;
                 }
             }
-
-            // reset friends loading flag
-            friendsLoading = false;
 
             InitializeTokenClient();
 
@@ -146,13 +139,13 @@ namespace GooglePlayGames.Android
                                                         Invitation invitation = CreateInvitation(activationHint.Call<AndroidJavaObject>("getParcelable", "invitation" /* Multiplayer.EXTRA_INVITATION */));
                                                         mInvitationDelegate(invitation, /* shouldAutoAccept= */ true);
                                                     }
-                                                    catch (Exception e)
+                                                    catch (Exception)
                                                     {  // handle null return
                                                     }
                                                 }
                                             }
                                         }
-                                        catch (Exception e)
+                                        catch (Exception)
                                         {  // handle null return
                                         }
                                     }
@@ -993,7 +986,7 @@ namespace GooglePlayGames.Android
             {
                 player = CreatePlayer(participant.Call<AndroidJavaObject>("getPlayer"));
             }
-            catch (Exception ex)
+            catch (Exception)
             {  // Unity throws exception for returned null
             }
             return new Participant(displayName, participantId, status, player, connectedToRoom);
