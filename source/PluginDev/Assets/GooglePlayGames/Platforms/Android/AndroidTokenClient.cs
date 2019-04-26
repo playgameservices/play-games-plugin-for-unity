@@ -20,7 +20,6 @@ namespace GooglePlayGames.Android
     using System;
     using BasicApi;
     using OurUtils;
-    using Com.Google.Android.Gms.Common.Api;
     using UnityEngine;
     using System.Collections.Generic;
 

@@ -17,7 +17,6 @@
 #if UNITY_ANDROID
 namespace GooglePlayGames.Android
 {
-    using Com.Google.Android.Gms.Common.Api;
     using GooglePlayGames.BasicApi;
     using GooglePlayGames.BasicApi.SavedGame;
     using OurUtils;
