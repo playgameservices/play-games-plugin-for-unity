@@ -28,6 +28,13 @@ namespace GooglePlayGames.Android
 
     internal class AndroidJavaConverter
     {
+        internal static System.DateTime ToDateTime(long milliseconds)
+        {
+            System.DateTime result = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
+            result.AddMilliseconds(milliseconds);
+            return result;
+        }
+
         // Convert to LeaderboardVariant.java#TimeSpan
         internal static int ToLeaderboardVariantTimeSpan(LeaderboardTimeSpan span) 
         {

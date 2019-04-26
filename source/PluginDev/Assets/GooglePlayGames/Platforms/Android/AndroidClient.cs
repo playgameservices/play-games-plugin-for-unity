@@ -569,11 +569,8 @@ namespace GooglePlayGames.Android
                                         achievement.Name = javaAchievement.Call<string>("getName");
                                         achievement.Points = javaAchievement.Call<ulong>("getXpValue");
 
-                                        System.DateTime lastModifiedTime = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
                                         long timestamp = javaAchievement.Call<long>("getLastUpdatedTimestamp");
-                                        // Java timestamp is in milliseconds
-                                        lastModifiedTime.AddSeconds(timestamp / 1000);
-                                        achievement.LastModifiedTime = lastModifiedTime;
+                                        achievement.LastModifiedTime = AndroidJavaConverter.ToDateTime(timestamp);
                                         
                                         achievement.RevealedImageUrl = javaAchievement.Call<string>("getRevealedImageUrl");
                                         achievement.UnlockedImageUrl = javaAchievement.Call<string>("getUnlockedImageUrl");
@@ -802,10 +799,8 @@ namespace GooglePlayGames.Android
                 {
                     using (var leaderboardScore = scoresBuffer.Call<AndroidJavaObject>("get", i)) 
                     {
-                        System.DateTime date = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
                         long timestamp = leaderboardScore.Call<long>("getTimestampMillis");
-                        // Java timestamp is in milliseconds
-                        date.AddSeconds(timestamp / 1000);
+                        System.DateTime date = AndroidJavaConverter.ToDateTime(timestamp);
 
                         ulong rank = (ulong)leaderboardScore.Call<long>("getRank");
                         string scoreHolderId = "";
@@ -834,7 +829,7 @@ namespace GooglePlayGames.Android
                     {
                         if (variant.Call<bool>("hasPlayerInfo"))
                         {
-                            System.DateTime date = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
+                            System.DateTime date = AndroidJavaConverter.ToDateTime(0);
                             ulong rank = (ulong)variant.Call<long>("getPlayerRank");
                             string scoreHolderId = "me";                          
                             ulong score = (ulong)variant.Call<long>("getRawPlayerScore");
@@ -977,8 +972,7 @@ namespace GooglePlayGames.Android
             int invitationType = invitation.Call<int>("getInvitationType");
             int variant = invitation.Call<int>("getVariant");
             long creationTimestamp = invitation.Call<long>("getCreationTimestamp");
-            System.DateTime creationTime = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
-            creationTime.AddMilliseconds(creationTimestamp);
+            System.DateTime creationTime = AndroidJavaConverter.ToDateTime(creationTimestamp);
             return new Invitation(
                 AndroidJavaConverter.FromInvitationType(invitationType),
                 invitationId,

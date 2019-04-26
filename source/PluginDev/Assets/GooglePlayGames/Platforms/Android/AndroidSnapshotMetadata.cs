@@ -99,8 +99,7 @@ namespace GooglePlayGames.Android
             get
             {   
                 long timestamp = mJavaMetadata.Call<long>("getLastModifiedTimestamp");
-                System.DateTime lastModifiedTime = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
-                lastModifiedTime.AddSeconds(timestamp / 1000);
+                System.DateTime lastModifiedTime = AndroidJavaConverter.ToDateTime(timestamp);
                 return lastModifiedTime;
             }
         }
