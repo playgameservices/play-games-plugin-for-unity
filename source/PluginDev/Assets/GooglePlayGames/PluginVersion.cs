@@ -34,7 +34,7 @@ namespace GooglePlayGames
     public const string VersionKeyJarResolverDLL = "00935";
 
     // Current Version.
-    public const int VersionInt = 0x0958;
+    public const int VersionInt = 0x0963;
     public const string VersionString = "0.9.63";
     public const string VersionKey = "00963";
 
