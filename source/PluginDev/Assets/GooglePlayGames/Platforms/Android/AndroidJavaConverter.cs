@@ -17,7 +17,6 @@
 #if UNITY_ANDROID
 namespace GooglePlayGames.Android
 {
-    using Com.Google.Android.Gms.Common.Api;
     using GooglePlayGames.BasicApi;
     using GooglePlayGames.BasicApi.SavedGame;
     using GooglePlayGames.BasicApi.Multiplayer;
@@ -36,7 +35,7 @@ namespace GooglePlayGames.Android
         }
 
         // Convert to LeaderboardVariant.java#TimeSpan
-        internal static int ToLeaderboardVariantTimeSpan(LeaderboardTimeSpan span) 
+        internal static int ToLeaderboardVariantTimeSpan(LeaderboardTimeSpan span)
         {
             switch(span)
             {
@@ -51,7 +50,7 @@ namespace GooglePlayGames.Android
         }
 
         // Convert to LeaderboardVariant.java#Collection
-        internal static int ToLeaderboardVariantCollection(LeaderboardCollection collection) 
+        internal static int ToLeaderboardVariantCollection(LeaderboardCollection collection)
         {
             switch(collection)
             {
@@ -64,7 +63,7 @@ namespace GooglePlayGames.Android
         }
 
         // Convert to PageDirection.java#Direction
-        internal static int ToPageDirection(ScorePageDirection direction) 
+        internal static int ToPageDirection(ScorePageDirection direction)
         {
             switch(direction)
             {
@@ -86,7 +85,7 @@ namespace GooglePlayGames.Android
                 case 1: // INVITATION_TYPE_TURN_BASED
                 return Invitation.InvType.TurnBased;
                 default:
-                return Invitation.InvType.Unknown; 
+                return Invitation.InvType.Unknown;
             }
         }
 

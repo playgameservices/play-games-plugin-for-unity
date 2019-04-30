@@ -17,7 +17,6 @@
 #if UNITY_ANDROID
 namespace GooglePlayGames.Android
 {
-    using Com.Google.Android.Gms.Common.Api;
     using GooglePlayGames.BasicApi;
     using GooglePlayGames.BasicApi.SavedGame;
     using OurUtils;
@@ -117,7 +116,7 @@ namespace GooglePlayGames.Android
         {
             using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
             {
-                using(var task = helperFragment.CallStatic<AndroidJavaObject>("showSelectSnapshotUi", 
+                using(var task = helperFragment.CallStatic<AndroidJavaObject>("showSelectSnapshotUi",
                     AndroidHelperFragment.GetActivity(), uiTitle, showCreateSaveUI, showDeleteSaveUI, maxDisplayedSavedGames))
                 {
                     task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
