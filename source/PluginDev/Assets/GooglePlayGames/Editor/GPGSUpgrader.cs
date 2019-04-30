@@ -32,38 +32,25 @@ namespace GooglePlayGames.Editor
         /// </summary>
         static GPGSUpgrader()
         {
-            string prevVer = GPGSProjectSettings.Instance.Get(GPGSUtil.LASTUPGRADEKEY, "00000");
-            if (!prevVer.Equals(PluginVersion.VersionKey))
+            Debug.Log("GPGSUpgrader start");
+            string initialVer = GPGSProjectSettings.Instance.Get(GPGSUtil.LASTUPGRADEKEY, "00000");
+            if (!initialVer.Equals(PluginVersion.VersionKey))
             {
-                // if this is a really old version, upgrade to 911 first, then 915
-                if (!prevVer.Equals(PluginVersion.VersionKeyCPP))
-                {
-                    prevVer = Upgrade911(prevVer);
-                }
-
+                Debug.Log("Upgrading from format version " + initialVer + " to " + PluginVersion.VersionKey);
+                string prevVer = initialVer;
+                prevVer = Upgrade911(prevVer);
                 prevVer = Upgrade915(prevVer);
-
                 prevVer = Upgrade927Patch(prevVer);
 
                 // Upgrade to remove gpg version of jar resolver
                 prevVer = Upgrade928(prevVer);
-
                 prevVer = Upgrade930(prevVer);
-
                 prevVer = Upgrade931(prevVer);
-
                 prevVer = Upgrade935(prevVer);
-
                 prevVer = Upgrade941(prevVer);
-
                 prevVer = Upgrade942 (prevVer);
 
-                // there is no migration needed to 930+
-                if (!prevVer.Equals(PluginVersion.VersionKey))
-                {
-                    Debug.Log("Upgrading from format version " + prevVer + " to " + PluginVersion.VersionKey);
-                    prevVer = PluginVersion.VersionKey;
-                }
+                Debug.Log("Done all upgrades to " + PluginVersion.VersionKey);
 
                 string msg = GPGSStrings.PostInstall.Text.Replace(
                                  "$VERSION",
@@ -71,7 +58,7 @@ namespace GooglePlayGames.Editor
                 EditorUtility.DisplayDialog(GPGSStrings.PostInstall.Title, msg, "OK");
             }
 
-            GPGSProjectSettings.Instance.Set(GPGSUtil.LASTUPGRADEKEY, prevVer);
+            GPGSProjectSettings.Instance.Set(GPGSUtil.LASTUPGRADEKEY, PluginVersion.VersionKey);
             GPGSProjectSettings.Instance.Set(GPGSUtil.PLUGINVERSIONKEY,
                 PluginVersion.VersionString);
             GPGSProjectSettings.Instance.Save();
@@ -112,6 +99,7 @@ namespace GooglePlayGames.Editor
             }
 
             AssetDatabase.Refresh();
+            Debug.Log("GPGSUpgrader done");
         }
 
         /// <summary>
@@ -145,6 +133,7 @@ namespace GooglePlayGames.Editor
             }
         }
 
+ 
     private static string Upgrade942(string prevVer)
     {
         string file = "Assets/Plugins/Android/play-games-plugin-support.aar";
@@ -153,7 +142,7 @@ namespace GooglePlayGames.Editor
             Debug.Log("Deleting obsolete file: " + file);
             File.Delete(file);
         }
-        return PluginVersion.VersionKey;
+        return "00942";
     }
 
     /// <summary> Upgrade to 0.9.41 </summary>
@@ -188,7 +177,7 @@ namespace GooglePlayGames.Editor
         }
       }
 
-      return PluginVersion.VersionKey;
+      return "00941";
     }
 
         /// <summary>
@@ -243,7 +232,7 @@ namespace GooglePlayGames.Editor
                 }
             }
 
-            return PluginVersion.VersionKey;
+            return "00935";
         }
 
         /// <summary>
@@ -269,7 +258,7 @@ namespace GooglePlayGames.Editor
                 }
             }
 
-            return PluginVersion.VersionKey;
+            return "00931";
         }
 
         /// <summary>
@@ -279,7 +268,7 @@ namespace GooglePlayGames.Editor
         /// <returns>the version string upgraded to.</returns>
         private static string Upgrade930(string prevVer)
         {
-            Debug.Log("Upgrading from format version " + prevVer + " to " + PluginVersion.VersionKeyNativeCRM);
+            Debug.Log("Upgrading from format version " + prevVer + " to 00930");
 
             // As of 930, the CRM API is handled by the Native SDK, not GmsCore.
             string[] obsoleteFiles =
@@ -299,7 +288,7 @@ namespace GooglePlayGames.Editor
             };
 
             // only delete these if we are not version 0.9.34
-            if (string.Compare(PluginVersion.VersionKey, PluginVersion.VersionKeyJNIStats,
+            if (string.Compare(PluginVersion.VersionKey, "00934",
                                System.StringComparison.Ordinal) <= 0)
             {
                 foreach (string file in obsoleteFiles)
@@ -312,11 +301,12 @@ namespace GooglePlayGames.Editor
                 }
             }
 
-            return PluginVersion.VersionKeyNativeCRM;
+            return "00930";
         }
 
         private static string Upgrade928(string prevVer)
         {
+            Debug.Log("Upgrading from version " + prevVer + " to 00928");
             //remove the jar resolver and if found, then
             // warn the user that restarting the editor is required.
             string[] obsoleteFiles =
@@ -343,8 +333,7 @@ namespace GooglePlayGames.Editor
                 GPGSUtil.Alert("This update made changes that requires that you restart the editor");
             }
 
-            Debug.Log("Upgrading from version " + prevVer + " to " + PluginVersion.VersionKeyJarResolver);
-            return PluginVersion.VersionKeyJarResolver;
+            return "00928";
         }
 
         /// <summary>
@@ -375,7 +364,7 @@ namespace GooglePlayGames.Editor
                 }
             }
 
-            return PluginVersion.VersionKey27Patch;
+            return "00927a";
         }
 
         /// <summary>
@@ -385,7 +374,7 @@ namespace GooglePlayGames.Editor
         /// <returns>the version string upgraded to.</returns>
         private static string Upgrade915(string prevVer)
         {
-            Debug.Log("Upgrading from format version " + prevVer + " to " + PluginVersion.VersionKeyU5);
+            Debug.Log("Upgrading from format version " + prevVer + " to 00915");
 
             // all that was done was moving the Editor files to be in GooglePlayGames/Editor
             string[] obsoleteFiles =
@@ -437,7 +426,7 @@ namespace GooglePlayGames.Editor
                 }
             }
 
-            return PluginVersion.VersionKeyU5;
+            return "00915";
         }
 
         /// <summary>
@@ -447,7 +436,7 @@ namespace GooglePlayGames.Editor
         /// <returns>the version string upgraded to.</returns>
         private static string Upgrade911(string prevVer)
         {
-            Debug.Log("Upgrading from format version " + prevVer + " to " + PluginVersion.VersionKeyCPP);
+            Debug.Log("Upgrading from format version " + prevVer + " to 00911");
 
             // delete obsolete files, if they are there
             string[] obsoleteFiles =
@@ -484,8 +473,8 @@ namespace GooglePlayGames.Editor
                 }
             }
 
-            Debug.Log("Done upgrading from format version " + prevVer + " to " + PluginVersion.VersionKeyCPP);
-            return PluginVersion.VersionKeyCPP;
+            Debug.Log("Done upgrading from format version " + prevVer + " to 00911");
+            return "00911";
         }
     }
 }
