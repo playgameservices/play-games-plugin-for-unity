@@ -91,6 +91,29 @@ namespace GooglePlayGames.Android
         {
             callback = ToOnGameThread(callback);
             // Task<AnnotatedData<LoadMatchesResponse>> loadMatchesByStatus(@InvitationSortOrder int invitationSortOrder, @NonNull @MatchTurnStatus int[] matchTurnStatuses))
+            using (var task = mClient.Call<AndroidJavaObject>("loadMatchesByStatus", new int[]{0, 1, 2, 3}))
+            {
+                task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                    annotatedData => {
+                      using (var matchesResponse = annotatedData.Call<AndroidJavaObject>("get"))
+                      {
+                        List<TurnBasedMatch> myTurnMatches = createTurnBasedMatchList(matchesResponse.Call<AndroidJavaObject>("getMyTurnMatches"));
+                        List<TurnBasedMatch> theirTurnMatches = createTurnBasedMatchList(matchesResponse.Call<AndroidJavaObject>("getTheirTurnMatches"));
+                        List<TurnBasedMatch> completedMatches = createTurnBasedMatchList(matchesResponse.Call<AndroidJavaObject>("getCompletedMatches"));
+
+                        List<TurnBasedMatch> matches = new List<TurnBasedMatch>(myTurnMatches);
+                        matches.AddRange(theirTurnMatches);
+                        matches.AddRange(completedMatches);
+                        callback(matches.ToArray());
+                      }
+                    }
+                ));
+                task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                    exception => {
+                      callback(null);
+                    }
+                ));
+            }
         }
 
         public void GetMatch(string matchId, Action<bool, TurnBasedMatch> callback)
@@ -174,6 +197,16 @@ namespace GooglePlayGames.Android
         public void DeclineInvitation(string invitationId)
         {
             //Task<Void> declineInvitation(@NonNull String invitationId)
+        }
+
+        private List<TurnBasedMatch> createTurnBasedMatchList(AndroidJavaObject turnBasedMatchBuffer) {
+                List<TurnBasedMatch> turnBasedMatches = new List<TurnBasedMatch>();
+                int count = turnBasedMatchBuffer.Call<int>("getCount");
+                for (int i=0; i<count; i++) {
+                  TurnBasedMatch match = createTurnBasedMatch(turnBasedMatchBuffer.Call<AndroidJavaObject>("get", (int) i));
+                  turnBasedMatches.Add(match);
+                }
+                return turnBasedMatches;
         }
 
         private TurnBasedMatch createTurnBasedMatch(AndroidJavaObject turnBasedMatch)
