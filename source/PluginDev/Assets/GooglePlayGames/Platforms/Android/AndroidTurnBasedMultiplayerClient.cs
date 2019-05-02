@@ -119,6 +119,30 @@ namespace GooglePlayGames.Android
         public void GetMatch(string matchId, Action<bool, TurnBasedMatch> callback)
         {
             callback = ToOnGameThread(callback);
+            // public Task<AnnotatedData<TurnBasedMatch>> loadMatch(@NonNull String matchId)
+
+            using (var task = mClient.Call<AndroidJavaObject>("loadMatch"))
+            {
+              task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                    annotatedData => {
+                      using (var turnBasedMatch = annotatedData.Call<AndroidJavaObject>("get"))
+                      {
+                        if (turnBasedMatch == null) {
+                          Logger.e(string.Format("Could not find match {0}", matchId));
+                          callback(false, null);
+                        }
+                        else
+                        {
+                          callback(true, createTurnBasedMatch(turnBasedMatch));
+                        }
+                      }
+                    });
+              task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                exception => {
+                  callback(false, null);
+                }
+              ));
+            }
         }
 
         public void AcceptFromInbox(Action<bool, TurnBasedMatch> callback)
