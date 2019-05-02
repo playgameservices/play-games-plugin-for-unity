@@ -111,6 +111,68 @@ namespace GooglePlayGames.Android
                 return Participant.ParticipantStatus.Unknown;
             }
         }
+
+        internal static Participant ToParticipant(AndroidJavaObject participant)
+        {
+            string displayName = participant.Call<string>("getDisplayName");
+            string participantId = participant.Call<string>("getParticipantId");
+            Participant.ParticipantStatus status =
+                AndroidJavaConverter.FromParticipantStatus(participant.Call<int>("getStatus"));
+            bool connectedToRoom = participant.Call<bool>("isConnectedToRoom");
+            Player player = null;
+            try
+            {
+                player = ToPlayer(participant.Call<AndroidJavaObject>("getPlayer"));
+            }
+            catch (Exception)
+            {  // Unity throws exception for returned null
+            }
+            return new Participant(displayName, participantId, status, player, connectedToRoom);
+        }
+
+        internal static Player ToPlayer(AndroidJavaObject player)
+        {
+            string displayName = player.Call<String>("getDisplayName");
+            string playerId = player.Call<String>("getPlayerId");
+            string avatarUrl = player.Call<String>("getIconImageUrl");
+            return new Player(displayName, playerId, avatarUrl);
+        }
+
+        internal static TurnBasedMatch.MatchStatus ToTurnStatus(int turnStatus)
+        {
+            switch(turnStatus) {
+              case 0:
+              return TurnBasedMatch.MatchStatus.AutoMatching;
+              case 1:
+              return TurnBasedMatch.MatchStatus.Active;
+              case 2:
+              return TurnBasedMatch.MatchStatus.Complete;
+              case 3:
+              return TurnBasedMatch.MatchStatus.Expired;
+              case 4:
+              return TurnBasedMatch.MatchStatus.Cancelled;
+              case 5:
+              return TurnBasedMatch.MatchStatus.Deleted;
+              default:
+              return TurnBasedMatch.MatchStatus.Unknown;
+            }
+        }
+
+        internal static TurnBasedMatch.MatchTurnStatus ToMatchTurnStatus(int matchTurnStatus)
+        {
+            switch(matchTurnStatus) {
+              case 0:
+              return TurnBasedMatch.MatchTurnStatus.Invited;
+              case 1:
+              return TurnBasedMatch.MatchTurnStatus.MyTurn;
+              case 2:
+              return TurnBasedMatch.MatchTurnStatus.TheirTurn;
+              case 3:
+              return TurnBasedMatch.MatchTurnStatus.Complete;
+              default:
+              return TurnBasedMatch.MatchTurnStatus.Unknown;
+            }
+        }
     }
 }
 #endif
