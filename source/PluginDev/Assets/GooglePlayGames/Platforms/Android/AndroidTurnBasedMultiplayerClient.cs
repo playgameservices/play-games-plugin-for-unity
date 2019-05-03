@@ -128,7 +128,7 @@ namespace GooglePlayGames.Android
                       using (var turnBasedMatch = annotatedData.Call<AndroidJavaObject>("get"))
                       {
                         if (turnBasedMatch == null) {
-                          Logger.e(string.Format("Could not find match {0}", matchId));
+                          OurUtils.Logger.e(string.Format("Could not find match {0}", matchId));
                           callback(false, null);
                         }
                         else
@@ -136,7 +136,7 @@ namespace GooglePlayGames.Android
                           callback(true, createTurnBasedMatch(turnBasedMatch));
                         }
                       }
-                    });
+                    }));
               task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
                 exception => {
                   callback(false, null);
@@ -209,7 +209,17 @@ namespace GooglePlayGames.Android
 
         public void Dismiss(TurnBasedMatch match)
         {
-
+            GetMatch(match.MatchId, (success, foundMatch) => {
+              if (success) {
+                if (foundMatch.Version != match.Version) {
+                  OurUtils.Logger.e(string.Format("Attempted to update a stale version of the " +
+                        "match. Expected version was {0} but current version is {1}.",
+                        match.Version, foundMatch.Version));
+                  return;
+                }
+                mClient.Call<AndroidJavaObject>("dismissMatch", match.MatchId);
+              }
+            });
         }
 
         public void Rematch(TurnBasedMatch match, Action<bool, TurnBasedMatch> callback)
