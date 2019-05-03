@@ -659,14 +659,12 @@ namespace GooglePlayGames
         /// </param>
         public void ReportProgress(string achievementID, double progress, Action<bool> callback)
         {
+            callback = ToOnGameThread(callback);
             if (!IsAuthenticated())
             {
                 GooglePlayGames.OurUtils.Logger.e(
                     "ReportProgress can only be called after authentication.");
-                if (callback != null)
-                {
-                    callback.Invoke(false);
-                }
+                callback.Invoke(false);
 
                 return;
             }
@@ -686,6 +684,12 @@ namespace GooglePlayGames
 
             mClient.LoadAchievements(ach =>
             {
+                if (ach == null) 
+                {
+                    GooglePlayGames.OurUtils.Logger.e("Unable to load achievements");
+                    callback.Invoke(false);
+                    return;
+                }
                 for (int i = 0; i < ach.Length; i++)
                 {
                     if (ach[i].Id == achievementID) 
@@ -717,10 +721,7 @@ namespace GooglePlayGames
                             {
                                 // not enough to unlock
                                 GooglePlayGames.OurUtils.Logger.d("Progress " + progress + " not enough to unlock non-incremental achievement.");
-                                if (callback != null)
-                                {
-                                    callback.Invoke(false);
-                                }
+                                callback.Invoke(false);
                             }
                         }
                         return;
@@ -728,11 +729,8 @@ namespace GooglePlayGames
                 }
 
                 // Achievement not found
-                if (callback != null)
-                {
-                    GooglePlayGames.OurUtils.Logger.e("Unable to locate achievement " + achievementID);
-                    callback.Invoke(false);
-                }
+                GooglePlayGames.OurUtils.Logger.e("Unable to locate achievement " + achievementID);
+                callback.Invoke(false);
             });
         }
 
@@ -1396,6 +1394,18 @@ namespace GooglePlayGames
             }
 
             return id;
+        }
+
+        private static Action<T> ToOnGameThread<T>(Action<T> toConvert)
+        {
+            if (toConvert == null)
+            {
+                return delegate
+                {
+                };
+            }
+
+            return (val) => PlayGamesHelperObject.RunOnGameThread(() => toConvert(val));
         }
     }
 }
