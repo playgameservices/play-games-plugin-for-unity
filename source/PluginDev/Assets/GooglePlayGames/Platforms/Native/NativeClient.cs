@@ -107,6 +107,8 @@ namespace GooglePlayGames.Native
                       mPendingAuthCallbacks += callback;
                     }
                     GameServices().StartAuthorizationUI();
+                    // Update achievements cache
+                    LoadAchievements(ignore => {});
                 } else {
                     Action<bool, string> localCallback = callback;
                     if (result == 16 /* CommonStatusCodes.CANCELED */) {
