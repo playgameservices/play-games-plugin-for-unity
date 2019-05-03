@@ -9,7 +9,7 @@ buildscript {
         mavenLocal()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.2'
+        classpath 'com.android.tools.build:gradle:3.4.0'
     }
 }
 
@@ -579,6 +579,8 @@ task clean() {
     dependsOn clean_support_lib
 }
 
+tasks.findAll { task -> task.ext.has('remoteTaskPhase') && task.ext.remoteTaskPhase == 'build' }*.dependsOn('prebuild')
+tasks.findAll { task -> task.ext.has('remoteTaskPhase') && task.ext.remoteTaskPhase == 'postbuild' }*.dependsOn('build')
 
 // Construct the name of a versioned asset from the source filename and version
 // // string.
