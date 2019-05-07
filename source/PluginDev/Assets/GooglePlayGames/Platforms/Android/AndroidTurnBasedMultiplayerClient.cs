@@ -202,6 +202,27 @@ namespace GooglePlayGames.Android
         {
             callback = ToOnGameThread(callback);
             // Task<Void> dismissMatch(@NonNull String matchId)
+            FindEqualVersionMatch(match, (success, foundMatch) => {
+              if (!success)
+              {
+                callback(false);
+                return;
+              }
+
+              using (var task = mClient.Call<AndroidJavaObject>("dismissMatch", foundMatch.MatchId))
+              {
+                task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                  v => {
+                    callback(true);
+                  }
+                ));
+                task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                    exception => {
+                      callback(false);
+                    }
+                ));
+              }
+            });
         }
 
         public void Leave(TurnBasedMatch match, Action<bool> callback)
