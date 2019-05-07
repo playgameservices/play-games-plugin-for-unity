@@ -97,9 +97,9 @@ namespace GooglePlayGames.Android
                     annotatedData => {
                       using (var matchesResponse = annotatedData.Call<AndroidJavaObject>("get"))
                       {
-                        List<TurnBasedMatch> myTurnMatches = createTurnBasedMatchList(matchesResponse.Call<AndroidJavaObject>("getMyTurnMatches"));
-                        List<TurnBasedMatch> theirTurnMatches = createTurnBasedMatchList(matchesResponse.Call<AndroidJavaObject>("getTheirTurnMatches"));
-                        List<TurnBasedMatch> completedMatches = createTurnBasedMatchList(matchesResponse.Call<AndroidJavaObject>("getCompletedMatches"));
+                        List<TurnBasedMatch> myTurnMatches = CreateTurnBasedMatchList(matchesResponse.Call<AndroidJavaObject>("getMyTurnMatches"));
+                        List<TurnBasedMatch> theirTurnMatches = CreateTurnBasedMatchList(matchesResponse.Call<AndroidJavaObject>("getTheirTurnMatches"));
+                        List<TurnBasedMatch> completedMatches = CreateTurnBasedMatchList(matchesResponse.Call<AndroidJavaObject>("getCompletedMatches"));
 
                         List<TurnBasedMatch> matches = new List<TurnBasedMatch>(myTurnMatches);
                         matches.AddRange(theirTurnMatches);
@@ -219,6 +219,21 @@ namespace GooglePlayGames.Android
         {
             callback = ToOnGameThread(callback);
             // Task<Void> leaveMatchDuringTurn(@NonNull String matchId, @Nullable String pendingParticipantId)
+            FindEqualVersionMatchWithParticipant(match, pendingParticipantId, callback, (pendingParticipant, foundMatch) => {
+                using (var task = mClient.Call<AndroidJavaObject>("leaveMatchDuringTurn", match.MatchId, pendingParticipantId))
+                {
+                  task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                    v => {
+                      callback(true);
+                    }
+                  ));
+                  task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                      exception => {
+                        callback(false);
+                      }
+                  ));
+                }
+            });
         }
 
         public void Cancel(TurnBasedMatch match, Action<bool> callback)
@@ -297,7 +312,46 @@ namespace GooglePlayGames.Android
             });
         }
 
-        private List<TurnBasedMatch> createTurnBasedMatchList(AndroidJavaObject turnBasedMatchBuffer) {
+        private void FindEqualVersionMatchWithParticipant(TurnBasedMatch match, string participantId, Action<bool> onFailure, Action<Participant, TurnBasedMatch> onFoundParticipantAndMatch)
+        {
+            FindEqualVersionMatch(match, (success, foundMatch) => {
+                if (!success)
+                {
+                    onFailure(true);
+                }
+
+                // If we received a null participantId, we're using an automatching player instead -
+                // issue the callback using that.
+                if (participantId == null)
+                {
+                    onFoundParticipantAndMatch(CreateAutomatchingSentinel(), foundMatch);
+                    return;
+                }
+
+                Participant participant = foundMatch.GetParticipant(participantId);
+                if (participant == null)
+                {
+                    OurUtils.Logger.e(string.Format("Located match {0} but desired participant with ID " +
+                            "{1} could not be found", match.MatchId, participantId));
+                    onFailure(false);
+                    return;
+                }
+
+                onFoundParticipantAndMatch(participant, foundMatch);
+              });
+        }
+
+        private Participant CreateAutomatchingSentinel() {
+            return new Participant(
+              /* displayName= */ "",
+              /* participantId= */ "",
+              Participant.ParticipantStatus.NotInvitedYet,
+              new Player(null, null, null), // ????????????????????????/
+              /* connectedToRoom= */ false
+            );
+        }
+
+        private List<TurnBasedMatch> CreateTurnBasedMatchList(AndroidJavaObject turnBasedMatchBuffer) {
                 List<TurnBasedMatch> turnBasedMatches = new List<TurnBasedMatch>();
                 int count = turnBasedMatchBuffer.Call<int>("getCount");
                 for (int i=0; i<count; i++) {
