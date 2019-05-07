@@ -168,6 +168,22 @@ namespace GooglePlayGames.Android
         {
             callback = ToOnGameThread(callback);
             // Task<TurnBasedMatch> takeTurn(@NonNull String matchId, @Nullable byte[] matchData, @Nullable String pendingParticipantId)
+            FindEqualVersionMatchWithParticipant(match, pendingParticipantId, callback, (pendingParticipant, foundMatch) => {
+              using (var task = mClient.Call<AndroidJavaObject>("takeTurn", foundMatch.MatchId, data, pendingParticipantId))
+              {
+                task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                  turnBasedMatch => {
+                    callback(true);
+                  }
+                ));
+                task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                    exception => {
+                      OurUtils.Logger.d("Taking turn failed");
+                      callback(false);
+                    }
+                ));
+              }
+            });
         }
 
         public int GetMaxMatchDataSize()
