@@ -43,7 +43,7 @@ namespace GooglePlayGames
         {
             mDisplayName = displayName;
             mPlayerId = playerId;
-            mAvatarUrl = avatarUrl;
+            mAvatarUrl = VerifyAvatarURL(avatarUrl);
             mImageLoading = false;
         }
 
@@ -52,6 +52,8 @@ namespace GooglePlayGames
         {
             mDisplayName = displayName;
             mPlayerId = playerId;
+
+            avatarUrl = VerifyAvatarURL(avatarUrl);
             if (mAvatarUrl != avatarUrl)
             {
                 mImage = null;
@@ -117,6 +119,16 @@ namespace GooglePlayGames
             {
                 return mAvatarUrl;
             }
+        }
+
+        /// <summary>
+        /// Adds HTTPS to the avatar url because Google Servers can't handle HTTP requests, they require an HTTPS transfer.
+        /// </summary>
+        /// <param name="url">The URL to be checked</param>
+        /// <returns>The URL that is modified if needed</returns>
+        private string VerifyAvatarURL(string url)
+        {
+            return url.Replace("http://", "https://");
         }
 
         /// <summary>
