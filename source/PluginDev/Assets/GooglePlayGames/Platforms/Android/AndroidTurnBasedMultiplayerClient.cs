@@ -121,7 +121,7 @@ namespace GooglePlayGames.Android
             callback = ToOnGameThread(callback);
             // public Task<AnnotatedData<TurnBasedMatch>> loadMatch(@NonNull String matchId)
 
-            using (var task = mClient.Call<AndroidJavaObject>("loadMatch"))
+            using (var task = mClient.Call<AndroidJavaObject>("loadMatch", matchId))
             {
               task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
                     annotatedData => {
@@ -191,7 +191,27 @@ namespace GooglePlayGames.Android
         public void Leave(TurnBasedMatch match, Action<bool> callback)
         {
             callback = ToOnGameThread(callback);
+
             // Task<Void> leaveMatch(@NonNull String matchId)
+            FindEqualVersionMatch(match, (success, foundMatch) => {
+              if(!success) {
+                callback(false);
+              }
+
+              using (var task = mClient.Call<AndroidJavaObject>("leaveMatch", match.MatchId))
+              {
+                task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                  v => {
+                    callback(true);
+                  }
+                ));
+                task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                    exception => {
+                      callback(false);
+                    }
+                ));
+              }
+            });
         }
 
         public void LeaveDuringTurn(TurnBasedMatch match, string pendingParticipantId,
@@ -205,32 +225,76 @@ namespace GooglePlayGames.Android
         {
             callback = ToOnGameThread(callback);
             // Task<String> cancelMatch(@NonNull String matchId)
+            FindEqualVersionMatch(match, (success, foundMatch) => {
+              if (!success)
+              {
+                callback(false);
+                return;
+              }
+              mClient.Call<AndroidJavaObject>("cancelMatch", match.MatchId);
+              callback(true);
+            });
         }
 
         public void Dismiss(TurnBasedMatch match)
         {
-            GetMatch(match.MatchId, (success, foundMatch) => {
-              if (success) {
-                if (foundMatch.Version != match.Version) {
-                  OurUtils.Logger.e(string.Format("Attempted to update a stale version of the " +
-                        "match. Expected version was {0} but current version is {1}.",
-                        match.Version, foundMatch.Version));
-                  return;
-                }
+          FindEqualVersionMatch(match, (success, foundMatch) => {
+              if (success)
+              {
                 mClient.Call<AndroidJavaObject>("dismissMatch", match.MatchId);
               }
-            });
+          });
         }
 
         public void Rematch(TurnBasedMatch match, Action<bool, TurnBasedMatch> callback)
         {
             callback = ToOnGameThread(callback);
             // Task<TurnBasedMatch> rematch(@NonNull String matchId)
+            FindEqualVersionMatch(match, (success, foundMatch) => {
+              if (!success)
+              {
+                callback(false, null);
+                return;
+              }
+
+              using (var task = mClient.Call<AndroidJavaObject>("rematch", match.MatchId))
+              {
+                task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                  turnBasedMatch => {
+                    callback(true, createTurnBasedMatch(turnBasedMatch));
+                  }
+                ));
+                task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                    exception => {
+                      callback(false, null);
+                    }
+                ));
+              }
+            });
         }
 
         public void DeclineInvitation(string invitationId)
         {
             //Task<Void> declineInvitation(@NonNull String invitationId)
+        }
+
+        private void FindEqualVersionMatch(TurnBasedMatch match, Action<bool, TurnBasedMatch> callback) {
+            GetMatch(match.MatchId, (success, foundMatch) => {
+              if (!success)
+              {
+                callback(false, null);
+                return;
+              }
+              if (match.Version != foundMatch.Version)
+              {
+                OurUtils.Logger.e(string.Format("Attempted to update a stale version of the " +
+                        "match. Expected version was {0} but current version is {1}.",
+                        match.Version, foundMatch.Version));
+                callback(false, null);
+                return;
+              }
+              callback(true, foundMatch);
+            });
         }
 
         private List<TurnBasedMatch> createTurnBasedMatchList(AndroidJavaObject turnBasedMatchBuffer) {
