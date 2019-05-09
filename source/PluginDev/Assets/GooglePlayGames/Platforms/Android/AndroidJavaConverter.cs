@@ -138,6 +138,22 @@ namespace GooglePlayGames.Android
             return new Player(displayName, playerId, avatarUrl);
         }
 
+        internal static Invitation ToInvitation(AndroidJavaObject invitation)
+        {
+            string invitationId = invitation.Call<string>("getInvitationId");
+            AndroidJavaObject participant = invitation.Call<AndroidJavaObject>("getInviter");
+            int invitationType = invitation.Call<int>("getInvitationType");
+            int variant = invitation.Call<int>("getVariant");
+            long creationTimestamp = invitation.Call<long>("getCreationTimestamp");
+            System.DateTime creationTime = AndroidJavaConverter.ToDateTime(creationTimestamp);
+            return new Invitation(
+                AndroidJavaConverter.FromInvitationType(invitationType),
+                invitationId,
+                AndroidJavaConverter.ToParticipant(participant),
+                variant,
+                creationTime);
+        }
+
         internal static TurnBasedMatch.MatchStatus ToTurnStatus(int turnStatus)
         {
             switch(turnStatus) {

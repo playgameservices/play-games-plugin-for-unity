@@ -85,6 +85,32 @@ namespace GooglePlayGames.Android
         {
             callback = ToOnGameThread(callback);
             // Task<AnnotatedData<InvitationBuffer>> InvitationsClient.loadInvitations()
+
+            // Task<AnnotatedData<LoadMatchesResponse>> loadMatchesByStatus(@InvitationSortOrder int invitationSortOrder, @NonNull @MatchTurnStatus int[] matchTurnStatuses))
+            using (var task = mClient.Call<AndroidJavaObject>("loadMatchesByStatus", new int[]{0, 1, 2, 3}))
+            {
+                task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                    annotatedData => {
+                      // LoadMatchesResponse
+                      using (var matchesResponse = annotatedData.Call<AndroidJavaObject>("get"))
+                      {
+                        AndroidJavaObject invitationsBuffer = matchesResponse.Call<AndroidJavaObject>("getInvitations");
+                        int count = invitationsBuffer.Call<int>("getCount");
+                        Invitation[] invitations = new Invitation[count];
+                        for (int i=0; i<count; i++) {
+                          Invitation invitation = AndroidJavaConverter.ToInvitation(invitationsBuffer.Call<AndroidJavaObject>("get", (int) i));
+                          invitations[i] = invitation;
+                        }
+                        callback(invitations);
+                      }
+                    }
+                ));
+                task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                    exception => {
+                      callback(null);
+                    }
+                ));
+            }
         }
 
         public void GetAllMatches(Action<TurnBasedMatch[]> callback)
@@ -155,6 +181,27 @@ namespace GooglePlayGames.Android
         {
             callback = ToOnGameThread(callback);
             // Task<TurnBasedMatch> acceptInvitation(@NonNull String invitationId)
+            FindInvitationWithId(invitationId, invitation => {
+              if (invitation == null) {
+                OurUtils.Logger.e("Could not find invitation with id " + invitationId);
+                callback(false, null);
+                return;
+              }
+
+              using (var task = mClient.Call<AndroidJavaObject>("acceptInvitation", invitationId))
+              {
+                task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                  turnBasedMatch => {
+                    callback(true, createTurnBasedMatch(turnBasedMatch));
+                  }
+                ));
+                task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                    exception => {
+                      callback(false, null);
+                    }
+                ));
+              }
+            });
         }
 
         public void RegisterMatchDelegate(MatchDelegate del)
@@ -328,7 +375,48 @@ namespace GooglePlayGames.Android
         public void DeclineInvitation(string invitationId)
         {
             //Task<Void> declineInvitation(@NonNull String invitationId)
+            FindInvitationWithId(invitationId, invitation =>
+              {
+                  if (invitation == null)
+                  {
+                      return;
+                  }
+
+                  mClient.Call<AndroidJavaObject>("declineInvitation", invitationId);
+            });
         }
+
+        private void FindInvitationWithId(string invitationId, Action<Invitation> callback)
+        {
+            // Task<AnnotatedData<LoadMatchesResponse>> loadMatchesByStatus(@InvitationSortOrder int invitationSortOrder, @NonNull @MatchTurnStatus int[] matchTurnStatuses))
+            using (var task = mClient.Call<AndroidJavaObject>("loadMatchesByStatus", new int[]{0, 1, 2, 3}))
+            {
+                task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                    annotatedData => {
+                      // LoadMatchesResponse
+                      using (var matchesResponse = annotatedData.Call<AndroidJavaObject>("get"))
+                      {
+                        AndroidJavaObject invitationsBuffer = matchesResponse.Call<AndroidJavaObject>("getInvitations");
+                        int count = invitationsBuffer.Call<int>("getCount");
+                        for (int i=0; i<count; i++) {
+                          Invitation invitation = AndroidJavaConverter.ToInvitation(invitationsBuffer.Call<AndroidJavaObject>("get", (int) i));
+                          if (invitation.InvitationId == invitationId) {
+                            callback(invitation);
+                            return;
+                          }
+                        }
+                      }
+                      callback(null);
+                    }
+                ));
+                task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                    exception => {
+                      callback(null);
+                    }
+                ));
+            }
+        }
+
 
         private void FindEqualVersionMatch(TurnBasedMatch match, Action<bool, TurnBasedMatch> callback) {
             GetMatch(match.MatchId, (success, foundMatch) => {
