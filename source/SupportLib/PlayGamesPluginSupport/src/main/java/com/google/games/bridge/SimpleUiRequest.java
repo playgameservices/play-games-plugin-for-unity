@@ -16,15 +16,6 @@ import com.google.android.gms.tasks.TaskCompletionSource;
 class SimpleUiRequest implements HelperFragment.Request {
     private static final String TAG = "SimpleUiRequest";
 
-    /**
-     * Should be aligned to:
-     * PluginDev/Assets/GooglePlayGames/BasicApi/CommonTypes.cs enum UIStatus
-     * */
-    static final int UI_STATUS_VALID = 1;
-    static final int UI_STATUS_INTERNAL_ERROR = -2;
-    static final int UI_STATUS_NOT_AUTHORIZED = -3;
-    static final int UI_STATUS_UI_BUSY = -12;
-
     private final TaskCompletionSource<Integer> resultTaskSource = new TaskCompletionSource<>();
 
     public Task<Integer> getTask() {
@@ -54,8 +45,6 @@ class SimpleUiRequest implements HelperFragment.Request {
                             setFailure(e);
                         }
                     });
-
-
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

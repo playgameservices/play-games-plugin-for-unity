@@ -18,6 +18,7 @@
 namespace GooglePlayGames.Android
 {
     using GooglePlayGames.BasicApi;
+    using GooglePlayGames.BasicApi.Multiplayer;
     using GooglePlayGames.BasicApi.SavedGame;
     using OurUtils;
     using UnityEngine;
@@ -153,6 +154,7 @@ namespace GooglePlayGames.Android
                           if ((UIStatus)status != UIStatus.Valid)
                           {
                             cb.Invoke((UIStatus)status, null);
+                            return;
                           }
 
                           List<string> playerIdsToInvite = CreatePlayerIdsToInvite(result.Get<AndroidJavaObject>("playerIdsToInvite"));
@@ -177,10 +179,41 @@ namespace GooglePlayGames.Android
             }
         }
 
+        public static void ShowInboxUI(Action<UIStatus, TurnBasedMatch> cb)
+        {
+            using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
+            {
+                using (var task = helperFragment.CallStatic<AndroidJavaObject>("showInboxUi",
+                    AndroidHelperFragment.GetActivity()))
+                {
+                  task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                      result => {
+                          int status = result.Get<int>("status");
+                          if ((UIStatus)status != UIStatus.Valid)
+                          {
+                            cb.Invoke((UIStatus)status, null);
+                            return;
+                          }
+
+                          AndroidJavaObject turnBasedMatch = result.Get<AndroidJavaObject>("turnBasedMatch");
+                          cb.Invoke((UIStatus)status, AndroidJavaConverter.ToTurnBasedMatch(turnBasedMatch));
+                      }
+                  ));
+
+                  task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                      exception => {
+                          Debug.Log("ShowPlayerSelectUI failed with exception");
+                          cb.Invoke(UIStatus.InternalError, null);
+                      }
+                  ));
+                }
+            }
+        }
+
         private static List<string> CreatePlayerIdsToInvite(AndroidJavaObject playerIdsObject)
         {
           int size = playerIdsObject.Call<int>("size");
-          List<string> playerIdsToInvite = new List<string>(); // do something
+          List<string> playerIdsToInvite = new List<string>();
           for (int i=0;i<size;i++)
           {
             playerIdsToInvite.Add(playerIdsObject.Call<string>("get", i));

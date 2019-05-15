@@ -154,6 +154,44 @@ namespace GooglePlayGames.Android
                 creationTime);
         }
 
+        internal static TurnBasedMatch ToTurnBasedMatch(AndroidJavaObject turnBasedMatch)
+        {
+            if (turnBasedMatch == null)
+            {
+              return null;
+            }
+            string matchId = turnBasedMatch.Call<string>("getMatchId");
+            byte[] data = turnBasedMatch.Call<byte[]>("getData");
+            bool canRematch = turnBasedMatch.Call<bool>("canRematch");
+            uint availableAutomatchSlots = (uint) turnBasedMatch.Call<int>("getAvailableAutoMatchSlots");
+            string selfParticipantId = turnBasedMatch.Call<string>("getCreatorId");
+            List<Participant> participants = ToParticipantList(turnBasedMatch);
+            string pendingParticipantId = turnBasedMatch.Call<string>("getPendingParticipantId");
+            TurnBasedMatch.MatchStatus turnStatus = AndroidJavaConverter.ToTurnStatus(turnBasedMatch.Call<int>("getStatus"));
+            TurnBasedMatch.MatchTurnStatus matchStatus = AndroidJavaConverter.ToMatchTurnStatus(turnBasedMatch.Call<int>("getTurnStatus"));
+            uint variant = (uint) turnBasedMatch.Call<int>("getVariant");
+            uint version = (uint) turnBasedMatch.Call<int>("getVersion");
+            DateTime creationTime = AndroidJavaConverter.ToDateTime(turnBasedMatch.Call<long>("getCreationTimestamp"));
+            DateTime lastUpdateTime = AndroidJavaConverter.ToDateTime(turnBasedMatch.Call<long>("getLastUpdatedTimestamp"));
+
+            return new TurnBasedMatch(matchId, data, canRematch, selfParticipantId, participants, availableAutomatchSlots, pendingParticipantId, matchStatus, turnStatus, variant, version, creationTime, lastUpdateTime);
+        }
+
+        internal static List<Participant> ToParticipantList(AndroidJavaObject turnBasedMatch)
+        {
+            AndroidJavaObject participantsObject = turnBasedMatch.Call<AndroidJavaObject>("getParticipantIds");
+            List<Participant> participants = new List<Participant>();
+            int size = participantsObject.Call<int>("size");
+
+            for (int i = 0; i < size ; i++)
+            {
+                string participantId = participantsObject.Call<string>("get", i);
+                AndroidJavaObject participantObject = turnBasedMatch.Call<AndroidJavaObject>("getParticipant", participantId);
+                participants.Add(AndroidJavaConverter.ToParticipant(participantObject));
+            }
+            return participants;
+        }
+
         internal static TurnBasedMatch.MatchStatus ToTurnStatus(int turnStatus)
         {
             switch(turnStatus) {
