@@ -21,10 +21,10 @@ import com.google.android.gms.tasks.TaskCompletionSource;
 class SelectSnapshotUiRequest implements HelperFragment.Request {
     private static final String TAG = "SelectSnapshotUiRequest";
 
-    /** 
+    /**
      * Should be aligned to:
      * PluginDev/Assets/GooglePlayGames/BasicApi/SavedGame/ISavedGameClient.cs enum SelectUIStatus
-     * */ 
+     * */
     static final int SELECT_UI_STATUS_GAME_SELECTED = 1;
     static final int SELECT_UI_STATUS_USER_CLOSED_UI = 2;
     static final int SELECT_UI_STATUS_INTERNAL_ERROR = -1;

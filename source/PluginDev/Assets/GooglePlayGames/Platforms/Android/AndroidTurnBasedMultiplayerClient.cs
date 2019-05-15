@@ -72,13 +72,73 @@ namespace GooglePlayGames.Android
         {
             callback = ToOnGameThread(callback);
             // Task<Intent> getSelectOpponentsIntent(@IntRange(from = 1) int minPlayers, @IntRange(from = 1) int maxPlayers)
+            CreateWithInvitationScreen(minOpponents, maxOpponents, variant, (status, match) => {
+              callback(status == UIStatus.Valid, match);
+            });
         }
 
         public void CreateWithInvitationScreen(uint minOpponents, uint maxOpponents, uint variant,
             Action<UIStatus, TurnBasedMatch> callback)
         {
             callback = ToOnGameThread(callback);
-            // Task<Intent> getSelectOpponentsIntent(@IntRange(from = 1) int minPlayers, @IntRange(from = 1) int maxPlayers)
+
+            AndroidHelperFragment.InvitePlayerUI(minOpponents, maxOpponents, (status, result) => {
+                if (status != UIStatus.Valid)
+                {
+                  callback(status, null);
+                  return;
+                }
+
+                AndroidJavaObject matchConfig;
+                using (var matchConfigClass = new AndroidJavaClass("com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig"))
+                {
+                    using (var matchConfigBuilder = matchConfigClass.CallStatic<AndroidJavaObject>("builder"))
+                    {
+
+                      var autoMatchCriteria = matchConfigClass.CallStatic<AndroidJavaObject>("createAutoMatchCriteria", (int) result.MinAutomatchingPlayers, (int) result.MaxAutomatchingPlayers, /* exclusiveBitMask= */ (long) 0);
+                      matchConfigBuilder.Call<AndroidJavaObject>("setAutoMatchCriteria", autoMatchCriteria);
+
+                      if (variant != 0) {
+                        matchConfigBuilder.Call<AndroidJavaObject>("setVariant", (int) variant);
+                      }
+
+                      AndroidJavaObject invitedPlayersObject = new AndroidJavaObject("java.util.ArrayList");
+                      for (int i=0;i<result.PlayerIdsToInvite.Count;i++)
+                      {
+                          invitedPlayersObject.Call<string>("add", result.PlayerIdsToInvite[i]);
+                      }
+
+                      matchConfigBuilder.Call<AndroidJavaObject>("addInvitedPlayers", invitedPlayersObject);
+
+                      matchConfig = matchConfigBuilder.Call<AndroidJavaObject>("build");
+                    }
+                }
+
+                // Task<TurnBasedMatch> createMatch(@NonNull TurnBasedMatchConfig config)
+                using (var task = mClient.Call<AndroidJavaObject>("createMatch", matchConfig))
+                {
+                    task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                        turnBasedMatch => {
+                          callback(UIStatus.Valid, createTurnBasedMatch(turnBasedMatch));
+                        }
+                    ));
+                    task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                        exception => {
+                          callback(UIStatus.InternalError, null);
+                        }
+                    ));
+                }
+            });
+        }
+
+        private AndroidJavaObject StringListToAndroidJavaObject(List<string> list)
+        {
+          AndroidJavaObject javaObject = new AndroidJavaObject("java.util.ArrayList");
+          for (int i=0;i<list.Count;i++)
+          {
+            javaObject.Call<string>("add", list[i]);
+          }
+          return javaObject;
         }
 
         public void GetAllInvitations(Action<Invitation[]> callback)
@@ -204,7 +264,7 @@ namespace GooglePlayGames.Android
             });
         }
 
-        public void RegisterMatchDelegate(MatchDelegate del)
+      public void RegisterMatchDelegate(MatchDelegate del)
         {
             // Task<Void> registerTurnBasedMatchUpdateCallback(@NonNull TurnBasedMatchUpdateCallback callback)
             // Task<Boolean> unregisterTurnBasedMatchUpdateCallback(@NonNull TurnBasedMatchUpdateCallback callback)

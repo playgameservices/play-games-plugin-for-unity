@@ -51,6 +51,7 @@ public class HelperFragment extends Fragment
     static final int RC_SIMPLE_UI = 9003;
     static final int RC_SELECT_SNAPSHOT_UI = 9004;
     static final int RC_CAPTURE_OVERLAY_UI = 9005;
+    static final int RC_INVITATION_UI = 9006;
 
     // Pending token request.  There can be only one outstanding request at a
     // time.
@@ -101,7 +102,7 @@ public class HelperFragment extends Fragment
                                            String[] additionalScopes,
                                            boolean hidePopups,
                                            String accountName) {
-        SignInRequest request = new SignInRequest(silent, requestAuthCode, requestEmail, 
+        SignInRequest request = new SignInRequest(silent, requestAuthCode, requestEmail,
                 requestIdToken, webClientId, forceRefreshToken, additionalScopes, hidePopups,
                 accountName);
 
@@ -136,7 +137,7 @@ public class HelperFragment extends Fragment
         AchievementUiRequest request = new AchievementUiRequest();
 
         if(!HelperFragment.startRequest(parentActivity, request)) {
-            request.setResult(SimpleUiRequest.UI_STATUS_UI_BUSY);
+            request.setResult(CommonUIStatus.UI_BUSY);
         }
 
         return request.getTask();
@@ -152,7 +153,7 @@ public class HelperFragment extends Fragment
         AllLeaderboardsUiRequest request = new AllLeaderboardsUiRequest();
 
         if(!HelperFragment.startRequest(parentActivity, request)) {
-            request.setResult(SimpleUiRequest.UI_STATUS_UI_BUSY);
+            request.setResult(CommonUIStatus.UI_BUSY);
         }
 
         return request.getTask();
@@ -162,7 +163,7 @@ public class HelperFragment extends Fragment
         LeaderboardUiRequest request = new LeaderboardUiRequest(leaderboardId, timeSpan);
 
         if(!HelperFragment.startRequest(parentActivity, request)) {
-            request.setResult(SimpleUiRequest.UI_STATUS_UI_BUSY);
+            request.setResult(CommonUIStatus.UI_BUSY);
         }
 
         return request.getTask();
@@ -174,6 +175,16 @@ public class HelperFragment extends Fragment
 
         if(!HelperFragment.startRequest(parentActivity, request)) {
             request.setResult(SelectSnapshotUiRequest.SELECT_UI_STATUS_UI_BUSY);
+        }
+
+        return request.getTask();
+    }
+
+    public static Task<InvitePlayerUiRequest.Result> invitePlayerUi(Activity parentActivity, int minOpponents, int maxOpponents){
+        InvitePlayerUiRequest request = new InvitePlayerUiRequest(minOpponents, maxOpponents);
+
+        if(!HelperFragment.startRequest(parentActivity, request)) {
+            request.setResult(CommonUIStatus.UI_BUSY);
         }
 
         return request.getTask();
@@ -225,7 +236,7 @@ public class HelperFragment extends Fragment
     /**
      * Processes the token requests that are queued up.
      */
-    private void processRequest() {     
+    private void processRequest() {
         Request request;
         synchronized (lock) {
             request = pendingRequest;

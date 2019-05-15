@@ -138,6 +138,69 @@ namespace GooglePlayGames.Android
                 }
             }
         }
+
+        public static void InvitePlayerUI(uint minOpponents, uint maxOpponents, Action<UIStatus,  InvitationResultHolder> cb)
+        {
+            using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
+            {
+                using (var task = helperFragment.CallStatic<AndroidJavaObject>("invitePlayerUi",
+                    AndroidHelperFragment.GetActivity(), (int) minOpponents, (int) maxOpponents))
+                {
+                  task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                      result => {
+                          int status = result.Get<int>("status");
+                          Debug.Log("ShowPlayerSelectUI result " + status);
+                          if ((UIStatus)status != UIStatus.Valid)
+                          {
+                            cb.Invoke((UIStatus)status, null);
+                          }
+
+                          List<string> playerIdsToInvite = CreatePlayerIdsToInvite(result.Get<AndroidJavaObject>("playerIdsToInvite"));
+
+                          InvitationResultHolder resultHolder = new InvitationResultHolder(
+                            result.Get<int>("minAutomatchingPlayers"),
+                            result.Get<int>("maxAutomatchingPlayers"),
+                            playerIdsToInvite
+                          );
+
+                          cb.Invoke((UIStatus)status, resultHolder);
+                      }
+                  ));
+
+                  task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                      exception => {
+                          Debug.Log("ShowPlayerSelectUI failed with exception");
+                          cb.Invoke(UIStatus.InternalError, null);
+                      }
+                  ));
+                }
+            }
+        }
+
+        private static List<string> CreatePlayerIdsToInvite(AndroidJavaObject playerIdsObject)
+        {
+          int size = playerIdsObject.Call<int>("size");
+          List<string> playerIdsToInvite = new List<string>(); // do something
+          for (int i=0;i<size;i++)
+          {
+            playerIdsToInvite.Add(playerIdsObject.Call<string>("get", i));
+          }
+          return playerIdsToInvite;
+        }
+
+        public class InvitationResultHolder
+        {
+
+          public int MinAutomatchingPlayers;
+          public int MaxAutomatchingPlayers;
+          public List<string> PlayerIdsToInvite;
+
+          public InvitationResultHolder(int MinAutomatchingPlayers, int MaxAutomatchingPlayers, List<string> PlayerIdsToInvite) {
+            this.MinAutomatchingPlayers = MinAutomatchingPlayers;
+            this.MaxAutomatchingPlayers = MaxAutomatchingPlayers;
+            this.PlayerIdsToInvite = PlayerIdsToInvite;
+          }
+        }
     }
 }
 #endif

@@ -16,10 +16,10 @@ import com.google.android.gms.tasks.TaskCompletionSource;
 class SimpleUiRequest implements HelperFragment.Request {
     private static final String TAG = "SimpleUiRequest";
 
-    /** 
+    /**
      * Should be aligned to:
      * PluginDev/Assets/GooglePlayGames/BasicApi/CommonTypes.cs enum UIStatus
-     * */ 
+     * */
     static final int UI_STATUS_VALID = 1;
     static final int UI_STATUS_INTERNAL_ERROR = -2;
     static final int UI_STATUS_NOT_AUTHORIZED = -3;
@@ -54,19 +54,19 @@ class SimpleUiRequest implements HelperFragment.Request {
                             setFailure(e);
                         }
                     });
-      
+
 
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == HelperFragment.RC_SIMPLE_UI) {
             if (resultCode == Activity.RESULT_OK || resultCode == Activity.RESULT_CANCELED) {
-                setResult(UI_STATUS_VALID);
+                setResult(CommonUIStatus.VALID);
             } else if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) {
-                setResult(UI_STATUS_NOT_AUTHORIZED);
+                setResult(CommonUIStatus.NOT_AUTHORIZED);
             } else {
                 Log.d(TAG, "onActivityResult unknown resultCode: " + resultCode);
-                setResult(UI_STATUS_INTERNAL_ERROR);
+                setResult(CommonUIStatus.INTERNAL_ERROR);
             }
         }
     }
