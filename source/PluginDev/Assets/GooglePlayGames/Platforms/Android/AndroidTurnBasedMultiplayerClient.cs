@@ -95,8 +95,11 @@ namespace GooglePlayGames.Android
                     using (var matchConfigBuilder = matchConfigClass.CallStatic<AndroidJavaObject>("builder"))
                     {
 
-                      var autoMatchCriteria = matchConfigClass.CallStatic<AndroidJavaObject>("createAutoMatchCriteria", (int) result.MinAutomatchingPlayers, (int) result.MaxAutomatchingPlayers, /* exclusiveBitMask= */ (long) 0);
-                      matchConfigBuilder.Call<AndroidJavaObject>("setAutoMatchCriteria", autoMatchCriteria);
+                      if (result.MinAutomatchingPlayers > 0)
+                      {
+                        var autoMatchCriteria = matchConfigClass.CallStatic<AndroidJavaObject>("createAutoMatchCriteria", result.MinAutomatchingPlayers, result.MaxAutomatchingPlayers, /* exclusiveBitMask= */ (long) 0);
+                        matchConfigBuilder.Call<AndroidJavaObject>("setAutoMatchCriteria", autoMatchCriteria);
+                      }
 
                       if (variant != 0) {
                         matchConfigBuilder.Call<AndroidJavaObject>("setVariant", (int) variant);
@@ -105,7 +108,7 @@ namespace GooglePlayGames.Android
                       AndroidJavaObject invitedPlayersObject = new AndroidJavaObject("java.util.ArrayList");
                       for (int i=0;i<result.PlayerIdsToInvite.Count;i++)
                       {
-                          invitedPlayersObject.Call<string>("add", result.PlayerIdsToInvite[i]);
+                          invitedPlayersObject.Call<bool>("add", result.PlayerIdsToInvite[i]);
                       }
 
                       matchConfigBuilder.Call<AndroidJavaObject>("addInvitedPlayers", invitedPlayersObject);
@@ -136,7 +139,7 @@ namespace GooglePlayGames.Android
           AndroidJavaObject javaObject = new AndroidJavaObject("java.util.ArrayList");
           for (int i=0;i<list.Count;i++)
           {
-            javaObject.Call<string>("add", list[i]);
+            javaObject.Call<bool>("add", list[i]);
           }
           return javaObject;
         }
@@ -231,6 +234,33 @@ namespace GooglePlayGames.Android
             }
         }
 
+        private void GetMatchAndroidJavaObject(string matchId, Action<bool, AndroidJavaObject> callback)
+        {
+            // public Task<AnnotatedData<TurnBasedMatch>> loadMatch(@NonNull String matchId)
+            using (var task = mClient.Call<AndroidJavaObject>("loadMatch", matchId))
+            {
+              task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                    annotatedData => {
+                      using (var turnBasedMatch = annotatedData.Call<AndroidJavaObject>("get"))
+                      {
+                        if (turnBasedMatch == null) {
+                          OurUtils.Logger.e(string.Format("Could not find match {0}", matchId));
+                          callback(false, null);
+                        }
+                        else
+                        {
+                          callback(true, turnBasedMatch);
+                        }
+                      }
+                    }));
+              task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                exception => {
+                  callback(false, null);
+                }
+              ));
+            }
+        }
+
         public void AcceptFromInbox(Action<bool, TurnBasedMatch> callback)
         {
             callback = ToOnGameThread(callback);
@@ -312,7 +342,71 @@ namespace GooglePlayGames.Android
         public void Finish(TurnBasedMatch match, byte[] data, MatchOutcome outcome, Action<bool> callback)
         {
             callback = ToOnGameThread(callback);
-            // Task<TurnBasedMatch> finishMatch(@NonNull String matchId)
+
+            GetMatchAndroidJavaObject(match.MatchId, (status, foundMatch) => {
+              if (!status)
+              {
+                callback(false);
+                return;
+              }
+
+              AndroidJavaObject results = new AndroidJavaObject("java.util.ArrayList");
+              Dictionary<string, AndroidJavaObject> idToResult = new Dictionary<string, AndroidJavaObject>();
+
+              AndroidJavaObject participantList = foundMatch.Call<AndroidJavaObject>("getParticipants");
+              int size = participantList.Call<int>("size");
+              for (int i=0;i<size;i++)
+              {
+                AndroidJavaObject participantResult = participantList.Call<AndroidJavaObject>("get", i).Call<AndroidJavaObject>("getResult");
+                if (participantResult == null) {
+                  continue;
+                }
+                string id = participantResult.Call<string>("getParticipantId");
+                idToResult[id] = participantResult;
+                results.Call<AndroidJavaObject>("add", participantResult);
+              }
+
+              foreach (string participantId in outcome.ParticipantIds)
+              {
+                MatchOutcome.ParticipantResult result = outcome.GetResultFor(participantId);
+                uint placing = outcome.GetPlacementFor(participantId);
+
+                if (idToResult.ContainsKey(participantId))
+                {
+                  var existingResult = idToResult[participantId].Get<int>("result");
+                  uint existingPlacing = (uint) idToResult[participantId].Get<int>("placing");
+
+                  if (result != (MatchOutcome.ParticipantResult) existingResult || placing != existingPlacing)
+                  {
+                    OurUtils.Logger.e(string.Format("Attempted to override existing results for " +
+                            "participant {0}: Placing {1}, Result {2}",
+                            participantId, existingPlacing, existingResult));
+                    callback(false);
+                    return;
+                  }
+                }
+                else
+                {
+                  AndroidJavaObject participantResult = new AndroidJavaObject("com.google.android.gms.games.multiplayer.ParticipantResult", participantId, (int) result, (int) placing);
+                  results.Call<bool>("add", participantResult);
+                }
+              }
+
+              // Task<TurnBasedMatch> finishMatch(@NonNull String matchId, @Nullable byte[] matchData, @Nullable List<ParticipantResult> results)
+              using (var task = mClient.Call<AndroidJavaObject>("finishMatch", match.MatchId, data, results))
+              {
+                  task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                    turnBasedMatch => {
+                      callback(true);
+                    }
+                  ));
+                  task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                      exception => {
+                        callback(false);
+                      }
+                  ));
+              }
+            });
         }
 
         public void AcknowledgeFinished(TurnBasedMatch match, Action<bool> callback)
