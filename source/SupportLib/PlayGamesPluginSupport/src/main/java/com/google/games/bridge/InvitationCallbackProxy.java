@@ -21,6 +21,6 @@ public class InvitationCallbackProxy extends InvitationCallback {
 
     public interface Callback {
         void onInvitationReceived(@NonNull Invitation invitation);
-        void onInvitationRemoved(@NonNull String invitationId);        
+        void onInvitationRemoved(@NonNull String invitationId);
     }
 }

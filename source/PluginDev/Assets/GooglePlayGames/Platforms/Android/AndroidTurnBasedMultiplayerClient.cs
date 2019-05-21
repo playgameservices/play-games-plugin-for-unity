@@ -304,10 +304,17 @@ namespace GooglePlayGames.Android
             });
         }
 
-      public void RegisterMatchDelegate(MatchDelegate del)
+        public void RegisterMatchDelegate(MatchDelegate del)
         {
-            // Task<Void> registerTurnBasedMatchUpdateCallback(@NonNull TurnBasedMatchUpdateCallback callback)
-            // Task<Boolean> unregisterTurnBasedMatchUpdateCallback(@NonNull TurnBasedMatchUpdateCallback callback)
+            if (del != null)
+            {
+              Action<TurnBasedMatch, bool> matchDelegate = ToOnGameThread<TurnBasedMatch, bool>((turnBasedMatch, autoAccept) => del(turnBasedMatch, autoAccept));
+
+              TurnBasedMatchUpdateCallbackProxy callbackProxy = new TurnBasedMatchUpdateCallbackProxy(matchDelegate);
+
+              AndroidJavaObject turnBasedMatchUpdateCallback = new AndroidJavaObject("com.google.games.bridge.TurnBasedMatchUpdateCallbackProxy", callbackProxy);
+              mClient.Call<AndroidJavaObject>("registerTurnBasedMatchUpdateCallback", turnBasedMatchUpdateCallback);
+            }
         }
 
         public void TakeTurn(TurnBasedMatch match, byte[] data, string pendingParticipantId,
@@ -660,6 +667,24 @@ namespace GooglePlayGames.Android
             return (val1, val2) => PlayGamesHelperObject.RunOnGameThread(() => toConvert(val1, val2));
         }
 
+        private class TurnBasedMatchUpdateCallbackProxy : AndroidJavaProxy
+        {
+            private Action<TurnBasedMatch, bool> mMatchDelegate;
+            public TurnBasedMatchUpdateCallbackProxy(Action<TurnBasedMatch, bool> matchDelegate)
+            : base("com/google/games/bridge/TurnBasedMatchUpdateCallbackProxy$Callback")
+            {
+                mMatchDelegate = matchDelegate;
+            }
+
+            public void onTurnBasedMatchReceived(AndroidJavaObject turnBasedMatch)
+            {
+                mMatchDelegate.Invoke(AndroidJavaConverter.ToTurnBasedMatch(turnBasedMatch), /* shouldAutoLaunch= */ false);
+            }
+
+            public void onTurnBasedMatchRemoved(string invitationId)
+            {
+            }
+        }
     }
 }
 #endif
