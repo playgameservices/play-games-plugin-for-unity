@@ -11,15 +11,23 @@ namespace GooglePlayGames.Android
 
     internal class AndroidRealTimeMultiplayerClient : IRealTimeMultiplayerClient
     {
+        private static readonly int ROOM_VARIANT_DEFAULT = -1;
+        private static readonly int ROOM_STATUS_INVITING = 0;
+        private static readonly int ROOM_STATUS_AUTO_MATCHING = 1;
+        private static readonly int ROOM_STATUS_CONNECTING = 2;
         private static readonly int ROOM_STATUS_ACTIVE = 3;
+        private static readonly int ROOM_STATUS_DELETED = 4;
 
+        private volatile AndroidClient mAndroidClient;
         private volatile AndroidJavaObject mClient;
         private volatile AndroidJavaObject mInvitationsClient;
+
         private AndroidJavaObject mRoomConfig;
         private AndroidJavaObject mRoom;
 
-        public AndroidRealTimeMultiplayerClient(AndroidJavaObject account)
+        public AndroidRealTimeMultiplayerClient(AndroidClient androidClient, AndroidJavaObject account)
         {
+            mAndroidClient = androidClient;
             using(var gamesClass = new AndroidJavaClass("com.google.android.gms.games.Games"))
             {
                 mClient = gamesClass.CallStatic<AndroidJavaObject>("getRealTimeMultiplayerClient",
@@ -143,17 +151,31 @@ namespace GooglePlayGames.Android
 
         public List<Participant> GetConnectedParticipants()
         {
-            return null;
+            int roomStatus = getRoomStatus();
+            if (roomStatus != ROOM_STATUS_ACTIVE && roomStatus != ROOM_STATUS_CONNECTING)
+            {
+                return new List<Participant>();
+            }
+            return AndroidJavaConverter.ToParticipantList(mRoom.Call<AndroidJavaObject>("getParticipants"));
         }
 
         public Participant GetSelf()
         {
-            return null;
+            if (getRoomStatus() != ROOM_STATUS_ACTIVE)
+            {
+                return null;
+            }
+            return GetParticipant(mAndroidClient.GetUserId());
         }
 
         public Participant GetParticipant(string participantId)
         {
-            return null;
+            if (getRoomStatus() != ROOM_STATUS_ACTIVE)
+            {
+                return null;
+            }
+            AndroidJavaObject participant = mRoom.Call<AndroidJavaObject>("getParticipant", participantId);
+            return AndroidJavaConverter.ToParticipant(participant);
         }
 
         public Invitation GetInvitation()
@@ -168,7 +190,12 @@ namespace GooglePlayGames.Android
 
         public bool IsRoomConnected()
         {
-            return mRoom != null && mRoom.Call<int>("getStatus") == ROOM_STATUS_ACTIVE;
+            return getRoomStatus() == ROOM_STATUS_ACTIVE;
+        }
+
+        private int getRoomStatus()
+        {
+            return mRoom != null ? mRoom.Call<int>("getStatus") : ROOM_VARIANT_DEFAULT;
         }
 
         public void DeclineInvitation(string invitationId)

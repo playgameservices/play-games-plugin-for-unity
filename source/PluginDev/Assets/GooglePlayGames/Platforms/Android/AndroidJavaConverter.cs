@@ -165,7 +165,7 @@ namespace GooglePlayGames.Android
             bool canRematch = turnBasedMatch.Call<bool>("canRematch");
             uint availableAutomatchSlots = (uint) turnBasedMatch.Call<int>("getAvailableAutoMatchSlots");
             string selfParticipantId = turnBasedMatch.Call<string>("getCreatorId");
-            List<Participant> participants = ToParticipantList(turnBasedMatch);
+            List<Participant> participants = ToParticipantList(turnBasedMatch.Call<AndroidJavaObject>("getParticipants"));
             string pendingParticipantId = turnBasedMatch.Call<string>("getPendingParticipantId");
             TurnBasedMatch.MatchStatus turnStatus = AndroidJavaConverter.ToTurnStatus(turnBasedMatch.Call<int>("getStatus"));
             TurnBasedMatch.MatchTurnStatus matchStatus = AndroidJavaConverter.ToMatchTurnStatus(turnBasedMatch.Call<int>("getTurnStatus"));
@@ -177,25 +177,22 @@ namespace GooglePlayGames.Android
             return new TurnBasedMatch(matchId, data, canRematch, selfParticipantId, participants, availableAutomatchSlots, pendingParticipantId, matchStatus, turnStatus, variant, version, creationTime, lastUpdateTime);
         }
 
-        internal static List<Participant> ToParticipantList(AndroidJavaObject turnBasedMatch)
+        internal static List<Participant> ToParticipantList(AndroidJavaObject participants)
         {
-            AndroidJavaObject participantsObject = turnBasedMatch.Call<AndroidJavaObject>("getParticipantIds");
-            List<Participant> participants = new List<Participant>();
-            int size = participantsObject.Call<int>("size");
-
+            int size = participants.Call<int>("size");
+            List<Participant> converted = new List<Participant>(size);
             for (int i = 0; i < size ; i++)
             {
-                string participantId = participantsObject.Call<string>("get", i);
-                AndroidJavaObject participantObject = turnBasedMatch.Call<AndroidJavaObject>("getParticipant", participantId);
-                participants.Add(AndroidJavaConverter.ToParticipant(participantObject));
+                AndroidJavaObject participant = participants.Call<AndroidJavaObject>("get", i);
+                converted.Add(ToParticipant(participant));
             }
-            return participants;
+            return converted;
         }
 
         internal static List<string> ToStringList(AndroidJavaObject list)
         {
-            List<string> converted = new List<string>();
             int size = list.Call<int>("size");
+            List<string> converted = new List<string>(size);
 
             for (int i = 0; i < size ; i++)
             {
