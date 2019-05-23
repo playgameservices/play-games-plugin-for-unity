@@ -12,6 +12,7 @@ namespace GooglePlayGames.Android
     internal class AndroidRealTimeMultiplayerClient : IRealTimeMultiplayerClient
     {
         private volatile AndroidJavaObject mClient;
+        private volatile AndroidJavaObject mInvitationsClient;
         private AndroidJavaObject mRoomConfig;
         private AndroidJavaObject mRoom;
 
@@ -19,7 +20,9 @@ namespace GooglePlayGames.Android
         {
             using(var gamesClass = new AndroidJavaClass("com.google.android.gms.games.Games"))
             {
-                mClient = gamesClass.CallStatic<AndroidJavaObject>("getRealTimeMultiplayerClient", AndroidHelperFragment.GetActivity(), account);
+                mClient = gamesClass.CallStatic<AndroidJavaObject>("getRealTimeMultiplayerClient",
+                        AndroidHelperFragment.GetActivity(), account);
+                mInvitationsClient = gamesClass.CallStatic<AndroidJavaObject>("getInvitationsClient", AndroidHelperFragment.GetActivity(), account);
             }
         }
 
@@ -73,7 +76,35 @@ namespace GooglePlayGames.Android
 
         public void GetAllInvitations(Action<Invitation[]> callback)
         {
-            // Task<AnnotatedData<InvitationBuffer>> InvitationsClient.loadInvitations()
+            callback = ToOnGameThread(callback);
+            using (var task = mInvitationsClient.Call<AndroidJavaObject>("loadInvitations"))
+            {
+                task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                    annotatedData => {
+                      using (var matchesResponse = annotatedData.Call<AndroidJavaObject>("get"))
+                      {
+                        AndroidJavaObject invitationsBuffer = matchesResponse.Call<AndroidJavaObject>("getInvitations");
+                        int count = invitationsBuffer.Call<int>("getCount");
+                        Invitation[] invitations = new Invitation[count];
+                        for (int i=0; i<count; i++) {
+                          Invitation invitation = AndroidJavaConverter.ToInvitation(invitationsBuffer.Call<AndroidJavaObject>("get", (int) i));
+                          invitations[i] = invitation;
+                        }
+                        callback(invitations);
+                      }
+                    }
+                ));
+                task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                    exception => {
+                      callback(null);
+                    }
+                ));
+            }
+        }
+
+        private static Action<T> ToOnGameThread<T>(Action<T> toConvert)
+        {
+            return (val) => PlayGamesHelperObject.RunOnGameThread(() => toConvert(val));
         }
 
         public void AcceptFromInbox(RealTimeMultiplayerListener listener)
