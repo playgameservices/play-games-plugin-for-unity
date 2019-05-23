@@ -11,6 +11,8 @@ namespace GooglePlayGames.Android
 
     internal class AndroidRealTimeMultiplayerClient : IRealTimeMultiplayerClient
     {
+        private static readonly int ROOM_STATUS_ACTIVE = 3;
+
         private volatile AndroidJavaObject mClient;
         private volatile AndroidJavaObject mInvitationsClient;
         private AndroidJavaObject mRoomConfig;
@@ -166,7 +168,7 @@ namespace GooglePlayGames.Android
 
         public bool IsRoomConnected()
         {
-            return false;
+            return mRoom != null && mRoom.Call<int>("getStatus") == ROOM_STATUS_ACTIVE;
         }
 
         public void DeclineInvitation(string invitationId)
