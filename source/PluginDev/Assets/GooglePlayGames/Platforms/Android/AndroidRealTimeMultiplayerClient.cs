@@ -91,13 +91,12 @@ namespace GooglePlayGames.Android
             {
                 task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
                     annotatedData => {
-                      using (var matchesResponse = annotatedData.Call<AndroidJavaObject>("get"))
+                      using (var invitationBuffer = annotatedData.Call<AndroidJavaObject>("get"))
                       {
-                        AndroidJavaObject invitationsBuffer = matchesResponse.Call<AndroidJavaObject>("getInvitations");
-                        int count = invitationsBuffer.Call<int>("getCount");
+                        int count = invitationBuffer.Call<int>("getCount");
                         Invitation[] invitations = new Invitation[count];
                         for (int i=0; i<count; i++) {
-                          Invitation invitation = AndroidJavaConverter.ToInvitation(invitationsBuffer.Call<AndroidJavaObject>("get", (int) i));
+                          Invitation invitation = AndroidJavaConverter.ToInvitation(invitationBuffer.Call<AndroidJavaObject>("get", i));
                           invitations[i] = invitation;
                         }
                         callback(invitations);
@@ -200,7 +199,22 @@ namespace GooglePlayGames.Android
 
         public void DeclineInvitation(string invitationId)
         {
-            // Task<Void> declineInvitation(@NonNull String invitationId)
+            using (var task = mInvitationsClient.Call<AndroidJavaObject>("loadInvitations"))
+            {
+                task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                    annotatedData => {
+                        using (var invitationBuffer = annotatedData.Call<AndroidJavaObject>("get"))
+                        {
+                            int count = invitationBuffer.Call<int>("getCount");
+                            Invitation[] invitations = new Invitation[count];
+                            for (int i=0; i<count; i++) {
+                                Invitation invitation = AndroidJavaConverter.ToInvitation(invitationBuffer.Call<AndroidJavaObject>("get", i));
+                                invitations[i] = invitation;
+                            }
+                        }
+                    }
+                ));
+            }
         }
 
         private class RoomStatusUpdateCallbackProxy : AndroidJavaProxy
