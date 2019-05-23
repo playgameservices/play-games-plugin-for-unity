@@ -192,6 +192,18 @@ namespace GooglePlayGames.Android
             return participants;
         }
 
+        internal static List<string> ToStringList(AndroidJavaObject list)
+        {
+            List<string> converted = new List<string>();
+            int size = list.Call<int>("size");
+
+            for (int i = 0; i < size ; i++)
+            {
+                converted.Add(list.Call<string>("get", i));
+            }
+            return converted;
+        }
+
         internal static TurnBasedMatch.MatchStatus ToTurnStatus(int turnStatus)
         {
             switch(turnStatus) {
