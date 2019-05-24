@@ -134,12 +134,30 @@ namespace GooglePlayGames.Android
 
         public void SendMessageToAll(bool reliable, byte[] data)
         {
-            // Task<Void> sendUnreliableMessageToOthers(@NonNull byte[] messageData, @NonNull String roomId)
+            if (reliable)
+            {
+                List<Participant> participants = AndroidJavaConverter.ToParticipantList(mRoom.Call<AndroidJavaObject>("getParticipants"));
+                foreach (Participant participant in participants)
+                {
+                    SendMessage(true, participant.ParticipantId, data);
+                }
+                return;
+            }
+
+            int roomStatus = GetRoomStatus();
+            if (roomStatus != ROOM_STATUS_ACTIVE && roomStatus != ROOM_STATUS_CONNECTING)
+            {
+                OurUtils.Logger.d("Sending message is not allowed in this state.");
+                return;
+            }
+
+            string roomId = mRoom.Call<string>("getRoomId");
+            mClient.Call<AndroidJavaObject>("sendUnreliableMessageToOthers", data, roomId);
         }
 
         public void SendMessageToAll(bool reliable, byte[] data, int offset, int length)
         {
-            // Task<Void> sendUnreliableMessageToOthers(@NonNull byte[] messageData, @NonNull String roomId)
+            SendMessageToAll(reliable, Misc.GetSubsetBytes(data, offset, length));
         }
 
         public void SendMessage(bool reliable, string participantId, byte[] data)
@@ -227,12 +245,14 @@ namespace GooglePlayGames.Android
             using (var task = mInvitationsClient.Call<AndroidJavaObject>("loadInvitations"))
             {
                 task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
-                    annotatedData => {
+                    annotatedData =>
+                    {
                         using (var invitationBuffer = annotatedData.Call<AndroidJavaObject>("get"))
                         {
                             int count = invitationBuffer.Call<int>("getCount");
                             Invitation[] invitations = new Invitation[count];
-                            for (int i=0; i<count; i++) {
+                            for (int i=0; i<count; i++)
+                            {
                                 Invitation invitation = AndroidJavaConverter.ToInvitation(invitationBuffer.Call<AndroidJavaObject>("get", i));
                                 invitations[i] = invitation;
                             }
