@@ -50,10 +50,9 @@ public class RoomStatusUpdateCallbackProxy extends RoomStatusUpdateCallback {
         callback.onPeersConnected(room, participantIds);
     }
 
-    public void onPeersDisconnected(
-        @Nullable Room room, @NonNull List<String> participantIds) {
-            callback.onPeersDisconnected(room, participantIds);
-        }
+    public void onPeersDisconnected(@Nullable Room room, @NonNull List<String> participantIds) {
+        callback.onPeersDisconnected(room, participantIds);
+    }
 
     public void onP2PConnected(@NonNull String participantId) {
         callback.onP2PConnected(participantId);

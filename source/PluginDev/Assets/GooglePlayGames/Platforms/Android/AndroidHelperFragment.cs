@@ -76,7 +76,7 @@ namespace GooglePlayGames.Android
                     task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<int>(
                         uiCode => {
                             Debug.Log("ShowAllLeaderboardsUI result " + uiCode);
-                            cb.Invoke((UIStatus)uiCode);
+                            cb.Invoke((UIStatus) uiCode);
                         }
                     ));
                     task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
@@ -99,7 +99,7 @@ namespace GooglePlayGames.Android
                     task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<int>(
                         uiCode => {
                             Debug.Log("ShowLeaderboardUI result " + uiCode);
-                            cb.Invoke((UIStatus)uiCode);
+                            cb.Invoke((UIStatus) uiCode);
                         }
                     ));
                     task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
@@ -147,34 +147,34 @@ namespace GooglePlayGames.Android
                 using (var task = helperFragment.CallStatic<AndroidJavaObject>("invitePlayerUi",
                     AndroidHelperFragment.GetActivity(), (int) minOpponents, (int) maxOpponents))
                 {
-                  task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
-                      result => {
-                          int status = result.Get<int>("status");
-                          Debug.Log("ShowPlayerSelectUI result " + status);
-                          if ((UIStatus)status != UIStatus.Valid)
-                          {
-                            cb.Invoke((UIStatus)status, null);
-                            return;
-                          }
+                    task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                        result => {
+                            int status = result.Get<int>("status");
+                            Debug.Log("ShowPlayerSelectUI result " + status);
+                            if ((UIStatus)status != UIStatus.Valid)
+                            {
+                                cb.Invoke((UIStatus)status, null);
+                                return;
+                            }
 
-                          List<string> playerIdsToInvite = CreatePlayerIdsToInvite(result.Get<AndroidJavaObject>("playerIdsToInvite"));
+                            List<string> playerIdsToInvite = CreatePlayerIdsToInvite(result.Get<AndroidJavaObject>("playerIdsToInvite"));
 
-                          InvitationResultHolder resultHolder = new InvitationResultHolder(
-                            result.Get<int>("minAutomatchingPlayers"),
-                            result.Get<int>("maxAutomatchingPlayers"),
-                            playerIdsToInvite
-                          );
+                            InvitationResultHolder resultHolder = new InvitationResultHolder(
+                                result.Get<int>("minAutomatchingPlayers"),
+                                result.Get<int>("maxAutomatchingPlayers"),
+                                playerIdsToInvite
+                            );
 
-                          cb.Invoke((UIStatus)status, resultHolder);
-                      }
-                  ));
+                            cb.Invoke((UIStatus)status, resultHolder);
+                        }
+                    ));
 
-                  task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
-                      exception => {
-                          Debug.Log("ShowPlayerSelectUI failed with exception");
-                          cb.Invoke(UIStatus.InternalError, null);
-                      }
-                  ));
+                    task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                        exception => {
+                            Debug.Log("ShowPlayerSelectUI failed with exception");
+                            cb.Invoke(UIStatus.InternalError, null);
+                        }
+                    ));
                 }
             }
         }
@@ -186,53 +186,53 @@ namespace GooglePlayGames.Android
                 using (var task = helperFragment.CallStatic<AndroidJavaObject>("showInboxUi",
                     AndroidHelperFragment.GetActivity()))
                 {
-                  task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
-                      result => {
-                          int status = result.Get<int>("status");
-                          if ((UIStatus)status != UIStatus.Valid)
-                          {
-                            cb.Invoke((UIStatus)status, null);
-                            return;
-                          }
+                    task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                        result => {
+                            int status = result.Get<int>("status");
+                            if ((UIStatus)status != UIStatus.Valid)
+                            {
+                                cb.Invoke((UIStatus)status, null);
+                                return;
+                            }
 
-                          AndroidJavaObject turnBasedMatch = result.Get<AndroidJavaObject>("turnBasedMatch");
-                          cb.Invoke((UIStatus)status, AndroidJavaConverter.ToTurnBasedMatch(turnBasedMatch));
-                      }
-                  ));
+                            AndroidJavaObject turnBasedMatch = result.Get<AndroidJavaObject>("turnBasedMatch");
+                            cb.Invoke((UIStatus)status, AndroidJavaConverter.ToTurnBasedMatch(turnBasedMatch));
+                        }
+                    ));
 
-                  task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
-                      exception => {
-                          Debug.Log("ShowPlayerSelectUI failed with exception");
-                          cb.Invoke(UIStatus.InternalError, null);
-                      }
-                  ));
+                    task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                        exception => {
+                            Debug.Log("ShowPlayerSelectUI failed with exception");
+                            cb.Invoke(UIStatus.InternalError, null);
+                        }
+                    ));
                 }
             }
         }
 
         private static List<string> CreatePlayerIdsToInvite(AndroidJavaObject playerIdsObject)
         {
-          int size = playerIdsObject.Call<int>("size");
-          List<string> playerIdsToInvite = new List<string>();
-          for (int i=0;i<size;i++)
-          {
-            playerIdsToInvite.Add(playerIdsObject.Call<string>("get", i));
-          }
-          return playerIdsToInvite;
+            int size = playerIdsObject.Call<int>("size");
+            List<string> playerIdsToInvite = new List<string>();
+            for (int i=0;i<size;i++)
+            {
+                playerIdsToInvite.Add(playerIdsObject.Call<string>("get", i));
+            }
+            return playerIdsToInvite;
         }
 
         public class InvitationResultHolder
         {
+            public int MinAutomatchingPlayers;
+            public int MaxAutomatchingPlayers;
+            public List<string> PlayerIdsToInvite;
 
-          public int MinAutomatchingPlayers;
-          public int MaxAutomatchingPlayers;
-          public List<string> PlayerIdsToInvite;
-
-          public InvitationResultHolder(int MinAutomatchingPlayers, int MaxAutomatchingPlayers, List<string> PlayerIdsToInvite) {
-            this.MinAutomatchingPlayers = MinAutomatchingPlayers;
-            this.MaxAutomatchingPlayers = MaxAutomatchingPlayers;
-            this.PlayerIdsToInvite = PlayerIdsToInvite;
-          }
+            public InvitationResultHolder(int MinAutomatchingPlayers, int MaxAutomatchingPlayers, List<string> PlayerIdsToInvite)
+            {
+                this.MinAutomatchingPlayers = MinAutomatchingPlayers;
+                this.MaxAutomatchingPlayers = MaxAutomatchingPlayers;
+                this.PlayerIdsToInvite = PlayerIdsToInvite;
+            }
         }
     }
 }

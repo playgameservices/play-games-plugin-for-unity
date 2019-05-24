@@ -80,8 +80,6 @@ project.ext {
          'QuizRacer',  'TicTacToe',
          'NearbyDroids', 'SmokeTest']
 
-    sampleList = ['Minimal']
-
     jarresolver_uri = System.getProperty("RESOLVER_PACKAGE_URI")
     jarresolver_repos = [
       'https://github.com/googlesamples/unity-jar-resolver.git'
@@ -351,9 +349,10 @@ task inject_versionIntoMetaFiles() {
     for (fileobj in fileTree("${pluginProj}")) {
       if (fileobj.path.endsWith('.meta')) {
         // Skip the manifest files for any previous versions
-       if (fileobj.path.contains("PackageCache")) {
-         continue;
-       }
+//        if (fileobj.path.contains("Editor/${currentPluginBasename}") &&
+//            !fileobj.path.contains(currentManifestFile)) {
+//          continue
+//        }
         def lines = fileobj.text.split('\n')
         def outputLines = []
         def added = false

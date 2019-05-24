@@ -204,17 +204,17 @@ namespace GooglePlayGames.Android
         internal static TurnBasedMatch.MatchStatus ToTurnStatus(int turnStatus)
         {
             switch(turnStatus) {
-              case 0:
+              case 0: // MATCH_STATUS_AUTO_MATCHING
               return TurnBasedMatch.MatchStatus.AutoMatching;
-              case 1:
+              case 1: // MATCH_STATUS_ACTIVE
               return TurnBasedMatch.MatchStatus.Active;
-              case 2:
+              case 2: // MATCH_STATUS_COMPLETE
               return TurnBasedMatch.MatchStatus.Complete;
-              case 3:
+              case 3: // MATCH_STATUS_EXPIRED
               return TurnBasedMatch.MatchStatus.Expired;
-              case 4:
+              case 4: // MATCH_STATUS_CANCELED
               return TurnBasedMatch.MatchStatus.Cancelled;
-              case 5:
+              case 5: // MATCH_STATUS_DELETED
               return TurnBasedMatch.MatchStatus.Deleted;
               default:
               return TurnBasedMatch.MatchStatus.Unknown;
@@ -224,13 +224,13 @@ namespace GooglePlayGames.Android
         internal static TurnBasedMatch.MatchTurnStatus ToMatchTurnStatus(int matchTurnStatus)
         {
             switch(matchTurnStatus) {
-              case 0:
+              case 0: // MATCH_TURN_STATUS_INVITED
               return TurnBasedMatch.MatchTurnStatus.Invited;
-              case 1:
+              case 1: // MATCH_TURN_STATUS_MY_TURN
               return TurnBasedMatch.MatchTurnStatus.MyTurn;
-              case 2:
+              case 2: // MATCH_TURN_STATUS_THEIR_TURN
               return TurnBasedMatch.MatchTurnStatus.TheirTurn;
-              case 3:
+              case 3: // MATCH_TURN_STATUS_COMPLETE
               return TurnBasedMatch.MatchTurnStatus.Complete;
               default:
               return TurnBasedMatch.MatchTurnStatus.Unknown;
