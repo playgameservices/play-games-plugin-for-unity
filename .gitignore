@@ -38,3 +38,6 @@ source/PluginDev/ProjectSettings/NavMeshAreas.asset
 
 .gradle/
 .idea/
+current-build/GooglePlayGamesPlugin-0.10.01.unitypackage
+samples/Minimal/Minimal.unitypackage
+source/build.gradle

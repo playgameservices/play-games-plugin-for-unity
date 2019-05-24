@@ -46,6 +46,12 @@ namespace GooglePlayGames.Android
             RealTimeMultiplayerListener listener) {
             AndroidJavaObject roomUpdateCallback = new AndroidJavaObject("com.google.games.bridge.RoomUpdateCallbackProxy",
                 new RoomUpdateCallbackProxy( /* parent= */ this, listener));
+
+            if (GetRoomStatus() == ROOM_STATUS_ACTIVE)
+            {
+                OurUtils.Logger.e("Received attempt to create a new room without cleaning up the old one.");
+                listener.OnRoomConnected(false);
+            }
             // build room config
             using(var roomConfigClass = new AndroidJavaClass("com.google.android.gms.games.multiplayer.realtime.RoomConfig")) {
                 using(var roomConfigBuilder = roomConfigClass.CallStatic<AndroidJavaObject>("builder", roomUpdateCallback)) {
@@ -138,19 +144,38 @@ namespace GooglePlayGames.Android
 
         public void SendMessage(bool reliable, string participantId, byte[] data)
         {
-            // Task<Integer> sendReliableMessage(@NonNull byte[] messageData, @NonNull String roomId, @NonNull String recipientParticipantId, @Nullable ReliableMessageSentCallback callback)
-            // Task<Void> sendUnreliableMessage(@NonNull byte[] messageData, @NonNull String roomId, @NonNull String recipientParticipantId)
+            int roomStatus = GetRoomStatus();
+            if (roomStatus != ROOM_STATUS_ACTIVE && roomStatus != ROOM_STATUS_CONNECTING)
+            {
+                OurUtils.Logger.d("Sending message is not allowed in this state.");
+                return;
+            }
+
+            if (GetParticipant(participantId) == null)
+            {
+                OurUtils.Logger.e("Attempted to send message to unknown participant " + participantId);
+                return;
+            }
+
+            string roomId = mRoom.Call<string>("getRoomId");
+            if (reliable)
+            {
+                mClient.Call<AndroidJavaObject>("sendReliableMessage", data, roomId, participantId, new AndroidJavaObject("com.google.games.bridge.ReliableMessageSentCallbackProxy", new ReliableMessageSentCallbackProxy(this)));
+            }
+            else
+            {
+                mClient.Call<AndroidJavaObject>("sendUnreliableMessage", data, roomId, participantId);
+            }
         }
 
         public void SendMessage(bool reliable, string participantId, byte[] data, int offset, int length)
         {
-            // Task<Integer> sendReliableMessage(@NonNull byte[] messageData, @NonNull String roomId, @NonNull String recipientParticipantId, @Nullable ReliableMessageSentCallback callback)
-            // Task<Void> sendUnreliableMessage(@NonNull byte[] messageData, @NonNull String roomId, @NonNull String recipientParticipantId)
+            SendMessage(reliable, participantId, Misc.GetSubsetBytes(data, offset, length));
         }
 
         public List<Participant> GetConnectedParticipants()
         {
-            int roomStatus = getRoomStatus();
+            int roomStatus = GetRoomStatus();
             if (roomStatus != ROOM_STATUS_ACTIVE && roomStatus != ROOM_STATUS_CONNECTING)
             {
                 return new List<Participant>();
@@ -160,7 +185,7 @@ namespace GooglePlayGames.Android
 
         public Participant GetSelf()
         {
-            if (getRoomStatus() != ROOM_STATUS_ACTIVE)
+            if (GetRoomStatus() != ROOM_STATUS_ACTIVE)
             {
                 return null;
             }
@@ -169,7 +194,7 @@ namespace GooglePlayGames.Android
 
         public Participant GetParticipant(string participantId)
         {
-            if (getRoomStatus() != ROOM_STATUS_ACTIVE)
+            if (GetRoomStatus() != ROOM_STATUS_ACTIVE)
             {
                 return null;
             }
@@ -189,10 +214,10 @@ namespace GooglePlayGames.Android
 
         public bool IsRoomConnected()
         {
-            return getRoomStatus() == ROOM_STATUS_ACTIVE;
+            return GetRoomStatus() == ROOM_STATUS_ACTIVE;
         }
 
-        private int getRoomStatus()
+        private int GetRoomStatus()
         {
             return mRoom != null ? mRoom.Call<int>("getStatus") : ROOM_VARIANT_DEFAULT;
         }
@@ -214,6 +239,21 @@ namespace GooglePlayGames.Android
                         }
                     }
                 ));
+            }
+        }
+
+        private class ReliableMessageSentCallbackProxy: AndroidJavaProxy
+        {
+            private AndroidRealTimeMultiplayerClient mParent;
+
+            public ReliableMessageSentCallbackProxy(AndroidRealTimeMultiplayerClient parent) : base("com/google/games/bridge/ReliableMessageSentCallbackProxy$Callback")
+            {
+                mParent = parent;
+            }
+
+            public void onRealTimeMessageSent(int statusCode, int tokenId, string recipientParticipantId)
+            {
+
             }
         }
 
