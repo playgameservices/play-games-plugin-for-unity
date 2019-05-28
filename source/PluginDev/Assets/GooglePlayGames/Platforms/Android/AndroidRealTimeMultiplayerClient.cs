@@ -27,6 +27,8 @@ namespace GooglePlayGames.Android
         private AndroidJavaObject mRoomConfig;
         private RealTimeMultiplayerListener mListener;
 
+        private Invitation mInvitation;
+
         public AndroidRealTimeMultiplayerClient(AndroidClient androidClient, AndroidJavaObject account)
         {
             mAndroidClient = androidClient;
@@ -90,6 +92,9 @@ namespace GooglePlayGames.Android
                                         RealTimeMultiplayerListener listener)
         {
             // Task<Intent> getSelectOpponentsIntent(@IntRange(from = 1) int minPlayers, @IntRange(from = 1) int maxPlayers, boolean allowAutomatch)
+
+
+            // set mInvitation here
         }
 
         public void ShowWaitingRoomUI()
@@ -149,6 +154,8 @@ namespace GooglePlayGames.Android
 
                 FindInvitation(invitationId, fail => listener.OnRoomConnected(false),
                     invitation => {
+
+                        mInvitation = invitation;
                         // build room config
                         using (var roomConfigClass = new AndroidJavaClass ("com.google.android.gms.games.multiplayer.realtime.RoomConfig"))
                         {
@@ -170,7 +177,10 @@ namespace GooglePlayGames.Android
 
                                 using (var task = mClient.Call<AndroidJavaObject> ("join", mRoomConfig)) {
                                     task.Call<AndroidJavaObject> ("addOnFailureListener", new TaskOnFailedProxy (
-                                        e => listener.OnRoomConnected (false)
+                                        e => {
+                                            mInvitation = null;
+                                            listener.OnRoomConnected (false);
+                                        }
                                     ));
                                 }
                             }
@@ -269,14 +279,15 @@ namespace GooglePlayGames.Android
 
         public Invitation GetInvitation()
         {
-            return null;
+            return mInvitation;
         }
 
         public void LeaveRoom()
         {
+            mInvitation = null;
             if (GetRoomStatus() == ROOM_STATUS_ACTIVE)
             {
-                mClient.Call<AndroidJavaObject> ("leave", mRoomConfig, mRoom.Call<String>("getRoomId")));
+                mClient.Call<AndroidJavaObject> ("leave", mRoomConfig, mRoom.Call<String>("getRoomId"));
                 return;
             }
 
