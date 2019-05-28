@@ -7,6 +7,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.multiplayer.Multiplayer;
 import com.google.android.gms.games.TurnBasedMultiplayerClient;
+import com.google.android.gms.games.RealTimeMultiplayerClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
@@ -19,6 +20,7 @@ class InvitePlayerUiRequest implements HelperFragment.Request {
 
     private final int minPlayers;
     private final int maxPlayers;
+    private final boolean realTime;
 
     private final TaskCompletionSource<Result> resultTaskSource = new TaskCompletionSource<>();
 
@@ -36,9 +38,10 @@ class InvitePlayerUiRequest implements HelperFragment.Request {
       }
     }
 
-    InvitePlayerUiRequest(int minPlayers, int maxPlayers) {
+    InvitePlayerUiRequest(int minPlayers, int maxPlayers, boolean realTime) {
         this.minPlayers = minPlayers;
         this.maxPlayers = maxPlayers;
+        this.realTime = realTime;
     }
 
     Task<Result> getTask() {
@@ -49,24 +52,32 @@ class InvitePlayerUiRequest implements HelperFragment.Request {
     public void process(final HelperFragment helperFragment) {
         final Activity activity = helperFragment.getActivity();
         GoogleSignInAccount account = HelperFragment.getAccount(activity);
+
+        OnSuccessListener onSuccess = new OnSuccessListener<Intent>() {
+            @Override
+            public void onSuccess(Intent intent) {
+                helperFragment.startActivityForResult(intent, HelperFragment.RC_INVITATION_UI);
+            }
+        };
+        OnFailureListener onFailure = new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                setFailure(e);
+            }
+        };
+
+        if (realTime) {
+            RealTimeMultiplayerClient client = Games.getRealTimeMultiplayerClient(activity, account);
+            client.getSelectOpponentsIntent(minPlayers, maxPlayers)
+                .addOnSuccessListener(activity, onSuccess)
+                .addOnFailureListener(activity, onFailure);
+            return;
+        }
+
         TurnBasedMultiplayerClient client = Games.getTurnBasedMultiplayerClient(activity, account);
         client.getSelectOpponentsIntent(minPlayers, maxPlayers)
-          .addOnSuccessListener(
-                activity,
-                    new OnSuccessListener<Intent>() {
-                        @Override
-                        public void onSuccess(Intent intent) {
-                            helperFragment.startActivityForResult(intent, HelperFragment.RC_INVITATION_UI);
-                        }
-                    })
-          .addOnFailureListener(
-                activity,
-                    new OnFailureListener() {
-                        @Override
-                        public void onFailure(Exception e) {
-                            setFailure(e);
-                        }
-                    });
+          .addOnSuccessListener(activity, onSuccess)
+          .addOnFailureListener(activity, onFailure);
     }
 
     @Override

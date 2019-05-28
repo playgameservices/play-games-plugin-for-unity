@@ -81,6 +81,7 @@ namespace GooglePlayGames.Android
                 {
                     task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
                         e => {
+                            mListener = null;
                             listener.OnRoomConnected(false);
                         }
                     ));
@@ -88,13 +89,61 @@ namespace GooglePlayGames.Android
             }
         }
 
-        public void CreateWithInvitationScreen(uint minOpponents, uint maxOppponents, uint variant,
+        public void CreateWithInvitationScreen(uint minOpponents, uint maxOpponents, uint variant,
                                         RealTimeMultiplayerListener listener)
         {
-            // Task<Intent> getSelectOpponentsIntent(@IntRange(from = 1) int minPlayers, @IntRange(from = 1) int maxPlayers, boolean allowAutomatch)
+            AndroidHelperFragment.InvitePlayerUI(minOpponents, maxOpponents, /* realTime= */ true, (status, result) =>
+            {
+                if (status != UIStatus.Valid)
+                {
+                    listener.OnRoomConnected(false);
+                    return;
+                }
 
+                lock (mSessionLock)
+                {
+                    using (var roomConfigClass = new AndroidJavaClass ("com.google.android.gms.games.multiplayer.realtime.RoomConfig"))
+                    {
+                        AndroidJavaObject roomUpdateCallback = new AndroidJavaObject ("com.google.games.bridge.RoomUpdateCallbackProxy",
+                                new RoomUpdateCallbackProxy ( /* parent= */ this, listener));
 
-            // set mInvitation here
+                        using (var roomConfigBuilder = roomConfigClass.CallStatic<AndroidJavaObject> ("builder", roomUpdateCallback)) {
+
+                            if (result.MinAutomatchingPlayers > 0)
+                            {
+                                var autoMatchCriteria = roomConfigClass.CallStatic<AndroidJavaObject>("createAutoMatchCriteria", result.MinAutomatchingPlayers, result.MaxAutomatchingPlayers, /* exclusiveBitMask= */ (long) 0);
+                                roomConfigBuilder.Call<AndroidJavaObject>("setAutoMatchCriteria", autoMatchCriteria);
+                            }
+
+                            if (variant != 0)
+                            {
+                                roomConfigBuilder.Call<AndroidJavaObject>("setVariant", (int) variant);
+                            }
+
+                            AndroidJavaObject messageReceivedListener = new AndroidJavaObject ("com.google.games.bridge.RealTimeMessageReceivedListenerProxy", new MessageReceivedListenerProxy (listener));
+                            roomConfigBuilder.Call<AndroidJavaObject> ("setOnMessageReceivedListener", messageReceivedListener);
+
+                            AndroidJavaObject roomStatusUpdateCallback = new AndroidJavaObject ("com.google.games.bridge.RoomStatusUpdateCallbackProxy", new RoomStatusUpdateCallbackProxy (this, listener));
+                            roomConfigBuilder.Call<AndroidJavaObject> ("setRoomStatusUpdateCallback", roomStatusUpdateCallback);
+
+                            roomConfigBuilder.Call<AndroidJavaObject>("addPlayersToInvite", AndroidJavaConverter.ToJavaStringList(result.PlayerIdsToInvite));
+                            mRoomConfig = roomConfigBuilder.Call<AndroidJavaObject>("build");
+                            mListener = listener;
+                        }
+                    }
+
+                    using (var task = mClient.Call<AndroidJavaObject>("create", mRoomConfig))
+                    {
+                        task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                            exception =>
+                            {
+                                mListener = null;
+                                listener.OnRoomConnected(false);
+                            }
+                        ));
+                    }
+                }
+            });
         }
 
         public void ShowWaitingRoomUI()

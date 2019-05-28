@@ -79,7 +79,7 @@ namespace GooglePlayGames.Android
         {
             callback = ToOnGameThread(callback);
 
-            AndroidHelperFragment.InvitePlayerUI(minOpponents, maxOpponents, (status, result) =>
+            AndroidHelperFragment.InvitePlayerUI(minOpponents, maxOpponents, /* realTime= */ false, (status, result) =>
             {
                 if (status != UIStatus.Valid)
                 {
@@ -104,13 +104,7 @@ namespace GooglePlayGames.Android
                             matchConfigBuilder.Call<AndroidJavaObject>("setVariant", (int) variant);
                         }
 
-                        AndroidJavaObject invitedPlayersObject = new AndroidJavaObject("java.util.ArrayList");
-                        for (int i=0;i<result.PlayerIdsToInvite.Count;i++)
-                        {
-                            invitedPlayersObject.Call<bool>("add", result.PlayerIdsToInvite[i]);
-                        }
-
-                        matchConfigBuilder.Call<AndroidJavaObject>("addInvitedPlayers", invitedPlayersObject);
+                        matchConfigBuilder.Call<AndroidJavaObject>("addInvitedPlayers", AndroidJavaConverter.ToJavaStringList(result.PlayerIdsToInvite));
 
                         matchConfig = matchConfigBuilder.Call<AndroidJavaObject>("build");
                     }

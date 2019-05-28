@@ -140,12 +140,12 @@ namespace GooglePlayGames.Android
             }
         }
 
-        public static void InvitePlayerUI(uint minOpponents, uint maxOpponents, Action<UIStatus,  InvitationResultHolder> cb)
+        public static void InvitePlayerUI(uint minOpponents, uint maxOpponents, bool realTime, Action<UIStatus,  InvitationResultHolder> cb)
         {
             using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
             {
                 using (var task = helperFragment.CallStatic<AndroidJavaObject>("invitePlayerUi",
-                    AndroidHelperFragment.GetActivity(), (int) minOpponents, (int) maxOpponents))
+                    AndroidHelperFragment.GetActivity(), (int) minOpponents, (int) maxOpponents, realTime))
                 {
                   task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
                       result => {

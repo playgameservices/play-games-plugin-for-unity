@@ -181,8 +181,8 @@ public class HelperFragment extends Fragment
         return request.getTask();
     }
 
-    public static Task<InvitePlayerUiRequest.Result> invitePlayerUi(Activity parentActivity, int minOpponents, int maxOpponents){
-        InvitePlayerUiRequest request = new InvitePlayerUiRequest(minOpponents, maxOpponents);
+    public static Task<InvitePlayerUiRequest.Result> invitePlayerUi(Activity parentActivity, int minOpponents, int maxOpponents, boolean realTime){
+        InvitePlayerUiRequest request = new InvitePlayerUiRequest(minOpponents, maxOpponents, realTime);
 
         if(!HelperFragment.startRequest(parentActivity, request)) {
             request.setResult(CommonUIStatus.UI_BUSY);

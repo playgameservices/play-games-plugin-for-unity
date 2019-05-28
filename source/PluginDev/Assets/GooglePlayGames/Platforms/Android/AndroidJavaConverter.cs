@@ -201,6 +201,17 @@ namespace GooglePlayGames.Android
             return converted;
         }
 
+        // from C#: List<string> to Java: ArrayList<String>
+        internal static AndroidJavaObject ToJavaStringList(List<string> list)
+        {
+            AndroidJavaObject converted = new AndroidJavaObject("java.util.ArrayList");
+            for (int i=0;i<list.Count;i++)
+            {
+                converted.Call<bool>("add", list[i]);
+            }
+            return converted;
+        }
+
         internal static TurnBasedMatch.MatchStatus ToTurnStatus(int turnStatus)
         {
             switch(turnStatus) {
