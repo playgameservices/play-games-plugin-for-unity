@@ -23,8 +23,9 @@ namespace GooglePlayGames.Android
         private volatile AndroidJavaObject mClient;
         private volatile AndroidJavaObject mInvitationsClient;
 
-        private AndroidJavaObject mRoomConfig;
         private AndroidJavaObject mRoom;
+        private AndroidJavaObject mRoomConfig;
+        private RealTimeMultiplayerListener mListener;
 
         public AndroidRealTimeMultiplayerClient(AndroidClient androidClient, AndroidJavaObject account)
         {
@@ -71,6 +72,7 @@ namespace GooglePlayGames.Android
                         roomConfigBuilder.Call<AndroidJavaObject>("setRoomStatusUpdateCallback", roomStatusUpdateCallback);
 
                         mRoomConfig = roomConfigBuilder.Call<AndroidJavaObject>("build");
+                        mListener = listener;
                     }
                 }
                 using(var task = mClient.Call<AndroidJavaObject>("create", mRoomConfig))
@@ -164,6 +166,7 @@ namespace GooglePlayGames.Android
                                 roomConfigBuilder.Call<AndroidJavaObject> ("setInvitationIdToAccept", invitationId);
 
                                 mRoomConfig = roomConfigBuilder.Call<AndroidJavaObject> ("build");
+                                mListener = listener;
 
                                 using (var task = mClient.Call<AndroidJavaObject> ("join", mRoomConfig)) {
                                     task.Call<AndroidJavaObject> ("addOnFailureListener", new TaskOnFailedProxy (
@@ -271,7 +274,16 @@ namespace GooglePlayGames.Android
 
         public void LeaveRoom()
         {
-            // Task<Void> leave(@NonNull RoomConfig config, @NonNull String roomId)
+            if (GetRoomStatus() == ROOM_STATUS_ACTIVE)
+            {
+                mClient.Call<AndroidJavaObject> ("leave", mRoomConfig, mRoom.Call<String>("getRoomId")));
+                return;
+            }
+
+            if (mListener != null)
+            {
+                mListener.OnRoomConnected(false);
+            }
         }
 
         public bool IsRoomConnected()
