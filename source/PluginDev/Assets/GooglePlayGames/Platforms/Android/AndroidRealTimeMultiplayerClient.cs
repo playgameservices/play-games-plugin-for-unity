@@ -12,6 +12,9 @@ namespace GooglePlayGames.Android
     internal class AndroidRealTimeMultiplayerClient : IRealTimeMultiplayerClient
     {
         private readonly object mSessionLock = new object();
+
+        private const float InitialPercentComplete = 20.0F;
+
         private static readonly int ROOM_VARIANT_DEFAULT = -1;
         private static readonly int ROOM_STATUS_INVITING = 0;
         private static readonly int ROOM_STATUS_AUTO_MATCHING = 1;
@@ -56,7 +59,7 @@ namespace GooglePlayGames.Android
                 if (GetRoomStatus() == ROOM_STATUS_ACTIVE)
                 {
                     OurUtils.Logger.e("Received attempt to create a new room without cleaning up the old one.");
-                    listener.OnRoomConnected(false);
+                    return;
                 }
                 // build room config
                 using(var roomConfigClass = new AndroidJavaClass("com.google.android.gms.games.multiplayer.realtime.RoomConfig")) {
@@ -146,9 +149,57 @@ namespace GooglePlayGames.Android
             });
         }
 
+        private int GetMinParticipantsToStart()
+        {
+            int minParticipantsToStart = mRoom.Call<AndroidJavaObject>("getParticipants").Call<int>("size");
+
+            AndroidJavaObject autoMatchCriteria = mRoom.Call<AndroidJavaObject>("getAutoMatchCriteria");
+            if (autoMatchCriteria != null)
+            {
+                minParticipantsToStart = minParticipantsToStart + autoMatchCriteria.Call<int>("getInt", "min_automatch_players", 0);
+            }
+
+            if (mInvitation != null)
+            {
+                minParticipantsToStart = minParticipantsToStart + 1;
+            }
+
+            return minParticipantsToStart;
+        }
+
+        // need a second check
+        private float GetPercentComplete()
+        {
+            int connectedCount = GetConnectedParticipants().Count;
+            float percentPerParticipant = (100.0F - InitialPercentComplete) / GetMinParticipantsToStart();
+            return InitialPercentComplete + connectedCount * percentPerParticipant;
+        }
+
         public void ShowWaitingRoomUI()
         {
-            // Task<Intent> getWaitingRoomIntent(@NonNull Room room, @IntRange(from = 0) int minParticipantsToStart)
+            if (mRoom == null)
+            {
+                return;
+            }
+
+            AndroidHelperFragment.ShowWaitingRoomUI(mRoom, GetMinParticipantsToStart(), (response, room) => {
+
+                if (response == AndroidHelperFragment.WaitingRoomUIStatus.Valid)
+                {
+                    if (GetRoomStatus() == ROOM_STATUS_ACTIVE)
+                    {
+                        mListener.OnRoomConnected(true);
+                    }
+                }
+                else if (response == AndroidHelperFragment.WaitingRoomUIStatus.LeftRoom)
+                {
+                    LeaveRoom();
+                }
+                else
+                {
+                    mListener.OnRoomSetupProgress(GetPercentComplete());
+                }
+            });
         }
 
         public void GetAllInvitations(Action<Invitation[]> callback)
@@ -193,11 +244,10 @@ namespace GooglePlayGames.Android
             lock (mSessionLock)
             {
                 int roomStatus = GetRoomStatus();
-                if (roomStatus == ROOM_STATUS_ACTIVE || roomStatus == ROOM_STATUS_CONNECTING)
+                if (roomStatus == ROOM_STATUS_ACTIVE)
                 {
                     OurUtils.Logger.e("Received attempt to accept invitation without cleaning up " +
                     "active session.");
-                    listener.OnRoomConnected(false);
                     return;
                 }
 
@@ -304,7 +354,17 @@ namespace GooglePlayGames.Android
             {
                 return new List<Participant>();
             }
-            return AndroidJavaConverter.ToParticipantList(mRoom.Call<AndroidJavaObject>("getParticipants"));
+
+            List<Participant> result = new List<Participant>();
+            foreach (Participant participant in AndroidJavaConverter.ToParticipantList(mRoom.Call<AndroidJavaObject>("getParticipants")))
+            {
+                if (participant.IsConnectedToRoom)
+                {
+                    result.Add(participant);
+                }
+            }
+
+            return result;
         }
 
         public Participant GetSelf()
@@ -435,60 +495,151 @@ namespace GooglePlayGames.Android
 
             public void onPeerInvitedToRoom(AndroidJavaObject room, AndroidJavaObject participantIds)
             {
-                mParent.mRoom = room;
-                // do we need to add something here?
+                handleParticipantStatusChanged(room, participantIds);
             }
 
             public void onPeerDeclined(AndroidJavaObject room, AndroidJavaObject participantIds)
             {
-                mParent.mRoom = room;
-                // do we need to add something here?
+                handleParticipantStatusChanged(room, participantIds);
             }
 
             public void onPeerJoined(AndroidJavaObject room, AndroidJavaObject participantIds)
             {
-                mParent.mRoom = room;
-                // do we need to add something here?
+                handleParticipantStatusChanged(room, participantIds);
             }
 
             public void onPeerLeft(AndroidJavaObject room, AndroidJavaObject participantIds)
             {
+                handleParticipantStatusChanged(room, participantIds);
+            }
+
+            private void handleParticipantStatusChanged(AndroidJavaObject room, AndroidJavaObject participantIds)
+            {
                 mParent.mRoom = room;
-                // do we need to add something here?
+                int size = participantIds.Get<int>("size");
+                for (int i=0; i<size; i++)
+                {
+                    String participantId = participantIds.Call<String>("get", i);
+                    Participant participant = AndroidJavaConverter.ToParticipant(mParent.mRoom.Call<AndroidJavaObject>("getParticipant", participantId));
+
+                    HashSet<Participant.ParticipantStatus> failedStatus = new HashSet<Participant.ParticipantStatus>
+                            {
+                                Participant.ParticipantStatus.Declined,
+                                Participant.ParticipantStatus.Left
+                            };
+                    if (!failedStatus.Contains(participant.Status))
+                    {
+                        continue;
+                    }
+
+                    mListener.OnParticipantLeft(participant);
+
+                    if (mParent.GetRoomStatus() != ROOM_STATUS_CONNECTING && mParent.GetRoomStatus() != ROOM_STATUS_AUTO_MATCHING)
+                    {
+                        mParent.LeaveRoom();
+                    }
+                }
             }
 
             public void onConnectedToRoom(AndroidJavaObject room)
             {
-                mParent.mRoom = room;
-                // do we need to add something here?
+                if (mParent.GetRoomStatus() == ROOM_STATUS_ACTIVE)
+                {
+                    mParent.mRoom = room;
+                    // do we need to add anything here?
+                }
+                else
+                {
+                    handleConnectedSetChanged(room);
+                }
             }
 
             public void onDisconnectedFromRoom(AndroidJavaObject room)
             {
-                mParent.mRoom = room;
-                // do we need to add something here?
+                if (mParent.GetRoomStatus() == ROOM_STATUS_ACTIVE)
+                {
+                    mParent.mRoom = room;
+                }
+                else
+                {
+                    handleConnectedSetChanged(room);
+                }
             }
 
             public void onPeersConnected(AndroidJavaObject room, AndroidJavaObject participantIds)
             {
-                mParent.mRoom = room;
-                // do we need to add something here?
+                if (mParent.GetRoomStatus() == ROOM_STATUS_ACTIVE)
+                {
+                    mParent.mRoom = room;
+                    mParent.mListener.OnPeersConnected(AndroidJavaConverter.ToStringList(participantIds).ToArray());
+                }
+                else
+                {
+                    handleConnectedSetChanged(room);
+                }
             }
 
             public void onPeersDisconnected(AndroidJavaObject room, AndroidJavaObject participantIds)
             {
+                if (mParent.GetRoomStatus() == ROOM_STATUS_ACTIVE)
+                {
+                    mParent.mRoom = room;
+                    mParent.mListener.OnPeersDisconnected(AndroidJavaConverter.ToStringList(participantIds).ToArray());
+                }
+                else
+                {
+                    handleConnectedSetChanged(room);
+                }
+            }
+
+            private void handleConnectedSetChanged(AndroidJavaObject room)
+            {
+                HashSet<string> oldConnectedSet = new HashSet<string>();
+                foreach(Participant participant in mParent.GetConnectedParticipants())
+                {
+                    oldConnectedSet.Add(participant.ParticipantId);
+                }
+
                 mParent.mRoom = room;
-                // do we need to add something here?
+
+                HashSet<string> connectedSet = new HashSet<string>();
+                foreach(Participant participant in mParent.GetConnectedParticipants())
+                {
+                    connectedSet.Add(participant.ParticipantId);
+                }
+
+                // If the connected set hasn't actually changed, bail out.
+                if (oldConnectedSet.Equals(connectedSet))
+                {
+                    OurUtils.Logger.w("Received connected set callback with unchanged connected set!");
+                    return;
+                }
+
+                List<string> noLongerConnected = new List<string>();
+                foreach(string id in oldConnectedSet)
+                {
+                    if(!connectedSet.Contains(id))
+                    {
+                        noLongerConnected.Add(id);
+                    }
+                }
+
+                if (mParent.GetRoomStatus() == ROOM_STATUS_DELETED)
+                {
+                    OurUtils.Logger.e("Participants disconnected during room setup, failing. " + "Participants were: " + string.Join(",", noLongerConnected.ToArray()));
+                    mParent.mListener.OnRoomConnected(false);
+                    return;
+                }
+
+                mParent.mListener.OnRoomSetupProgress(mParent.GetPercentComplete());
             }
 
             public void onP2PConnected(string participantId)
             {
-                // not sure what to do
             }
 
             public void onP2PDisconnected(string participantId)
             {
-                // not sure what to do
             }
         }
 
@@ -521,7 +672,7 @@ namespace GooglePlayGames.Android
             public void onRoomCreated( /* @OnRoomCreatedStatusCodes */ int statusCode, /* @Nullable Room */ AndroidJavaObject room)
             {
                 mParent.mRoom = room;
-                mListener.OnRoomConnected(true);
+                mListener.OnRoomSetupProgress(mParent.GetPercentComplete());
             }
 
             public void onJoinedRoom( /* @OnJoinedRoomStatusCodes */ int statusCode, /* @Nullable Room */ AndroidJavaObject room)

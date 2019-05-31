@@ -179,6 +179,40 @@ namespace GooglePlayGames.Android
             }
         }
 
+        public enum WaitingRoomUIStatus
+        {
+            Valid = 1,
+            Cancelled = 2,
+            LeftRoom = 3,
+            InvalidRoom = 4,
+            Busy = -1,
+            InternalError = -2,
+        }
+
+        // first callback param type will be enumerated.
+        public static void ShowWaitingRoomUI(AndroidJavaObject room, int minParticipantsToStart,  Action<WaitingRoomUIStatus, AndroidJavaObject> cb)
+        {
+            using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
+            {
+                using (var task = helperFragment.CallStatic<AndroidJavaObject>("showWaitingRoomUI",
+                    AndroidHelperFragment.GetActivity(), room, minParticipantsToStart))
+                {
+                    task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                        result => {
+                            cb.Invoke((WaitingRoomUIStatus) result.Get<int>("status"), result.Get<AndroidJavaObject>("room"));
+                        }
+                    ));
+
+                    task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                        exception => {
+                            Debug.Log("ShowWaitingRoomUI failed with exception");
+                            cb.Invoke(WaitingRoomUIStatus.InternalError, null);
+                        }
+                    ));
+                }
+            }
+        }
+
         public static void ShowInboxUI(Action<UIStatus, TurnBasedMatch> cb)
         {
             using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
