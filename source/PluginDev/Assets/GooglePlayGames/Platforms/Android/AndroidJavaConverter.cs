@@ -158,7 +158,7 @@ namespace GooglePlayGames.Android
         {
             if (turnBasedMatch == null)
             {
-              return null;
+                return null;
             }
             string matchId = turnBasedMatch.Call<string>("getMatchId");
             byte[] data = turnBasedMatch.Call<byte[]>("getData");
