@@ -332,6 +332,14 @@ namespace GooglePlayGames.Android
             }
         }
 
+        protected Action<TurnBasedMatch, bool> MatchDelegate
+        {
+            get
+            {
+                return mMatchDelegate;
+            }
+        }
+
         public void TakeTurn(TurnBasedMatch match, byte[] data, string pendingParticipantId,
                       Action<bool> callback)
         {

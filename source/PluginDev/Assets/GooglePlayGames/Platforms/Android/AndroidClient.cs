@@ -42,7 +42,7 @@ namespace GooglePlayGames.Android
         private readonly object AuthStateLock = new object();
 
         private readonly PlayGamesClientConfiguration mConfiguration;
-        private volatile ITurnBasedMultiplayerClient mTurnBasedClient;
+        private volatile AndroidTurnBasedMultiplayerClient mTurnBasedClient;
         private volatile IRealTimeMultiplayerClient mRealTimeClient;
         private volatile ISavedGameClient mSavedGameClient;
         private volatile IEventsClient mEventsClient;
@@ -124,6 +124,7 @@ namespace GooglePlayGames.Android
                                             mVideoClient = new AndroidVideoClient(isCaptureSupported, account);
                                             mRealTimeClient = new AndroidRealTimeMultiplayerClient(account);
                                             mTurnBasedClient = new AndroidTurnBasedMultiplayerClient(account);
+                                            mTurnBasedClient.RegisterMatchDelegate(mConfiguration.MatchDelegate);
                                         }
 
                                         mAuthState = AuthState.Authenticated;
@@ -136,11 +137,24 @@ namespace GooglePlayGames.Android
                                                 {
                                                     try
                                                     {
-                                                        Invitation invitation = CreateInvitation(activationHint.Call<AndroidJavaObject>("getParcelable", "invitation" /* Multiplayer.EXTRA_INVITATION */));
+                                                        Invitation invitation = AndroidJavaConverter.ToInvitation(activationHint.Call<AndroidJavaObject>("getParcelable", "invitation" /* Multiplayer.EXTRA_INVITATION */));
                                                         mInvitationDelegate(invitation, /* shouldAutoAccept= */ true);
                                                     }
                                                     catch (Exception)
                                                     {  // handle null return
+                                                    }
+                                                }
+
+
+                                                if (mTurnBasedClient.MatchDelegate != null)
+                                                {
+                                                    try
+                                                    {
+                                                        TurnBasedMatch turnBasedMatch = AndroidJavaConverter.ToTurnBasedMatch(activationHint.Call<AndroidJavaObject>("getParcelable", "turn_based_match" /* Multiplayer#EXTRA_TURN_BASED_MATCH */));
+                                                        mTurnBasedClient.MatchDelegate(turnBasedMatch, /* shouldAutoLaunch= */ true);
+                                                    }
+                                                    catch (Exception)
+                                                    {
                                                     }
                                                 }
                                             }
@@ -950,28 +964,12 @@ namespace GooglePlayGames.Android
 
             public void onInvitationReceived(AndroidJavaObject invitation)
             {
-                mInvitationDelegate.Invoke(CreateInvitation(invitation), /* shouldAutoAccept= */ false);
+                mInvitationDelegate.Invoke(AndroidJavaConverter.ToInvitation(invitation), /* shouldAutoAccept= */ false);
             }
 
             public void onInvitationRemoved(string invitationId)
             {
             }
-        }
-
-        private static Invitation CreateInvitation(AndroidJavaObject invitation)
-        {
-            string invitationId = invitation.Call<string>("getInvitationId");
-            AndroidJavaObject participant = invitation.Call<AndroidJavaObject>("getInviter");
-            int invitationType = invitation.Call<int>("getInvitationType");
-            int variant = invitation.Call<int>("getVariant");
-            long creationTimestamp = invitation.Call<long>("getCreationTimestamp");
-            System.DateTime creationTime = AndroidJavaConverter.ToDateTime(creationTimestamp);
-            return new Invitation(
-                AndroidJavaConverter.FromInvitationType(invitationType),
-                invitationId,
-                AndroidJavaConverter.ToParticipant(participant),
-                variant,
-                creationTime);
         }
 
         private AndroidJavaObject getAchievementsClient()
