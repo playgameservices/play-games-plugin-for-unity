@@ -992,6 +992,17 @@ To sign the user out, use the **PlayGamesPlatform.SignOut** method.
 
 After signing out, no further API calls can be made until the user authenticates again.
 
+## Decreasing apk size
+
+It is possible to decrease the size of the Play Games Services Unity Plugin by removing code for the Play Games Services features that your game doesn’t use by using Proguard. Proguard will remove the Play Games Unity plugin code for features that are not used in your game, so your game ships with only the code that is needed and minimizes the size impact of using Play Games Services.
+
+Additionally, it is possible to reduce the size of the entire Unity project using Unity’s [Managed Code Stripping](https://docs.unity3d.com/Manual/ManagedCodeStripping.html), which will compress your entire project.  This can be used in conjunction with Proguard.
+
+### Play Games Services Proguard configuration
+
+1. Go to `File > Build Settings > Player Settings` and click `Publishing Settings` section. Choose `Proguard` for `Minify > Release`. Then, enable `User Proguard File`. If you want the plugin to be proguarded for debug apks as well, you can choose `Proguard` for `Minify > Debug`.
+2. Copy the content of [the proguard configuration](scripts/proguard.txt) into `Assets/Plugins/Android/proguard-user.txt`.
+
 ## (Advanced) Using the Plugin Without Overriding the Default Social Platform
 
 When you call `PlayGamesPlatform.Activate`, Google Play Games becomes your default social platform implementation, which means that static calls to methods in `Social` and `Social.Active` will be carried out by the Google Play Games plugin. This is the desired behavior for most games using the plugin.
