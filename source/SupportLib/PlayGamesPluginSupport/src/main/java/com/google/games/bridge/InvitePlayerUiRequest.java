@@ -23,17 +23,17 @@ class InvitePlayerUiRequest implements HelperFragment.Request {
     private final TaskCompletionSource<Result> resultTaskSource = new TaskCompletionSource<>();
 
     public class Result {
-      public int status;
-      public int minAutomatchingPlayers;
-      public int maxAutomatchingPlayers;
-      public List<String> playerIdsToInvite;
+        public int status;
+        public int minAutomatchingPlayers;
+        public int maxAutomatchingPlayers;
+        public List<String> playerIdsToInvite;
 
-      Result(int status, int minAutomatchingPlayers, int maxAutomatchingPlayers, List<String> playerIdsToInvite) {
-        this.status = status;
-        this.minAutomatchingPlayers = minAutomatchingPlayers;
-        this.maxAutomatchingPlayers = maxAutomatchingPlayers;
-        this.playerIdsToInvite = playerIdsToInvite;
-      }
+        Result(int status, int minAutomatchingPlayers, int maxAutomatchingPlayers, List<String> playerIdsToInvite) {
+            this.status = status;
+            this.minAutomatchingPlayers = minAutomatchingPlayers;
+            this.maxAutomatchingPlayers = maxAutomatchingPlayers;
+            this.playerIdsToInvite = playerIdsToInvite;
+        }
     }
 
     InvitePlayerUiRequest(int minPlayers, int maxPlayers) {
@@ -42,7 +42,7 @@ class InvitePlayerUiRequest implements HelperFragment.Request {
     }
 
     Task<Result> getTask() {
-      return resultTaskSource.getTask();
+        return resultTaskSource.getTask();
     }
 
     @Override
@@ -51,22 +51,22 @@ class InvitePlayerUiRequest implements HelperFragment.Request {
         GoogleSignInAccount account = HelperFragment.getAccount(activity);
         TurnBasedMultiplayerClient client = Games.getTurnBasedMultiplayerClient(activity, account);
         client.getSelectOpponentsIntent(minPlayers, maxPlayers)
-          .addOnSuccessListener(
+            .addOnSuccessListener(
                 activity,
-                    new OnSuccessListener<Intent>() {
-                        @Override
-                        public void onSuccess(Intent intent) {
-                            helperFragment.startActivityForResult(intent, HelperFragment.RC_INVITATION_UI);
-                        }
-                    })
-          .addOnFailureListener(
+                new OnSuccessListener<Intent>() {
+                    @Override
+                    public void onSuccess(Intent intent) {
+                        helperFragment.startActivityForResult(intent, HelperFragment.RC_INVITATION_UI);
+                    }
+                })
+            .addOnFailureListener(
                 activity,
-                    new OnFailureListener() {
-                        @Override
-                        public void onFailure(Exception e) {
-                            setFailure(e);
-                        }
-                    });
+                new OnFailureListener() {
+                    @Override
+                    public void onFailure(Exception e) {
+                        setFailure(e);
+                    }
+                });
     }
 
     @Override
