@@ -39,11 +39,6 @@ namespace GooglePlayGames.Native
             mNativeClient = Misc.CheckNotNull(nativeClient);
             mRealtimeManager = Misc.CheckNotNull(manager);
             mCurrentSession = GetTerminatedSession();
-
-            // register callback for when the application pauses.  OnPause
-            // will disconnect the client, we need to leave the room manually
-            // the disconnection does not trigger and events.
-            PlayGamesHelperObject.AddPauseCallback(HandleAppPausing);
         }
 
         private RoomSession GetTerminatedSession()
@@ -114,16 +109,6 @@ namespace GooglePlayGames.Native
                     session.OnConnectedSetChanged(room))
             .SetOnRoomStatusChangedCallback((room) =>
                     session.OnRoomStatusChanged(room));
-        }
-
-        private void HandleAppPausing(bool paused)
-        {
-            if (paused)
-            {
-                Logger.d("Application is pausing, which disconnects the RTMP " +
-                    " client.  Leaving room.");
-                LeaveRoom();
-            }
         }
 
         public void CreateWithInvitationScreen(uint minOpponents, uint maxOppponents, uint variant,
