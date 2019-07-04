@@ -36,6 +36,17 @@ namespace GooglePlayGames.Android
             }
         }
 
+        public static AndroidJavaObject GetDefaultPopupView()
+        {
+            using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
+            {
+                using(var activity = AndroidHelperFragment.GetActivity())
+                {
+                    return helperFragment.CallStatic<AndroidJavaObject>("getDecorView", activity);
+                }
+            }
+        }
+
         public static void ShowAchievementsUI(Action<UIStatus> cb)
         {
             using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
