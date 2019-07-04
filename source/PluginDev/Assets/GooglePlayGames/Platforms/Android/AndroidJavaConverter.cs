@@ -122,7 +122,10 @@ namespace GooglePlayGames.Android
             Player player = null;
             try
             {
-                player = ToPlayer(participant.Call<AndroidJavaObject>("getPlayer"));
+                using (var playerObject = participant.Call<AndroidJavaObject>("getPlayer"))
+                {
+                    player = ToPlayer(playerObject);
+                }
             }
             catch (Exception)
             {  // Unity throws exception for returned null
@@ -141,17 +144,19 @@ namespace GooglePlayGames.Android
         internal static Invitation ToInvitation(AndroidJavaObject invitation)
         {
             string invitationId = invitation.Call<string>("getInvitationId");
-            AndroidJavaObject participant = invitation.Call<AndroidJavaObject>("getInviter");
             int invitationType = invitation.Call<int>("getInvitationType");
             int variant = invitation.Call<int>("getVariant");
             long creationTimestamp = invitation.Call<long>("getCreationTimestamp");
             System.DateTime creationTime = AndroidJavaConverter.ToDateTime(creationTimestamp);
-            return new Invitation(
-                AndroidJavaConverter.FromInvitationType(invitationType),
-                invitationId,
-                AndroidJavaConverter.ToParticipant(participant),
-                variant,
-                creationTime);
+            using (var participant = invitation.Call<AndroidJavaObject>("getInviter"))
+            {
+                return new Invitation(
+                    AndroidJavaConverter.FromInvitationType(invitationType),
+                    invitationId,
+                    AndroidJavaConverter.ToParticipant(participant),
+                    variant,
+                    creationTime);
+            }
         }
 
         internal static TurnBasedMatch ToTurnBasedMatch(AndroidJavaObject turnBasedMatch)
@@ -167,7 +172,7 @@ namespace GooglePlayGames.Android
             string selfParticipantId = turnBasedMatch.Call<string>("getCreatorId");
             List<Participant> participants = ToParticipantList(turnBasedMatch);
             string pendingParticipantId = turnBasedMatch.Call<string>("getPendingParticipantId");
-            TurnBasedMatch.MatchStatus turnStatus = AndroidJavaConverter.ToTurnStatus(turnBasedMatch.Call<int>("getStatus"));
+            TurnBasedMatch.MatchStatus turnStatus = ToMatchStatus(turnBasedMatch.Call<int>("getStatus"));
             TurnBasedMatch.MatchTurnStatus matchStatus = AndroidJavaConverter.ToMatchTurnStatus(turnBasedMatch.Call<int>("getTurnStatus"));
             uint variant = (uint) turnBasedMatch.Call<int>("getVariant");
             uint version = (uint) turnBasedMatch.Call<int>("getVersion");
@@ -179,52 +184,56 @@ namespace GooglePlayGames.Android
 
         internal static List<Participant> ToParticipantList(AndroidJavaObject turnBasedMatch)
         {
-            AndroidJavaObject participantsObject = turnBasedMatch.Call<AndroidJavaObject>("getParticipantIds");
-            List<Participant> participants = new List<Participant>();
-            int size = participantsObject.Call<int>("size");
-
-            for (int i = 0; i < size ; i++)
+            using (var participantsObject = turnBasedMatch.Call<AndroidJavaObject>("getParticipantIds"))
             {
-                string participantId = participantsObject.Call<string>("get", i);
-                AndroidJavaObject participantObject = turnBasedMatch.Call<AndroidJavaObject>("getParticipant", participantId);
-                participants.Add(AndroidJavaConverter.ToParticipant(participantObject));
+                List<Participant> participants = new List<Participant>();
+                int size = participantsObject.Call<int>("size");
+
+                for (int i = 0; i < size ; i++)
+                {
+                    string participantId = participantsObject.Call<string>("get", i);
+                    using (var participantObject = turnBasedMatch.Call<AndroidJavaObject>("getParticipant", participantId))
+                    {
+                        participants.Add(AndroidJavaConverter.ToParticipant(participantObject));
+                    }
+                }
+                return participants;
             }
-            return participants;
         }
 
-        internal static TurnBasedMatch.MatchStatus ToTurnStatus(int turnStatus)
+        internal static TurnBasedMatch.MatchStatus ToMatchStatus(int matchStatus)
         {
-            switch(turnStatus) {
-              case 0: // MATCH_STATUS_AUTO_MATCHING
-              return TurnBasedMatch.MatchStatus.AutoMatching;
-              case 1: // MATCH_STATUS_ACTIVE
-              return TurnBasedMatch.MatchStatus.Active;
-              case 2: // MATCH_STATUS_COMPLETE
-              return TurnBasedMatch.MatchStatus.Complete;
-              case 3: // MATCH_STATUS_EXPIRED
-              return TurnBasedMatch.MatchStatus.Expired;
-              case 4: // MATCH_STATUS_CANCELED
-              return TurnBasedMatch.MatchStatus.Cancelled;
-              case 5: // MATCH_STATUS_DELETED
-              return TurnBasedMatch.MatchStatus.Deleted;
-              default:
-              return TurnBasedMatch.MatchStatus.Unknown;
+            switch(matchStatus) {
+                case 0: // MATCH_STATUS_AUTO_MATCHING
+                return TurnBasedMatch.MatchStatus.AutoMatching;
+                case 1: // MATCH_STATUS_ACTIVE
+                return TurnBasedMatch.MatchStatus.Active;
+                case 2: // MATCH_STATUS_COMPLETE
+                return TurnBasedMatch.MatchStatus.Complete;
+                case 3: // MATCH_STATUS_EXPIRED
+                return TurnBasedMatch.MatchStatus.Expired;
+                case 4: // MATCH_STATUS_CANCELED
+                return TurnBasedMatch.MatchStatus.Cancelled;
+                case 5: // MATCH_STATUS_DELETED
+                return TurnBasedMatch.MatchStatus.Deleted;
+                default:
+                return TurnBasedMatch.MatchStatus.Unknown;
             }
         }
 
         internal static TurnBasedMatch.MatchTurnStatus ToMatchTurnStatus(int matchTurnStatus)
         {
             switch(matchTurnStatus) {
-              case 0: // MATCH_TURN_STATUS_INVITED
-              return TurnBasedMatch.MatchTurnStatus.Invited;
-              case 1: // MATCH_TURN_STATUS_MY_TURN
-              return TurnBasedMatch.MatchTurnStatus.MyTurn;
-              case 2: // MATCH_TURN_STATUS_THEIR_TURN
-              return TurnBasedMatch.MatchTurnStatus.TheirTurn;
-              case 3: // MATCH_TURN_STATUS_COMPLETE
-              return TurnBasedMatch.MatchTurnStatus.Complete;
-              default:
-              return TurnBasedMatch.MatchTurnStatus.Unknown;
+                case 0: // MATCH_TURN_STATUS_INVITED
+                return TurnBasedMatch.MatchTurnStatus.Invited;
+                case 1: // MATCH_TURN_STATUS_MY_TURN
+                return TurnBasedMatch.MatchTurnStatus.MyTurn;
+                case 2: // MATCH_TURN_STATUS_THEIR_TURN
+                return TurnBasedMatch.MatchTurnStatus.TheirTurn;
+                case 3: // MATCH_TURN_STATUS_COMPLETE
+                return TurnBasedMatch.MatchTurnStatus.Complete;
+                default:
+                return TurnBasedMatch.MatchTurnStatus.Unknown;
             }
         }
     }

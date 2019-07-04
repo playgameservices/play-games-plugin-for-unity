@@ -214,7 +214,7 @@ namespace GooglePlayGames.Android
         {
             int size = playerIdsObject.Call<int>("size");
             List<string> playerIdsToInvite = new List<string>();
-            for (int i=0;i<size;i++)
+            for (int i = 0; i < size; i++)
             {
                 playerIdsToInvite.Add(playerIdsObject.Call<string>("get", i));
             }

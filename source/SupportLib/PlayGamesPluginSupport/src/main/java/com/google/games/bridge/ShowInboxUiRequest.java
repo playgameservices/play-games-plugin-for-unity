@@ -23,13 +23,13 @@ class ShowInboxUiRequest implements HelperFragment.Request {
     private final TaskCompletionSource<Result> resultTaskSource = new TaskCompletionSource<>();
 
     public class Result {
-      public int status;
-      public TurnBasedMatch turnBasedMatch;
+        public int status;
+        public TurnBasedMatch turnBasedMatch;
 
-      Result(int status, TurnBasedMatch turnBasedMatch) {
-        this.status = status;
-        this.turnBasedMatch = turnBasedMatch;
-      }
+        Result(int status, TurnBasedMatch turnBasedMatch) {
+            this.status = status;
+            this.turnBasedMatch = turnBasedMatch;
+        }
     }
 
     public Task<Result> getTask() {
