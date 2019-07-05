@@ -140,17 +140,16 @@ namespace GooglePlayGames.Android
             }
         }
 
-        public static void InvitePlayerUI(uint minOpponents, uint maxOpponents, Action<UIStatus,  InvitationResultHolder> cb)
+        public static void ShowSelectOpponentsUI(uint minOpponents, uint maxOpponents, Action<UIStatus,  InvitationResultHolder> cb)
         {
             using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
             {
-                using (var task = helperFragment.CallStatic<AndroidJavaObject>("invitePlayerUi",
+                using (var task = helperFragment.CallStatic<AndroidJavaObject>("showSelectOpponentsUi",
                     AndroidHelperFragment.GetActivity(), (int) minOpponents, (int) maxOpponents))
                 {
                     task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
                         result => {
                             int status = result.Get<int>("status");
-                            Debug.Log("ShowPlayerSelectUI result " + status);
                             if ((UIStatus)status != UIStatus.Valid)
                             {
                                 cb.Invoke((UIStatus)status, null);
@@ -171,7 +170,7 @@ namespace GooglePlayGames.Android
 
                     task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
                         exception => {
-                            Debug.Log("ShowPlayerSelectUI failed with exception");
+                            Debug.Log("showSelectOpponentsUi failed with exception");
                             cb.Invoke(UIStatus.InternalError, null);
                         }
                     ));
@@ -202,7 +201,7 @@ namespace GooglePlayGames.Android
 
                     task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
                         exception => {
-                            Debug.Log("ShowPlayerSelectUI failed with exception");
+                            Debug.Log("showInboxUi failed with exception");
                             cb.Invoke(UIStatus.InternalError, null);
                         }
                     ));

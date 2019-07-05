@@ -77,7 +77,7 @@ namespace GooglePlayGames.Android
         {
             callback = ToOnGameThread(callback);
 
-            AndroidHelperFragment.InvitePlayerUI(minOpponents, maxOpponents, (status, result) =>
+            AndroidHelperFragment.ShowSelectOpponentsUI(minOpponents, maxOpponents, (status, result) =>
             {
                 if (status != UIStatus.Valid)
                 {

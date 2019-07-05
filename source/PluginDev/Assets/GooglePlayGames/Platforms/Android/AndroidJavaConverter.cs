@@ -189,7 +189,7 @@ namespace GooglePlayGames.Android
                 List<Participant> participants = new List<Participant>();
                 int size = participantsObject.Call<int>("size");
 
-                for (int i = 0; i < size ; i++)
+                for (int i = 0; i < size; i++)
                 {
                     string participantId = participantsObject.Call<string>("get", i);
                     using (var participantObject = turnBasedMatch.Call<AndroidJavaObject>("getParticipant", participantId))

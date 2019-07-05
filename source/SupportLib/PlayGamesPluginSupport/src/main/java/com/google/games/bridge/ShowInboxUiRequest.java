@@ -81,7 +81,7 @@ class ShowInboxUiRequest implements HelperFragment.Request {
     }
 
     void setResult(Integer result) {
-        setResult(result, null);
+        setResult(result, /* turnBasedMatch= */ null);
     }
 
     void setFailure(Exception e) {

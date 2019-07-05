@@ -14,8 +14,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.List;
 
-class InvitePlayerUiRequest implements HelperFragment.Request {
-    private static final String TAG = "InvitePlayerUiRequest";
+class ShowSelectOpponentsRequest implements HelperFragment.Request {
+    private static final String TAG = "ShowSelectOpponents";
 
     private final int minPlayers;
     private final int maxPlayers;
@@ -36,7 +36,7 @@ class InvitePlayerUiRequest implements HelperFragment.Request {
         }
     }
 
-    InvitePlayerUiRequest(int minPlayers, int maxPlayers) {
+    ShowSelectOpponentsRequest(int minPlayers, int maxPlayers) {
         this.minPlayers = minPlayers;
         this.maxPlayers = maxPlayers;
     }
@@ -56,7 +56,7 @@ class InvitePlayerUiRequest implements HelperFragment.Request {
                 new OnSuccessListener<Intent>() {
                     @Override
                     public void onSuccess(Intent intent) {
-                        helperFragment.startActivityForResult(intent, HelperFragment.RC_INVITATION_UI);
+                        helperFragment.startActivityForResult(intent, HelperFragment.RC_SELECT_OPPONENTS_UI);
                     }
                 })
             .addOnFailureListener(
@@ -71,12 +71,12 @@ class InvitePlayerUiRequest implements HelperFragment.Request {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == HelperFragment.RC_INVITATION_UI) {
+        if (requestCode == HelperFragment.RC_SELECT_OPPONENTS_UI) {
             if (resultCode == Activity.RESULT_OK) {
                 setResult(CommonUIStatus.VALID,
-                data.getIntExtra(Multiplayer.EXTRA_MIN_AUTOMATCH_PLAYERS, minPlayers),
-                data.getIntExtra(Multiplayer.EXTRA_MAX_AUTOMATCH_PLAYERS, maxPlayers),
-                data.getStringArrayListExtra(Games.EXTRA_PLAYER_IDS));
+                    data.getIntExtra(Multiplayer.EXTRA_MIN_AUTOMATCH_PLAYERS, minPlayers),
+                    data.getIntExtra(Multiplayer.EXTRA_MAX_AUTOMATCH_PLAYERS, maxPlayers),
+                    data.getStringArrayListExtra(Games.EXTRA_PLAYER_IDS));
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 setResult(CommonUIStatus.CANCELLED);
             } else {
@@ -93,7 +93,10 @@ class InvitePlayerUiRequest implements HelperFragment.Request {
     }
 
     void setResult(Integer status) {
-        setResult(status, 0, 0, null);
+        setResult(status,
+            /* minAutomatchingPlayers= */ 0,
+            /* maxAutomatchingPlayers= */ 0,
+            /* playerIdsToInvite= */ null);
     }
 
     void setFailure(Exception e) {
