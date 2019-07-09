@@ -15,10 +15,10 @@ namespace GooglePlayGames.Android
         private bool mIsCaptureSupported;
         private OnCaptureOverlayStateListenerProxy mOnCaptureOverlayStateListenerProxy = null;
 
-        public AndroidVideoClient(bool isCaptureSupported, AndroidJavaObject account) 
+        public AndroidVideoClient(bool isCaptureSupported, AndroidJavaObject account)
         {
             mIsCaptureSupported = isCaptureSupported;
-            using (var gamesClass = new AndroidJavaClass("com.google.android.gms.games.Games")) 
+            using (var gamesClass = new AndroidJavaClass("com.google.android.gms.games.Games"))
             {
                 mVideosClient = gamesClass.CallStatic<AndroidJavaObject>("getVideosClient", AndroidHelperFragment.GetActivity(), account);
             }
@@ -28,19 +28,14 @@ namespace GooglePlayGames.Android
         {
             callback = ToOnGameThread(callback);
             using (var task = mVideosClient.Call<AndroidJavaObject>("getCaptureCapabilities"))
-            {   // Task<VideoCapabilities> task
-                task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
-                    videoCapabilities =>
-                    {
-                        callback(ResponseStatus.Success, CreateVideoCapabilities(videoCapabilities));
-                    }
-                ));
+            {
+                TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
+                    task,
+                    videoCapabilities => callback(ResponseStatus.Success, CreateVideoCapabilities(videoCapabilities)));
 
-                task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
-                    exception => {
-                        callback(ResponseStatus.InternalError, null);
-                    }
-                ));
+                TaskListenerHelper.AddOnFailureListener(
+                    task,
+                    exception => callback(ResponseStatus.InternalError, null));
             }
         }
 
@@ -53,18 +48,15 @@ namespace GooglePlayGames.Android
         {
             callback = ToOnGameThread(callback);
             using (var task = mVideosClient.Call<AndroidJavaObject>("getCaptureState"))
-            {   // Task<CaptureState> task
-                task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+            {
+                TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
+                    task,
                     captureState =>
-                    {
-                        callback(ResponseStatus.Success, CreateVideoCaptureState(captureState));
-                    }
-                ));
-                task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
-                    exception => {
-                        callback(ResponseStatus.InternalError, null);
-                    }
-                ));
+                        callback(ResponseStatus.Success, CreateVideoCaptureState(captureState)));
+
+                TaskListenerHelper.AddOnFailureListener(
+                    task,
+                    exception => callback(ResponseStatus.InternalError, null));
             }
         }
 
@@ -72,18 +64,14 @@ namespace GooglePlayGames.Android
         {
             callback = ToOnGameThread(callback);
             using (var task = mVideosClient.Call<AndroidJavaObject>("isCaptureAvailable", ToVideoCaptureMode(captureMode)))
-            {   // Task<Boolean> task
-                task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<bool>(
-                    isCaptureAvailable =>
-                    {
-                        callback(ResponseStatus.Success, isCaptureAvailable);
-                    }
-                ));
-                task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
-                    exception => {
-                        callback(ResponseStatus.InternalError, false);
-                    }
-                ));
+            {
+                TaskListenerHelper.AddOnSuccessListener<bool>(
+                    task,
+                    isCaptureAvailable => callback(ResponseStatus.Success, isCaptureAvailable));
+
+                TaskListenerHelper.AddOnFailureListener(
+                    task,
+                    exception => callback(ResponseStatus.InternalError, false));
             }
         }
 
@@ -99,7 +87,7 @@ namespace GooglePlayGames.Android
                 UnregisterCaptureOverlayStateChangedListener();
             }
             mOnCaptureOverlayStateListenerProxy = new OnCaptureOverlayStateListenerProxy(listener);
-            mVideosClient.Call<AndroidJavaObject>("registerOnCaptureOverlayStateChangedListener", 
+            mVideosClient.Call<AndroidJavaObject>("registerOnCaptureOverlayStateChangedListener",
                 mOnCaptureOverlayStateListenerProxy);
         }
 
@@ -107,9 +95,9 @@ namespace GooglePlayGames.Android
         {
             if (mOnCaptureOverlayStateListenerProxy != null)
             {
-                mVideosClient.Call<AndroidJavaObject>("unregisterOnCaptureOverlayStateChangedListener", 
+                mVideosClient.Call<AndroidJavaObject>("unregisterOnCaptureOverlayStateChangedListener",
                     mOnCaptureOverlayStateListenerProxy);
-               
+
                 mOnCaptureOverlayStateListenerProxy = null;
             }
         }
@@ -117,7 +105,7 @@ namespace GooglePlayGames.Android
         private class OnCaptureOverlayStateListenerProxy : AndroidJavaProxy
         {
             private CaptureOverlayStateListener mListener;
-            public OnCaptureOverlayStateListenerProxy(CaptureOverlayStateListener listener) 
+            public OnCaptureOverlayStateListenerProxy(CaptureOverlayStateListener listener)
             : base("com/google/android/gms/games/VideosClient$OnCaptureOverlayStateListener")
             {
                 mListener = listener;
@@ -125,7 +113,7 @@ namespace GooglePlayGames.Android
 
             public void onCaptureOverlayStateChanged(int overlayState)
             {
-                PlayGamesHelperObject.RunOnGameThread(() => 
+                PlayGamesHelperObject.RunOnGameThread(() =>
                     mListener.OnCaptureOverlayStateChanged(FromVideoCaptureOverlayState(overlayState))
                 );
             }
