@@ -9,7 +9,7 @@ namespace GooglePlayGames.Android
     {
         private Action<T> mCallback;
 
-        public TaskOnCompleteProxy(Action<T> callback) 
+        public TaskOnCompleteProxy(Action<T> callback)
         : base("com/google/android/gms/tasks/OnCompleteListener")
         {
             mCallback = callback;
@@ -25,7 +25,7 @@ namespace GooglePlayGames.Android
     {
         private Action<T> mCallback;
 
-        public TaskOnSuccessProxy(Action<T> callback) 
+        public TaskOnSuccessProxy(Action<T> callback)
         : base("com/google/android/gms/tasks/OnSuccessListener")
         {
             mCallback = callback;
@@ -41,7 +41,7 @@ namespace GooglePlayGames.Android
     {
         private Action<AndroidJavaObject> mCallback;
 
-        public TaskOnFailedProxy(Action<AndroidJavaObject> callback) 
+        public TaskOnFailedProxy(Action<AndroidJavaObject> callback)
         : base("com/google/android/gms/tasks/OnFailureListener")
         {
             mCallback = callback;
@@ -50,6 +50,23 @@ namespace GooglePlayGames.Android
         public void onFailure(AndroidJavaObject exception)
         {
             mCallback(exception);
+        }
+    }
+
+    class TaskListenerHelper
+    {
+        public static void AddOnSuccessListener<T>(AndroidJavaObject task, Action<T> callback)
+        {
+            using (task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<T>(callback)))
+            {
+            }
+        }
+
+        public static void AddOnFailureListener(AndroidJavaObject task, Action<AndroidJavaObject> callback)
+        {
+            using (var v = task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(callback)))
+            {
+            }
         }
     }
 }
