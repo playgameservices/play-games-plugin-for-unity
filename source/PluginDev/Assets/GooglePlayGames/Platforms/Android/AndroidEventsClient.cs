@@ -13,9 +13,9 @@ namespace GooglePlayGames.Android
     {
         private volatile AndroidJavaObject mEventsClient;
 
-        public AndroidEventsClient(AndroidJavaObject account) 
+        public AndroidEventsClient(AndroidJavaObject account)
         {
-            using (var gamesClass = new AndroidJavaClass("com.google.android.gms.games.Games")) 
+            using (var gamesClass = new AndroidJavaClass("com.google.android.gms.games.Games"))
             {
                 mEventsClient = gamesClass.CallStatic<AndroidJavaObject>("getEventsClient", AndroidHelperFragment.GetActivity(), account);
             }
@@ -25,16 +25,17 @@ namespace GooglePlayGames.Android
         {
             callback = ToOnGameThread(callback);
             using (var task = mEventsClient.Call<AndroidJavaObject>("load", source == DataSource.ReadNetworkOnly ? true : false))
-            {   // Task<AnnotatedData<EventBuffer>> task
-                task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+            {
+                TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
+                    task,
                     annotatedData => {
-                        using (var buffer = annotatedData.Call<AndroidJavaObject>("get")) 
+                        using (var buffer = annotatedData.Call<AndroidJavaObject>("get"))
                         {
                             int count = buffer.Call<int>("getCount");
                             List<IEvent> result = new List<IEvent>();
-                            for (int i = 0; i < count; ++i) 
+                            for (int i = 0; i < count; ++i)
                             {
-                                using (var eventJava = buffer.Call<AndroidJavaObject>("get", i)) 
+                                using (var eventJava = buffer.Call<AndroidJavaObject>("get", i))
                                 {
                                     result.Add(CreateEvent(eventJava));
                                 }
@@ -42,19 +43,19 @@ namespace GooglePlayGames.Android
                             buffer.Call("release");
                             callback.Invoke(
                                 annotatedData.Call<bool>("isStale")
-                                    ? ResponseStatus.SuccessWithStale 
+                                    ? ResponseStatus.SuccessWithStale
                                     : ResponseStatus.Success,
                                 result
                             );
                         }
-                    }
-                ));
-                task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                    });
+
+                TaskListenerHelper.AddOnFailureListener(
+                    task,
                     exception => {
                         Debug.Log("FetchAllEvents failed");
                         callback.Invoke(ResponseStatus.InternalError, null);
-                    }
-                ));
+                    });
             }
         }
 
@@ -64,43 +65,44 @@ namespace GooglePlayGames.Android
             string[] ids = new string[1];
             ids[0] = eventId;
             using (var task = mEventsClient.Call<AndroidJavaObject>("loadByIds", source == DataSource.ReadNetworkOnly ? true : false, ids))
-            {   // Task<AnnotatedData<EventBuffer>> task
-                task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+            {
+                TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
+                    task,
                     annotatedData => {
-                        using (var buffer = annotatedData.Call<AndroidJavaObject>("get")) 
+                        using (var buffer = annotatedData.Call<AndroidJavaObject>("get"))
                         {
                             int count = buffer.Call<int>("getCount");
                             if (count > 0)
                             {
-                                using (var eventJava = buffer.Call<AndroidJavaObject>("get", 0)) 
+                                using (var eventJava = buffer.Call<AndroidJavaObject>("get", 0))
                                 {
                                     callback.Invoke(
                                         annotatedData.Call<bool>("isStale")
-                                            ? ResponseStatus.SuccessWithStale 
+                                            ? ResponseStatus.SuccessWithStale
                                             : ResponseStatus.Success,
                                         CreateEvent(eventJava)
                                     );
                                 }
                             }
-                            else 
+                            else
                             {
                                 callback.Invoke(
                                     annotatedData.Call<bool>("isStale")
-                                        ? ResponseStatus.SuccessWithStale 
+                                        ? ResponseStatus.SuccessWithStale
                                         : ResponseStatus.Success,
                                     null
                                 );
                             }
                             buffer.Call("release");
                         }
-                    }
-                ));
-                task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                    });
+
+                TaskListenerHelper.AddOnFailureListener(
+                    task,
                     exception => {
                         Debug.Log("FetchEvent failed");
                         callback.Invoke(ResponseStatus.InternalError, null);
-                    }
-                ));
+                    });
             }
         }
 
@@ -112,7 +114,7 @@ namespace GooglePlayGames.Android
         private static Action<T1, T2> ToOnGameThread<T1, T2>(Action<T1, T2> toConvert)
         {
             return (val1, val2) => PlayGamesHelperObject.RunOnGameThread(() => toConvert(val1, val2));
-        }        
+        }
 
         private static BasicApi.Events.Event CreateEvent(AndroidJavaObject eventJava)
         {
