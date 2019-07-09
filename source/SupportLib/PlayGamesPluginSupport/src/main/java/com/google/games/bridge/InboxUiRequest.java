@@ -6,35 +6,47 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesActivityResultCodes;
+import com.google.android.gms.games.multiplayer.Multiplayer;
+import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch;
+import com.google.android.gms.games.TurnBasedMultiplayerClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
 
 
-class SimpleUiRequest implements HelperFragment.Request {
+class InboxUiRequest implements HelperFragment.Request {
     private static final String TAG = "SimpleUiRequest";
 
-    private final TaskCompletionSource<Integer> resultTaskSource = new TaskCompletionSource<>();
+    private final TaskCompletionSource<Result> resultTaskSource = new TaskCompletionSource<>();
 
-    public Task<Integer> getTask() {
-        return resultTaskSource.getTask();
+    public class Result {
+        public int status;
+        public TurnBasedMatch turnBasedMatch;
+
+        Result(int status, TurnBasedMatch turnBasedMatch) {
+            this.status = status;
+            this.turnBasedMatch = turnBasedMatch;
+        }
     }
 
-    protected Task<Intent> getIntent(Activity activity) {
-        return null;
+    public Task<Result> getTask() {
+        return resultTaskSource.getTask();
     }
 
     public void process(final HelperFragment helperFragment) {
         final Activity activity = helperFragment.getActivity();
-        getIntent(activity)
+        GoogleSignInAccount account = HelperFragment.getAccount(activity);
+        TurnBasedMultiplayerClient client = Games.getTurnBasedMultiplayerClient(activity, account);
+        client.getInboxIntent()
             .addOnSuccessListener(
                 activity,
                 new OnSuccessListener<Intent>() {
                     @Override
                     public void onSuccess(Intent intent) {
-                        helperFragment.startActivityForResult(intent, HelperFragment.RC_SIMPLE_UI);
+                        helperFragment.startActivityForResult(intent, HelperFragment.RC_INBOX_UI);
                     }
                 })
             .addOnFailureListener(
@@ -48,9 +60,11 @@ class SimpleUiRequest implements HelperFragment.Request {
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == HelperFragment.RC_SIMPLE_UI) {
-            if (resultCode == Activity.RESULT_OK || resultCode == Activity.RESULT_CANCELED) {
-                setResult(CommonUIStatus.VALID);
+        if (requestCode == HelperFragment.RC_INBOX_UI) {
+            if (resultCode == Activity.RESULT_OK) {
+                setResult(CommonUIStatus.VALID, (TurnBasedMatch) data.getParcelableExtra(Multiplayer.EXTRA_TURN_BASED_MATCH));
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                setResult(CommonUIStatus.CANCELLED);
             } else if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) {
                 setResult(CommonUIStatus.NOT_AUTHORIZED);
             } else {
@@ -60,9 +74,14 @@ class SimpleUiRequest implements HelperFragment.Request {
         }
     }
 
-    void setResult(Integer result) {
+    void setResult(Integer status, TurnBasedMatch turnBasedMatch) {
+        Result result = new Result(status, turnBasedMatch);
         resultTaskSource.setResult(result);
         HelperFragment.finishRequest(this);
+    }
+
+    void setResult(Integer result) {
+        setResult(result, /* turnBasedMatch= */ null);
     }
 
     void setFailure(Exception e) {

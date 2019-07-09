@@ -21,10 +21,10 @@ import com.google.android.gms.tasks.TaskCompletionSource;
 class SelectSnapshotUiRequest implements HelperFragment.Request {
     private static final String TAG = "SelectSnapshotUiRequest";
 
-    /** 
+    /**
      * Should be aligned to:
      * PluginDev/Assets/GooglePlayGames/BasicApi/SavedGame/ISavedGameClient.cs enum SelectUIStatus
-     * */ 
+     * */
     static final int SELECT_UI_STATUS_GAME_SELECTED = 1;
     static final int SELECT_UI_STATUS_USER_CLOSED_UI = 2;
     static final int SELECT_UI_STATUS_INTERNAL_ERROR = -1;
@@ -68,20 +68,20 @@ class SelectSnapshotUiRequest implements HelperFragment.Request {
             .getSelectSnapshotIntent(title, allowAddButton, allowDelete, maxSnapshots)
             .addOnSuccessListener(
                 activity,
-                    new OnSuccessListener<Intent>() {
-                        @Override
-                        public void onSuccess(Intent intent) {
-                            helperFragment.startActivityForResult(intent, HelperFragment.RC_SELECT_SNAPSHOT_UI);
-                        }
-                    })
+                new OnSuccessListener<Intent>() {
+                    @Override
+                    public void onSuccess(Intent intent) {
+                        helperFragment.startActivityForResult(intent, HelperFragment.RC_SELECT_SNAPSHOT_UI);
+                    }
+                })
             .addOnFailureListener(
                 activity,
-                    new OnFailureListener() {
-                        @Override
-                        public void onFailure(Exception e) {
-                            setFailure(e);
-                        }
-                    });
+                new OnFailureListener() {
+                    @Override
+                    public void onFailure(Exception e) {
+                        setFailure(e);
+                    }
+                });
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

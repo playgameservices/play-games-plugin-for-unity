@@ -118,7 +118,7 @@ namespace GooglePlayGames.Android
                             silent,
                             requestAuthCode,
                             requestEmail,
-                            requestIdToken, 
+                            requestIdToken,
                             webClientId,
                             forceRefresh,
                             oauthScopes.ToArray(),
@@ -214,14 +214,14 @@ namespace GooglePlayGames.Android
             {
                 OurUtils.Logger.e("Exception launching token request: " + e.Message);
                 OurUtils.Logger.e(e.ToString());
-            }              
+            }
         }
 
         private class ResultCallbackProxy : AndroidJavaProxy
         {
             private Action<AndroidJavaObject> mCallback;
 
-            public ResultCallbackProxy(Action<AndroidJavaObject> callback) 
+            public ResultCallbackProxy(Action<AndroidJavaObject> callback)
             : base("com/google/android/gms/common/api/ResultCallback")
             {
                 mCallback = callback;
