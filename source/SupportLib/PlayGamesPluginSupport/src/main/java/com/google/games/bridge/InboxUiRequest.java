@@ -2,61 +2,51 @@ package com.google.games.bridge;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.games.Games;
+import com.google.android.gms.games.GamesActivityResultCodes;
 import com.google.android.gms.games.multiplayer.Multiplayer;
+import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch;
 import com.google.android.gms.games.TurnBasedMultiplayerClient;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import java.util.List;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.TaskCompletionSource;
 
-class ShowSelectOpponentsRequest implements HelperFragment.Request {
-    private static final String TAG = "ShowSelectOpponents";
 
-    private final int minPlayers;
-    private final int maxPlayers;
+class InboxUiRequest implements HelperFragment.Request {
+    private static final String TAG = "SimpleUiRequest";
 
     private final TaskCompletionSource<Result> resultTaskSource = new TaskCompletionSource<>();
 
     public class Result {
         public int status;
-        public int minAutomatchingPlayers;
-        public int maxAutomatchingPlayers;
-        public List<String> playerIdsToInvite;
+        public TurnBasedMatch turnBasedMatch;
 
-        Result(int status, int minAutomatchingPlayers, int maxAutomatchingPlayers, List<String> playerIdsToInvite) {
+        Result(int status, TurnBasedMatch turnBasedMatch) {
             this.status = status;
-            this.minAutomatchingPlayers = minAutomatchingPlayers;
-            this.maxAutomatchingPlayers = maxAutomatchingPlayers;
-            this.playerIdsToInvite = playerIdsToInvite;
+            this.turnBasedMatch = turnBasedMatch;
         }
     }
 
-    ShowSelectOpponentsRequest(int minPlayers, int maxPlayers) {
-        this.minPlayers = minPlayers;
-        this.maxPlayers = maxPlayers;
-    }
-
-    Task<Result> getTask() {
+    public Task<Result> getTask() {
         return resultTaskSource.getTask();
     }
 
-    @Override
     public void process(final HelperFragment helperFragment) {
         final Activity activity = helperFragment.getActivity();
         GoogleSignInAccount account = HelperFragment.getAccount(activity);
         TurnBasedMultiplayerClient client = Games.getTurnBasedMultiplayerClient(activity, account);
-        client.getSelectOpponentsIntent(minPlayers, maxPlayers)
+        client.getInboxIntent()
             .addOnSuccessListener(
                 activity,
                 new OnSuccessListener<Intent>() {
                     @Override
                     public void onSuccess(Intent intent) {
-                        helperFragment.startActivityForResult(intent, HelperFragment.RC_SELECT_OPPONENTS_UI);
+                        helperFragment.startActivityForResult(intent, HelperFragment.RC_INBOX_UI);
                     }
                 })
             .addOnFailureListener(
@@ -69,16 +59,14 @@ class ShowSelectOpponentsRequest implements HelperFragment.Request {
                 });
     }
 
-    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == HelperFragment.RC_SELECT_OPPONENTS_UI) {
+        if (requestCode == HelperFragment.RC_INBOX_UI) {
             if (resultCode == Activity.RESULT_OK) {
-                setResult(CommonUIStatus.VALID,
-                    data.getIntExtra(Multiplayer.EXTRA_MIN_AUTOMATCH_PLAYERS, minPlayers),
-                    data.getIntExtra(Multiplayer.EXTRA_MAX_AUTOMATCH_PLAYERS, maxPlayers),
-                    data.getStringArrayListExtra(Games.EXTRA_PLAYER_IDS));
+                setResult(CommonUIStatus.VALID, (TurnBasedMatch) data.getParcelableExtra(Multiplayer.EXTRA_TURN_BASED_MATCH));
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 setResult(CommonUIStatus.CANCELLED);
+            } else if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) {
+                setResult(CommonUIStatus.NOT_AUTHORIZED);
             } else {
                 Log.d(TAG, "onActivityResult unknown resultCode: " + resultCode);
                 setResult(CommonUIStatus.INTERNAL_ERROR);
@@ -86,17 +74,14 @@ class ShowSelectOpponentsRequest implements HelperFragment.Request {
         }
     }
 
-    void setResult(Integer status, int minAutomatchingPlayers, int maxAutomatchingPlayers, List<String> playerIdsToInvite) {
-        Result result = new Result(status, minAutomatchingPlayers, maxAutomatchingPlayers, playerIdsToInvite);
+    void setResult(Integer status, TurnBasedMatch turnBasedMatch) {
+        Result result = new Result(status, turnBasedMatch);
         resultTaskSource.setResult(result);
         HelperFragment.finishRequest(this);
     }
 
-    void setResult(Integer status) {
-        setResult(status,
-            /* minAutomatchingPlayers= */ 0,
-            /* maxAutomatchingPlayers= */ 0,
-            /* playerIdsToInvite= */ null);
+    void setResult(Integer result) {
+        setResult(result, /* turnBasedMatch= */ null);
     }
 
     void setFailure(Exception e) {

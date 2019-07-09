@@ -52,7 +52,7 @@ public class HelperFragment extends Fragment
     static final int RC_SELECT_SNAPSHOT_UI = 9004;
     static final int RC_CAPTURE_OVERLAY_UI = 9005;
     static final int RC_SELECT_OPPONENTS_UI = 9006;
-    static final int RC_SHOW_INBOX_UI = 9007;
+    static final int RC_INBOX_UI = 9007;
 
     // Pending token request.  There can be only one outstanding request at a
     // time.
@@ -181,8 +181,8 @@ public class HelperFragment extends Fragment
         return request.getTask();
     }
 
-    public static Task<ShowSelectOpponentsRequest.Result> showSelectOpponentsUi(Activity parentActivity, int minOpponents, int maxOpponents){
-        ShowSelectOpponentsRequest request = new ShowSelectOpponentsRequest(minOpponents, maxOpponents);
+    public static Task<SelectOpponentsUiRequest.Result> showSelectOpponentsUi(Activity parentActivity, int minOpponents, int maxOpponents){
+        SelectOpponentsUiRequest request = new SelectOpponentsUiRequest(minOpponents, maxOpponents);
 
         if(!HelperFragment.startRequest(parentActivity, request)) {
             request.setResult(CommonUIStatus.UI_BUSY);
@@ -191,8 +191,8 @@ public class HelperFragment extends Fragment
         return request.getTask();
     }
 
-    public static Task<ShowInboxUiRequest.Result> showInboxUi(Activity parentActivity){
-        ShowInboxUiRequest request = new ShowInboxUiRequest();
+    public static Task<InboxUiRequest.Result> showInboxUi(Activity parentActivity){
+        InboxUiRequest request = new InboxUiRequest();
 
         if(!HelperFragment.startRequest(parentActivity, request)) {
             request.setResult(CommonUIStatus.UI_BUSY);
