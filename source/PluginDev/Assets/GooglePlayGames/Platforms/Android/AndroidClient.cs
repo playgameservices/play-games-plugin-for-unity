@@ -87,7 +87,8 @@ namespace GooglePlayGames.Android
             mTokenClient.FetchTokens(silent, (int result) => {
                 bool succeed = result == 0 /* CommonStatusCodes.SUCCEED */;
                 InitializeGameServices();
-                if (succeed) {
+                if (succeed)
+                {
                     AndroidJavaObject signInTasks = new AndroidJavaObject("java.util.ArrayList");
                     if (mInvitationDelegate != null)
                     {
@@ -172,14 +173,21 @@ namespace GooglePlayGames.Android
                             ));
                         }
                     }
-                } else {
+                }
+                else
+                {
                     lock (AuthStateLock)
                     {
-                        if (result == 16 /* CommonStatusCodes.CANCELED */) {
+                        if (result == 16 /* CommonStatusCodes.CANCELED */)
+                        {
                             InvokeCallbackOnGameThread(callback, false, "Authentication canceled");
-                        } else if (result == 8 /* CommonStatusCodes.DEVELOPER_ERROR */) {
+                        }
+                        else if (result == 8 /* CommonStatusCodes.DEVELOPER_ERROR */)
+                        {
                             InvokeCallbackOnGameThread(callback, false, "Authentication failed - developer error");
-                        } else {
+                        }
+                        else
+                        {
                             InvokeCallbackOnGameThread(callback, false, "Authentication failed");
                         }
                     }
@@ -244,20 +252,24 @@ namespace GooglePlayGames.Android
 
         private void InitializeGameServices()
         {
-            if (mTokenClient != null) {
+            if (mTokenClient != null)
+            {
                 return;
             }
             InitializeTokenClient();
         }
 
-        private void InitializeTokenClient() {
-            if (mTokenClient != null) {
+        private void InitializeTokenClient()
+        {
+            if (mTokenClient != null)
+            {
                 return;
             }
             mTokenClient = new AndroidTokenClient();
 
             if (!GameInfo.WebClientIdInitialized() &&
-                (mConfiguration.IsRequestingIdToken || mConfiguration.IsRequestingAuthCode)) {
+                (mConfiguration.IsRequestingIdToken || mConfiguration.IsRequestingAuthCode))
+            {
                 OurUtils.Logger.e("Server Auth Code and ID Token require web clientId to configured.");
             }
             string[] scopes = mConfiguration.Scopes;
@@ -268,7 +280,8 @@ namespace GooglePlayGames.Android
             mTokenClient.SetRequestIdToken(mConfiguration.IsRequestingIdToken);
             mTokenClient.SetHidePopups(mConfiguration.IsHidingPopups);
             mTokenClient.AddOauthScopes("https://www.googleapis.com/auth/games_lite");
-            if (mConfiguration.EnableSavedGames) {
+            if (mConfiguration.EnableSavedGames)
+            {
                 mTokenClient.AddOauthScopes("https://www.googleapis.com/auth/drive.appdata");
             }
             mTokenClient.AddOauthScopes(scopes);
@@ -450,8 +463,9 @@ namespace GooglePlayGames.Android
             using (var playerStatsClient = getPlayerStatsClient())
             {
                 using (var task = playerStatsClient.Call<AndroidJavaObject>("loadPlayerStats", /* forceReload= */ false))
-                {   // Task<AnnotatedData<PlayerStats>>
-                    task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                {
+                    TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
+                        task,
                         annotatedData => {
                             using (var playerStatsJava = annotatedData.Call<AndroidJavaObject>("get"))
                             {
@@ -480,14 +494,14 @@ namespace GooglePlayGames.Android
 
                                 InvokeCallbackOnGameThread(callback, CommonStatusCodes.Success, result);
                             }
-                        }
-                    ));
-                    task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
-                        exception => {
+                        });
+
+                    TaskListenerHelper.AddOnFailureListener(
+                        task,
+                        e => {
                             Debug.Log("GetPlayerStats failed");
                             InvokeCallbackOnGameThread(callback, CommonStatusCodes.InternalError, new PlayerStats());
-                        }
-                    ));
+                        });
                 }
             }
         }
@@ -511,8 +525,9 @@ namespace GooglePlayGames.Android
                 for (int i = 0; i < count; ++i)
                 {
                     using (var task = playersClient.Call<AndroidJavaObject>("loadPlayer", userIds[i]))
-                    {   // Task<AnnotatedData<Player>> task
-                        task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                    {
+                        TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
+                            task,
                             annotatedData => {
                                 using (var player = annotatedData.Call<AndroidJavaObject>("get"))
                                 {
@@ -528,25 +543,27 @@ namespace GooglePlayGames.Android
                                     lock (countLock)
                                     {
                                         ++resultCount;
-                                        if(resultCount == count) {
+                                        if(resultCount == count)
+                                        {
                                             InvokeCallbackOnGameThread(callback, users);
                                         }
                                     }
                                 }
-                            }
-                        ));
-                        task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                            });
+
+                        TaskListenerHelper.AddOnFailureListener(
+                            task,
                             exception => {
                                 Debug.Log("LoadUsers failed for index " + i);
                                 lock (countLock)
                                 {
                                     ++resultCount;
-                                    if(resultCount == count) {
+                                    if(resultCount == count)
+                                    {
                                         InvokeCallbackOnGameThread(callback, users);
                                     }
                                 }
-                            }
-                        ));
+                            });
                     }
                 }
             }
@@ -559,8 +576,9 @@ namespace GooglePlayGames.Android
             using (var achievementsClient = getAchievementsClient())
             {
                 using (var task = achievementsClient.Call<AndroidJavaObject>("load", /* forceReload= */ false))
-                {   // Task<AnnotatedData<AchievementBuffer>>
-                    task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                {
+                    TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
+                        task,
                         annotatedData => {
                             using (var achievementBuffer = annotatedData.Call<AndroidJavaObject>("get"))
                             {
@@ -597,14 +615,14 @@ namespace GooglePlayGames.Android
                                 achievementBuffer.Call("release");
                                 InvokeCallbackOnGameThread(callback, result);
                             }
-                        }
-                    ));
-                    task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                        });
+
+                    TaskListenerHelper.AddOnFailureListener(
+                        task,
                         exception => {
                             Debug.Log("LoadAchievements failed");
                             InvokeCallbackOnGameThread(callback, new Achievement[0]);
-                        }
-                    ));
+                        });
                 }
             }
         }
@@ -731,8 +749,9 @@ namespace GooglePlayGames.Android
                     AndroidJavaConverter.ToLeaderboardVariantTimeSpan(timeSpan),
                     AndroidJavaConverter.ToLeaderboardVariantCollection(collection),
                     rowCount))
-                {   // Task<AnnotatedData<LeaderboardScores>> task
-                    task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                {
+                    TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
+                        task,
                         annotatedData => {
                             using (var leaderboardScores = annotatedData.Call<AndroidJavaObject>("get"))
                             {
@@ -744,16 +763,15 @@ namespace GooglePlayGames.Android
                                     leaderboardScores));
                                 leaderboardScores.Call("release");
                             }
-                        }
-                    ));
-                    task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                        });
+
+                    TaskListenerHelper.AddOnFailureListener(
+                        task,
                         exception => {
                             Debug.Log("LoadScores failed");
                             InvokeCallbackOnGameThread(callback, new LeaderboardScoreData(leaderboardId, ResponseStatus.InternalError));
-                        }
-                    ));
+                        });
                 }
-
             }
         }
 
@@ -766,8 +784,9 @@ namespace GooglePlayGames.Android
             {
                 using (var task = client.Call<AndroidJavaObject>("loadMoreScores",
                     token.InternalObject, rowCount, AndroidJavaConverter.ToPageDirection(token.Direction)))
-                {   // Task<AnnotatedData<LeaderboardScores>> task
-                    task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                {
+                    TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
+                        task,
                         annotatedData => {
                             using (var leaderboardScores = annotatedData.Call<AndroidJavaObject>("get"))
                             {
@@ -779,14 +798,14 @@ namespace GooglePlayGames.Android
                                     leaderboardScores));
                                 leaderboardScores.Call("release");
                             }
-                        }
-                    ));
-                    task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                        });
+
+                    TaskListenerHelper.AddOnFailureListener(
+                        task,
                         exception => {
                             Debug.Log("LoadMoreScores failed");
                             InvokeCallbackOnGameThread(callback, new LeaderboardScoreData(token.LeaderboardId, ResponseStatus.InternalError));
-                        }
-                    ));
+                        });
                 }
             }
         }
