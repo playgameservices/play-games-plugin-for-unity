@@ -40,22 +40,21 @@ namespace GooglePlayGames.Android
         public static void ShowAchievementsUI(Action<UIStatus> cb)
         {
             using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
+            using (var task = helperFragment.CallStatic<AndroidJavaObject>("showAchievementUi", AndroidHelperFragment.GetActivity()))
             {
-                using (var task = helperFragment.CallStatic<AndroidJavaObject>("showAchievementUi", AndroidHelperFragment.GetActivity()))
-                {
-                    task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<int>(
-                        uiCode => {
-                            Debug.Log("ShowAchievementsUI result " + uiCode);
-                            cb.Invoke((UIStatus)uiCode);
-                        }
-                    ));
-                    task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
-                        exception => {
-                            Debug.Log("ShowAchievementsUI failed with exception");
-                            cb.Invoke(UIStatus.InternalError);
-                        }
-                    ));
-                }
+                TaskListenerHelper.AddOnSuccessListener<int>(
+                    task,
+                    uiCode => {
+                        Debug.Log("ShowAchievementsUI result " + uiCode);
+                        cb.Invoke((UIStatus)uiCode);
+                    });
+
+                TaskListenerHelper.AddOnFailureListener(
+                    task,
+                    exception => {
+                        Debug.Log("ShowAchievementsUI failed with exception");
+                        cb.Invoke(UIStatus.InternalError);
+                    });
             }
         }
 
@@ -70,45 +69,43 @@ namespace GooglePlayGames.Android
         public static void ShowAllLeaderboardsUI(Action<UIStatus> cb)
         {
             using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
+            using (var task = helperFragment.CallStatic<AndroidJavaObject>("showAllLeaderboardsUi", AndroidHelperFragment.GetActivity()))
             {
-                using (var task = helperFragment.CallStatic<AndroidJavaObject>("showAllLeaderboardsUi", AndroidHelperFragment.GetActivity()))
-                {
-                    task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<int>(
-                        uiCode => {
-                            Debug.Log("ShowAllLeaderboardsUI result " + uiCode);
-                            cb.Invoke((UIStatus) uiCode);
-                        }
-                    ));
-                    task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
-                        exception => {
-                            Debug.Log("ShowAllLeaderboardsUI failed with exception");
-                            cb.Invoke(UIStatus.InternalError);
-                        }
-                    ));
-                }
+                TaskListenerHelper.AddOnSuccessListener<int>(
+                    task,
+                    uiCode => {
+                        Debug.Log("ShowAllLeaderboardsUI result " + uiCode);
+                        cb.Invoke((UIStatus) uiCode);
+                    });
+
+                TaskListenerHelper.AddOnFailureListener(
+                    task,
+                    exception => {
+                        Debug.Log("ShowAllLeaderboardsUI failed with exception");
+                        cb.Invoke(UIStatus.InternalError);
+                    });
             }
         }
 
         public static void ShowLeaderboardUI(string leaderboardId, LeaderboardTimeSpan timeSpan, Action<UIStatus> cb)
         {
             using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
+            using (var task = helperFragment.CallStatic<AndroidJavaObject>("showLeaderboardUi",
+                AndroidHelperFragment.GetActivity(), leaderboardId, AndroidJavaConverter.ToLeaderboardVariantTimeSpan(timeSpan)))
             {
-                using (var task = helperFragment.CallStatic<AndroidJavaObject>("showLeaderboardUi",
-                    AndroidHelperFragment.GetActivity(), leaderboardId, AndroidJavaConverter.ToLeaderboardVariantTimeSpan(timeSpan)))
-                {
-                    task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<int>(
-                        uiCode => {
-                            Debug.Log("ShowLeaderboardUI result " + uiCode);
-                            cb.Invoke((UIStatus) uiCode);
-                        }
-                    ));
-                    task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
-                        exception => {
-                            Debug.Log("ShowLeaderboardUI failed with exception");
-                            cb.Invoke(UIStatus.InternalError);
-                        }
-                    ));
-                }
+                TaskListenerHelper.AddOnSuccessListener<int>(
+                    task,
+                    uiCode => {
+                        Debug.Log("ShowLeaderboardUI result " + uiCode);
+                        cb.Invoke((UIStatus) uiCode);
+                    });
+
+                TaskListenerHelper.AddOnFailureListener(
+                    task,
+                    exception => {
+                        Debug.Log("ShowLeaderboardUI failed with exception");
+                        cb.Invoke(UIStatus.InternalError);
+                    });
             }
         }
 
@@ -116,96 +113,101 @@ namespace GooglePlayGames.Android
                 int maxDisplayedSavedGames, string uiTitle, Action<SelectUIStatus, ISavedGameMetadata> cb)
         {
             using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
+            using(var task = helperFragment.CallStatic<AndroidJavaObject>("showSelectSnapshotUi",
+                AndroidHelperFragment.GetActivity(), uiTitle, showCreateSaveUI, showDeleteSaveUI, maxDisplayedSavedGames))
             {
-                using(var task = helperFragment.CallStatic<AndroidJavaObject>("showSelectSnapshotUi",
-                    AndroidHelperFragment.GetActivity(), uiTitle, showCreateSaveUI, showDeleteSaveUI, maxDisplayedSavedGames))
-                {
-                    task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
-                        // SelectSnapshotUiRequest.Result result
-                        result => {
-                            SelectUIStatus status = (SelectUIStatus)result.Get<int>("status");
-                            AndroidJavaObject javaMetadata = result.Get<AndroidJavaObject>("metadata");
-                            AndroidSnapshotMetadata metadata = javaMetadata == null ? null : new AndroidSnapshotMetadata(javaMetadata, /* contents= */null);
-                            Debug.Log("ShowSelectSnapshotUI result " + status);
-                            cb.Invoke(status, metadata);
+                TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
+                    task,
+                    result => {
+                        SelectUIStatus status = (SelectUIStatus) result.Get<int>("status");
+                        Debug.Log("ShowSelectSnapshotUI result " + status);
+
+                        AndroidSnapshotMetadata metadata;
+                        using (var javaMetadata = result.Get<AndroidJavaObject>("metadata"))
+                        {
+                            metadata = javaMetadata == null ? null : new AndroidSnapshotMetadata(javaMetadata, /* contents= */null);
                         }
-                    ));
-                    task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
-                        exception => {
-                            Debug.Log("ShowSelectSnapshotUI failed with exception");
-                            cb.Invoke(SelectUIStatus.InternalError, null);
-                        }
-                    ));
-                }
+
+                        cb.Invoke(status, metadata);
+                    });
+
+                TaskListenerHelper.AddOnFailureListener(
+                    task,
+                    exception => {
+                        Debug.Log("ShowSelectSnapshotUI failed with exception");
+                        cb.Invoke(SelectUIStatus.InternalError, null);
+                    });
             }
         }
 
         public static void ShowSelectOpponentsUI(uint minOpponents, uint maxOpponents, Action<UIStatus,  InvitationResultHolder> cb)
         {
             using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
+            using (var task = helperFragment.CallStatic<AndroidJavaObject>("showSelectOpponentsUi",
+                AndroidHelperFragment.GetActivity(), (int) minOpponents, (int) maxOpponents))
             {
-                using (var task = helperFragment.CallStatic<AndroidJavaObject>("showSelectOpponentsUi",
-                    AndroidHelperFragment.GetActivity(), (int) minOpponents, (int) maxOpponents))
-                {
-                    task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
-                        result => {
-                            int status = result.Get<int>("status");
-                            if ((UIStatus)status != UIStatus.Valid)
-                            {
-                                cb.Invoke((UIStatus)status, null);
-                                return;
-                            }
-
-                            List<string> playerIdsToInvite = CreatePlayerIdsToInvite(result.Get<AndroidJavaObject>("playerIdsToInvite"));
-
-                            InvitationResultHolder resultHolder = new InvitationResultHolder(
-                                result.Get<int>("minAutomatchingPlayers"),
-                                result.Get<int>("maxAutomatchingPlayers"),
-                                playerIdsToInvite
-                            );
-
-                            cb.Invoke((UIStatus)status, resultHolder);
+                TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
+                    task,
+                    result => {
+                        int status = result.Get<int>("status");
+                        if ((UIStatus) status != UIStatus.Valid)
+                        {
+                            cb.Invoke((UIStatus) status, null);
+                            return;
                         }
-                    ));
 
-                    task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
-                        exception => {
-                            Debug.Log("showSelectOpponentsUi failed with exception");
-                            cb.Invoke(UIStatus.InternalError, null);
+                        List<string> playerIdsToInvite;
+                        using (var ids = result.Get<AndroidJavaObject>("playerIdsToInvite"))
+                        {
+                            playerIdsToInvite = CreatePlayerIdsToInvite(ids);
                         }
-                    ));
-                }
+
+                        InvitationResultHolder resultHolder = new InvitationResultHolder(
+                            result.Get<int>("minAutomatchingPlayers"),
+                            result.Get<int>("maxAutomatchingPlayers"),
+                            playerIdsToInvite
+                        );
+
+                        cb.Invoke((UIStatus) status, resultHolder);
+                    });
+
+                TaskListenerHelper.AddOnFailureListener(
+                    task,
+                    exception => {
+                        Debug.Log("showSelectOpponentsUi failed with exception");
+                        cb.Invoke(UIStatus.InternalError, null);
+                    });
             }
         }
 
         public static void ShowInboxUI(Action<UIStatus, TurnBasedMatch> cb)
         {
             using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
+            using (var task = helperFragment.CallStatic<AndroidJavaObject>("showInboxUi",
+                AndroidHelperFragment.GetActivity()))
             {
-                using (var task = helperFragment.CallStatic<AndroidJavaObject>("showInboxUi",
-                    AndroidHelperFragment.GetActivity()))
-                {
-                    task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
-                        result => {
-                            int status = result.Get<int>("status");
-                            if ((UIStatus)status != UIStatus.Valid)
-                            {
-                                cb.Invoke((UIStatus)status, null);
-                                return;
-                            }
-
-                            AndroidJavaObject turnBasedMatch = result.Get<AndroidJavaObject>("turnBasedMatch");
-                            cb.Invoke((UIStatus)status, AndroidJavaConverter.ToTurnBasedMatch(turnBasedMatch));
+                TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
+                    task,
+                    result => {
+                        int status = result.Get<int>("status");
+                        if ((UIStatus) status != UIStatus.Valid)
+                        {
+                            cb.Invoke((UIStatus) status, null);
+                            return;
                         }
-                    ));
 
-                    task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
-                        exception => {
-                            Debug.Log("showInboxUi failed with exception");
-                            cb.Invoke(UIStatus.InternalError, null);
+                        using (var turnBasedMatch = result.Get<AndroidJavaObject>("turnBasedMatch"))
+                        {
+                            cb.Invoke((UIStatus) status, AndroidJavaConverter.ToTurnBasedMatch(turnBasedMatch));
                         }
-                    ));
-                }
+                    });
+
+                TaskListenerHelper.AddOnFailureListener(
+                    task,
+                    exception => {
+                        Debug.Log("showInboxUi failed with exception");
+                        cb.Invoke(UIStatus.InternalError, null);
+                    });
             }
         }
 
