@@ -68,6 +68,13 @@ namespace GooglePlayGames.Android
             {
             }
         }
+
+        public static void AddOnCompleteListener<T>(AndroidJavaObject task, Action<T> callback)
+        {
+            using (task.Call<AndroidJavaObject>("addOnCompleteListener", new TaskOnCompleteProxy<T>(callback)))
+            {
+            }
+        }
     }
 }
 #endif
