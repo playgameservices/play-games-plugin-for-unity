@@ -130,9 +130,17 @@ namespace GooglePlayGames.Android
                         {
                             using (var conflict = dataOrConflict.Call<AndroidJavaObject>("getConflict"))
                             {
+                                AndroidSnapshotMetadata original, unmerged;
                                 // If we get here, manual conflict resolution is required.
-                                AndroidSnapshotMetadata original = new AndroidSnapshotMetadata(conflict.Call<AndroidJavaObject>("getSnapshot"));
-                                AndroidSnapshotMetadata unmerged = new AndroidSnapshotMetadata(conflict.Call<AndroidJavaObject>("getConflictingSnapshot"));
+                                using (var snapshot = conflict.Call<AndroidJavaObject>("getSnapshot"))
+                                {
+                                    original = new AndroidSnapshotMetadata(snapshot);
+                                }
+
+                                using (var snapshot = conflict.Call<AndroidJavaObject>("getConflictingSnapshot"))
+                                {
+                                    unmerged = new AndroidSnapshotMetadata(snapshot);
+                                }
 
                                 // Instantiate the conflict resolver. Note that the retry callback closes over
                                 // all the parameters we need to retry the open attempt. Once the conflict is
@@ -148,8 +156,7 @@ namespace GooglePlayGames.Android
                                                                 completedCallback,
                                                                 () => InternalOpen(filename, source, resolutionStrategy,
                                                                     prefetchDataOnConflict,
-                                                                    conflictCallback, completedCallback)
-                                                            );
+                                                                    conflictCallback, completedCallback));
 
                                 conflictCallback(resolver, original, null, unmerged, null);
                             }
@@ -157,15 +164,15 @@ namespace GooglePlayGames.Android
                         else
                         {
                             using (var snapshot = dataOrConflict.Call<AndroidJavaObject>("getData"))
+                            using (var metadata = snapshot.Call<AndroidJavaObject>("freeze"))
                             {
-                                completedCallback(SavedGameRequestStatus.Success, new AndroidSnapshotMetadata(snapshot.Call<AndroidJavaObject>("freeze")));
+                                completedCallback(SavedGameRequestStatus.Success, new AndroidSnapshotMetadata(metadata));
                             }
                         }});
 
                 TaskListenerHelper.AddOnFailureListener(
                     task,
-                    exception =>
-                        completedCallback(SavedGameRequestStatus.InternalError, null));
+                    exception => completedCallback(SavedGameRequestStatus.InternalError, null));
             }
         }
 
@@ -252,23 +259,21 @@ namespace GooglePlayGames.Android
             }
 
             using (var convertedMetadataChange = AsMetadataChange(updateForMetadata))
+            using (var task = mSnapshotsClient.Call<AndroidJavaObject>("commitAndClose", convertedMetadata.JavaSnapshot, convertedMetadataChange))
             {
-                using (var task = mSnapshotsClient.Call<AndroidJavaObject>("commitAndClose", convertedMetadata.JavaSnapshot, convertedMetadataChange))
-                {
-                    TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
-                        task,
-                        snapshotMetadata => {
-                            Debug.Log("commitAndClose.succeed");
-                            callback(SavedGameRequestStatus.Success, new AndroidSnapshotMetadata(snapshotMetadata, /* contents= */null));
-                        });
+                TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
+                    task,
+                    snapshotMetadata => {
+                        Debug.Log("commitAndClose.succeed");
+                        callback(SavedGameRequestStatus.Success, new AndroidSnapshotMetadata(snapshotMetadata, /* contents= */null));
+                    });
 
-                    TaskListenerHelper.AddOnFailureListener(
-                        task,
-                        exception => {
-                            Debug.Log("commitAndClose.failed");
-                            callback(SavedGameRequestStatus.InternalError, null);
-                        });
-                }
+                TaskListenerHelper.AddOnFailureListener(
+                    task,
+                    exception => {
+                        Debug.Log("commitAndClose.failed");
+                        callback(SavedGameRequestStatus.InternalError, null);
+                    });
             }
         }
 
@@ -290,8 +295,9 @@ namespace GooglePlayGames.Android
                             for(int i = 0; i < count; ++i)
                             {
                                 using (var metadata = buffer.Call<AndroidJavaObject>("get", i))
+                                using (var freezed = metadata.Call<AndroidJavaObject>("freeze"))
                                 {
-                                    result.Add(new AndroidSnapshotMetadata(metadata.Call<AndroidJavaObject>("freeze"), /* contents= */null));
+                                    result.Add(new AndroidSnapshotMetadata(freezed, /* contents= */null));
                                 }
                             }
                             buffer.Call("release");
@@ -310,7 +316,9 @@ namespace GooglePlayGames.Android
         {
             AndroidSnapshotMetadata androidMetadata = metadata as AndroidSnapshotMetadata;
             Misc.CheckNotNull(androidMetadata);
-            mSnapshotsClient.Call<AndroidJavaObject>("delete", androidMetadata.JavaMetadata);
+            using (mSnapshotsClient.Call<AndroidJavaObject>("delete", androidMetadata.JavaMetadata))
+            {
+            }
         }
 
         private ConflictCallback ToOnGameThread(ConflictCallback conflictCallback)
@@ -371,22 +379,20 @@ namespace GooglePlayGames.Android
                     }
 
                     using (var convertedMetadataChange = AsMetadataChange(metadataUpdate))
+                    using (var task = mSnapshotsClient.Call<AndroidJavaObject>(
+                        "resolveConflict",
+                        mConflict.Call<string>("getConflictId"),
+                        convertedMetadata.JavaSnapshot.Call<string>("getSnapshotId"),
+                        convertedMetadataChange,
+                        contentUpdate))
                     {
-                        using (var task = mSnapshotsClient.Call<AndroidJavaObject>(
-                            "resolveConflict",
-                            mConflict.Call<string>("getConflictId"),
-                            convertedMetadata.JavaSnapshot.Call<string>("getSnapshotId"),
-                            convertedMetadataChange,
-                            contentUpdate))
-                        {
-                            TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
-                                task,
-                                dataOrConflict => mRetryFileOpen());
+                        TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
+                            task,
+                            dataOrConflict => mRetryFileOpen());
 
-                            TaskListenerHelper.AddOnFailureListener(
-                                task,
-                                exception => mCompleteCallback(SavedGameRequestStatus.InternalError, null));
-                        }
+                        TaskListenerHelper.AddOnFailureListener(
+                            task,
+                            exception => mCompleteCallback(SavedGameRequestStatus.InternalError, null));
                     }
                 }
             }
@@ -434,23 +440,25 @@ namespace GooglePlayGames.Android
                 if (update.IsCoverImageUpdated)
                 {
                     using (var bitmapFactory = new AndroidJavaClass("android.graphics.BitmapFactory"))
+                    using (var bitmap = bitmapFactory.CallStatic<AndroidJavaObject>(
+                        "decodeByteArray", update.UpdatedPngCoverImage, /* offset= */0, update.UpdatedPngCoverImage.Length))
+                    using (builder.Call<AndroidJavaObject>("setCoverImage", bitmap))
                     {
-                        using (var bitmap = bitmapFactory.CallStatic<AndroidJavaObject>(
-                            "decodeByteArray", update.UpdatedPngCoverImage, /* offset= */0, update.UpdatedPngCoverImage.Length))
-                        {
-                            builder.Call<AndroidJavaObject>("setCoverImage", bitmap);
-                        }
                     }
                 }
 
                 if (update.IsDescriptionUpdated)
                 {
-                    builder.Call<AndroidJavaObject>("setDescription", update.UpdatedDescription);
+                    using (builder.Call<AndroidJavaObject>("setDescription", update.UpdatedDescription))
+                    {
+                    }
                 }
 
                 if (update.IsPlayedTimeUpdated)
                 {
-                    builder.Call<AndroidJavaObject>("setPlayedTimeMillis", (long)update.UpdatedPlayedTime.Value.TotalMilliseconds);
+                    using (builder.Call<AndroidJavaObject>("setPlayedTimeMillis", (long)update.UpdatedPlayedTime.Value.TotalMilliseconds))
+                    {
+                    }
                 }
 
                 return builder.Call<AndroidJavaObject>("build");
