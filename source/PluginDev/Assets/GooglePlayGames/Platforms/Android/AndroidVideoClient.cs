@@ -87,16 +87,20 @@ namespace GooglePlayGames.Android
                 UnregisterCaptureOverlayStateChangedListener();
             }
             mOnCaptureOverlayStateListenerProxy = new OnCaptureOverlayStateListenerProxy(listener);
-            mVideosClient.Call<AndroidJavaObject>("registerOnCaptureOverlayStateChangedListener",
-                mOnCaptureOverlayStateListenerProxy);
+            using (mVideosClient.Call<AndroidJavaObject>("registerOnCaptureOverlayStateChangedListener",
+                mOnCaptureOverlayStateListenerProxy))
+            {
+            }
         }
 
         public void UnregisterCaptureOverlayStateChangedListener()
         {
             if (mOnCaptureOverlayStateListenerProxy != null)
             {
-                mVideosClient.Call<AndroidJavaObject>("unregisterOnCaptureOverlayStateChangedListener",
-                    mOnCaptureOverlayStateListenerProxy);
+                using (mVideosClient.Call<AndroidJavaObject>("unregisterOnCaptureOverlayStateChangedListener",
+                    mOnCaptureOverlayStateListenerProxy))
+                {
+                }
 
                 mOnCaptureOverlayStateListenerProxy = null;
             }

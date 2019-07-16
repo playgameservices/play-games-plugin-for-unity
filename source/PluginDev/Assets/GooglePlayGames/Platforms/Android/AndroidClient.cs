@@ -464,10 +464,8 @@ namespace GooglePlayGames.Android
             }
 
             using (var gamesClient = getGamesClient())
+            using (gamesClient.Call<AndroidJavaObject>("setGravityForPopups", (int)gravity | (int)Gravity.CENTER_HORIZONTAL))
             {
-                using (gamesClient.Call<AndroidJavaObject>("setGravityForPopups", (int)gravity | (int)Gravity.CENTER_HORIZONTAL))
-                {
-                }
             }
         }
 
