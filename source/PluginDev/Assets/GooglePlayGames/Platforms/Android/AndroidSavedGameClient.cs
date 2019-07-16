@@ -130,17 +130,8 @@ namespace GooglePlayGames.Android
                         {
                             using (var conflict = dataOrConflict.Call<AndroidJavaObject>("getConflict"))
                             {
-                                AndroidSnapshotMetadata original, unmerged;
-                                // If we get here, manual conflict resolution is required.
-                                using (var snapshot = conflict.Call<AndroidJavaObject>("getSnapshot"))
-                                {
-                                    original = new AndroidSnapshotMetadata(snapshot);
-                                }
-
-                                using (var snapshot = conflict.Call<AndroidJavaObject>("getConflictingSnapshot"))
-                                {
-                                    unmerged = new AndroidSnapshotMetadata(snapshot);
-                                }
+                                AndroidSnapshotMetadata original = new AndroidSnapshotMetadata(conflict.Call<AndroidJavaObject>("getSnapshot"));
+                                AndroidSnapshotMetadata unmerged = new AndroidSnapshotMetadata(conflict.Call<AndroidJavaObject>("getConflictingSnapshot"));
 
                                 // Instantiate the conflict resolver. Note that the retry callback closes over
                                 // all the parameters we need to retry the open attempt. Once the conflict is
@@ -164,8 +155,8 @@ namespace GooglePlayGames.Android
                         else
                         {
                             using (var snapshot = dataOrConflict.Call<AndroidJavaObject>("getData"))
-                            using (var metadata = snapshot.Call<AndroidJavaObject>("freeze"))
                             {
+                                AndroidJavaObject metadata = snapshot.Call<AndroidJavaObject>("freeze");
                                 completedCallback(SavedGameRequestStatus.Success, new AndroidSnapshotMetadata(metadata));
                             }
                         }});
@@ -295,9 +286,8 @@ namespace GooglePlayGames.Android
                             for(int i = 0; i < count; ++i)
                             {
                                 using (var metadata = buffer.Call<AndroidJavaObject>("get", i))
-                                using (var freezed = metadata.Call<AndroidJavaObject>("freeze"))
                                 {
-                                    result.Add(new AndroidSnapshotMetadata(freezed, /* contents= */null));
+                                    result.Add(new AndroidSnapshotMetadata(metadata.Call<AndroidJavaObject>("freeze"), /* contents= */null));
                                 }
                             }
                             buffer.Call("release");

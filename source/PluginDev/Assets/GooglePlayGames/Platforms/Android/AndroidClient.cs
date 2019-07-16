@@ -89,9 +89,6 @@ namespace GooglePlayGames.Android
                 InitializeGameServices();
                 if (succeed)
                 {
-                    using (var taskGetPlayer = getPlayersClient().Call<AndroidJavaObject>("getCurrentPlayer"))
-                    using (var taskGetActivationHint = getGamesClient().Call<AndroidJavaObject>("getActivationHint"))
-                    using (var taskIsCaptureSupported = getVideosClient().Call<AndroidJavaObject>("isCaptureSupported"))
                     using (var signInTasks = new AndroidJavaObject("java.util.ArrayList"))
                     {
                         if (mInvitationDelegate != null)
@@ -99,12 +96,13 @@ namespace GooglePlayGames.Android
                             mInvitationCallback = new AndroidJavaObject("com.google.games.bridge.InvitationCallbackProxy",
                                 new InvitationCallbackProxy(mInvitationDelegate));
                             using (var invitationsClient = getInvitationsClient())
-                            using (var task = invitationsClient.Call<AndroidJavaObject>("registerInvitationCallback", mInvitationCallback))
                             {
-
-                                signInTasks.Call<bool>("add", task);
+                                signInTasks.Call<bool>("add", invitationsClient.Call<AndroidJavaObject>("registerInvitationCallback", mInvitationCallback));
                             }
                         }
+                        AndroidJavaObject taskGetPlayer = getPlayersClient().Call<AndroidJavaObject>("getCurrentPlayer");
+                        AndroidJavaObject taskGetActivationHint = getGamesClient().Call<AndroidJavaObject>("getActivationHint");
+                        AndroidJavaObject taskIsCaptureSupported = getVideosClient().Call<AndroidJavaObject>("isCaptureSupported");
                         signInTasks.Call<bool>("add", taskGetPlayer);
                         signInTasks.Call<bool>("add", taskGetActivationHint);
                         signInTasks.Call<bool>("add", taskIsCaptureSupported);
@@ -123,22 +121,20 @@ namespace GooglePlayGames.Android
                                             mUser = AndroidJavaConverter.ToPlayer(resultObject);
                                         }
 
-                                        using (var account = mTokenClient.GetAccount())
+                                        var account = mTokenClient.GetAccount();
+                                        lock (GameServicesLock)
                                         {
-                                            lock (GameServicesLock)
+                                            mSavedGameClient = new AndroidSavedGameClient(account);
+                                            mEventsClient = new AndroidEventsClient(account);
+                                            bool isCaptureSupported;
+                                            using (var resultObject = taskIsCaptureSupported.Call<AndroidJavaObject>("getResult"))
                                             {
-                                                mSavedGameClient = new AndroidSavedGameClient(account);
-                                                mEventsClient = new AndroidEventsClient(account);
-                                                bool isCaptureSupported;
-                                                using (var resultObject = taskIsCaptureSupported.Call<AndroidJavaObject>("getResult"))
-                                                {
-                                                    isCaptureSupported = resultObject.Call<bool>("booleanValue");
-                                                }
-                                                mVideoClient = new AndroidVideoClient(isCaptureSupported, account);
-                                                mRealTimeClient = new AndroidRealTimeMultiplayerClient(account);
-                                                mTurnBasedClient = new AndroidTurnBasedMultiplayerClient(account);
-                                                mTurnBasedClient.RegisterMatchDelegate(mConfiguration.MatchDelegate);
+                                                isCaptureSupported = resultObject.Call<bool>("booleanValue");
                                             }
+                                            mVideoClient = new AndroidVideoClient(isCaptureSupported, account);
+                                            mRealTimeClient = new AndroidRealTimeMultiplayerClient(account);
+                                            mTurnBasedClient = new AndroidTurnBasedMultiplayerClient(account);
+                                            mTurnBasedClient.RegisterMatchDelegate(mConfiguration.MatchDelegate);
                                         }
 
 

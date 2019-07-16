@@ -113,7 +113,7 @@ namespace GooglePlayGames.Android
                 int maxDisplayedSavedGames, string uiTitle, Action<SelectUIStatus, ISavedGameMetadata> cb)
         {
             using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
-            using(var task = helperFragment.CallStatic<AndroidJavaObject>("showSelectSnapshotUi",
+            using (var task = helperFragment.CallStatic<AndroidJavaObject>("showSelectSnapshotUi",
                 AndroidHelperFragment.GetActivity(), uiTitle, showCreateSaveUI, showDeleteSaveUI, maxDisplayedSavedGames))
             {
                 TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
@@ -122,11 +122,9 @@ namespace GooglePlayGames.Android
                         SelectUIStatus status = (SelectUIStatus) result.Get<int>("status");
                         Debug.Log("ShowSelectSnapshotUI result " + status);
 
-                        AndroidSnapshotMetadata metadata;
-                        using (var javaMetadata = result.Get<AndroidJavaObject>("metadata"))
-                        {
-                            metadata = javaMetadata == null ? null : new AndroidSnapshotMetadata(javaMetadata, /* contents= */null);
-                        }
+                        AndroidJavaObject javaMetadata = result.Get<AndroidJavaObject>("metadata");
+                        AndroidSnapshotMetadata metadata =
+                            javaMetadata == null ? null : new AndroidSnapshotMetadata(javaMetadata, /* contents= */null);
 
                         cb.Invoke(status, metadata);
                     });
