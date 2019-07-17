@@ -103,9 +103,17 @@ namespace GooglePlayGames.Android
                         AndroidJavaObject taskGetPlayer = getPlayersClient().Call<AndroidJavaObject>("getCurrentPlayer");
                         AndroidJavaObject taskGetActivationHint = getGamesClient().Call<AndroidJavaObject>("getActivationHint");
                         AndroidJavaObject taskIsCaptureSupported = getVideosClient().Call<AndroidJavaObject>("isCaptureSupported");
+                        AndroidJavaObject taskSetViewForPopups;
+                        using (var popupView = AndroidHelperFragment.GetDefaultPopupView())
+                        {
+                            taskSetViewForPopups = getGamesClient().Call<AndroidJavaObject>("setViewForPopups", popupView);
+                        }
+
                         signInTasks.Call<bool>("add", taskGetPlayer);
                         signInTasks.Call<bool>("add", taskGetActivationHint);
                         signInTasks.Call<bool>("add", taskIsCaptureSupported);
+                        signInTasks.Call<bool>("add", taskSetViewForPopups);
+                        
                         using (var tasks = new AndroidJavaClass(TasksClassName))
                         using (var allTask = tasks.CallStatic<AndroidJavaObject>("whenAll", signInTasks))
                         {
@@ -115,7 +123,6 @@ namespace GooglePlayGames.Android
                                 {
                                     if (completeTask.Call<bool>("isSuccessful"))
                                     {
-
                                         using (var resultObject = taskGetPlayer.Call<AndroidJavaObject>("getResult"))
                                         {
                                             mUser = AndroidJavaConverter.ToPlayer(resultObject);

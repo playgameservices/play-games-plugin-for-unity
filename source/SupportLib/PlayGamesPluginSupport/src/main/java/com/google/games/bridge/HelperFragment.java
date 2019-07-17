@@ -326,4 +326,8 @@ public class HelperFragment extends Fragment
         view.setClickable(false);
         return view;
     }
+
+    public static View getDecorView(Activity activity) {
+        return activity.getWindow().getDecorView();
+    }
 }
