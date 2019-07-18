@@ -123,7 +123,7 @@ namespace GooglePlayGames.Android
 
             using (var task = mSnapshotsClient.Call<AndroidJavaObject>("open", filename, /* createIfNotFound= */ true, conflictPolicy))
             {
-                TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
+                AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
                     task,
                     dataOrConflict => {
                         if (dataOrConflict.Call<bool>("isConflict"))
@@ -161,7 +161,7 @@ namespace GooglePlayGames.Android
                             }
                         }});
 
-                TaskListenerHelper.AddOnFailureListener(
+                AndroidTaskUtils.AddOnFailureListener(
                     task,
                     exception => completedCallback(SavedGameRequestStatus.InternalError, null));
             }
@@ -252,14 +252,14 @@ namespace GooglePlayGames.Android
             using (var convertedMetadataChange = AsMetadataChange(updateForMetadata))
             using (var task = mSnapshotsClient.Call<AndroidJavaObject>("commitAndClose", convertedMetadata.JavaSnapshot, convertedMetadataChange))
             {
-                TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
+                AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
                     task,
                     snapshotMetadata => {
                         Debug.Log("commitAndClose.succeed");
                         callback(SavedGameRequestStatus.Success, new AndroidSnapshotMetadata(snapshotMetadata, /* contents= */null));
                     });
 
-                TaskListenerHelper.AddOnFailureListener(
+                AndroidTaskUtils.AddOnFailureListener(
                     task,
                     exception => {
                         Debug.Log("commitAndClose.failed");
@@ -276,7 +276,7 @@ namespace GooglePlayGames.Android
 
             using (var task = mSnapshotsClient.Call<AndroidJavaObject>("load", /* forecReload= */source == DataSource.ReadNetworkOnly))
             {
-                TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
+                AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
                     task,
                     annotatedData => {
                         using (var buffer = annotatedData.Call<AndroidJavaObject>("get"))
@@ -295,7 +295,7 @@ namespace GooglePlayGames.Android
                         }
                     });
 
-                TaskListenerHelper.AddOnFailureListener(
+                AndroidTaskUtils.AddOnFailureListener(
                     task,
                     exception =>
                         callback(SavedGameRequestStatus.InternalError, new List<ISavedGameMetadata>()));
@@ -306,9 +306,7 @@ namespace GooglePlayGames.Android
         {
             AndroidSnapshotMetadata androidMetadata = metadata as AndroidSnapshotMetadata;
             Misc.CheckNotNull(androidMetadata);
-            using (mSnapshotsClient.Call<AndroidJavaObject>("delete", androidMetadata.JavaMetadata))
-            {
-            }
+            using (mSnapshotsClient.Call<AndroidJavaObject>("delete", androidMetadata.JavaMetadata));
         }
 
         private ConflictCallback ToOnGameThread(ConflictCallback conflictCallback)
@@ -376,11 +374,11 @@ namespace GooglePlayGames.Android
                         convertedMetadataChange,
                         contentUpdate))
                     {
-                        TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
+                        AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
                             task,
                             dataOrConflict => mRetryFileOpen());
 
-                        TaskListenerHelper.AddOnFailureListener(
+                        AndroidTaskUtils.AddOnFailureListener(
                             task,
                             exception => mCompleteCallback(SavedGameRequestStatus.InternalError, null));
                     }
@@ -402,11 +400,11 @@ namespace GooglePlayGames.Android
                 using (var task = mSnapshotsClient.Call<AndroidJavaObject>(
                     "resolveConflict", mConflict.Call<string>("getConflictId"), convertedMetadata.JavaSnapshot))
                 {
-                    TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
+                    AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
                         task,
                         dataOrConflict => mRetryFileOpen());
 
-                    TaskListenerHelper.AddOnFailureListener(
+                    AndroidTaskUtils.AddOnFailureListener(
                         task,
                         exception => mCompleteCallback(SavedGameRequestStatus.InternalError, null));
                 }
@@ -432,23 +430,17 @@ namespace GooglePlayGames.Android
                     using (var bitmapFactory = new AndroidJavaClass("android.graphics.BitmapFactory"))
                     using (var bitmap = bitmapFactory.CallStatic<AndroidJavaObject>(
                         "decodeByteArray", update.UpdatedPngCoverImage, /* offset= */0, update.UpdatedPngCoverImage.Length))
-                    using (builder.Call<AndroidJavaObject>("setCoverImage", bitmap))
-                    {
-                    }
+                    using (builder.Call<AndroidJavaObject>("setCoverImage", bitmap));
                 }
 
                 if (update.IsDescriptionUpdated)
                 {
-                    using (builder.Call<AndroidJavaObject>("setDescription", update.UpdatedDescription))
-                    {
-                    }
+                    using (builder.Call<AndroidJavaObject>("setDescription", update.UpdatedDescription));
                 }
 
                 if (update.IsPlayedTimeUpdated)
                 {
-                    using (builder.Call<AndroidJavaObject>("setPlayedTimeMillis", (long)update.UpdatedPlayedTime.Value.TotalMilliseconds))
-                    {
-                    }
+                    using (builder.Call<AndroidJavaObject>("setPlayedTimeMillis", (long)update.UpdatedPlayedTime.Value.TotalMilliseconds));
                 }
 
                 return builder.Call<AndroidJavaObject>("build");

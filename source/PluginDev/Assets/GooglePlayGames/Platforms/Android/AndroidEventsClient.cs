@@ -26,7 +26,7 @@ namespace GooglePlayGames.Android
             callback = ToOnGameThread(callback);
             using (var task = mEventsClient.Call<AndroidJavaObject>("load", source == DataSource.ReadNetworkOnly ? true : false))
             {
-                TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
+                AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
                     task,
                     annotatedData => {
                         using (var buffer = annotatedData.Call<AndroidJavaObject>("get"))
@@ -50,7 +50,7 @@ namespace GooglePlayGames.Android
                         }
                     });
 
-                TaskListenerHelper.AddOnFailureListener(
+                AndroidTaskUtils.AddOnFailureListener(
                     task,
                     exception => {
                         Debug.Log("FetchAllEvents failed");
@@ -66,7 +66,7 @@ namespace GooglePlayGames.Android
             ids[0] = eventId;
             using (var task = mEventsClient.Call<AndroidJavaObject>("loadByIds", source == DataSource.ReadNetworkOnly ? true : false, ids))
             {
-                TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
+                AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
                     task,
                     annotatedData => {
                         using (var buffer = annotatedData.Call<AndroidJavaObject>("get"))
@@ -97,7 +97,7 @@ namespace GooglePlayGames.Android
                         }
                     });
 
-                TaskListenerHelper.AddOnFailureListener(
+                AndroidTaskUtils.AddOnFailureListener(
                     task,
                     exception => {
                         Debug.Log("FetchEvent failed");

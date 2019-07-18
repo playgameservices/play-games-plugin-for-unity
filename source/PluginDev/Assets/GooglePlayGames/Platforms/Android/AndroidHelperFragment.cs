@@ -42,14 +42,14 @@ namespace GooglePlayGames.Android
             using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
             using (var task = helperFragment.CallStatic<AndroidJavaObject>("showAchievementUi", AndroidHelperFragment.GetActivity()))
             {
-                TaskListenerHelper.AddOnSuccessListener<int>(
+                AndroidTaskUtils.AddOnSuccessListener<int>(
                     task,
                     uiCode => {
                         Debug.Log("ShowAchievementsUI result " + uiCode);
                         cb.Invoke((UIStatus)uiCode);
                     });
 
-                TaskListenerHelper.AddOnFailureListener(
+                AndroidTaskUtils.AddOnFailureListener(
                     task,
                     exception => {
                         Debug.Log("ShowAchievementsUI failed with exception");
@@ -71,14 +71,14 @@ namespace GooglePlayGames.Android
             using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
             using (var task = helperFragment.CallStatic<AndroidJavaObject>("showAllLeaderboardsUi", AndroidHelperFragment.GetActivity()))
             {
-                TaskListenerHelper.AddOnSuccessListener<int>(
+                AndroidTaskUtils.AddOnSuccessListener<int>(
                     task,
                     uiCode => {
                         Debug.Log("ShowAllLeaderboardsUI result " + uiCode);
                         cb.Invoke((UIStatus) uiCode);
                     });
 
-                TaskListenerHelper.AddOnFailureListener(
+                AndroidTaskUtils.AddOnFailureListener(
                     task,
                     exception => {
                         Debug.Log("ShowAllLeaderboardsUI failed with exception");
@@ -93,14 +93,14 @@ namespace GooglePlayGames.Android
             using (var task = helperFragment.CallStatic<AndroidJavaObject>("showLeaderboardUi",
                 AndroidHelperFragment.GetActivity(), leaderboardId, AndroidJavaConverter.ToLeaderboardVariantTimeSpan(timeSpan)))
             {
-                TaskListenerHelper.AddOnSuccessListener<int>(
+                AndroidTaskUtils.AddOnSuccessListener<int>(
                     task,
                     uiCode => {
                         Debug.Log("ShowLeaderboardUI result " + uiCode);
                         cb.Invoke((UIStatus) uiCode);
                     });
 
-                TaskListenerHelper.AddOnFailureListener(
+                AndroidTaskUtils.AddOnFailureListener(
                     task,
                     exception => {
                         Debug.Log("ShowLeaderboardUI failed with exception");
@@ -116,7 +116,7 @@ namespace GooglePlayGames.Android
             using (var task = helperFragment.CallStatic<AndroidJavaObject>("showSelectSnapshotUi",
                 AndroidHelperFragment.GetActivity(), uiTitle, showCreateSaveUI, showDeleteSaveUI, maxDisplayedSavedGames))
             {
-                TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
+                AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
                     task,
                     result => {
                         SelectUIStatus status = (SelectUIStatus) result.Get<int>("status");
@@ -129,7 +129,7 @@ namespace GooglePlayGames.Android
                         cb.Invoke(status, metadata);
                     });
 
-                TaskListenerHelper.AddOnFailureListener(
+                AndroidTaskUtils.AddOnFailureListener(
                     task,
                     exception => {
                         Debug.Log("ShowSelectSnapshotUI failed with exception");
@@ -144,7 +144,7 @@ namespace GooglePlayGames.Android
             using (var task = helperFragment.CallStatic<AndroidJavaObject>("showSelectOpponentsUi",
                 AndroidHelperFragment.GetActivity(), (int) minOpponents, (int) maxOpponents))
             {
-                TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
+                AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
                     task,
                     result => {
                         int status = result.Get<int>("status");
@@ -169,7 +169,7 @@ namespace GooglePlayGames.Android
                         cb.Invoke((UIStatus) status, resultHolder);
                     });
 
-                TaskListenerHelper.AddOnFailureListener(
+                AndroidTaskUtils.AddOnFailureListener(
                     task,
                     exception => {
                         Debug.Log("showSelectOpponentsUi failed with exception");
@@ -184,7 +184,7 @@ namespace GooglePlayGames.Android
             using (var task = helperFragment.CallStatic<AndroidJavaObject>("showInboxUi",
                 AndroidHelperFragment.GetActivity()))
             {
-                TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
+                AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
                     task,
                     result => {
                         int status = result.Get<int>("status");
@@ -200,7 +200,7 @@ namespace GooglePlayGames.Android
                         }
                     });
 
-                TaskListenerHelper.AddOnFailureListener(
+                AndroidTaskUtils.AddOnFailureListener(
                     task,
                     exception => {
                         Debug.Log("showInboxUi failed with exception");

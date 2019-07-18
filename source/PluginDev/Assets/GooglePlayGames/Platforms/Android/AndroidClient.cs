@@ -109,7 +109,7 @@ namespace GooglePlayGames.Android
                         using (var tasks = new AndroidJavaClass(TasksClassName))
                         using (var allTask = tasks.CallStatic<AndroidJavaObject>("whenAll", signInTasks))
                         {
-                            TaskListenerHelper.AddOnCompleteListener<AndroidJavaObject>(
+                            AndroidTaskUtils.AddOnCompleteListener<AndroidJavaObject>(
                                 allTask,
                                 completeTask =>
                                 {
@@ -399,18 +399,16 @@ namespace GooglePlayGames.Android
             if (mInvitationCallback != null)
             {
                 using (var invitationsClient = getInvitationsClient())
+                using (var task = invitationsClient.Call<AndroidJavaObject>(
+                    "unregisterInvitationCallback", mInvitationCallback))
                 {
-                    using (var task = invitationsClient.Call<AndroidJavaObject>(
-                        "unregisterInvitationCallback", mInvitationCallback))
-                    {
-                        TaskListenerHelper.AddOnCompleteListener<AndroidJavaObject>(
-                            task,
-                            completedTask => {
-                                mInvitationCallback = null;
-                                mTokenClient.Signout();
-                                mAuthState = AuthState.Unauthenticated;
-                            });
-                    }
+                    AndroidTaskUtils.AddOnCompleteListener<AndroidJavaObject>(
+                        task,
+                        completedTask => {
+                            mInvitationCallback = null;
+                            mTokenClient.Signout();
+                            mAuthState = AuthState.Unauthenticated;
+                        });
                 }
             }
             else
@@ -464,9 +462,7 @@ namespace GooglePlayGames.Android
             }
 
             using (var gamesClient = getGamesClient())
-            using (gamesClient.Call<AndroidJavaObject>("setGravityForPopups", (int)gravity | (int)Gravity.CENTER_HORIZONTAL))
-            {
-            }
+            using (gamesClient.Call<AndroidJavaObject>("setGravityForPopups", (int)gravity | (int)Gravity.CENTER_HORIZONTAL));
         }
 
         ///<summary></summary>
@@ -476,7 +472,7 @@ namespace GooglePlayGames.Android
             using (var playerStatsClient = getPlayerStatsClient())
             using (var task = playerStatsClient.Call<AndroidJavaObject>("loadPlayerStats", /* forceReload= */ false))
             {
-                TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
+                AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
                     task,
                     annotatedData => {
                         using (var playerStatsJava = annotatedData.Call<AndroidJavaObject>("get"))
@@ -508,7 +504,7 @@ namespace GooglePlayGames.Android
                         }
                     });
 
-                TaskListenerHelper.AddOnFailureListener(
+                AndroidTaskUtils.AddOnFailureListener(
                     task,
                     e => {
                         Debug.Log("GetPlayerStats failed");
@@ -537,7 +533,7 @@ namespace GooglePlayGames.Android
                 {
                     using (var task = playersClient.Call<AndroidJavaObject>("loadPlayer", userIds[i]))
                     {
-                        TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
+                        AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
                             task,
                             annotatedData => {
                                 using (var player = annotatedData.Call<AndroidJavaObject>("get"))
@@ -562,7 +558,7 @@ namespace GooglePlayGames.Android
                                 }
                             });
 
-                        TaskListenerHelper.AddOnFailureListener(
+                        AndroidTaskUtils.AddOnFailureListener(
                             task,
                             exception => {
                                 Debug.Log("LoadUsers failed for index " + i);
@@ -587,7 +583,7 @@ namespace GooglePlayGames.Android
             using (var achievementsClient = getAchievementsClient())
             using (var task = achievementsClient.Call<AndroidJavaObject>("load", /* forceReload= */ false))
             {
-                TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
+                AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
                     task,
                     annotatedData => {
                         using (var achievementBuffer = annotatedData.Call<AndroidJavaObject>("get"))
@@ -627,7 +623,7 @@ namespace GooglePlayGames.Android
                         }
                     });
 
-                TaskListenerHelper.AddOnFailureListener(
+                AndroidTaskUtils.AddOnFailureListener(
                     task,
                     exception => {
                         Debug.Log("LoadAchievements failed");
@@ -759,7 +755,7 @@ namespace GooglePlayGames.Android
                     AndroidJavaConverter.ToLeaderboardVariantCollection(collection),
                     rowCount))
                 {
-                    TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
+                    AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
                         task,
                         annotatedData => {
                             using (var leaderboardScores = annotatedData.Call<AndroidJavaObject>("get"))
@@ -774,7 +770,7 @@ namespace GooglePlayGames.Android
                             }
                         });
 
-                    TaskListenerHelper.AddOnFailureListener(
+                    AndroidTaskUtils.AddOnFailureListener(
                         task,
                         exception => {
                             Debug.Log("LoadScores failed");
@@ -790,32 +786,30 @@ namespace GooglePlayGames.Android
             Action<LeaderboardScoreData> callback)
         {
             using (var client = getLeaderboardsClient())
+            using (var task = client.Call<AndroidJavaObject>("loadMoreScores",
+                token.InternalObject, rowCount, AndroidJavaConverter.ToPageDirection(token.Direction)))
             {
-                using (var task = client.Call<AndroidJavaObject>("loadMoreScores",
-                    token.InternalObject, rowCount, AndroidJavaConverter.ToPageDirection(token.Direction)))
-                {
-                    TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
-                        task,
-                        annotatedData => {
-                            using (var leaderboardScores = annotatedData.Call<AndroidJavaObject>("get"))
-                            {
-                                InvokeCallbackOnGameThread(callback, CreateLeaderboardScoreData(
-                                    token.LeaderboardId,
-                                    token.Collection,
-                                    token.TimeSpan,
-                                    annotatedData.Call<bool>("isStale") ? ResponseStatus.SuccessWithStale : ResponseStatus.Success,
-                                    leaderboardScores));
-                                leaderboardScores.Call("release");
-                            }
-                        });
+                AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
+                    task,
+                    annotatedData => {
+                        using (var leaderboardScores = annotatedData.Call<AndroidJavaObject>("get"))
+                        {
+                            InvokeCallbackOnGameThread(callback, CreateLeaderboardScoreData(
+                                token.LeaderboardId,
+                                token.Collection,
+                                token.TimeSpan,
+                                annotatedData.Call<bool>("isStale") ? ResponseStatus.SuccessWithStale : ResponseStatus.Success,
+                                leaderboardScores));
+                            leaderboardScores.Call("release");
+                        }
+                    });
 
-                    TaskListenerHelper.AddOnFailureListener(
-                        task,
-                        exception => {
-                            Debug.Log("LoadMoreScores failed");
-                            InvokeCallbackOnGameThread(callback, new LeaderboardScoreData(token.LeaderboardId, ResponseStatus.InternalError));
-                        });
-                }
+                AndroidTaskUtils.AddOnFailureListener(
+                    task,
+                    exception => {
+                        Debug.Log("LoadMoreScores failed");
+                        InvokeCallbackOnGameThread(callback, new LeaderboardScoreData(token.LeaderboardId, ResponseStatus.InternalError));
+                    });
             }
         }
 
@@ -856,23 +850,21 @@ namespace GooglePlayGames.Android
                 leaderboardScoreData.NextPageToken = new ScorePageToken(scoresBuffer, leaderboardId, collection, timespan, ScorePageDirection.Backward);
             }
             using (var leaderboard = leaderboardScoresJava.Call<AndroidJavaObject>("getLeaderboard"))
+            using (var variants = leaderboard.Call<AndroidJavaObject>("getVariants"))
+            using (var variant = variants.Call<AndroidJavaObject>("get", 0))
             {
                 leaderboardScoreData.Title = leaderboard.Call<string>("getDisplayName");
-                using (var variants = leaderboard.Call<AndroidJavaObject>("getVariants"))
-                using (var variant = variants.Call<AndroidJavaObject>("get", 0))
+                if (variant.Call<bool>("hasPlayerInfo"))
                 {
-                    if (variant.Call<bool>("hasPlayerInfo"))
-                    {
-                        System.DateTime date = AndroidJavaConverter.ToDateTime(0);
-                        ulong rank = (ulong)variant.Call<long>("getPlayerRank");
-                        string scoreHolderId = "me";
-                        ulong score = (ulong)variant.Call<long>("getRawPlayerScore");
-                        string metadata = variant.Call<string>("getPlayerScoreTag");
-                        leaderboardScoreData.PlayerScore = new PlayGamesScore(date, leaderboardId,
-                            rank, scoreHolderId, score, metadata);
-                    }
-                    leaderboardScoreData.ApproximateCount = (ulong)variant.Call<long>("getNumScores");
+                    System.DateTime date = AndroidJavaConverter.ToDateTime(0);
+                    ulong rank = (ulong)variant.Call<long>("getPlayerRank");
+                    string scoreHolderId = "me";
+                    ulong score = (ulong)variant.Call<long>("getRawPlayerScore");
+                    string metadata = variant.Call<string>("getPlayerScoreTag");
+                    leaderboardScoreData.PlayerScore = new PlayGamesScore(date, leaderboardId,
+                        rank, scoreHolderId, score, metadata);
                 }
+                leaderboardScoreData.ApproximateCount = (ulong)variant.Call<long>("getNumScores");
             }
 
             return leaderboardScoreData;

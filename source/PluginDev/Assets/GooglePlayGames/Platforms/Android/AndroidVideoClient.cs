@@ -29,11 +29,11 @@ namespace GooglePlayGames.Android
             callback = ToOnGameThread(callback);
             using (var task = mVideosClient.Call<AndroidJavaObject>("getCaptureCapabilities"))
             {
-                TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
+                AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
                     task,
                     videoCapabilities => callback(ResponseStatus.Success, CreateVideoCapabilities(videoCapabilities)));
 
-                TaskListenerHelper.AddOnFailureListener(
+                AndroidTaskUtils.AddOnFailureListener(
                     task,
                     exception => callback(ResponseStatus.InternalError, null));
             }
@@ -49,12 +49,12 @@ namespace GooglePlayGames.Android
             callback = ToOnGameThread(callback);
             using (var task = mVideosClient.Call<AndroidJavaObject>("getCaptureState"))
             {
-                TaskListenerHelper.AddOnSuccessListener<AndroidJavaObject>(
+                AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
                     task,
                     captureState =>
                         callback(ResponseStatus.Success, CreateVideoCaptureState(captureState)));
 
-                TaskListenerHelper.AddOnFailureListener(
+                AndroidTaskUtils.AddOnFailureListener(
                     task,
                     exception => callback(ResponseStatus.InternalError, null));
             }
@@ -65,11 +65,11 @@ namespace GooglePlayGames.Android
             callback = ToOnGameThread(callback);
             using (var task = mVideosClient.Call<AndroidJavaObject>("isCaptureAvailable", ToVideoCaptureMode(captureMode)))
             {
-                TaskListenerHelper.AddOnSuccessListener<bool>(
+                AndroidTaskUtils.AddOnSuccessListener<bool>(
                     task,
                     isCaptureAvailable => callback(ResponseStatus.Success, isCaptureAvailable));
 
-                TaskListenerHelper.AddOnFailureListener(
+                AndroidTaskUtils.AddOnFailureListener(
                     task,
                     exception => callback(ResponseStatus.InternalError, false));
             }
@@ -88,9 +88,7 @@ namespace GooglePlayGames.Android
             }
             mOnCaptureOverlayStateListenerProxy = new OnCaptureOverlayStateListenerProxy(listener);
             using (mVideosClient.Call<AndroidJavaObject>("registerOnCaptureOverlayStateChangedListener",
-                mOnCaptureOverlayStateListenerProxy))
-            {
-            }
+                mOnCaptureOverlayStateListenerProxy));
         }
 
         public void UnregisterCaptureOverlayStateChangedListener()
@@ -98,9 +96,7 @@ namespace GooglePlayGames.Android
             if (mOnCaptureOverlayStateListenerProxy != null)
             {
                 using (mVideosClient.Call<AndroidJavaObject>("unregisterOnCaptureOverlayStateChangedListener",
-                    mOnCaptureOverlayStateListenerProxy))
-                {
-                }
+                    mOnCaptureOverlayStateListenerProxy));
 
                 mOnCaptureOverlayStateListenerProxy = null;
             }
