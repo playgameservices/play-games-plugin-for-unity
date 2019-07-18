@@ -96,8 +96,9 @@ namespace GooglePlayGames.Android
                             mInvitationCallback = new AndroidJavaObject("com.google.games.bridge.InvitationCallbackProxy",
                                 new InvitationCallbackProxy(mInvitationDelegate));
                             using (var invitationsClient = getInvitationsClient())
+                            using (var taskRegisterCallback = invitationsClient.Call<AndroidJavaObject>("registerInvitationCallback", mInvitationCallback))
                             {
-                                signInTasks.Call<bool>("add", invitationsClient.Call<AndroidJavaObject>("registerInvitationCallback", mInvitationCallback));
+                                signInTasks.Call<bool>("add", taskRegisterCallback);
                             }
                         }
                         AndroidJavaObject taskGetPlayer = getPlayersClient().Call<AndroidJavaObject>("getCurrentPlayer");
