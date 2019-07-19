@@ -109,32 +109,28 @@ namespace GooglePlayGames.Android
             try
             {
                 using (var bridgeClass = new AndroidJavaClass(HelperFragmentClass))
+                using (var currentActivity = AndroidHelperFragment.GetActivity())
+                using (var pendingResult = bridgeClass.CallStatic<AndroidJavaObject>(
+                    "fetchToken",
+                    currentActivity,
+                    silent,
+                    requestAuthCode,
+                    requestEmail,
+                    requestIdToken,
+                    webClientId,
+                    forceRefresh,
+                    oauthScopes.ToArray(),
+                    hidePopups,
+                    accountName))
                 {
-                    using (var currentActivity = AndroidHelperFragment.GetActivity())
-                    {
-                        using (var pendingResult = bridgeClass.CallStatic<AndroidJavaObject>(
-                            "fetchToken",
-                            currentActivity,
-                            silent,
-                            requestAuthCode,
-                            requestEmail,
-                            requestIdToken,
-                            webClientId,
-                            forceRefresh,
-                            oauthScopes.ToArray(),
-                            hidePopups,
-                            accountName))
-                        {
-                            pendingResult.Call("setResultCallback", new ResultCallbackProxy(
-                                tokenResult => {
-                                    account = tokenResult.Call<AndroidJavaObject>("getAccount");
-                                    authCode = tokenResult.Call<string>("getAuthCode");
-                                    email = tokenResult.Call<string>("getEmail");
-                                    idToken = tokenResult.Call<string>("getIdToken");
-                                    callback(tokenResult.Call<int>("getStatusCode"));
-                                }));
-                        }
-                    }
+                    pendingResult.Call("setResultCallback", new ResultCallbackProxy(
+                        tokenResult => {
+                            account = tokenResult.Call<AndroidJavaObject>("getAccount");
+                            authCode = tokenResult.Call<string>("getAuthCode");
+                            email = tokenResult.Call<string>("getEmail");
+                            idToken = tokenResult.Call<string>("getIdToken");
+                            callback(tokenResult.Call<int>("getStatusCode"));
+                        }));
                 }
             }
             catch (Exception e)
@@ -196,18 +192,14 @@ namespace GooglePlayGames.Android
             try
             {
                 using (var bridgeClass = new AndroidJavaClass(HelperFragmentClass))
+                using (var currentActivity = AndroidHelperFragment.GetActivity())
+                using (var pendingResult = bridgeClass.CallStatic<AndroidJavaObject>(
+                    "getAnotherAuthCode", currentActivity, reAuthenticateIfNeeded, webClientId))
                 {
-                    using (var currentActivity = AndroidHelperFragment.GetActivity())
-                    {
-                        using (var pendingResult = bridgeClass.CallStatic<AndroidJavaObject>(
-                            "getAnotherAuthCode", currentActivity, reAuthenticateIfNeeded, webClientId))
-                        {
-                            pendingResult.Call("setResultCallback", new ResultCallbackProxy(
-                                tokenResult => {
-                                    callback(tokenResult.Call<string>("getAuthCode"));
-                                }));
-                        }
-                    }
+                    pendingResult.Call("setResultCallback", new ResultCallbackProxy(
+                        tokenResult => {
+                            callback(tokenResult.Call<string>("getAuthCode"));
+                        }));
                 }
             }
             catch (Exception e)

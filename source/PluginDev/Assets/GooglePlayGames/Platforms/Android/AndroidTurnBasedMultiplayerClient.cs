@@ -34,32 +34,25 @@ namespace GooglePlayGames.Android
             callback = ToOnGameThread(callback);
 
             using (var matchConfigClass = new AndroidJavaClass("com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig"))
+            using (var matchConfigBuilder = matchConfigClass.CallStatic<AndroidJavaObject>("builder"))
+            using (var autoMatchCriteria = matchConfigClass.CallStatic<AndroidJavaObject>("createAutoMatchCriteria", (int) minOpponents, (int) maxOpponents, (long) exclusiveBitmask))
             {
-                using (var matchConfigBuilder = matchConfigClass.CallStatic<AndroidJavaObject>("builder"))
+                matchConfigBuilder.Call<AndroidJavaObject>("setAutoMatchCriteria", autoMatchCriteria);
+
+                if (variant != 0)
                 {
-                    using (var autoMatchCriteria = matchConfigClass.CallStatic<AndroidJavaObject>("createAutoMatchCriteria", (int) minOpponents, (int) maxOpponents, (long) exclusiveBitmask))
-                    {
-                        matchConfigBuilder.Call<AndroidJavaObject>("setAutoMatchCriteria", autoMatchCriteria);
+                    matchConfigBuilder.Call<AndroidJavaObject>("setVariant", (int) variant);
+                }
 
-                        if (variant != 0)
-                        {
-                            matchConfigBuilder.Call<AndroidJavaObject>("setVariant", (int) variant);
-                        }
+                using (var matchConfig = matchConfigBuilder.Call<AndroidJavaObject>("build"))
+                using (var task = mClient.Call<AndroidJavaObject>("createMatch", matchConfig))
+                {
+                    AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
+                        task,
+                        turnBasedMatch =>
+                            callback(true, AndroidJavaConverter.ToTurnBasedMatch(turnBasedMatch)));
 
-                        using (var matchConfig = matchConfigBuilder.Call<AndroidJavaObject>("build"))
-                        {
-                            using (var task = mClient.Call<AndroidJavaObject>("createMatch", matchConfig))
-                            {
-                                task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
-                                    turnBasedMatch =>
-                                    {
-                                        callback(true, AndroidJavaConverter.ToTurnBasedMatch(turnBasedMatch));
-                                    }
-                                ));
-                                task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(exception => callback(false, null)));
-                            }
-                        }
-                    }
+                    AndroidTaskUtils.AddOnFailureListener(task, e => callback(false, null));
                 }
             }
         }
@@ -86,50 +79,42 @@ namespace GooglePlayGames.Android
                     }
 
                     using (var matchConfigClass = new AndroidJavaClass("com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig"))
+                    using (var matchConfigBuilder = matchConfigClass.CallStatic<AndroidJavaObject>("builder"))
                     {
-                        using (var matchConfigBuilder = matchConfigClass.CallStatic<AndroidJavaObject>("builder"))
+                        if (result.MinAutomatchingPlayers > 0)
                         {
-                            if (result.MinAutomatchingPlayers > 0)
+                            using (var autoMatchCriteria = matchConfigClass.CallStatic<AndroidJavaObject>("createAutoMatchCriteria", result.MinAutomatchingPlayers, result.MaxAutomatchingPlayers, /* exclusiveBitMask= */ (long) 0))
                             {
-                                using (var autoMatchCriteria = matchConfigClass.CallStatic<AndroidJavaObject>("createAutoMatchCriteria", result.MinAutomatchingPlayers, result.MaxAutomatchingPlayers, /* exclusiveBitMask= */ (long) 0))
-                                {
-                                    matchConfigBuilder.Call<AndroidJavaObject>("setAutoMatchCriteria", autoMatchCriteria);
-                                }
+                                matchConfigBuilder.Call<AndroidJavaObject>("setAutoMatchCriteria", autoMatchCriteria);
+                            }
+                        }
+
+                        if (variant != 0)
+                        {
+                            matchConfigBuilder.Call<AndroidJavaObject>("setVariant", (int) variant);
+                        }
+
+                        using (var invitedPlayersObject = new AndroidJavaObject("java.util.ArrayList"))
+                        {
+                            for (int i = 0; i < result.PlayerIdsToInvite.Count; ++i)
+                            {
+                                invitedPlayersObject.Call<bool>("add", result.PlayerIdsToInvite[i]);
                             }
 
-                            if (variant != 0)
-                            {
-                                matchConfigBuilder.Call<AndroidJavaObject>("setVariant", (int) variant);
-                            }
+                            matchConfigBuilder.Call<AndroidJavaObject>("addInvitedPlayers", invitedPlayersObject);
+                        }
 
-                            using (var invitedPlayersObject = new AndroidJavaObject("java.util.ArrayList"))
-                            {
-                                for (int i = 0; i < result.PlayerIdsToInvite.Count; ++i)
-                                {
-                                    invitedPlayersObject.Call<bool>("add", result.PlayerIdsToInvite[i]);
-                                }
+                        using (var matchConfig = matchConfigBuilder.Call<AndroidJavaObject>("build"))
+                        using (var task = mClient.Call<AndroidJavaObject>("createMatch", matchConfig))
+                        {
+                            AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
+                                task,
+                                turnBasedMatch =>
+                                    callback(UIStatus.Valid, AndroidJavaConverter.ToTurnBasedMatch(turnBasedMatch)));
 
-                                matchConfigBuilder.Call<AndroidJavaObject>("addInvitedPlayers", invitedPlayersObject);
-                            }
-
-                            using (var matchConfig = matchConfigBuilder.Call<AndroidJavaObject>("build"))
-                            {
-                                using (var task = mClient.Call<AndroidJavaObject>("createMatch", matchConfig))
-                                {
-                                    task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
-                                        turnBasedMatch =>
-                                        {
-                                            callback(UIStatus.Valid, AndroidJavaConverter.ToTurnBasedMatch(turnBasedMatch));
-                                        }
-                                    ));
-                                    task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
-                                        exception =>
-                                        {
-                                            callback(UIStatus.InternalError, null);
-                                        }
-                                    ));
-                                }
-                            }
+                            AndroidTaskUtils.AddOnFailureListener(
+                                task,
+                                exception => callback(UIStatus.InternalError, null));
                         }
                     }
                 });
@@ -151,29 +136,26 @@ namespace GooglePlayGames.Android
 
             using (var task = mClient.Call<AndroidJavaObject>("loadMatchesByStatus", new int[]{0, 1, 2, 3}))
             {
-                task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
-                    annotatedData =>
-                    {
+                AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
+                    task,
+                    annotatedData => {
                         using (var matchesResponse = annotatedData.Call<AndroidJavaObject>("get"))
+                        using (var invitationsBuffer = matchesResponse.Call<AndroidJavaObject>("getInvitations"))
                         {
-                            using (var invitationsBuffer = matchesResponse.Call<AndroidJavaObject>("getInvitations"))
+                            int count = invitationsBuffer.Call<int>("getCount");
+                            Invitation[] invitations = new Invitation[count];
+                            for (int i = 0; i < count; i++)
                             {
-                                int count = invitationsBuffer.Call<int>("getCount");
-                                Invitation[] invitations = new Invitation[count];
-                                for (int i = 0; i < count; i++)
+                                using (var invitation = invitationsBuffer.Call<AndroidJavaObject>("get", (int) i))
                                 {
-                                    using (var invitation = invitationsBuffer.Call<AndroidJavaObject>("get", (int) i))
-                                    {
-                                        invitations[i] = AndroidJavaConverter.ToInvitation(invitation);
-                                    }
+                                    invitations[i] = AndroidJavaConverter.ToInvitation(invitation);
                                 }
-                                callback(invitations);
                             }
+                            callback(invitations);
                         }
-                    }
-                ));
-                task.Call<AndroidJavaObject>("addOnFailureListener",
-                    new TaskOnFailedProxy(exception => callback(null)));
+                    });
+
+                AndroidTaskUtils.AddOnFailureListener(task, e => callback(null));
             }
         }
 
@@ -183,9 +165,9 @@ namespace GooglePlayGames.Android
 
             using (var task = mClient.Call<AndroidJavaObject>("loadMatchesByStatus", new int[]{0, 1, 2, 3}))
             {
-                task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
-                    annotatedData =>
-                    {
+                AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
+                    task,
+                    annotatedData => {
                         using (var matchesResponse = annotatedData.Call<AndroidJavaObject>("get"))
                         {
                             List<TurnBasedMatch> myTurnMatches, theirTurnMatches, completedMatches;
@@ -209,9 +191,9 @@ namespace GooglePlayGames.Android
                             matches.AddRange(completedMatches);
                             callback(matches.ToArray());
                         }
-                    }
-                ));
-                task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(exception => callback(null)));
+                    });
+
+                AndroidTaskUtils.AddOnFailureListener(task, exception => callback(null));
             }
         }
 
@@ -221,9 +203,9 @@ namespace GooglePlayGames.Android
 
             using (var task = mClient.Call<AndroidJavaObject>("loadMatch", matchId))
             {
-                task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
-                    annotatedData =>
-                    {
+                AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
+                    task,
+                    annotatedData => {
                         using (var turnBasedMatch = annotatedData.Call<AndroidJavaObject>("get"))
                         {
                             if (turnBasedMatch == null)
@@ -236,8 +218,9 @@ namespace GooglePlayGames.Android
                                 callback(true, AndroidJavaConverter.ToTurnBasedMatch(turnBasedMatch));
                             }
                         }
-                    }));
-                task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(exception => callback(false, null)));
+                    });
+
+                AndroidTaskUtils.AddOnFailureListener(task, e => callback(false, null));
             }
         }
 
@@ -245,9 +228,9 @@ namespace GooglePlayGames.Android
         {
             using (var task = mClient.Call<AndroidJavaObject>("loadMatch", matchId))
             {
-                task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
-                    annotatedData =>
-                    {
+                AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
+                    task,
+                    annotatedData => {
                         using (var turnBasedMatch = annotatedData.Call<AndroidJavaObject>("get"))
                         {
                             if (turnBasedMatch == null)
@@ -260,13 +243,9 @@ namespace GooglePlayGames.Android
                                 callback(true, turnBasedMatch);
                             }
                         }
-                    }));
-                task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
-                    exception =>
-                    {
-                        callback(false, null);
-                    }
-                ));
+                    });
+
+                AndroidTaskUtils.AddOnFailureListener(task, exception => callback(false, null));
             }
         }
 
@@ -274,8 +253,7 @@ namespace GooglePlayGames.Android
         {
             callback = ToOnGameThread(callback);
 
-            AndroidHelperFragment.ShowInboxUI((status, turnBasedMatch) =>
-            {
+            AndroidHelperFragment.ShowInboxUI((status, turnBasedMatch) => {
                 if (status != UIStatus.Valid)
                 {
                     callback(false, null);
@@ -291,8 +269,7 @@ namespace GooglePlayGames.Android
         {
             callback = ToOnGameThread(callback);
 
-            FindInvitationWithId(invitationId, invitation =>
-            {
+            FindInvitationWithId(invitationId, invitation => {
                 if (invitation == null)
                 {
                     OurUtils.Logger.e("Could not find invitation with id " + invitationId);
@@ -302,18 +279,12 @@ namespace GooglePlayGames.Android
 
                 using (var task = mClient.Call<AndroidJavaObject>("acceptInvitation", invitationId))
                 {
-                    task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                    AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
+                        task,
                         turnBasedMatch =>
-                        {
-                            callback(true, AndroidJavaConverter.ToTurnBasedMatch(turnBasedMatch));
-                        }
-                    ));
-                    task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
-                        exception =>
-                        {
-                            callback(false, null);
-                        }
-                    ));
+                            callback(true, AndroidJavaConverter.ToTurnBasedMatch(turnBasedMatch)));
+
+                    AndroidTaskUtils.AddOnFailureListener(task, e => callback(false, null));
                 }
             });
         }
@@ -330,7 +301,7 @@ namespace GooglePlayGames.Android
 
                 TurnBasedMatchUpdateCallbackProxy callbackProxy = new TurnBasedMatchUpdateCallbackProxy(mMatchDelegate);
                 AndroidJavaObject turnBasedMatchUpdateCallback = new AndroidJavaObject("com.google.games.bridge.TurnBasedMatchUpdateCallbackProxy", callbackProxy);
-                mClient.Call<AndroidJavaObject>("registerTurnBasedMatchUpdateCallback", turnBasedMatchUpdateCallback);
+                using (mClient.Call<AndroidJavaObject>("registerTurnBasedMatchUpdateCallback", turnBasedMatchUpdateCallback));
             }
         }
 
@@ -350,14 +321,16 @@ namespace GooglePlayGames.Android
             {
                 using (var task = mClient.Call<AndroidJavaObject>("takeTurn", foundMatch.MatchId, data, pendingParticipantId))
                 {
-                    task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(turnBasedMatch => callback(true)));
-                    task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
-                        exception =>
-                        {
+                    AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
+                        task,
+                        turnBasedMatch => callback(true));
+
+                    AndroidTaskUtils.AddOnFailureListener(
+                        task,
+                        exception => {
                             OurUtils.Logger.d("Taking turn failed");
                             callback(false);
-                        }
-                    ));
+                        });
                 }
             });
         }
@@ -434,8 +407,11 @@ namespace GooglePlayGames.Android
 
                     using (var task = mClient.Call<AndroidJavaObject>("finishMatch", match.MatchId, data, results))
                     {
-                        task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(turnBasedMatch => callback(true)));
-                        task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(exception => callback(false)));
+                        AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
+                            task,
+                            turnBasedMatch => callback(true));
+
+                        AndroidTaskUtils.AddOnFailureListener(task, e => callback(false));
                     }
                 }
             });
@@ -455,12 +431,8 @@ namespace GooglePlayGames.Android
 
                 using (var task = mClient.Call<AndroidJavaObject>("dismissMatch", foundMatch.MatchId))
                 {
-                    task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
-                        v => callback(true)
-                    ));
-                    task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
-                        exception => callback(false)
-                    ));
+                    AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(task, v => callback(true));
+                    AndroidTaskUtils.AddOnFailureListener(task, e => callback(false));
                 }
             });
         }
@@ -478,10 +450,11 @@ namespace GooglePlayGames.Android
 
                 using (var task = mClient.Call<AndroidJavaObject>("leaveMatch", match.MatchId))
                 {
-                    task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(v => callback(true)));
-                    task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
-                        exception => callback(false)
-                    ));
+                    AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
+                        task,
+                        v => callback(true));
+
+                    AndroidTaskUtils.AddOnFailureListener(task, exception => callback(false));
                 }
             });
         }
@@ -495,8 +468,11 @@ namespace GooglePlayGames.Android
             {
                 using (var task = mClient.Call<AndroidJavaObject>("leaveMatchDuringTurn", match.MatchId, pendingParticipantId))
                 {
-                    task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(v => callback(true)));
-                    task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(exception => callback(false)));
+                    AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
+                        task,
+                        v => callback(true));
+
+                    AndroidTaskUtils.AddOnFailureListener(task, e => callback(false));
                 }
             });
         }
@@ -514,8 +490,11 @@ namespace GooglePlayGames.Android
                 }
                 using (var task = mClient.Call<AndroidJavaObject>("cancelMatch", match.MatchId))
                 {
-                    task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(v => callback(true)));
-                    task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(exception => callback(false)));
+                    AndroidTaskUtils.AddOnSuccessListener<string>(
+                        task,
+                        v => callback(true));
+
+                    AndroidTaskUtils.AddOnFailureListener(task, e => callback(false));
                 }
             });
         }
@@ -526,7 +505,7 @@ namespace GooglePlayGames.Android
             {
                 if (success)
                 {
-                    mClient.Call<AndroidJavaObject>("dismissMatch", match.MatchId);
+                    using (mClient.Call<AndroidJavaObject>("dismissMatch", match.MatchId));
                 }
             });
         }
@@ -545,15 +524,14 @@ namespace GooglePlayGames.Android
 
                 using (var task = mClient.Call<AndroidJavaObject>("rematch", match.MatchId))
                 {
-                    task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                    AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
+                        task,
                         turnBasedMatch =>
-                        {
-                            callback(true, AndroidJavaConverter.ToTurnBasedMatch(turnBasedMatch));
-                        }
-                    ));
-                    task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
-                        exception => callback(false, null)
-                    ));
+                            callback(true, AndroidJavaConverter.ToTurnBasedMatch(turnBasedMatch)));
+
+                    AndroidTaskUtils.AddOnFailureListener(
+                        task,
+                        e => callback(false, null));
                 }
             });
         }
@@ -567,7 +545,7 @@ namespace GooglePlayGames.Android
                     return;
                 }
 
-                mClient.Call<AndroidJavaObject>("declineInvitation", invitationId);
+                using (mClient.Call<AndroidJavaObject>("declineInvitation", invitationId));
             });
         }
 
@@ -575,12 +553,13 @@ namespace GooglePlayGames.Android
         {
             using (var task = mClient.Call<AndroidJavaObject>("loadMatchesByStatus", new int[]{0, 1, 2, 3}))
             {
-                task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
-                    annotatedData =>
-                    {
+                AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
+                    task,
+                    annotatedData => {
                         using (var matchesResponse = annotatedData.Call<AndroidJavaObject>("get"))
+                        using (var invitationsBuffer = matchesResponse.Call<AndroidJavaObject>("getInvitations"))
                         {
-                            AndroidJavaObject invitationsBuffer = matchesResponse.Call<AndroidJavaObject>("getInvitations");
+
                             int count = invitationsBuffer.Call<int>("getCount");
                             for (int i = 0; i < count; ++i)
                             {
@@ -593,11 +572,9 @@ namespace GooglePlayGames.Android
                             }
                         }
                         callback(null);
-                    }
-                ));
-                task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
-                    exception => callback(null)
-                ));
+                    });
+
+                AndroidTaskUtils.AddOnFailureListener(task, e => callback(null));
             }
         }
 
@@ -651,7 +628,7 @@ namespace GooglePlayGames.Android
                 }
 
                 onFoundParticipantAndMatch(participant, foundMatch);
-              });
+            });
         }
 
         private Participant CreateAutomatchingSentinel()
