@@ -61,18 +61,12 @@ namespace NearbyDroids
 
         public static IEnumerable<PlayerInfo> AllPlayers
         {
-            get
-            {
-                return allPlayers.Values;
-            }
+            get { return allPlayers.Values; }
         }
 
         public static PlayerInfo LocalPlayer
         {
-            get
-            {
-                return GetPlayer(NearbyPlayer.LocalDeviceId);
-            }
+            get { return GetPlayer(NearbyPlayer.LocalDeviceId); }
         }
 
         /// <summary>
@@ -81,112 +75,64 @@ namespace NearbyDroids
         /// <value><c>true</c> if moved; otherwise, <c>false</c>.</value>
         public bool Moved
         {
-            get
-            {
-                return moved;
-            }
+            get { return moved; }
 
-            set
-            {
-                moved = value;
-            }
+            set { moved = value; }
         }
 
         public int Score
         {
-            get
-            {
-                return dataState.score;
-            }
+            get { return dataState.score; }
 
-            set
-            {
-                dataState.score = value;
-            }
+            set { dataState.score = value; }
         }
 
         public int AvatarIndex
         {
-            get
-            {
-                return dataState.avatarIndex;
-            }
+            get { return dataState.avatarIndex; }
         }
 
         public string DeviceId
         {
-            get
-            {
-                return player.DeviceId;
-            }
+            get { return player.DeviceId; }
         }
 
         public NearbyPlayer Player
         {
-            get
-            {
-                return player;
-            }
+            get { return player; }
         }
 
         public PlayerData DataState
         {
-            get
-            {
-                return this.dataState;
-            }
+            get { return this.dataState; }
 
-            set
-            {
-                dataState = value;
-            }
+            set { dataState = value; }
         }
 
         public GameObject ScorePanel
         {
-            get
-            {
-                return scorePanel;
-            }
+            get { return scorePanel; }
 
-            set
-            {
-                scorePanel = value;
-            }
+            set { scorePanel = value; }
         }
 
         public Text NameText
         {
-            get
-            {
-                return nameText;
-            }
+            get { return nameText; }
 
-            set
-            {
-                nameText = value;
-            }
+            set { nameText = value; }
         }
 
         public Text ScoreText
         {
-            get
-            {
-                return scoreText;
-            }
+            get { return scoreText; }
 
-            set
-            {
-                scoreText = value;
-            }
+            set { scoreText = value; }
         }
 
         public bool IsLocal
         {
-            get
-            {
-                return this.player.IsLocal;
-            }
+            get { return this.player.IsLocal; }
         }
 
         public byte[] SerializedData
@@ -285,8 +231,9 @@ namespace NearbyDroids
             NearbyPlayer newPlayer = NearbyPlayer.FindByDeviceId(info.dataState.DeviceId);
             if (newPlayer == null)
             {
-                newPlayer = new NearbyPlayer (info.dataState.DeviceId, endpointId, info.DataState.Name);
+                newPlayer = new NearbyPlayer(info.dataState.DeviceId, endpointId, info.DataState.Name);
             }
+
             info.player = newPlayer;
             info.dataState.Name = newPlayer.Name;
 
@@ -343,36 +290,21 @@ namespace NearbyDroids
 
             public string DeviceId
             {
-                get
-                {
-                    return deviceId;
-                }
+                get { return deviceId; }
             }
 
             public string Name
             {
-                get
-                {
-                    return name;
-                }
+                get { return name; }
 
-                set
-                {
-                    name = value;
-                }
+                set { name = value; }
             }
 
             public int AvatarIndex
             {
-                get
-                {
-                    return avatarIndex;
-                }
+                get { return avatarIndex; }
 
-                set
-                {
-                    avatarIndex = value;
-                }
+                set { avatarIndex = value; }
             }
         }
     }

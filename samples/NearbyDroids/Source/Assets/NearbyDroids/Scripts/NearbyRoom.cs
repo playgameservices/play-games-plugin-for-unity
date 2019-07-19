@@ -106,99 +106,57 @@ namespace NearbyDroids
 
         public string Name
         {
-            get
-            {
-                return address.Name;
-            }
+            get { return address.Name; }
         }
 
         public bool AutoJoin
         {
-            get
-            {
-                return autoJoin;
-            }
+            get { return autoJoin; }
 
-            set
-            {
-                autoJoin = value;
-            }
+            set { autoJoin = value; }
         }
 
         public bool AlwaysOpen
         {
-            get
-            {
-                return alwaysOpen;
-            }
+            get { return alwaysOpen; }
 
-            set
-            {
-                alwaysOpen = value;
-            }
+            set { alwaysOpen = value; }
         }
 
         public string EndpointId
         {
-            get
-            {
-                return address.EndpointId;
-            }
+            get { return address.EndpointId; }
         }
 
         public NearbyPlayer Address
         {
-            get
-            {
-                return address;
-            }
+            get { return address; }
         }
 
         public bool IsLocal
         {
-            get
-            {
-                return local;
-            }
+            get { return local; }
         }
 
         public ConnectionDataBuilder ConnectionData
         {
-            get
-            {
-                return connectionDataBuilder;
-            }
+            get { return connectionDataBuilder; }
 
-            set
-            {
-                connectionDataBuilder = value;
-            }
+            set { connectionDataBuilder = value; }
         }
 
         public MessageReceiver MessageHandler
         {
-            get
-            {
-                return messageHandler;
-            }
+            get { return messageHandler; }
 
-            set
-            {
-                messageHandler = value;
-            }
+            set { messageHandler = value; }
         }
 
         public PlayerEventHandler PlayerHandler
         {
-            get
-            {
-                return playerHandler;
-            }
+            get { return playerHandler; }
 
-            set
-            {
-                playerHandler = value;
-            }
+            set { playerHandler = value; }
         }
 
         /// <summary>
@@ -225,6 +183,7 @@ namespace NearbyDroids
                     return r;
                 }
             }
+
             return null;
         }
 
@@ -380,7 +339,7 @@ namespace NearbyDroids
         /// <param name="player">Player to accept the request from.</param>
         public void AcceptRequest(string endpointId)
         {
-            NearbyPlayer player = NearbyPlayer.FindByEndpointId (endpointId);
+            NearbyPlayer player = NearbyPlayer.FindByEndpointId(endpointId);
             PlayGamesPlatform.Nearby.AcceptConnectionRequest(
                 player.EndpointId,
                 ConnectionData(),
@@ -431,15 +390,9 @@ namespace NearbyDroids
 
             public Action<NearbyRoom, bool> RoomDiscoveredCallback
             {
-                get
-                {
-                    return this.roomDiscoveredCallback;
-                }
+                get { return this.roomDiscoveredCallback; }
 
-                set
-                {
-                    roomDiscoveredCallback = value;
-                }
+                set { roomDiscoveredCallback = value; }
             }
 
             #region IDiscoveryListener implementation
@@ -448,9 +401,9 @@ namespace NearbyDroids
             {
                 Debug.Log("Found Endpoint!");
                 NearbyRoom room = new NearbyRoom(
-                                      null,
-                                      discoveredEndpoint.EndpointId,
-                                      discoveredEndpoint.Name);
+                    null,
+                    discoveredEndpoint.EndpointId,
+                    discoveredEndpoint.Name);
                 if (roomDiscoveredCallback != null)
                 {
                     Debug.Log("Invoking roomCallback.");

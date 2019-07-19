@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 namespace CubicPilot.GameLogic
 {
     using System;
@@ -24,34 +25,19 @@ namespace CubicPilot.GameLogic
 
         public int Score
         {
-            get
-            {
-                return mScore;
-            }
-            set
-            {
-                mScore = value;
-            }
+            get { return mScore; }
+            set { mScore = value; }
         }
 
         public int Stars
         {
-            get
-            {
-                return mStars;
-            }
-            set
-            {
-                mStars = value;
-            }
+            get { return mStars; }
+            set { mStars = value; }
         }
 
         public bool Cleared
         {
-            get
-            {
-                return mScore > 0;
-            }
+            get { return mScore > 0; }
         }
 
         public LevelProgress()
@@ -72,12 +58,13 @@ namespace CubicPilot.GameLogic
 
         public void SetFromString(string s)
         {
-            string[] p = s.Split(new char[] { ' ' });
+            string[] p = s.Split(new char[] {' '});
             if (p.Length != 3 || !p[0].Equals("LP"))
             {
                 Debug.LogError("Failed to parse level progress from: " + s);
                 mStars = mScore = 0;
             }
+
             mScore = Convert.ToInt32(p[1]);
             mStars = Convert.ToInt32(p[2]);
         }
@@ -97,11 +84,13 @@ namespace CubicPilot.GameLogic
                 mScore = other.mScore;
                 modified = true;
             }
+
             if (other.mStars > mStars)
             {
                 mStars = other.mStars;
                 modified = true;
             }
+
             return modified;
         }
     }

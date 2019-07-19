@@ -18,7 +18,8 @@ using UnityEngine;
 using System.Collections;
 using System;
 
-public class AimController : MonoBehaviour {
+public class AimController : MonoBehaviour
+{
     private const string ThrowSfxName = "ThrowSfx";
 
     Action mFireDelegate = null;
@@ -33,11 +34,13 @@ public class AimController : MonoBehaviour {
     Vector3 mStartPos;
     AudioClip mThrowSfx = null;
 
-    public void SetFireDelegate(Action a) {
+    public void SetFireDelegate(Action a)
+    {
         mFireDelegate = a;
     }
 
-    void Start () {
+    void Start()
+    {
         // initially, disable the object's physics
         gameObject.GetComponent<Rigidbody>().isKinematic = true;
         gameObject.GetComponent<Rigidbody>().useGravity = false;
@@ -49,38 +52,55 @@ public class AimController : MonoBehaviour {
     }
 
     // Update is called once per frame
-    void Update () {
-        if (mArmed) {
+    void Update()
+    {
+        if (mArmed)
+        {
             Touch controlFinger = new Touch();
-            if (!GetControlFinger(ref controlFinger)) {
+            if (!GetControlFinger(ref controlFinger))
+            {
                 // finger is off the screen -- fire!
                 AttemptToFire();
-            } else {
+            }
+            else
+            {
                 // finger moved -- adjust position
                 AdjustAim(controlFinger.position);
             }
-        } else {
+        }
+        else
+        {
             AcquireFinger();
         }
     }
 
-    private bool GetControlFinger(ref Touch result) {
-        if (mArmed) {
-            foreach (Touch t in Input.touches) {
-                if (t.fingerId == mFingerId) {
+    private bool GetControlFinger(ref Touch result)
+    {
+        if (mArmed)
+        {
+            foreach (Touch t in Input.touches)
+            {
+                if (t.fingerId == mFingerId)
+                {
                     result = t;
                     return true;
                 }
             }
+
             return false;
-        } else {
+        }
+        else
+        {
             return false;
         }
     }
 
-    private void AcquireFinger() {
-        foreach (Touch t in Input.touches) {
-            if (t.phase == TouchPhase.Began) {
+    private void AcquireFinger()
+    {
+        foreach (Touch t in Input.touches)
+        {
+            if (t.phase == TouchPhase.Began)
+            {
                 mFingerId = t.fingerId;
                 mArmed = true;
                 mTouchAnchor = t.position;
@@ -88,7 +108,8 @@ public class AimController : MonoBehaviour {
         }
     }
 
-    private void AdjustAim(Vector2 fingerPos) {
+    private void AdjustAim(Vector2 fingerPos)
+    {
         float factor = TouchSensivity / Screen.width;
         Vector2 delta = fingerPos - mTouchAnchor;
         float targetX = mStartPos.x + delta.x * factor;
@@ -96,30 +117,37 @@ public class AimController : MonoBehaviour {
         MoveTo(targetX, targetZ);
     }
 
-    private void MoveTo(float x, float z) {
+    private void MoveTo(float x, float z)
+    {
         float diffX = x - gameObject.transform.position.x;
         float diffZ = z - gameObject.transform.position.z;
         gameObject.transform.Translate(new Vector3(diffX, 0, diffZ));
     }
 
-    private void AttemptToFire() {
+    private void AttemptToFire()
+    {
         float displacement = Vector3.Distance(mStartPos, gameObject.transform.position);
-        if (displacement < MinDistanceToFire) {
+        if (displacement < MinDistanceToFire)
+        {
             mArmed = false;
             MoveTo(mStartPos.x, mStartPos.z);
-        } else {
+        }
+        else
+        {
             Vector3 force = (mStartPos - gameObject.transform.position) * ForceFactor;
             force += displacement * new Vector3(0.0f, ForceUpFactor, 0.0f);
             gameObject.GetComponent<Rigidbody>().useGravity = true;
             gameObject.GetComponent<Rigidbody>().isKinematic = false;
             gameObject.GetComponent<Rigidbody>().AddForce(force);
 
-            if (mThrowSfx != null) {
+            if (mThrowSfx != null)
+            {
                 AudioSource.PlayClipAtPoint(mThrowSfx, Vector3.zero);
             }
 
             this.enabled = false;
-            if (mFireDelegate != null) {
+            if (mFireDelegate != null)
+            {
                 mFireDelegate.Invoke();
             }
         }

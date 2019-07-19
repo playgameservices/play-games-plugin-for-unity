@@ -26,7 +26,7 @@ namespace QuizRacer.GameLogic
     public class RaceManager : RealTimeMultiplayerListener
     {
         const string RaceTrackName = "RaceTrack";
-        string[] CarNames = new string[] { "Car-Orange", "Car-Lime", "Car-Red", "Car-Cyan" };
+        string[] CarNames = new string[] {"Car-Orange", "Car-Lime", "Car-Red", "Car-Cyan"};
         const int QuickGameOpponents = 1;
         const int GameVariant = 0;
         const int MinOpponents = 1;
@@ -43,14 +43,13 @@ namespace QuizRacer.GameLogic
             Playing,
             Finished,
             SetupFailed,
-            Aborted}
-
-        ;
+            Aborted
+        };
 
         private RaceState mRaceState = RaceState.SettingUp;
 
         // how many points each of our fellow racers has
-        private Dictionary<string,int> mRacerScore = new Dictionary<string,int>();
+        private Dictionary<string, int> mRacerScore = new Dictionary<string, int>();
 
         // whether or not we received the final score for each participant id
         private HashSet<string> mGotFinalScore = new HashSet<string>();
@@ -104,26 +103,17 @@ namespace QuizRacer.GameLogic
 
         public RaceState State
         {
-            get
-            {
-                return mRaceState;
-            }
+            get { return mRaceState; }
         }
 
         public static RaceManager Instance
         {
-            get
-            {
-                return sInstance;
-            }
+            get { return sInstance; }
         }
 
         public int FinishRank
         {
-            get
-            {
-                return mFinishRank;
-            }
+            get { return mFinishRank; }
         }
 
         public float RoomSetupProgress
@@ -135,6 +125,7 @@ namespace QuizRacer.GameLogic
                 {
                     fakeProgress = MaxFakeProgress;
                 }
+
                 float progress = mRoomSetupProgress + fakeProgress;
                 return progress < 99.0f ? progress : 99.0f;
             }
@@ -255,14 +246,14 @@ namespace QuizRacer.GameLogic
 
         public void OnRealTimeMessageReceived(bool isReliable, string senderId, byte[] data)
         {
-            int score = (int)data[1];
+            int score = (int) data[1];
 
-            if (data[0] == (byte)'I')
+            if (data[0] == (byte) 'I')
             {
                 // interim score update
                 mRacerScore[senderId] = score;
             }
-            else if (data[0] == (byte)'F')
+            else if (data[0] == (byte) 'F')
             {
                 // finish notification
                 if (!mGotFinalScore.Contains(senderId))
@@ -295,7 +286,7 @@ namespace QuizRacer.GameLogic
 
         public float GetRacerProgress(string participantId)
         {
-            return GetRacerPosition(participantId) / (float)PointsToFinish;
+            return GetRacerPosition(participantId) / (float) PointsToFinish;
         }
 
         public int GetRacerPosition(string participantId)
@@ -355,8 +346,8 @@ namespace QuizRacer.GameLogic
 
         private void BroadCastPosition(int pos)
         {
-            mPosPacket[0] = (byte)'I'; // interim update
-            mPosPacket[1] = (byte)pos;
+            mPosPacket[0] = (byte) 'I'; // interim update
+            mPosPacket[1] = (byte) pos;
             PlayGamesPlatform.Instance.RealTime.SendMessageToAll(false, mPosPacket);
         }
 
@@ -369,8 +360,8 @@ namespace QuizRacer.GameLogic
             UpdateMyRank();
 
             // send final score packet to peers
-            mFinalPacket[0] = (byte)'F'; // final update
-            mFinalPacket[1] = (byte)mRacerScore[mMyParticipantId];
+            mFinalPacket[0] = (byte) 'F'; // final update
+            mFinalPacket[1] = (byte) mRacerScore[mMyParticipantId];
             PlayGamesPlatform.Instance.RealTime.SendMessageToAll(true, mFinalPacket);
         }
 
@@ -381,6 +372,7 @@ namespace QuizRacer.GameLogic
             {
                 mFinishRank = 0; // undefined for now
             }
+
             int myScore = mRacerScore[mMyParticipantId];
             int rank = 1;
             foreach (string participantId in mRacerScore.Keys)
@@ -390,6 +382,7 @@ namespace QuizRacer.GameLogic
                     ++rank;
                 }
             }
+
             mFinishRank = rank;
         }
     }

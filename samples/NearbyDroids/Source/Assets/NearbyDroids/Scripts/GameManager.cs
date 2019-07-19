@@ -25,6 +25,7 @@ namespace NearbyDroids
     using UnityEngine;
     using UnityEngine.UI;
     using UnityEngine.SceneManagement;
+
     /// <summary>
     /// Game manager manages the game play and players.
     /// Heavily inspired by http://unity3d.com/learn/tutorials/projects/2d-roguelike
@@ -113,10 +114,7 @@ namespace NearbyDroids
         /// <value>The instance.</value>
         public static GameManager Instance
         {
-            get
-            {
-                return instance;
-            }
+            get { return instance; }
         }
 
         /// <summary>
@@ -125,15 +123,9 @@ namespace NearbyDroids
         /// <value>The level.</value>
         public int Level
         {
-            get
-            {
-                return gameState.Level;
-            }
+            get { return gameState.Level; }
 
-            set
-            {
-                gameState.Level = value;
-            }
+            set { gameState.Level = value; }
         }
 
         /// <summary>
@@ -142,15 +134,9 @@ namespace NearbyDroids
         /// <value>The state of the game.</value>
         public GameStateData GameState
         {
-            get
-            {
-                return gameState;
-            }
+            get { return gameState; }
 
-            set
-            {
-                gameState = value;
-            }
+            set { gameState = value; }
         }
 
         /// <summary>
@@ -160,10 +146,7 @@ namespace NearbyDroids
         /// <value>The level data.</value>
         public List<ItemState> LevelData
         {
-            get
-            {
-                return gameState.LevelData;
-            }
+            get { return gameState.LevelData; }
         }
 
         /// <summary>
@@ -172,10 +155,7 @@ namespace NearbyDroids
         /// <value>The level manager.</value>
         public LevelManager LevelManager
         {
-            get
-            {
-                return levelmanager;
-            }
+            get { return levelmanager; }
         }
 
         /// <summary>
@@ -184,10 +164,7 @@ namespace NearbyDroids
         /// <value>The level text.</value>
         private Text LevelText
         {
-            get
-            {
-                return GameObject.Find("level_message").GetComponent<Text>();
-            }
+            get { return GameObject.Find("level_message").GetComponent<Text>(); }
         }
 
         /// <summary>
@@ -196,10 +173,7 @@ namespace NearbyDroids
         /// <value>The game over text.</value>
         private Text GameOverText
         {
-            get
-            {
-                return GameObject.Find("game_over_text").GetComponent<Text>();
-            }
+            get { return GameObject.Find("game_over_text").GetComponent<Text>(); }
         }
 
         /// <summary>
@@ -209,15 +183,9 @@ namespace NearbyDroids
         /// <value>The room.</value>
         public NearbyRoom Room
         {
-            get
-            {
-                return room;
-            }
+            get { return room; }
 
-            set
-            {
-                room = value;
-            }
+            set { room = value; }
         }
 
         /// <summary>
@@ -366,10 +334,10 @@ namespace NearbyDroids
                 instance = this;
             }
             else if (instance != this)
-            { 
+            {
                 // If instance already exists and it's not this:
                 // Then destroy this. This enforces our singleton pattern, meaning there can only ever be one instance of a GameManager.
-                Destroy(gameObject);   
+                Destroy(gameObject);
             }
 
             // Sets this to not be destroyed when reloading scene
@@ -475,7 +443,7 @@ namespace NearbyDroids
                         // done if the player is local, or if we are hosting
                         // the game room.
                         ctl.BroadcastMovement = player.IsLocal ||
-                        gameType == GameType.MultiplayerLocal;
+                                                gameType == GameType.MultiplayerLocal;
                     }
                     else
                     {
@@ -488,7 +456,7 @@ namespace NearbyDroids
                 }
             }
         }
-            
+
         // This is called each time a scene is loaded.
         internal void OnLevelWasLoaded(int sceneIndex)
         {
@@ -505,11 +473,8 @@ namespace NearbyDroids
                     Room.PlayerHandler = OnPlayerChanged;
                     if (gameType == GameType.MultiplayerLocal)
                     {
-                        Room.ConnectionData = 
-                        () =>
-                        {
-                            return GetGameStateData(GameStateData.Phase.Connecting);
-                        };
+                        Room.ConnectionData =
+                            () => { return GetGameStateData(GameStateData.Phase.Connecting); };
                     }
                 }
 
@@ -755,7 +720,7 @@ namespace NearbyDroids
             msg.Changes.AddRange(changesToShare.Values);
 
             MemoryStream m = new MemoryStream();
-            bf.Serialize(m, msg); 
+            bf.Serialize(m, msg);
             m.Flush();
             return m.ToArray();
         }
@@ -819,7 +784,7 @@ namespace NearbyDroids
         /// <param name="present">If set to <c>true</c> present.</param>
         internal void OnPlayerChanged(NearbyPlayer player, bool present)
         {
-            Debug.Log("Player " + player.Name + " " + (string)(present ? "Arrived" : "Left"));
+            Debug.Log("Player " + player.Name + " " + (string) (present ? "Arrived" : "Left"));
             if (player.DeviceId == Room.Address.DeviceId)
             {
                 connected = false;
@@ -856,15 +821,9 @@ namespace NearbyDroids
             /// <value>The state of the game.</value>
             public GameStateData GameState
             {
-                get
-                {
-                    return gameState;
-                }
+                get { return gameState; }
 
-                set
-                {
-                    gameState = value;
-                }
+                set { gameState = value; }
             }
 
             /// <summary>
@@ -874,15 +833,9 @@ namespace NearbyDroids
             /// <value>The changes.</value>
             public List<ItemState> Changes
             {
-                get
-                {
-                    return changes;
-                }
+                get { return changes; }
 
-                set
-                {
-                    changes = value;
-                }
+                set { changes = value; }
             }
         }
 
@@ -933,15 +886,9 @@ namespace NearbyDroids
             /// <value>The level.</value>
             internal int Level
             {
-                get
-                {
-                    return level;
-                }
+                get { return level; }
 
-                set
-                {
-                    level = value;
-                }
+                set { level = value; }
             }
 
             /// <summary>
@@ -950,15 +897,9 @@ namespace NearbyDroids
             /// <value>The current phase.</value>
             internal Phase CurrentPhase
             {
-                get
-                {
-                    return phase;
-                }
+                get { return phase; }
 
-                set
-                {
-                    phase = value;
-                }
+                set { phase = value; }
             }
 
             /// <summary>
@@ -969,15 +910,9 @@ namespace NearbyDroids
             /// <value>The serial number.</value>
             internal long SerialNumber
             {
-                get
-                {
-                    return serialnumber;
-                }
+                get { return serialnumber; }
 
-                set
-                {
-                    serialnumber = value;
-                }
+                set { serialnumber = value; }
             }
 
             /// <summary>
@@ -987,10 +922,7 @@ namespace NearbyDroids
             /// <value>The level data.</value>
             internal List<ItemState> LevelData
             {
-                get
-                {
-                    return levelData;
-                }
+                get { return levelData; }
             }
 
             /// <summary>
@@ -999,10 +931,7 @@ namespace NearbyDroids
             /// <value>The players.</value>
             internal List<PlayerInfo.PlayerData> Players
             {
-                get
-                {
-                    return players;
-                }
+                get { return players; }
             }
         }
     }

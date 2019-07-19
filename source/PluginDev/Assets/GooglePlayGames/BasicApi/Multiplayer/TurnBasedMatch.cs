@@ -13,6 +13,7 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
+
 #if UNITY_ANDROID
 
 namespace GooglePlayGames.BasicApi.Multiplayer
@@ -62,9 +63,9 @@ namespace GooglePlayGames.BasicApi.Multiplayer
         private DateTime mLastUpdateTime;
 
         internal TurnBasedMatch(string matchId, byte[] data, bool canRematch,
-                                string selfParticipantId, List<Participant> participants, uint availableAutomatchSlots,
-                                string pendingParticipantId, MatchTurnStatus turnStatus, MatchStatus matchStatus,
-                                uint variant, uint version, DateTime creationTime, DateTime lastUpdateTime)
+            string selfParticipantId, List<Participant> participants, uint availableAutomatchSlots,
+            string pendingParticipantId, MatchTurnStatus turnStatus, MatchStatus matchStatus,
+            uint variant, uint version, DateTime creationTime, DateTime lastUpdateTime)
         {
             mMatchId = matchId;
             mData = data;
@@ -88,65 +89,44 @@ namespace GooglePlayGames.BasicApi.Multiplayer
         /// Creation time
         public DateTime CreationTime
         {
-            get
-            {
-                return mCreationTime;
-            }
+            get { return mCreationTime; }
         }
 
         // Last update time
         public DateTime LastUpdateTime
         {
-            get
-            {
-                return mLastUpdateTime;
-            }
+            get { return mLastUpdateTime; }
         }
 
 
         /// Match ID.
         public string MatchId
         {
-            get
-            {
-                return mMatchId;
-            }
+            get { return mMatchId; }
         }
 
         /// The data associated with the match. The meaning of this data is defined by the game.
         public byte[] Data
         {
-            get
-            {
-                return mData;
-            }
+            get { return mData; }
         }
 
         /// If true, this match can be rematched.
         public bool CanRematch
         {
-            get
-            {
-                return mCanRematch;
-            }
+            get { return mCanRematch; }
         }
 
         /// The participant ID that represents the current player.
         public string SelfParticipantId
         {
-            get
-            {
-                return mSelfParticipantId;
-            }
+            get { return mSelfParticipantId; }
         }
 
         /// The participant that represents the current player in the match.
         public Participant Self
         {
-            get
-            {
-                return GetParticipant(mSelfParticipantId);
-            }
+            get { return GetParticipant(mSelfParticipantId); }
         }
 
         /// Gets a participant by ID. Returns null if not found.
@@ -167,81 +147,56 @@ namespace GooglePlayGames.BasicApi.Multiplayer
         /// Returns the list of participants. Guaranteed to be sorted by participant ID.
         public List<Participant> Participants
         {
-            get
-            {
-                return mParticipants;
-            }
+            get { return mParticipants; }
         }
 
         /// Returns the pending participant ID (whose turn it is).
         public string PendingParticipantId
         {
-            get
-            {
-                return mPendingParticipantId;
-            }
+            get { return mPendingParticipantId; }
         }
 
         /// Returns the pending participant (whose turn it is).
         public Participant PendingParticipant
         {
-            get
-            {
-                return mPendingParticipantId == null ? null :
-                        GetParticipant(mPendingParticipantId);
-            }
+            get { return mPendingParticipantId == null ? null : GetParticipant(mPendingParticipantId); }
         }
 
         /// Returns the turn status (whether it's my turn).
         public MatchTurnStatus TurnStatus
         {
-            get
-            {
-                return mTurnStatus;
-            }
+            get { return mTurnStatus; }
         }
 
         /// Returns the status of the match.
         public MatchStatus Status
         {
-            get
-            {
-                return mMatchStatus;
-            }
+            get { return mMatchStatus; }
         }
 
         /// Returns the match variant being played. 0 for default.
         public uint Variant
         {
-            get
-            {
-                return mVariant;
-            }
+            get { return mVariant; }
         }
 
         /// Returns the version for the contained match.
         public uint Version
         {
-            get
-            {
-                return mVersion;
-            }
+            get { return mVersion; }
         }
 
         // Returns how many automatch slots are still open in the match.
         public uint AvailableAutomatchSlots
         {
-            get
-            {
-                return mAvailableAutomatchSlots;
-            }
+            get { return mAvailableAutomatchSlots; }
         }
 
         public override string ToString()
         {
             return string.Format("[TurnBasedMatch: mMatchId={0}, mData={1}, mCanRematch={2}, " +
-                "mSelfParticipantId={3}, mParticipants={4}, mPendingParticipantId={5}, " +
-                "mTurnStatus={6}, mMatchStatus={7}, mVariant={8}, mVersion={9}, mCreationTime={10}, mLastUpdateTime={11}]",
+                                 "mSelfParticipantId={3}, mParticipants={4}, mPendingParticipantId={5}, " +
+                                 "mTurnStatus={6}, mMatchStatus={7}, mVariant={8}, mVersion={9}, mCreationTime={10}, mLastUpdateTime={11}]",
                 mMatchId,
                 mData,
                 mCanRematch,

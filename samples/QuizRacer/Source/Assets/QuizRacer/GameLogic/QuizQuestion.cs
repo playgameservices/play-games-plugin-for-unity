@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 namespace QuizRacer.GameLogic
 {
     using UnityEngine;
@@ -70,7 +71,7 @@ namespace QuizRacer.GameLogic
             switch (operation)
             {
                 case 0:
-                // a + b x c
+                    // a + b x c
                     a = Random.Range(1, 10);
                     b = Random.Range(1, 10);
                     c = Random.Range(2, 5);
@@ -78,7 +79,7 @@ namespace QuizRacer.GameLogic
                     q = a + " + (" + b + " x " + c + ")";
                     break;
                 case 1:
-                // a x b - c
+                    // a x b - c
                     a = Random.Range(2, 10);
                     b = Random.Range(2, 10);
                     c = Random.Range(0, a * b);
@@ -86,7 +87,7 @@ namespace QuizRacer.GameLogic
                     result = a * b - c;
                     break;
                 case 2:
-                // a/b + c
+                    // a/b + c
                     b = Random.Range(2, 8);
                     a = b * Random.Range(2, 8);
                     c = Random.Range(1, 5);
@@ -94,7 +95,7 @@ namespace QuizRacer.GameLogic
                     result = a / b + c;
                     break;
                 default:
-                // a + b + c
+                    // a + b + c
                     a = Random.Range(2, 10);
                     b = Random.Range(2, 10);
                     c = Random.Range(2, 10);
@@ -102,6 +103,7 @@ namespace QuizRacer.GameLogic
                     q = a + " + " + b + " + " + c;
                     break;
             }
+
             return new QuizQuestion(q + "?", result.ToString(),
                 MakeWrongNumericAnswers(result));
         }
@@ -119,6 +121,7 @@ namespace QuizRacer.GameLogic
                 n -= Random.Range(1, 4);
                 wrongNumbers[i] = n.ToString();
             }
+
             n = rightNumber;
             for (; i < wrongNumberCount; i++)
             {
@@ -131,42 +134,27 @@ namespace QuizRacer.GameLogic
 
         public string Question
         {
-            get
-            {
-                return mQuestion;
-            }
+            get { return mQuestion; }
         }
 
         public string[] Answers
         {
-            get
-            {
-                return mAnswers;
-            }
+            get { return mAnswers; }
         }
 
         public int RightAnswerIndex
         {
-            get
-            {
-                return mRightAnswer;
-            }
+            get { return mRightAnswer; }
         }
 
         public string RightAnswer
         {
-            get
-            {
-                return mAnswers[mRightAnswer];
-            }
+            get { return mAnswers[mRightAnswer]; }
         }
 
         public int ID
         {
-            get
-            {
-                return mID;
-            }
+            get { return mID; }
         }
     }
 }

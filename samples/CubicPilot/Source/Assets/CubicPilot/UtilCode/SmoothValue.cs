@@ -34,7 +34,7 @@ namespace CubicPilot.UtilCode
         }
 
         public SmoothValue(float initialValue, float maxChangeRate, float min,
-                       float max, int filterSamples)
+            float max, int filterSamples)
         {
             mValue = initialValue;
             mMaxChangeRate = maxChangeRate;
@@ -52,7 +52,7 @@ namespace CubicPilot.UtilCode
         public float PullTowards(float target, float deltaT)
         {
             mFilteredValue = (mFilteredValue * mFilterSamples + target) /
-            (mFilterSamples + 1);
+                             (mFilterSamples + 1);
             target = mFilteredValue;
 
             float displac = deltaT * mMaxChangeRate;
@@ -65,15 +65,13 @@ namespace CubicPilot.UtilCode
                 mValue = Util.Clamp(mValue > target ? mValue - displac : mValue + displac,
                     mMin, mMax);
             }
+
             return mValue;
         }
 
         public float Value
         {
-            get
-            {
-                return mValue;
-            }
+            get { return mValue; }
         }
     }
 }

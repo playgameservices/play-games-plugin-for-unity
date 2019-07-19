@@ -22,50 +22,32 @@
 
         public string Id
         {
-            get
-            {
-                return mId;
-            }
+            get { return mId; }
         }
 
         public string Name
         {
-            get
-            {
-                return mName;
-            }
+            get { return mName; }
         }
 
         public string Description
         {
-            get
-            {
-                return mDescription;
-            }
+            get { return mDescription; }
         }
 
         public string ImageUrl
         {
-            get
-            {
-                return mImageUrl;
-            }
+            get { return mImageUrl; }
         }
 
         public ulong CurrentCount
         {
-            get
-            {
-                return mCurrentCount;
-            }
+            get { return mCurrentCount; }
         }
 
         public EventVisibility Visibility
         {
-            get
-            {
-                return mVisibility;
-            }
+            get { return mVisibility; }
         }
     }
 }

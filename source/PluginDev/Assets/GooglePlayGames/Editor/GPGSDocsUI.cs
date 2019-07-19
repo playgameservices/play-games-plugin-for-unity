@@ -37,7 +37,7 @@ namespace GooglePlayGames.Editor
         public static void MenuItemAbout()
         {
             string msg = GPGSStrings.AboutText +
-                PluginVersion.VersionString + " (" +
+                         PluginVersion.VersionString + " (" +
                          string.Format("0x{0:X8}", GooglePlayGames.PluginVersion.VersionInt) + ")";
             EditorUtility.DisplayDialog(GPGSStrings.AboutTitle, msg,
                 GPGSStrings.Ok);

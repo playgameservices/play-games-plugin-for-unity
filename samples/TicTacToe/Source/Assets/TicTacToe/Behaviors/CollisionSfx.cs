@@ -18,21 +18,25 @@ using UnityEngine;
 using System.Collections;
 using System;
 
-public class CollisionSfx : MonoBehaviour {
+public class CollisionSfx : MonoBehaviour
+{
     private const string SfxName = "HitSfx";
     private AudioClip mSfx;
     private int mMaxTimes = 6;
 
-    void Start() {
+    void Start()
+    {
         mSfx = (AudioClip) Resources.Load(SfxName);
     }
 
-    public void OnCollisionEnter(Collision c) {
-        if (c.gameObject == null || mMaxTimes <= 0 || mSfx == null) {
+    public void OnCollisionEnter(Collision c)
+    {
+        if (c.gameObject == null || mMaxTimes <= 0 || mSfx == null)
+        {
             return;
         }
 
         mMaxTimes--;
-           AudioSource.PlayClipAtPoint(mSfx, Vector3.zero);
+        AudioSource.PlayClipAtPoint(mSfx, Vector3.zero);
     }
 }

@@ -46,15 +46,9 @@ namespace NearbyDroids
 
         public bool BroadcastMovement
         {
-            get
-            {
-                return broadcastMovement;
-            }
+            get { return broadcastMovement; }
 
-            set
-            {
-                broadcastMovement = value;
-            }
+            set { broadcastMovement = value; }
         }
 
         // Protected, virtual functions can be overridden by inheriting classes.

@@ -27,7 +27,6 @@ namespace GooglePlayGames.BasicApi.Video
     /// </remarks>
     public interface IVideoClient
     {
-
         /// <summary>
         /// Fetches the video capabilities of the service.
         /// </summary>

@@ -87,7 +87,7 @@ namespace CubicPilot.UtilCode
 
         public static int Dim(float units)
         {
-            return (int)(units * Screen.height / 1000);
+            return (int) (units * Screen.height / 1000);
         }
 
         public static int Left(float units)

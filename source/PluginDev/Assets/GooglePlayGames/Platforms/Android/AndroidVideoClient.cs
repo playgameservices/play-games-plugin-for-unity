@@ -20,7 +20,8 @@ namespace GooglePlayGames.Android
             mIsCaptureSupported = isCaptureSupported;
             using (var gamesClass = new AndroidJavaClass("com.google.android.gms.games.Games"))
             {
-                mVideosClient = gamesClass.CallStatic<AndroidJavaObject>("getVideosClient", AndroidHelperFragment.GetActivity(), account);
+                mVideosClient = gamesClass.CallStatic<AndroidJavaObject>("getVideosClient",
+                    AndroidHelperFragment.GetActivity(), account);
             }
         }
 
@@ -63,7 +64,8 @@ namespace GooglePlayGames.Android
         public void IsCaptureAvailable(VideoCaptureMode captureMode, Action<ResponseStatus, bool> callback)
         {
             callback = ToOnGameThread(callback);
-            using (var task = mVideosClient.Call<AndroidJavaObject>("isCaptureAvailable", ToVideoCaptureMode(captureMode)))
+            using (var task =
+                mVideosClient.Call<AndroidJavaObject>("isCaptureAvailable", ToVideoCaptureMode(captureMode)))
             {
                 AndroidTaskUtils.AddOnSuccessListener<bool>(
                     task,
@@ -86,9 +88,10 @@ namespace GooglePlayGames.Android
             {
                 UnregisterCaptureOverlayStateChangedListener();
             }
+
             mOnCaptureOverlayStateListenerProxy = new OnCaptureOverlayStateListenerProxy(listener);
             using (mVideosClient.Call<AndroidJavaObject>("registerOnCaptureOverlayStateChangedListener",
-                mOnCaptureOverlayStateListenerProxy));
+                mOnCaptureOverlayStateListenerProxy)) ;
         }
 
         public void UnregisterCaptureOverlayStateChangedListener()
@@ -96,7 +99,7 @@ namespace GooglePlayGames.Android
             if (mOnCaptureOverlayStateListenerProxy != null)
             {
                 using (mVideosClient.Call<AndroidJavaObject>("unregisterOnCaptureOverlayStateChangedListener",
-                    mOnCaptureOverlayStateListenerProxy));
+                    mOnCaptureOverlayStateListenerProxy)) ;
 
                 mOnCaptureOverlayStateListenerProxy = null;
             }
@@ -105,8 +108,9 @@ namespace GooglePlayGames.Android
         private class OnCaptureOverlayStateListenerProxy : AndroidJavaProxy
         {
             private CaptureOverlayStateListener mListener;
+
             public OnCaptureOverlayStateListenerProxy(CaptureOverlayStateListener listener)
-            : base("com/google/android/gms/games/VideosClient$OnCaptureOverlayStateListener")
+                : base("com/google/android/gms/games/VideosClient$OnCaptureOverlayStateListener")
             {
                 mListener = listener;
             }
@@ -120,20 +124,19 @@ namespace GooglePlayGames.Android
 
             private static VideoCaptureOverlayState FromVideoCaptureOverlayState(int overlayState)
             {
-                switch(overlayState)
+                switch (overlayState)
                 {
                     case 1: // CAPTURE_OVERLAY_STATE_SHOWN
-                    return VideoCaptureOverlayState.Shown;
+                        return VideoCaptureOverlayState.Shown;
                     case 2: // CAPTURE_OVERLAY_STATE_CAPTURE_STARTED
-                    return VideoCaptureOverlayState.Started;
+                        return VideoCaptureOverlayState.Started;
                     case 3: // CAPTURE_OVERLAY_STATE_CAPTURE_STOPPED
-                    return VideoCaptureOverlayState.Stopped;
+                        return VideoCaptureOverlayState.Stopped;
                     case 4: // CAPTURE_OVERLAY_STATE_DISMISSED
-                    return VideoCaptureOverlayState.Dismissed;
+                        return VideoCaptureOverlayState.Dismissed;
                     default:
-                    return VideoCaptureOverlayState.Unknown;
+                        return VideoCaptureOverlayState.Unknown;
                 }
-
             }
         }
 
@@ -144,44 +147,44 @@ namespace GooglePlayGames.Android
 
         private static VideoQualityLevel FromVideoQualityLevel(int captureQualityJava)
         {
-            switch(captureQualityJava)
+            switch (captureQualityJava)
             {
                 case 0: // QUALITY_LEVEL_SD
-                return VideoQualityLevel.SD;
+                    return VideoQualityLevel.SD;
                 case 1: // QUALITY_LEVEL_HD
-                return VideoQualityLevel.HD;
+                    return VideoQualityLevel.HD;
                 case 2: // QUALITY_LEVEL_XHD
-                return VideoQualityLevel.XHD;
+                    return VideoQualityLevel.XHD;
                 case 3: // QUALITY_LEVEL_FULLHD
-                return VideoQualityLevel.FullHD;
+                    return VideoQualityLevel.FullHD;
                 default:
-                return VideoQualityLevel.Unknown;
+                    return VideoQualityLevel.Unknown;
             }
         }
 
         private static VideoCaptureMode FromVideoCaptureMode(int captureMode)
         {
-            switch(captureMode)
+            switch (captureMode)
             {
                 case 0: // CAPTURE_MODE_FILE
-                return VideoCaptureMode.File;
+                    return VideoCaptureMode.File;
                 case 1: // CAPTURE_MODE_STREAM
-                return VideoCaptureMode.Stream;
+                    return VideoCaptureMode.Stream;
                 default:
-                return VideoCaptureMode.Unknown;
+                    return VideoCaptureMode.Unknown;
             }
         }
 
         private static int ToVideoCaptureMode(VideoCaptureMode captureMode)
         {
-            switch(captureMode)
+            switch (captureMode)
             {
                 case VideoCaptureMode.File:
-                return 0; // CAPTURE_MODE_FILE
+                    return 0; // CAPTURE_MODE_FILE
                 case VideoCaptureMode.Stream:
-                return 1; // CAPTURE_MODE_STREAM
+                    return 1; // CAPTURE_MODE_STREAM
                 default:
-                return -1; // CAPTURE_MODE_UNKNOWN
+                    return -1; // CAPTURE_MODE_UNKNOWN
             }
         }
 
@@ -211,4 +214,3 @@ namespace GooglePlayGames.Android
     }
 }
 #endif
-

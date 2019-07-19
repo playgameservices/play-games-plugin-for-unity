@@ -18,11 +18,14 @@ using UnityEngine;
 using System.Collections;
 using System;
 
-public class InvisibleOnStartup : MonoBehaviour {
+public class InvisibleOnStartup : MonoBehaviour
+{
     bool mDone = false;
 
-    void Start() {
-        if (!mDone) {
+    void Start()
+    {
+        if (!mDone)
+        {
             Util.MakeVisible(gameObject, false);
             mDone = true;
         }

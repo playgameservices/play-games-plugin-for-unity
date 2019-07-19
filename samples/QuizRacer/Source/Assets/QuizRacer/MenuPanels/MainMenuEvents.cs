@@ -25,7 +25,6 @@ namespace QuizRacer.MenuPanels
 
     public class MainMenuEvents : MonoBehaviour
     {
-
         // seconds for showing an error message;
         private const float ERROR_STATUS_TIMEOUT = 10.0f;
 
@@ -46,13 +45,11 @@ namespace QuizRacer.MenuPanels
         // manager in order to detect incoming invitiations.
         void Start()
         {
-
         }
 
         // Update is called once per frame
         void Update()
         {
-
             HandleStatusUpdate();
 
             UpdateInvitation();
@@ -61,6 +58,7 @@ namespace QuizRacer.MenuPanels
             {
                 return;
             }
+
             switch (RaceManager.Instance.State)
             {
                 case RaceManager.RaceState.SettingUp:
@@ -70,6 +68,7 @@ namespace QuizRacer.MenuPanels
                         mStatusMsg = null;
                         ShowStatus("Waiting for opponents...", false);
                     }
+
                     break;
                 case RaceManager.RaceState.SetupFailed:
                     ShowStatus("Game setup failed", true);
@@ -82,8 +81,8 @@ namespace QuizRacer.MenuPanels
                     processed = false;
                     break;
                 case RaceManager.RaceState.Finished:
-            // really should not see this on the main menu page,
-            // so go to playing panel to display the final outcome of the race.
+                    // really should not see this on the main menu page,
+                    // so go to playing panel to display the final outcome of the race.
                     NavigationUtil.ShowPlayingPanel();
                     processed = false;
                     break;
@@ -113,7 +112,6 @@ namespace QuizRacer.MenuPanels
         // Handle detecting incoming invitations.
         public void UpdateInvitation()
         {
-
             if (InvitationManager.Instance == null)
             {
                 return;
@@ -173,6 +171,7 @@ namespace QuizRacer.MenuPanels
             {
                 return;
             }
+
             processed = true;
             RaceManager.CreateQuickGame();
         }
@@ -190,6 +189,7 @@ namespace QuizRacer.MenuPanels
             {
                 return;
             }
+
             processed = true;
             RaceManager.AcceptFromInbox();
         }
@@ -201,6 +201,7 @@ namespace QuizRacer.MenuPanels
             {
                 RaceManager.Instance.CleanUp();
             }
+
             Debug.Log("Signing out...");
             if (PlayGamesPlatform.Instance != null)
             {
@@ -210,8 +211,8 @@ namespace QuizRacer.MenuPanels
             {
                 Debug.Log("PG Instance is null!");
             }
+
             NavigationUtil.ShowGameMenu();
         }
-
     }
 }

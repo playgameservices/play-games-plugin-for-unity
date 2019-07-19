@@ -15,16 +15,17 @@ namespace GooglePlayGames.Android
         private AndroidJavaObject mRoomConfig;
         private AndroidJavaObject mRoom;
 
-        public AndroidRealTimeMultiplayerClient(AndroidJavaObject account) 
+        public AndroidRealTimeMultiplayerClient(AndroidJavaObject account)
         {
-            using (var gamesClass = new AndroidJavaClass("com.google.android.gms.games.Games")) 
+            using (var gamesClass = new AndroidJavaClass("com.google.android.gms.games.Games"))
             {
-                mClient = gamesClass.CallStatic<AndroidJavaObject>("getRealTimeMultiplayerClient", AndroidHelperFragment.GetActivity(), account);
+                mClient = gamesClass.CallStatic<AndroidJavaObject>("getRealTimeMultiplayerClient",
+                    AndroidHelperFragment.GetActivity(), account);
             }
         }
 
         public void CreateQuickGame(uint minOpponents, uint maxOpponents, uint variant,
-                            RealTimeMultiplayerListener listener)
+            RealTimeMultiplayerListener listener)
         {
             CreateQuickGame(minOpponents, maxOpponents, variant, /* exclusiveBitMask= */ 0, listener);
         }
@@ -33,27 +34,32 @@ namespace GooglePlayGames.Android
             ulong exclusiveBitMask,
             RealTimeMultiplayerListener listener)
         {
-            AndroidJavaObject roomUpdateCallback = new AndroidJavaObject("com.google.games.bridge.RoomUpdateCallbackProxy",
-                new RoomUpdateCallbackProxy(/* parent= */this, listener));
+            AndroidJavaObject roomUpdateCallback = new AndroidJavaObject(
+                "com.google.games.bridge.RoomUpdateCallbackProxy",
+                new RoomUpdateCallbackProxy( /* parent= */this, listener));
             AndroidJavaObject realTimeListener = null; //listener
             // build room config
-            using (var roomConfigClass = new AndroidJavaClass("com.google.android.gms.games.multiplayer.realtime.RoomConfig"))
+            using (var roomConfigClass =
+                new AndroidJavaClass("com.google.android.gms.games.multiplayer.realtime.RoomConfig"))
             {
-                using (var roomConfigBuilder = roomConfigClass.CallStatic<AndroidJavaObject>("builder", roomUpdateCallback))
+                using (var roomConfigBuilder =
+                    roomConfigClass.CallStatic<AndroidJavaObject>("builder", roomUpdateCallback))
                 {
-                    roomConfigBuilder.Call<AndroidJavaObject>("setVariant", (int)variant);
+                    roomConfigBuilder.Call<AndroidJavaObject>("setVariant", (int) variant);
                     roomConfigBuilder.Call<AndroidJavaObject>("setAutoMatchCriteria",
-                        roomConfigBuilder.CallStatic<AndroidJavaObject>("createAutoMatchCriteria", (int)minOpponents, (int)maxOpponents, (long)exclusiveBitMask));
+                        roomConfigBuilder.CallStatic<AndroidJavaObject>("createAutoMatchCriteria", (int) minOpponents,
+                            (int) maxOpponents, (long) exclusiveBitMask));
                     mRoomConfig = roomConfigBuilder.Call<AndroidJavaObject>("build");
                 }
             }
+
             using (var task = mClient.Call<AndroidJavaObject>("create", mRoomConfig))
             {
             }
         }
 
         public void CreateWithInvitationScreen(uint minOpponents, uint maxOppponents, uint variant,
-                                        RealTimeMultiplayerListener listener)
+            RealTimeMultiplayerListener listener)
         {
             // Task<Intent> getSelectOpponentsIntent(@IntRange(from = 1) int minPlayers, @IntRange(from = 1) int maxPlayers, boolean allowAutomatch)
         }
@@ -107,17 +113,17 @@ namespace GooglePlayGames.Android
 
         public Participant GetSelf()
         {
-            return null;           
+            return null;
         }
 
         public Participant GetParticipant(string participantId)
         {
-            return null;           
+            return null;
         }
 
         public Invitation GetInvitation()
         {
-            return null;           
+            return null;
         }
 
         public void LeaveRoom()
@@ -139,30 +145,34 @@ namespace GooglePlayGames.Android
         {
             private RealTimeMultiplayerListener mListener;
             private AndroidRealTimeMultiplayerClient mParent;
-            
-            public RoomUpdateCallbackProxy(AndroidRealTimeMultiplayerClient parent, RealTimeMultiplayerListener listener) 
+
+            public RoomUpdateCallbackProxy(AndroidRealTimeMultiplayerClient parent,
+                RealTimeMultiplayerListener listener)
                 : base("com/google/games/bridge/RoomUpdateCallbackProxy$Callback")
             {
                 mListener = listener;
                 mParent = parent;
             }
 
-            public void onRoomCreated(/* @OnRoomCreatedStatusCodes */ int statusCode, /* @Nullable Room */ AndroidJavaObject room)
+            public void onRoomCreated( /* @OnRoomCreatedStatusCodes */ int statusCode, /* @Nullable Room */
+                AndroidJavaObject room)
             {
                 mParent.mRoom = room;
             }
 
-            public void onJoinedRoom(/* @OnJoinedRoomStatusCodes */ int statusCode, /* @Nullable Room */ AndroidJavaObject room)
+            public void onJoinedRoom( /* @OnJoinedRoomStatusCodes */ int statusCode, /* @Nullable Room */
+                AndroidJavaObject room)
             {
                 mParent.mRoom = room;
             }
 
-            public void onLeftRoom(/* @OnLeftRoomStatusCodes */ int statusCode, /* @Nullable */ string roomId)
+            public void onLeftRoom( /* @OnLeftRoomStatusCodes */ int statusCode, /* @Nullable */ string roomId)
             {
                 mListener.OnLeftRoom();
             }
 
-            public void onRoomConnected(/* @OnRoomConnectedStatusCodes */ int statusCode, /* @Nullable Room */ AndroidJavaObject room)
+            public void onRoomConnected( /* @OnRoomConnectedStatusCodes */ int statusCode, /* @Nullable Room */
+                AndroidJavaObject room)
             {
                 mListener.OnRoomConnected(true);
             }
@@ -170,4 +180,3 @@ namespace GooglePlayGames.Android
     }
 }
 #endif
-
