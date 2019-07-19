@@ -61,6 +61,7 @@ namespace QuizRacer.MenuPanels
 
         // question we're currently displaying
         QuizQuestion mCurQuestion = null;
+
         // current value of the question
         float mQuestionValue = MaxPointsPerQuestion;
 
@@ -84,7 +85,6 @@ namespace QuizRacer.MenuPanels
         // Reset the UI to the initial game state.
         private void ResetUI()
         {
-
             hasGamepad = DetectGamepad();
             EnableGamepad(hasGamepad);
 
@@ -94,17 +94,16 @@ namespace QuizRacer.MenuPanels
             {
                 b.gameObject.SetActive(true);
             }
+
             done = false;
             questionText.text = "";
 
             mLastQuestion = 0;
-
         }
 
         // Update is called once per frame
         void Update()
         {
-
             if (RaceManager.Instance == null)
             {
                 return;
@@ -117,25 +116,27 @@ namespace QuizRacer.MenuPanels
             // this avoids the need to navigate to the correct answer.
             if (hasGamepad && !done)
             {
-
                 if (Input.GetKey(KeyCode.JoystickButton0))
                 {
                     EventSystem.current.SetSelectedGameObject(answers[0].gameObject);
                     ExecuteEvents.Execute(answers[0].gameObject, null,
                         ExecuteEvents.submitHandler);
                 }
+
                 if (Input.GetKey(KeyCode.JoystickButton1))
                 {
                     EventSystem.current.SetSelectedGameObject(answers[1].gameObject);
                     ExecuteEvents.Execute(answers[1].gameObject, null,
                         ExecuteEvents.submitHandler);
                 }
+
                 if (Input.GetKey(KeyCode.JoystickButton2))
                 {
                     EventSystem.current.SetSelectedGameObject(answers[2].gameObject);
                     ExecuteEvents.Execute(answers[2].gameObject, null,
                         ExecuteEvents.submitHandler);
                 }
+
                 if (Input.GetKey(KeyCode.JoystickButton3))
                 {
                     EventSystem.current.SetSelectedGameObject(answers[3].gameObject);
@@ -146,15 +147,14 @@ namespace QuizRacer.MenuPanels
 
             switch (RaceManager.Instance.State)
             {
-
                 case RaceManager.RaceState.SetupFailed:
                     Debug.Log("RaceManager.Instance.State = " + RaceManager.Instance.State);
-                // call the local version of the method to handle the gamepad state.
+                    // call the local version of the method to handle the gamepad state.
                     ShowMainMenu();
                     break;
                 case RaceManager.RaceState.Aborted:
                     Debug.Log("RaceManager.Instance.State = " + RaceManager.Instance.State);
-                // call the local version of the method to handle the gamepad state.
+                    // call the local version of the method to handle the gamepad state.
                     ShowMainMenu();
                     break;
                 case RaceManager.RaceState.Finished:
@@ -166,13 +166,13 @@ namespace QuizRacer.MenuPanels
                     {
                         ResetUI();
                     }
+
                     HandleGamePlay();
                     break;
                 default:
                     Debug.Log("RaceManager.Instance.State = " + RaceManager.Instance.State);
                     break;
             }
-
         }
 
         // Look for a gamepad in the names of joysticks.
@@ -186,6 +186,7 @@ namespace QuizRacer.MenuPanels
                     return true;
                 }
             }
+
             return false;
         }
 
@@ -228,7 +229,6 @@ namespace QuizRacer.MenuPanels
         // Check the answer and take appropriate action.
         void CheckAnswer(int idx)
         {
-
             if (mShowingFeedback || mLastQuestion == mCurQuestion.ID)
             {
                 return;
@@ -321,6 +321,7 @@ namespace QuizRacer.MenuPanels
             {
                 return;
             }
+
             done = true;
             EnableGamepad(false);
             ShowStatus("Done! " + Ranks[RaceManager.Instance.FinishRank]);
@@ -378,11 +379,10 @@ namespace QuizRacer.MenuPanels
             pointText.text = Mathf.FloorToInt(mQuestionValue).ToString() + " pts.";
             for (int i = 0; i < answers.Length; i++)
             {
-
                 if (answers[i].GetComponentsInChildren<Text>().Length > 0)
                 {
                     answers[i].GetComponentsInChildren<Text>()[0].GetComponent<Text>().text =
-                    mCurQuestion.Answers[i];
+                        mCurQuestion.Answers[i];
                     answers[i].enabled = true;
                 }
             }
@@ -395,6 +395,5 @@ namespace QuizRacer.MenuPanels
                 AudioSource.PlayClipAtPoint(clip, Vector3.zero);
             }
         }
-
     }
 }

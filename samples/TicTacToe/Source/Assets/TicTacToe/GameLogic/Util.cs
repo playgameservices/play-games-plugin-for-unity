@@ -20,32 +20,44 @@ using System.Collections.Generic;
 using System.IO;
 using GooglePlayGames.BasicApi.Multiplayer;
 
-public class Util {
-    public static void MakeVisible(GameObject obj, bool visible) {
-        if (obj == null) {
+public class Util
+{
+    public static void MakeVisible(GameObject obj, bool visible)
+    {
+        if (obj == null)
+        {
             return;
         }
-        if (obj.GetComponent<Renderer>() != null) {
+
+        if (obj.GetComponent<Renderer>() != null)
+        {
             obj.GetComponent<Renderer>().enabled = visible;
         }
+
         int i;
-        for (i = 0; i < obj.transform.childCount; i++) {
+        for (i = 0; i < obj.transform.childCount; i++)
+        {
             GameObject child = obj.transform.GetChild(i).gameObject;
             MakeVisible(child, visible);
         }
     }
 
-    public static Participant GetOpponent(TurnBasedMatch match) {
-    	foreach (Participant p in match.Participants) {
-    		if (!p.ParticipantId.Equals(match.SelfParticipantId)) {
-    			return p;
-    		}
-    	}
-    	return null;
+    public static Participant GetOpponent(TurnBasedMatch match)
+    {
+        foreach (Participant p in match.Participants)
+        {
+            if (!p.ParticipantId.Equals(match.SelfParticipantId))
+            {
+                return p;
+            }
+        }
+
+        return null;
     }
 
-    public static string GetOpponentName(TurnBasedMatch match) {
-    	Participant p = GetOpponent(match);
-    	return p == null ? "(anonymous)" : p.DisplayName;
+    public static string GetOpponentName(TurnBasedMatch match)
+    {
+        Participant p = GetOpponent(match);
+        return p == null ? "(anonymous)" : p.DisplayName;
     }
 }

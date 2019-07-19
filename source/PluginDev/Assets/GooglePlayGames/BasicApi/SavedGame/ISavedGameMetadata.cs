@@ -32,10 +32,7 @@ namespace GooglePlayGames.BasicApi.SavedGame
         ///
         /// </summary>
         /// <value><c>true</c> if this instance is open; otherwise, <c>false</c>.</value>
-        bool IsOpen
-        {
-            get;
-        }
+        bool IsOpen { get; }
 
         /// <summary>
         /// Returns the filename for this saved game. A saved game filename will only consist of
@@ -43,29 +40,20 @@ namespace GooglePlayGames.BasicApi.SavedGame
         /// and will between 1 and 100 characters in length (inclusive).
         /// </summary>
         /// <value>The filename.</value>
-        string Filename
-        {
-            get;
-        }
+        string Filename { get; }
 
         /// <summary>
         /// Returns a human-readable description of what the saved game contains. This may be null.
         /// </summary>
         /// <value>The description.</value>
-        string Description
-        {
-            get;
-        }
+        string Description { get; }
 
         /// <summary>
         /// A URL corresponding to the PNG-encoded image corresponding to this saved game. null if
         /// the saved game does not have a cover image.
         /// </summary>
         /// <value>The cover image URL.</value>
-        string CoverImageURL
-        {
-            get;
-        }
+        string CoverImageURL { get; }
 
         /// <summary>
         /// Returns the total time played by the player for this saved game. This value is
@@ -75,10 +63,7 @@ namespace GooglePlayGames.BasicApi.SavedGame
         /// <code>TimeSpan.FromMilliseconds(0)</code>
         /// </summary>
         /// <value>The total time played.</value>
-        TimeSpan TotalTimePlayed
-        {
-            get;
-        }
+        TimeSpan TotalTimePlayed { get; }
 
         /// <summary>
         /// A timestamp corresponding to the last modification to the underlying saved game. If the
@@ -87,9 +72,6 @@ namespace GooglePlayGames.BasicApi.SavedGame
         /// CommitUpdate or Resolve methods).
         /// </summary>
         /// <value>The last modified timestamp.</value>
-        DateTime LastModifiedTimestamp
-        {
-            get;
-        }
+        DateTime LastModifiedTimestamp { get; }
     }
 }

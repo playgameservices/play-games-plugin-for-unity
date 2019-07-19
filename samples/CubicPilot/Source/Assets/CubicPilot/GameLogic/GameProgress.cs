@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 namespace CubicPilot.GameLogic
 {
     using System;
@@ -27,6 +28,7 @@ namespace CubicPilot.GameLogic
         private PilotStats[] mPilotStats = new PilotStats[LevelCount];
 
         private int mPilotExp = 0;
+
         // pilot experience points
         private LevelProgress[] mProgress;
 
@@ -44,6 +46,7 @@ namespace CubicPilot.GameLogic
             {
                 mProgress[i] = new LevelProgress();
             }
+
             for (i = 0; i < LevelCount; i++)
             {
                 mPilotStats[i] = new PilotStats(i);
@@ -64,6 +67,7 @@ namespace CubicPilot.GameLogic
                     mProgress[level].Score = score;
                     mDirty = true;
                 }
+
                 if (mProgress[level].Stars < stars)
                 {
                     mProgress[level].Stars = stars;
@@ -79,6 +83,7 @@ namespace CubicPilot.GameLogic
             {
                 return new GameProgress();
             }
+
             return GameProgress.FromString(s);
         }
 
@@ -103,11 +108,13 @@ namespace CubicPilot.GameLogic
                     mDirty = true;
                 }
             }
+
             if (other.mPilotExp > mPilotExp)
             {
                 mPilotExp = other.mPilotExp;
                 mDirty = true;
             }
+
             if (other.mPlayingTime > mPlayingTime)
             {
                 mPlayingTime = other.mPlayingTime;
@@ -131,6 +138,7 @@ namespace CubicPilot.GameLogic
             {
                 s += ":" + mProgress[i].ToString();
             }
+
             s += ":" + TotalPlayingTime.TotalMilliseconds;
             return s;
         }
@@ -143,18 +151,20 @@ namespace CubicPilot.GameLogic
         public static GameProgress FromString(string s)
         {
             GameProgress gp = new GameProgress();
-            string[] p = s.Split(new char[] { ':' });
+            string[] p = s.Split(new char[] {':'});
             if (!p[0].StartsWith("GPv"))
             {
                 Debug.LogError("Failed to parse game progress from: " + s);
                 return gp;
             }
+
             gp.mPilotExp = System.Convert.ToInt32(p[1]);
             int i;
             for (i = 2; i < p.Length && i - 2 < LevelCount; i++)
             {
                 gp.GetLevelProgress(i - 2).SetFromString(p[i]);
             }
+
             if (p[0].Equals("GPv3"))
             {
                 double val = Double.Parse(p[p.Length - 1]);
@@ -164,6 +174,7 @@ namespace CubicPilot.GameLogic
             {
                 gp.mPlayingTime = new TimeSpan();
             }
+
             gp.mLoadedTime = DateTime.Now;
             return gp;
         }
@@ -184,35 +195,24 @@ namespace CubicPilot.GameLogic
                     return false;
                 }
             }
+
             return true;
         }
 
         public int PilotExperience
         {
-            get
-            {
-                return mPilotExp;
-            }
+            get { return mPilotExp; }
         }
 
         public bool Dirty
         {
-            get
-            {
-                return mDirty;
-            }
-            set
-            {
-                mDirty = value;
-            }
+            get { return mDirty; }
+            set { mDirty = value; }
         }
 
         public int PilotLevel
         {
-            get
-            {
-                return GetPilotLevel(mPilotExp);
-            }
+            get { return GetPilotLevel(mPilotExp); }
         }
 
         public bool AddPilotExperience(int points)
@@ -240,6 +240,7 @@ namespace CubicPilot.GameLogic
                     break;
                 }
             }
+
             return Util.Clamp(i, 1, GameConsts.Progression.MaxLevel);
         }
 
@@ -255,10 +256,7 @@ namespace CubicPilot.GameLogic
 
         public PilotStats CurPilotStats
         {
-            get
-            {
-                return mPilotStats[PilotLevel];
-            }
+            get { return mPilotStats[PilotLevel]; }
         }
 
         public int TotalScore
@@ -270,6 +268,7 @@ namespace CubicPilot.GameLogic
                 {
                     sum += lp.Score;
                 }
+
                 return sum;
             }
         }
@@ -283,6 +282,7 @@ namespace CubicPilot.GameLogic
                 {
                     sum += lp.Stars;
                 }
+
                 return sum;
             }
         }

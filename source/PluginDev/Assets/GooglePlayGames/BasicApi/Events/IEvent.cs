@@ -30,50 +30,32 @@ namespace GooglePlayGames.BasicApi.Events
         /// <summary>
         /// The ID of the event.
         /// </summary>
-        string Id
-        {
-            get;
-        }
+        string Id { get; }
 
         /// <summary>
         /// The name of the event.
         /// </summary>
-        string Name
-        {
-            get;
-        }
+        string Name { get; }
 
         /// <summary>
         /// The description of the event.
         /// </summary>
-        string Description
-        {
-            get;
-        }
+        string Description { get; }
 
         /// <summary>
         /// The URL of the image for the event. Empty if there is no image for this event.
         /// </summary>
         /// <value>The image URL.</value>
-        string ImageUrl
-        {
-            get;
-        }
+        string ImageUrl { get; }
 
         /// <summary>
         /// The current count for this event.
         /// </summary>
-        ulong CurrentCount
-        {
-            get;
-        }
+        ulong CurrentCount { get; }
 
         /// <summary>
         /// The visibility of the event.
         /// </summary>
-        EventVisibility Visibility
-        {
-            get;
-        }
+        EventVisibility Visibility { get; }
     }
 }

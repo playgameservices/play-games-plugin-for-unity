@@ -32,7 +32,6 @@ namespace GooglePlayGames
     /// </summary>
     public static class GameInfo
     {
-
         private const string UnescapedApplicationId = "APP_ID";
         private const string UnescapedWebClientId = "WEB_CLIENTID";
         private const string UnescapedNearbyServiceId = "NEARBY_SERVICE_ID";
@@ -44,7 +43,8 @@ namespace GooglePlayGames
 
         public static bool ApplicationIdInitialized()
         {
-            return !string.IsNullOrEmpty(ApplicationId) && !ApplicationId.Equals(ToEscapedToken(UnescapedApplicationId));
+            return !string.IsNullOrEmpty(ApplicationId) &&
+                   !ApplicationId.Equals(ToEscapedToken(UnescapedApplicationId));
         }
 
         public static bool WebClientIdInitialized()
@@ -55,7 +55,7 @@ namespace GooglePlayGames
         public static bool NearbyConnectionsInitialized()
         {
             return !string.IsNullOrEmpty(NearbyConnectionServiceId) &&
-             !NearbyConnectionServiceId.Equals(ToEscapedToken(UnescapedNearbyServiceId));
+                   !NearbyConnectionServiceId.Equals(ToEscapedToken(UnescapedNearbyServiceId));
         }
 
         /// <summary>
@@ -70,4 +70,3 @@ namespace GooglePlayGames
     }
 }
 #endif //UNITY_ANDROID
-

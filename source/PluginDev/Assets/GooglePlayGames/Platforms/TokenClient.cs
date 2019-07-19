@@ -32,6 +32,7 @@ namespace GooglePlayGames
         /// <returns>The user email or null if not authenticated or the permission is
         /// not available.</returns>
         string GetEmail();
+
         string GetAuthCode();
         string GetIdToken();
 
@@ -47,7 +48,7 @@ namespace GooglePlayGames
         /// retrieving another auth code. </param>
         /// <param name="callback">Callback.</param>
         void GetAnotherServerAuthCode(bool reAuthenticateIfNeeded,
-                                      Action<string> callback);
+            Action<string> callback);
 
         void Signout();
 

@@ -38,15 +38,9 @@ namespace NearbyDroids
 
         public PlayerInfo Player
         {
-            get
-            {
-                return player;
-            }
+            get { return player; }
 
-            set
-            {
-                player = value;
-            }
+            set { player = value; }
         }
 
         // Start overrides the Start function of MovingObject
@@ -83,10 +77,10 @@ namespace NearbyDroids
             int vertical = 0;
 
             // Get input from the input manager, round it to an integer and store in horizontal to set x axis move direction
-            horizontal = (int)Input.GetAxisRaw("Horizontal");
+            horizontal = (int) Input.GetAxisRaw("Horizontal");
 
             // Get input from the input manager, round it to an integer and store in vertical to set y axis move direction
-            vertical = (int)Input.GetAxisRaw("Vertical");
+            vertical = (int) Input.GetAxisRaw("Vertical");
 
             // Check if moving horizontally, if so set vertical to zero.
             if (horizontal != 0)
@@ -125,7 +119,7 @@ namespace NearbyDroids
                     }
                 }
             }
- 
+
             // Check if we have a non-zero value for horizontal or vertical
             if (horizontal != 0 || vertical != 0)
             {
@@ -252,7 +246,7 @@ namespace NearbyDroids
         // ends the game.
         private bool CheckIfDead()
         {
-             // Check if point total is less than or equal to zero.
+            // Check if point total is less than or equal to zero.
             if (Player.Score < 0)
             {
                 // Call the GameOver function of GameManager.

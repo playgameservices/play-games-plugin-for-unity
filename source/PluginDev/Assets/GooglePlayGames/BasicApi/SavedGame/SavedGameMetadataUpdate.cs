@@ -44,50 +44,32 @@ namespace GooglePlayGames.BasicApi.SavedGame
 
         public bool IsDescriptionUpdated
         {
-            get
-            {
-                return mDescriptionUpdated;
-            }
+            get { return mDescriptionUpdated; }
         }
 
         public string UpdatedDescription
         {
-            get
-            {
-                return mNewDescription;
-            }
+            get { return mNewDescription; }
         }
 
         public bool IsCoverImageUpdated
         {
-            get
-            {
-                return mCoverImageUpdated;
-            }
+            get { return mCoverImageUpdated; }
         }
 
         public byte[] UpdatedPngCoverImage
         {
-            get
-            {
-                return mNewPngCoverImage;
-            }
+            get { return mNewPngCoverImage; }
         }
 
         public bool IsPlayedTimeUpdated
         {
-            get
-            {
-                return mNewPlayedTime.HasValue;
-            }
+            get { return mNewPlayedTime.HasValue; }
         }
 
         public TimeSpan? UpdatedPlayedTime
         {
-            get
-            {
-                return mNewPlayedTime;
-            }
+            get { return mNewPlayedTime; }
         }
 
         public struct Builder
@@ -117,7 +99,7 @@ namespace GooglePlayGames.BasicApi.SavedGame
                 if (newPlayedTime.TotalMilliseconds > ulong.MaxValue)
                 {
                     throw new InvalidOperationException("Timespans longer than ulong.MaxValue " +
-                        "milliseconds are not allowed");
+                                                        "milliseconds are not allowed");
                 }
 
                 mNewPlayedTime = newPlayedTime;

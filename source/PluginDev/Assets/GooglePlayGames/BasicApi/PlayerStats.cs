@@ -13,6 +13,7 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
+
 #if UNITY_ANDROID
 
 namespace GooglePlayGames.BasicApi
@@ -51,7 +52,7 @@ namespace GooglePlayGames.BasicApi
             mTotalSpendNext28Days = totalSpendNext28Days;
         }
 
-        public PlayerStats() 
+        public PlayerStats()
         {
             mValid = false;
         }
@@ -76,10 +77,7 @@ namespace GooglePlayGames.BasicApi
         /// </remarks>
         public bool Valid
         {
-            get
-            {
-                return mValid;
-            } 
+            get { return mValid; }
         }
 
         /// <summary>
@@ -87,10 +85,7 @@ namespace GooglePlayGames.BasicApi
         /// </summary>
         public int NumberOfPurchases
         {
-            get
-            {
-                return mNumberOfPurchases;
-            }
+            get { return mNumberOfPurchases; }
         }
 
         /// <summary>
@@ -98,10 +93,7 @@ namespace GooglePlayGames.BasicApi
         /// </summary>
         public float AvgSessionLength
         {
-            get
-            {
-                return mAvgSessionLength;
-            }
+            get { return mAvgSessionLength; }
         }
 
         /// <summary>
@@ -109,10 +101,7 @@ namespace GooglePlayGames.BasicApi
         /// </summary>
         public int DaysSinceLastPlayed
         {
-            get
-            {
-                return mDaysSinceLastPlayed;
-            }
+            get { return mDaysSinceLastPlayed; }
         }
 
         /// <summary>
@@ -120,10 +109,7 @@ namespace GooglePlayGames.BasicApi
         /// </summary>
         public int NumberOfSessions
         {
-            get
-            {
-                return mNumberOfSessions;
-            }
+            get { return mNumberOfSessions; }
         }
 
         /// <summary>
@@ -138,10 +124,7 @@ namespace GooglePlayGames.BasicApi
         /// </remarks>
         public float SessPercentile
         {
-            get
-            {
-                return mSessPercentile;
-            }
+            get { return mSessPercentile; }
         }
 
         /// <summary>
@@ -156,10 +139,7 @@ namespace GooglePlayGames.BasicApi
         /// </remarks>
         public float SpendPercentile
         {
-            get
-            {
-                return mSpendPercentile;
-            }
+            get { return mSpendPercentile; }
         }
 
         /// <summary>
@@ -172,10 +152,7 @@ namespace GooglePlayGames.BasicApi
         /// </remarks>
         public float SpendProbability
         {
-            get
-            {
-                return mSpendProbability;
-            }
+            get { return mSpendProbability; }
         }
 
         /// <summary>
@@ -187,10 +164,7 @@ namespace GooglePlayGames.BasicApi
         /// </remarks>
         public float ChurnProbability
         {
-            get
-            {
-                return mChurnProbability;
-            }
+            get { return mChurnProbability; }
         }
 
         /// <summary>
@@ -198,10 +172,7 @@ namespace GooglePlayGames.BasicApi
         /// </summary>
         public float HighSpenderProbability
         {
-            get
-            {
-                return mHighSpenderProbability;
-            }
+            get { return mHighSpenderProbability; }
         }
 
         /// <summary>
@@ -209,10 +180,7 @@ namespace GooglePlayGames.BasicApi
         /// </summary>
         public float TotalSpendNext28Days
         {
-            get
-            {
-                return mTotalSpendNext28Days;
-            }
+            get { return mTotalSpendNext28Days; }
         }
 
         /// <summary>
@@ -221,7 +189,7 @@ namespace GooglePlayGames.BasicApi
         /// <returns><c>true</c> if this instance has NumberOfPurchases; otherwise, <c>false</c>.</returns>
         public bool HasNumberOfPurchases()
         {
-            return NumberOfPurchases != (int)UNSET_VALUE;
+            return NumberOfPurchases != (int) UNSET_VALUE;
         }
 
         /// <summary>
@@ -239,7 +207,7 @@ namespace GooglePlayGames.BasicApi
         /// <returns><c>true</c> if this instance has DaysSinceLastPlayed; otherwise, <c>false</c>.</returns>
         public bool HasDaysSinceLastPlayed()
         {
-            return DaysSinceLastPlayed != (int)UNSET_VALUE;
+            return DaysSinceLastPlayed != (int) UNSET_VALUE;
         }
 
         /// <summary>
@@ -248,7 +216,7 @@ namespace GooglePlayGames.BasicApi
         /// <returns><c>true</c> if this instance has NumberOfSessions; otherwise, <c>false</c>.</returns>
         public bool HasNumberOfSessions()
         {
-            return NumberOfSessions != (int)UNSET_VALUE;
+            return NumberOfSessions != (int) UNSET_VALUE;
         }
 
         /// <summary>
@@ -295,7 +263,6 @@ namespace GooglePlayGames.BasicApi
         {
             return TotalSpendNext28Days != UNSET_VALUE;
         }
-
     }
 }
 #endif

@@ -83,7 +83,7 @@ namespace GooglePlayGames.OurUtils
             {
                 throw new ArgumentNullException();
             }
-        
+
             return value;
         }
 

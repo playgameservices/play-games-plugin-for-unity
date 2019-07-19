@@ -82,6 +82,7 @@ namespace GooglePlayGames.Android
                 {
                     oauthScopes = new List<string>();
                 }
+
                 oauthScopes.AddRange(scopes);
             }
         }
@@ -92,7 +93,8 @@ namespace GooglePlayGames.Android
             authCode = null;
             email = null;
             idToken = null;
-            PlayGamesHelperObject.RunOnGameThread(() => {
+            PlayGamesHelperObject.RunOnGameThread(() =>
+            {
                 Debug.Log("Calling Signout in token client");
                 AndroidJavaClass cls = new AndroidJavaClass(HelperFragmentClass);
                 cls.CallStatic("signOut", AndroidHelperFragment.GetActivity());
@@ -124,7 +126,8 @@ namespace GooglePlayGames.Android
                     accountName))
                 {
                     pendingResult.Call("setResultCallback", new ResultCallbackProxy(
-                        tokenResult => {
+                        tokenResult =>
+                        {
                             account = tokenResult.Call<AndroidJavaObject>("getAccount");
                             authCode = tokenResult.Call<string>("getAuthCode");
                             email = tokenResult.Call<string>("getEmail");
@@ -197,9 +200,7 @@ namespace GooglePlayGames.Android
                     "getAnotherAuthCode", currentActivity, reAuthenticateIfNeeded, webClientId))
                 {
                     pendingResult.Call("setResultCallback", new ResultCallbackProxy(
-                        tokenResult => {
-                            callback(tokenResult.Call<string>("getAuthCode"));
-                        }));
+                        tokenResult => { callback(tokenResult.Call<string>("getAuthCode")); }));
                 }
             }
             catch (Exception e)
@@ -214,7 +215,7 @@ namespace GooglePlayGames.Android
             private Action<AndroidJavaObject> mCallback;
 
             public ResultCallbackProxy(Action<AndroidJavaObject> callback)
-            : base("com/google/android/gms/common/api/ResultCallback")
+                : base("com/google/android/gms/common/api/ResultCallback")
             {
                 mCallback = callback;
             }

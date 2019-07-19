@@ -22,7 +22,6 @@ namespace SmokeTest
 
     public class AchievementGUI : MonoBehaviour
     {
-
         private MainGui mOwner;
         private string mStatus;
 
@@ -36,14 +35,15 @@ namespace SmokeTest
         internal void OnGUI()
         {
             float height = Screen.height / 11f;
-            GUILayout.BeginVertical(GUILayout.Height(Screen.height),GUILayout.Width(Screen.width));
+            GUILayout.BeginVertical(GUILayout.Height(Screen.height), GUILayout.Width(Screen.width));
             GUILayout.Label("SmokeTest: Achievements", GUILayout.Height(height));
             GUILayout.BeginHorizontal(GUILayout.Height(height));
-            if (GUILayout.Button("Ach Reveal", GUILayout.Height(height),GUILayout.ExpandWidth(true)))
+            if (GUILayout.Button("Ach Reveal", GUILayout.Height(height), GUILayout.ExpandWidth(true)))
             {
                 DoAchievementReveal(GPGSIds.achievement_achievementtoreveal);
             }
-            if (GUILayout.Button("Ach Reveal Incremental", GUILayout.Height(height),GUILayout.ExpandWidth(true)))
+
+            if (GUILayout.Button("Ach Reveal Incremental", GUILayout.Height(height), GUILayout.ExpandWidth(true)))
             {
                 DoAchievementReveal(GPGSIds.achievement_achievement_hidden_incremental);
             }
@@ -51,48 +51,54 @@ namespace SmokeTest
             GUILayout.EndHorizontal();
             GUILayout.Space(50f);
             GUILayout.BeginHorizontal(GUILayout.Height(height));
-            if (GUILayout.Button("Ach Unlock",GUILayout.Height(height),GUILayout.ExpandWidth(true)))
+            if (GUILayout.Button("Ach Unlock", GUILayout.Height(height), GUILayout.ExpandWidth(true)))
             {
                 DoAchievementUnlock();
             }
-            if (GUILayout.Button("Ach Increment",GUILayout.ExpandHeight(true)))
+
+            if (GUILayout.Button("Ach Increment", GUILayout.ExpandHeight(true)))
             {
                 DoAchievementIncrement(GPGSIds.achievement_achievementtoincrement);
             }
-            if (GUILayout.Button("Ach Increment Hidden",GUILayout.ExpandHeight(true)))
+
+            if (GUILayout.Button("Ach Increment Hidden", GUILayout.ExpandHeight(true)))
             {
                 DoAchievementIncrement(GPGSIds.achievement_achievement_hidden_incremental);
             }
+
             GUILayout.EndHorizontal();
             GUILayout.Space(50f);
             GUILayout.BeginHorizontal(GUILayout.Height(height));
 
-            if (GUILayout.Button("List Achievements",GUILayout.ExpandHeight(true)))
+            if (GUILayout.Button("List Achievements", GUILayout.ExpandHeight(true)))
             {
                 DoListAchievements();
             }
-            if (GUILayout.Button("List Achievement Descriptions",GUILayout.ExpandHeight(true)))
+
+            if (GUILayout.Button("List Achievement Descriptions", GUILayout.ExpandHeight(true)))
             {
                 DoListAchievementDescriptions();
             }
+
             GUILayout.EndHorizontal();
             GUILayout.Space(50f);
             GUILayout.BeginHorizontal(GUILayout.Height(height));
 
-            if (GUILayout.Button("Ach ShowUI",GUILayout.Height(height),GUILayout.ExpandWidth(true)))
+            if (GUILayout.Button("Ach ShowUI", GUILayout.Height(height), GUILayout.ExpandWidth(true)))
             {
                 DoAchievementUI();
             }
-            if (GUILayout.Button("Back",GUILayout.ExpandHeight(true),
-                GUILayout.Height(height),GUILayout.ExpandWidth(true)))
+
+            if (GUILayout.Button("Back", GUILayout.ExpandHeight(true),
+                GUILayout.Height(height), GUILayout.ExpandWidth(true)))
             {
                 mOwner.SetUI(MainGui.Ui.Main);
             }
+
             GUILayout.EndHorizontal();
             GUILayout.FlexibleSpace();
             GUILayout.Label(mStatus);
             GUILayout.EndVertical();
-
         }
 
         void SetStandBy(string msg)
@@ -107,9 +113,8 @@ namespace SmokeTest
 
         internal void ShowEffect(bool success)
         {
-            Camera.main.backgroundColor = success ?
-                new Color(0.0f, 0.0f, 0.8f, 1.0f) :
-                new Color(0.8f, 0.0f, 0.0f, 1.0f);
+            Camera.main.backgroundColor =
+                success ? new Color(0.0f, 0.0f, 0.8f, 1.0f) : new Color(0.8f, 0.0f, 0.0f, 1.0f);
         }
 
         internal void DoAchievementReveal(string achId)
@@ -143,7 +148,7 @@ namespace SmokeTest
 
         internal void DoAchievementIncrement(string achId)
         {
-            PlayGamesPlatform p = (PlayGamesPlatform)Social.Active;
+            PlayGamesPlatform p = (PlayGamesPlatform) Social.Active;
 
             SetStandBy("Incrementing achievement...");
             p.IncrementAchievement(
@@ -166,26 +171,25 @@ namespace SmokeTest
         internal void DoListAchievements()
         {
             Social.LoadAchievements(achievements =>
+            {
+                mStatus = "Loaded " + achievements.Length + " achievments";
+                foreach (IAchievement ach in achievements)
                 {
-                    mStatus = "Loaded " + achievements.Length + " achievments";
-                    foreach(IAchievement ach in achievements)
-                    {
-                        mStatus += "\n    " + ach.id + ": " + ach.completed;
-                    }
-                });
+                    mStatus += "\n    " + ach.id + ": " + ach.completed;
+                }
+            });
         }
 
         internal void DoListAchievementDescriptions()
         {
             Social.LoadAchievementDescriptions(achievements =>
+            {
+                mStatus = "Loaded " + achievements.Length + " achievments";
+                foreach (IAchievementDescription ach in achievements)
                 {
-                    mStatus = "Loaded " + achievements.Length + " achievments";
-                    foreach (IAchievementDescription ach in achievements)
-                    {
-                        mStatus += "\n    " + ach.id + ": " + ach.title;
-                    }
-                });
+                    mStatus += "\n    " + ach.id + ": " + ach.title;
+                }
+            });
         }
-
     }
 }

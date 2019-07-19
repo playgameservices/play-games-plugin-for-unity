@@ -26,7 +26,6 @@ namespace QuizRacer.MenuPanels
     // This should be attached to the InvitationPanel object in the main scene.
     public class InvitationEvents : MonoBehaviour
     {
-
         // associated Text component to display the message.
         public Text message;
 
@@ -39,7 +38,6 @@ namespace QuizRacer.MenuPanels
         // Update is called once per frame
         void Update()
         {
-
             inv = (inv != null) ? inv : InvitationManager.Instance.Invitation;
             if (inv == null && !processed)
             {
@@ -50,8 +48,9 @@ namespace QuizRacer.MenuPanels
 
             if (inviterName == null)
             {
-                inviterName = (inv.Inviter == null || inv.Inviter.DisplayName == null) ? "Someone" :
-          inv.Inviter.DisplayName;
+                inviterName = (inv.Inviter == null || inv.Inviter.DisplayName == null)
+                    ? "Someone"
+                    : inv.Inviter.DisplayName;
                 message.text = inviterName + " is challenging you to a quiz race!";
             }
 
@@ -85,7 +84,6 @@ namespace QuizRacer.MenuPanels
         // to the On Click list for the accept button.
         public void OnAccept()
         {
-
             if (processed)
             {
                 return;
@@ -96,13 +94,11 @@ namespace QuizRacer.MenuPanels
 
             RaceManager.AcceptInvitation(inv.InvitationId);
             Debug.Log("Accepted! RaceManager state is now " + RaceManager.Instance.State);
-
         }
 
         // Handler script for the decline button.
         public void OnDecline()
         {
-
             if (processed)
             {
                 return;

@@ -13,17 +13,17 @@ namespace GooglePlayGames.Android
 
         public static void AddOnSuccessListener<T>(AndroidJavaObject task, Action<T> callback)
         {
-            using (task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<T>(callback)));
+            using (task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<T>(callback))) ;
         }
 
         public static void AddOnFailureListener(AndroidJavaObject task, Action<AndroidJavaObject> callback)
         {
-            using (task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(callback)));
+            using (task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(callback))) ;
         }
 
         public static void AddOnCompleteListener<T>(AndroidJavaObject task, Action<T> callback)
         {
-            using (task.Call<AndroidJavaObject>("addOnCompleteListener", new TaskOnCompleteProxy<T>(callback)));
+            using (task.Call<AndroidJavaObject>("addOnCompleteListener", new TaskOnCompleteProxy<T>(callback))) ;
         }
 
         private class TaskOnCompleteProxy<T> : AndroidJavaProxy

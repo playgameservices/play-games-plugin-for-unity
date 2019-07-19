@@ -31,7 +31,6 @@ namespace GooglePlayGames.Android
 
     public class AndroidClient : IPlayGamesClient
     {
-
         private enum AuthState
         {
             Unauthenticated,
@@ -68,7 +67,7 @@ namespace GooglePlayGames.Android
 
         ///<summary></summary>
         /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.Authenticate"/>
-        public void Authenticate(Action<bool,string> callback, bool silent)
+        public void Authenticate(Action<bool, string> callback, bool silent)
         {
             lock (AuthStateLock)
             {
@@ -84,7 +83,8 @@ namespace GooglePlayGames.Android
             InitializeTokenClient();
 
             Debug.Log("Starting Auth with token client.");
-            mTokenClient.FetchTokens(silent, (int result) => {
+            mTokenClient.FetchTokens(silent, (int result) =>
+            {
                 bool succeed = result == 0 /* CommonStatusCodes.SUCCEED */;
                 InitializeGameServices();
                 if (succeed)
@@ -93,28 +93,36 @@ namespace GooglePlayGames.Android
                     {
                         if (mInvitationDelegate != null)
                         {
-                            mInvitationCallback = new AndroidJavaObject("com.google.games.bridge.InvitationCallbackProxy",
+                            mInvitationCallback = new AndroidJavaObject(
+                                "com.google.games.bridge.InvitationCallbackProxy",
                                 new InvitationCallbackProxy(mInvitationDelegate));
                             using (var invitationsClient = getInvitationsClient())
-                            using (var taskRegisterCallback = invitationsClient.Call<AndroidJavaObject>("registerInvitationCallback", mInvitationCallback))
+                            using (var taskRegisterCallback =
+                                invitationsClient.Call<AndroidJavaObject>("registerInvitationCallback",
+                                    mInvitationCallback))
                             {
                                 signInTasks.Call<bool>("add", taskRegisterCallback);
                             }
                         }
-                        AndroidJavaObject taskGetPlayer = getPlayersClient().Call<AndroidJavaObject>("getCurrentPlayer");
-                        AndroidJavaObject taskGetActivationHint = getGamesClient().Call<AndroidJavaObject>("getActivationHint");
-                        AndroidJavaObject taskIsCaptureSupported = getVideosClient().Call<AndroidJavaObject>("isCaptureSupported");
+
+                        AndroidJavaObject taskGetPlayer =
+                            getPlayersClient().Call<AndroidJavaObject>("getCurrentPlayer");
+                        AndroidJavaObject taskGetActivationHint =
+                            getGamesClient().Call<AndroidJavaObject>("getActivationHint");
+                        AndroidJavaObject taskIsCaptureSupported =
+                            getVideosClient().Call<AndroidJavaObject>("isCaptureSupported");
                         AndroidJavaObject taskSetViewForPopups;
                         using (var popupView = AndroidHelperFragment.GetDefaultPopupView())
                         {
-                            taskSetViewForPopups = getGamesClient().Call<AndroidJavaObject>("setViewForPopups", popupView);
+                            taskSetViewForPopups =
+                                getGamesClient().Call<AndroidJavaObject>("setViewForPopups", popupView);
                         }
 
                         signInTasks.Call<bool>("add", taskGetPlayer);
                         signInTasks.Call<bool>("add", taskGetActivationHint);
                         signInTasks.Call<bool>("add", taskIsCaptureSupported);
                         signInTasks.Call<bool>("add", taskSetViewForPopups);
-                        
+
                         using (var tasks = new AndroidJavaClass(TasksClassName))
                         using (var allTask = tasks.CallStatic<AndroidJavaObject>("whenAll", signInTasks))
                         {
@@ -135,10 +143,12 @@ namespace GooglePlayGames.Android
                                             mSavedGameClient = new AndroidSavedGameClient(account);
                                             mEventsClient = new AndroidEventsClient(account);
                                             bool isCaptureSupported;
-                                            using (var resultObject = taskIsCaptureSupported.Call<AndroidJavaObject>("getResult"))
+                                            using (var resultObject =
+                                                taskIsCaptureSupported.Call<AndroidJavaObject>("getResult"))
                                             {
                                                 isCaptureSupported = resultObject.Call<bool>("booleanValue");
                                             }
+
                                             mVideoClient = new AndroidVideoClient(isCaptureSupported, account);
                                             mRealTimeClient = new AndroidRealTimeMultiplayerClient(account);
                                             mTurnBasedClient = new AndroidTurnBasedMultiplayerClient(account);
@@ -150,20 +160,26 @@ namespace GooglePlayGames.Android
                                         InvokeCallbackOnGameThread(callback, true, "Authentication succeed");
                                         try
                                         {
-                                            using (var activationHint = taskGetActivationHint.Call<AndroidJavaObject>("getResult"))
+                                            using (var activationHint =
+                                                taskGetActivationHint.Call<AndroidJavaObject>("getResult"))
                                             {
                                                 if (mInvitationDelegate != null)
                                                 {
                                                     try
                                                     {
-                                                        using (var invitationObject = activationHint.Call<AndroidJavaObject>("getParcelable", "invitation" /* Multiplayer.EXTRA_INVITATION */))
+                                                        using (var invitationObject =
+                                                            activationHint.Call<AndroidJavaObject>("getParcelable",
+                                                                "invitation" /* Multiplayer.EXTRA_INVITATION */))
                                                         {
-                                                            Invitation invitation = AndroidJavaConverter.ToInvitation(invitationObject);
-                                                            mInvitationDelegate(invitation, /* shouldAutoAccept= */ true);
+                                                            Invitation invitation =
+                                                                AndroidJavaConverter.ToInvitation(invitationObject);
+                                                            mInvitationDelegate(invitation, /* shouldAutoAccept= */
+                                                                true);
                                                         }
                                                     }
                                                     catch (Exception)
-                                                    {  // handle null return
+                                                    {
+                                                        // handle null return
                                                     }
                                                 }
 
@@ -172,10 +188,15 @@ namespace GooglePlayGames.Android
                                                 {
                                                     try
                                                     {
-                                                        using (var matchObject = activationHint.Call<AndroidJavaObject>("getParcelable", "turn_based_match" /* Multiplayer#EXTRA_TURN_BASED_MATCH */))
+                                                        using (var matchObject =
+                                                            activationHint.Call<AndroidJavaObject>("getParcelable",
+                                                                "turn_based_match" /* Multiplayer#EXTRA_TURN_BASED_MATCH */)
+                                                        )
                                                         {
-                                                            TurnBasedMatch turnBasedMatch = AndroidJavaConverter.ToTurnBasedMatch(matchObject);
-                                                            mTurnBasedClient.MatchDelegate(turnBasedMatch, /* shouldAutoLaunch= */ true);
+                                                            TurnBasedMatch turnBasedMatch =
+                                                                AndroidJavaConverter.ToTurnBasedMatch(matchObject);
+                                                            mTurnBasedClient.MatchDelegate(
+                                                                turnBasedMatch, /* shouldAutoLaunch= */ true);
                                                         }
                                                     }
                                                     catch (Exception)
@@ -185,7 +206,8 @@ namespace GooglePlayGames.Android
                                             }
                                         }
                                         catch (Exception)
-                                        {  // handle null return
+                                        {
+                                            // handle null return
                                         }
                                     }
                                     else
@@ -223,9 +245,7 @@ namespace GooglePlayGames.Android
         {
             if (callback == null)
             {
-                return delegate
-                {
-                };
+                return delegate { };
             }
 
             return result => InvokeCallbackOnGameThread(callback, result);
@@ -238,7 +258,8 @@ namespace GooglePlayGames.Android
                 return;
             }
 
-            PlayGamesHelperObject.RunOnGameThread(() => {
+            PlayGamesHelperObject.RunOnGameThread(() =>
+            {
                 GooglePlayGames.OurUtils.Logger.d("Invoking user callback on game thread");
                 callback(data);
             });
@@ -248,7 +269,8 @@ namespace GooglePlayGames.Android
         private static Action<T1, T2> AsOnGameThreadCallback<T1, T2>(
             Action<T1, T2> toInvokeOnGameThread)
         {
-            return (result1, result2) => {
+            return (result1, result2) =>
+            {
                 if (toInvokeOnGameThread == null)
                 {
                     return;
@@ -258,14 +280,15 @@ namespace GooglePlayGames.Android
             };
         }
 
-        private static void InvokeCallbackOnGameThread<T1,T2>(Action<T1, T2> callback, T1 t1, T2 t2)
+        private static void InvokeCallbackOnGameThread<T1, T2>(Action<T1, T2> callback, T1 t1, T2 t2)
         {
             if (callback == null)
             {
                 return;
             }
 
-            PlayGamesHelperObject.RunOnGameThread(() => {
+            PlayGamesHelperObject.RunOnGameThread(() =>
+            {
                 OurUtils.Logger.d("Invoking user callback on game thread");
                 callback(t1, t2);
             });
@@ -277,6 +300,7 @@ namespace GooglePlayGames.Android
             {
                 return;
             }
+
             InitializeTokenClient();
         }
 
@@ -286,6 +310,7 @@ namespace GooglePlayGames.Android
             {
                 return;
             }
+
             mTokenClient = new AndroidTokenClient();
 
             if (!GameInfo.WebClientIdInitialized() &&
@@ -293,6 +318,7 @@ namespace GooglePlayGames.Android
             {
                 OurUtils.Logger.e("Server Auth Code and ID Token require web clientId to configured.");
             }
+
             string[] scopes = mConfiguration.Scopes;
             // Set the auth flags in the token client.
             mTokenClient.SetWebClientId(GameInfo.WebClientId);
@@ -305,6 +331,7 @@ namespace GooglePlayGames.Android
             {
                 mTokenClient.AddOauthScopes("https://www.googleapis.com/auth/drive.appdata");
             }
+
             mTokenClient.AddOauthScopes(scopes);
             mTokenClient.SetAccountName(mConfiguration.AccountName);
         }
@@ -343,6 +370,7 @@ namespace GooglePlayGames.Android
                 Debug.Log("Cannot get API client - not authenticated");
                 return null;
             }
+
             return mTokenClient.GetIdToken();
         }
 
@@ -359,11 +387,12 @@ namespace GooglePlayGames.Android
                 Debug.Log("Cannot get API client - not authenticated");
                 return null;
             }
+
             return mTokenClient.GetAuthCode();
         }
 
         public void GetAnotherServerAuthCode(bool reAuthenticateIfNeeded,
-                                             Action<string> callback)
+            Action<string> callback)
         {
             mTokenClient.GetAnotherServerAuthCode(reAuthenticateIfNeeded, AsOnGameThreadCallback(callback));
         }
@@ -412,7 +441,8 @@ namespace GooglePlayGames.Android
                 {
                     AndroidTaskUtils.AddOnCompleteListener<AndroidJavaObject>(
                         task,
-                        completedTask => {
+                        completedTask =>
+                        {
                             mInvitationCallback = null;
                             mTokenClient.Signout();
                             mAuthState = AuthState.Unauthenticated;
@@ -470,7 +500,9 @@ namespace GooglePlayGames.Android
             }
 
             using (var gamesClient = getGamesClient())
-            using (gamesClient.Call<AndroidJavaObject>("setGravityForPopups", (int)gravity | (int)Gravity.CENTER_HORIZONTAL));
+            using (gamesClient.Call<AndroidJavaObject>("setGravityForPopups",
+                (int) gravity | (int) Gravity.CENTER_HORIZONTAL))
+                ;
         }
 
         ///<summary></summary>
@@ -482,7 +514,8 @@ namespace GooglePlayGames.Android
             {
                 AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
                     task,
-                    annotatedData => {
+                    annotatedData =>
+                    {
                         using (var playerStatsJava = annotatedData.Call<AndroidJavaObject>("get"))
                         {
                             int numberOfPurchases = playerStatsJava.Call<int>("getNumberOfPurchases");
@@ -514,7 +547,8 @@ namespace GooglePlayGames.Android
 
                 AndroidTaskUtils.AddOnFailureListener(
                     task,
-                    e => {
+                    e =>
+                    {
                         Debug.Log("GetPlayerStats failed");
                         InvokeCallbackOnGameThread(callback, CommonStatusCodes.InternalError, new PlayerStats());
                     });
@@ -543,7 +577,8 @@ namespace GooglePlayGames.Android
                     {
                         AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
                             task,
-                            annotatedData => {
+                            annotatedData =>
+                            {
                                 using (var player = annotatedData.Call<AndroidJavaObject>("get"))
                                 {
                                     string playerId = player.Call<string>("getPlayerId");
@@ -555,10 +590,11 @@ namespace GooglePlayGames.Android
                                             break;
                                         }
                                     }
+
                                     lock (countLock)
                                     {
                                         ++resultCount;
-                                        if(resultCount == count)
+                                        if (resultCount == count)
                                         {
                                             InvokeCallbackOnGameThread(callback, users);
                                         }
@@ -568,12 +604,13 @@ namespace GooglePlayGames.Android
 
                         AndroidTaskUtils.AddOnFailureListener(
                             task,
-                            exception => {
+                            exception =>
+                            {
                                 Debug.Log("LoadUsers failed for index " + i);
                                 lock (countLock)
                                 {
                                     ++resultCount;
-                                    if(resultCount == count)
+                                    if (resultCount == count)
                                     {
                                         InvokeCallbackOnGameThread(callback, users);
                                     }
@@ -593,7 +630,8 @@ namespace GooglePlayGames.Android
             {
                 AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
                     task,
-                    annotatedData => {
+                    annotatedData =>
+                    {
                         using (var achievementBuffer = annotatedData.Call<AndroidJavaObject>("get"))
                         {
                             int count = achievementBuffer.Call<int>("getCount");
@@ -613,7 +651,8 @@ namespace GooglePlayGames.Android
 
                                     achievement.RevealedImageUrl = javaAchievement.Call<string>("getRevealedImageUrl");
                                     achievement.UnlockedImageUrl = javaAchievement.Call<string>("getUnlockedImageUrl");
-                                    achievement.IsIncremental = javaAchievement.Call<int>("getType") == 1 /* TYPE_INCREMENTAL */;
+                                    achievement.IsIncremental =
+                                        javaAchievement.Call<int>("getType") == 1 /* TYPE_INCREMENTAL */;
                                     if (achievement.IsIncremental)
                                     {
                                         achievement.CurrentSteps = javaAchievement.Call<int>("getCurrentSteps");
@@ -624,8 +663,10 @@ namespace GooglePlayGames.Android
                                     achievement.IsUnlocked = state == 0 /* STATE_UNLOCKED */;
                                     achievement.IsRevealed = state == 1 /* STATE_REVEALED */;
                                 }
+
                                 result[i] = achievement;
                             }
+
                             achievementBuffer.Call("release");
                             InvokeCallbackOnGameThread(callback, result);
                         }
@@ -633,7 +674,8 @@ namespace GooglePlayGames.Android
 
                 AndroidTaskUtils.AddOnFailureListener(
                     task,
-                    exception => {
+                    exception =>
+                    {
                         Debug.Log("LoadAchievements failed");
                         InvokeCallbackOnGameThread(callback, new Achievement[0]);
                     });
@@ -717,6 +759,7 @@ namespace GooglePlayGames.Android
                 InvokeCallbackOnGameThread(callback, UIStatus.NotAuthorized);
                 return;
             }
+
             AndroidHelperFragment.ShowAchievementsUI(AsOnGameThreadCallback(callback));
         }
 
@@ -736,6 +779,7 @@ namespace GooglePlayGames.Android
                 InvokeCallbackOnGameThread(callback, UIStatus.NotAuthorized);
                 return;
             }
+
             if (leaderboardId == null)
             {
                 AndroidHelperFragment.ShowAllLeaderboardsUI(AsOnGameThreadCallback(callback));
@@ -755,7 +799,8 @@ namespace GooglePlayGames.Android
         {
             using (var client = getLeaderboardsClient())
             {
-                string loadScoresMethod = start == LeaderboardStart.TopScores ? "loadTopScores" : "loadPlayerCenteredScores";
+                string loadScoresMethod =
+                    start == LeaderboardStart.TopScores ? "loadTopScores" : "loadPlayerCenteredScores";
                 using (var task = client.Call<AndroidJavaObject>(
                     loadScoresMethod,
                     leaderboardId,
@@ -765,14 +810,17 @@ namespace GooglePlayGames.Android
                 {
                     AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
                         task,
-                        annotatedData => {
+                        annotatedData =>
+                        {
                             using (var leaderboardScores = annotatedData.Call<AndroidJavaObject>("get"))
                             {
                                 InvokeCallbackOnGameThread(callback, CreateLeaderboardScoreData(
                                     leaderboardId,
                                     collection,
                                     timeSpan,
-                                    annotatedData.Call<bool>("isStale") ? ResponseStatus.SuccessWithStale : ResponseStatus.Success,
+                                    annotatedData.Call<bool>("isStale")
+                                        ? ResponseStatus.SuccessWithStale
+                                        : ResponseStatus.Success,
                                     leaderboardScores));
                                 leaderboardScores.Call("release");
                             }
@@ -780,9 +828,11 @@ namespace GooglePlayGames.Android
 
                     AndroidTaskUtils.AddOnFailureListener(
                         task,
-                        exception => {
+                        exception =>
+                        {
                             Debug.Log("LoadScores failed");
-                            InvokeCallbackOnGameThread(callback, new LeaderboardScoreData(leaderboardId, ResponseStatus.InternalError));
+                            InvokeCallbackOnGameThread(callback,
+                                new LeaderboardScoreData(leaderboardId, ResponseStatus.InternalError));
                         });
                 }
             }
@@ -799,14 +849,17 @@ namespace GooglePlayGames.Android
             {
                 AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
                     task,
-                    annotatedData => {
+                    annotatedData =>
+                    {
                         using (var leaderboardScores = annotatedData.Call<AndroidJavaObject>("get"))
                         {
                             InvokeCallbackOnGameThread(callback, CreateLeaderboardScoreData(
                                 token.LeaderboardId,
                                 token.Collection,
                                 token.TimeSpan,
-                                annotatedData.Call<bool>("isStale") ? ResponseStatus.SuccessWithStale : ResponseStatus.Success,
+                                annotatedData.Call<bool>("isStale")
+                                    ? ResponseStatus.SuccessWithStale
+                                    : ResponseStatus.Success,
                                 leaderboardScores));
                             leaderboardScores.Call("release");
                         }
@@ -814,9 +867,11 @@ namespace GooglePlayGames.Android
 
                 AndroidTaskUtils.AddOnFailureListener(
                     task,
-                    exception => {
+                    exception =>
+                    {
                         Debug.Log("LoadMoreScores failed");
-                        InvokeCallbackOnGameThread(callback, new LeaderboardScoreData(token.LeaderboardId, ResponseStatus.InternalError));
+                        InvokeCallbackOnGameThread(callback,
+                            new LeaderboardScoreData(token.LeaderboardId, ResponseStatus.InternalError));
                     });
             }
         }
@@ -839,14 +894,14 @@ namespace GooglePlayGames.Android
                         long timestamp = leaderboardScore.Call<long>("getTimestampMillis");
                         System.DateTime date = AndroidJavaConverter.ToDateTime(timestamp);
 
-                        ulong rank = (ulong)leaderboardScore.Call<long>("getRank");
+                        ulong rank = (ulong) leaderboardScore.Call<long>("getRank");
                         string scoreHolderId = "";
                         using (var scoreHolder = leaderboardScore.Call<AndroidJavaObject>("getScoreHolder"))
                         {
                             scoreHolderId = scoreHolder.Call<string>("getPlayerId");
                         }
 
-                        ulong score = (ulong)leaderboardScore.Call<long>("getRawScore");
+                        ulong score = (ulong) leaderboardScore.Call<long>("getRawScore");
                         string metadata = leaderboardScore.Call<string>("getScoreTag");
 
                         leaderboardScoreData.AddScore(new PlayGamesScore(date, leaderboardId,
@@ -854,9 +909,12 @@ namespace GooglePlayGames.Android
                     }
                 }
 
-                leaderboardScoreData.NextPageToken = new ScorePageToken(scoresBuffer, leaderboardId, collection, timespan, ScorePageDirection.Forward);
-                leaderboardScoreData.NextPageToken = new ScorePageToken(scoresBuffer, leaderboardId, collection, timespan, ScorePageDirection.Backward);
+                leaderboardScoreData.NextPageToken = new ScorePageToken(scoresBuffer, leaderboardId, collection,
+                    timespan, ScorePageDirection.Forward);
+                leaderboardScoreData.NextPageToken = new ScorePageToken(scoresBuffer, leaderboardId, collection,
+                    timespan, ScorePageDirection.Backward);
             }
+
             using (var leaderboard = leaderboardScoresJava.Call<AndroidJavaObject>("getLeaderboard"))
             using (var variants = leaderboard.Call<AndroidJavaObject>("getVariants"))
             using (var variant = variants.Call<AndroidJavaObject>("get", 0))
@@ -865,14 +923,15 @@ namespace GooglePlayGames.Android
                 if (variant.Call<bool>("hasPlayerInfo"))
                 {
                     System.DateTime date = AndroidJavaConverter.ToDateTime(0);
-                    ulong rank = (ulong)variant.Call<long>("getPlayerRank");
+                    ulong rank = (ulong) variant.Call<long>("getPlayerRank");
                     string scoreHolderId = "me";
-                    ulong score = (ulong)variant.Call<long>("getRawPlayerScore");
+                    ulong score = (ulong) variant.Call<long>("getRawPlayerScore");
                     string metadata = variant.Call<string>("getPlayerScoreTag");
                     leaderboardScoreData.PlayerScore = new PlayGamesScore(date, leaderboardId,
                         rank, scoreHolderId, score, metadata);
                 }
-                leaderboardScoreData.ApproximateCount = (ulong)variant.Call<long>("getNumScores");
+
+                leaderboardScoreData.ApproximateCount = (ulong) variant.Call<long>("getNumScores");
             }
 
             return leaderboardScoreData;
@@ -886,6 +945,7 @@ namespace GooglePlayGames.Android
             {
                 InvokeCallbackOnGameThread(callback, false);
             }
+
             using (var client = getLeaderboardsClient())
             {
                 client.Call("submitScore", leaderboardId, score);
@@ -896,12 +956,13 @@ namespace GooglePlayGames.Android
         ///<summary></summary>
         /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.SubmitScore"/>
         public void SubmitScore(string leaderboardId, long score, string metadata,
-                                Action<bool> callback)
+            Action<bool> callback)
         {
             if (!IsAuthenticated())
             {
                 InvokeCallbackOnGameThread(callback, false);
             }
+
             using (var client = getLeaderboardsClient())
             {
                 client.Call("submitScore", leaderboardId, score, metadata);
@@ -982,15 +1043,17 @@ namespace GooglePlayGames.Android
         private class InvitationCallbackProxy : AndroidJavaProxy
         {
             private Action<Invitation, bool> mInvitationDelegate;
+
             public InvitationCallbackProxy(Action<Invitation, bool> invitationDelegate)
-            : base("com/google/games/bridge/InvitationCallbackProxy$Callback")
+                : base("com/google/games/bridge/InvitationCallbackProxy$Callback")
             {
                 mInvitationDelegate = invitationDelegate;
             }
 
             public void onInvitationReceived(AndroidJavaObject invitation)
             {
-                mInvitationDelegate.Invoke(AndroidJavaConverter.ToInvitation(invitation), /* shouldAutoAccept= */ false);
+                mInvitationDelegate.Invoke(AndroidJavaConverter.ToInvitation(invitation), /* shouldAutoAccept= */
+                    false);
             }
 
             public void onInvitationRemoved(string invitationId)
@@ -1000,37 +1063,44 @@ namespace GooglePlayGames.Android
 
         private AndroidJavaObject getAchievementsClient()
         {
-            return mGamesClass.CallStatic<AndroidJavaObject>("getAchievementsClient", AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
+            return mGamesClass.CallStatic<AndroidJavaObject>("getAchievementsClient",
+                AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
         }
 
         private AndroidJavaObject getGamesClient()
         {
-            return mGamesClass.CallStatic<AndroidJavaObject>("getGamesClient", AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
+            return mGamesClass.CallStatic<AndroidJavaObject>("getGamesClient", AndroidHelperFragment.GetActivity(),
+                mTokenClient.GetAccount());
         }
 
         private AndroidJavaObject getInvitationsClient()
         {
-            return mGamesClass.CallStatic<AndroidJavaObject>("getInvitationsClient", AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
+            return mGamesClass.CallStatic<AndroidJavaObject>("getInvitationsClient",
+                AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
         }
 
         private AndroidJavaObject getPlayersClient()
         {
-            return mGamesClass.CallStatic<AndroidJavaObject>("getPlayersClient", AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
+            return mGamesClass.CallStatic<AndroidJavaObject>("getPlayersClient", AndroidHelperFragment.GetActivity(),
+                mTokenClient.GetAccount());
         }
 
         private AndroidJavaObject getLeaderboardsClient()
         {
-            return mGamesClass.CallStatic<AndroidJavaObject>("getLeaderboardsClient", AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
+            return mGamesClass.CallStatic<AndroidJavaObject>("getLeaderboardsClient",
+                AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
         }
 
         private AndroidJavaObject getPlayerStatsClient()
         {
-            return mGamesClass.CallStatic<AndroidJavaObject>("getPlayerStatsClient", AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
+            return mGamesClass.CallStatic<AndroidJavaObject>("getPlayerStatsClient",
+                AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
         }
 
         private AndroidJavaObject getVideosClient()
         {
-            return mGamesClass.CallStatic<AndroidJavaObject>("getVideosClient", AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
+            return mGamesClass.CallStatic<AndroidJavaObject>("getVideosClient", AndroidHelperFragment.GetActivity(),
+                mTokenClient.GetAccount());
         }
     }
 }

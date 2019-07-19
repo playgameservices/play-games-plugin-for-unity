@@ -27,7 +27,6 @@ using UnityEngine.SocialPlatforms;
 
 namespace SmokeTest
 {
-
     public class MainGui : MonoBehaviour, RealTimeMultiplayerListener
     {
         public GUISkin GuiSkin;
@@ -170,7 +169,7 @@ namespace SmokeTest
         {
             SetUI(Ui.RtmpWaiting);
             EndStandBy();
-            Status = "Setting up room (" + ((int)progress) + "%)";
+            Status = "Setting up room (" + ((int) progress) + "%)";
         }
 
         public void OnRoomConnected(bool success)
@@ -185,6 +184,7 @@ namespace SmokeTest
             {
                 Status += " Room setup failed!";
             }
+
             EndStandBy();
             SetUI(Ui.Rtmp);
         }
@@ -192,11 +192,10 @@ namespace SmokeTest
         public void OnParticipantLeft(Participant participant)
         {
             Debug.Log("Player " + participant.DisplayName + "(" +
-                participant.ParticipantId + ") has " + participant.Status);
+                      participant.ParticipantId + ") has " + participant.Status);
             Status = participant.DisplayName + " " +
-                (string)(
-                    (participant.Status == Participant.ParticipantStatus.Declined) ?
-                    "Declined" : "Left");
+                     (string) (
+                         (participant.Status == Participant.ParticipantStatus.Declined) ? "Declined" : "Left");
         }
 
         public void OnLeftRoom()
@@ -237,6 +236,7 @@ namespace SmokeTest
                     Status += pid + "(NULL) ";
                 }
             }
+
             Debug.Log(Status);
         }
 
@@ -291,6 +291,7 @@ namespace SmokeTest
             {
                 SetUI(Ui.Achievements);
             }
+
             if (GUI.Button(this.CalcGrid(1, 1), "Events"))
             {
                 SetUI(Ui.Events);
@@ -313,7 +314,7 @@ namespace SmokeTest
             }
             else if (GUI.Button(this.CalcGrid(0, 4), "Video"))
             {
-                 SetUI(Ui.Video);
+                SetUI(Ui.Video);
             }
             else if (GUI.Button(this.CalcGrid(1, 4), "Nearby Connections"))
             {
@@ -376,7 +377,7 @@ namespace SmokeTest
             GUI.Label(CalcGrid(0, 1, 2, 2), msg);
 
             msg = "Unmerged: " + mConflictUnmerged.Filename + ":" + mConflictUnmerged.Description + "\n" +
-            "Data: " + mConflictUnmergedData;
+                  "Data: " + mConflictUnmergedData;
             GUI.Label(CalcGrid(0, 2, 2, 2), msg);
 
             if (GUI.Button(CalcGrid(0, 3), "Use Original"))
@@ -391,11 +392,11 @@ namespace SmokeTest
                 SetStandBy("Choosing unmerged, retrying open");
                 SetUI(Ui.SavedGame);
             }
-            else if (GUI.Button (CalcGrid (0, 4), "Use new data"))
+            else if (GUI.Button(CalcGrid(0, 4), "Use new data"))
             {
                 SavedGameMetadataUpdate.Builder builder = new SavedGameMetadataUpdate.Builder();
                 builder = builder.WithUpdatedDescription(mConflictOriginal.Description + " (resolved).");
-                mConflictResolver.ResolveConflict(mConflictOriginal,builder.Build(),
+                mConflictResolver.ResolveConflict(mConflictOriginal, builder.Build(),
                     System.Text.ASCIIEncoding.Default.GetBytes(mSavedGameFileContent + " resolved"));
             }
 
@@ -475,6 +476,7 @@ namespace SmokeTest
                 Status = "No save game selected";
                 return;
             }
+
             PlayGamesPlatform.Instance.SavedGame.Delete(mCurrentSavedGame);
             Status = mCurrentSavedGame.Filename + " deleted.";
             mCurrentSavedGame = null;
@@ -583,7 +585,7 @@ namespace SmokeTest
                 {
                     Status = "Fetch All Status: " + status + "\n";
                     Status += "Saved Games: [" +
-                    string.Join(",", savedGames.Select(g => g.Filename).ToArray()) + "]";
+                              string.Join(",", savedGames.Select(g => g.Filename).ToArray()) + "]";
                     savedGames.ForEach(g =>
                         GooglePlayGames.OurUtils.Logger.d("Retrieved save game: " + g));
                     EndStandBy();
@@ -647,6 +649,7 @@ namespace SmokeTest
                 DoLeaveRoom();
                 SetUI(Ui.Rtmp);
             }
+
             if (GUI.Button(CalcGrid(1, 4), "Show Waiting UI"))
             {
                 DoWaitingRoom();
@@ -821,7 +824,7 @@ namespace SmokeTest
                     {
                         Status = "Fetch All Status: " + status + "\n";
                         Status += "Events: [" +
-                        string.Join(",", events.Select(g => g.Id).ToArray()) + "]";
+                                  string.Join(",", events.Select(g => g.Id).ToArray()) + "]";
                         events.ForEach(e =>
                             GooglePlayGames.OurUtils.Logger.d("Retrieved event: " + e));
                         EndStandBy();
@@ -839,7 +842,7 @@ namespace SmokeTest
                         if (fetchedEvent != null)
                         {
                             Status += "Event: [" + fetchedEvent.Id + ", " + fetchedEvent.Description + "]: " +
-                                fetchedEvent.CurrentCount;
+                                      fetchedEvent.CurrentCount;
                             GooglePlayGames.OurUtils.Logger.d("Fetched event: " + fetchedEvent);
                         }
 
@@ -874,51 +877,58 @@ namespace SmokeTest
                 "ID Token: " + idToken);
 
             GUI.Label(
-                this.CalcGrid(0, 4,2, 1),
+                this.CalcGrid(0, 4, 2, 1),
                 "Server Auth Code: " + authCode
-                );
+            );
 
             string friendString = "";
-            if (Social.localUser.friends.Any() || loadedFriends) {
-                foreach(IUserProfile p in Social.localUser.friends) {
+            if (Social.localUser.friends.Any() || loadedFriends)
+            {
+                foreach (IUserProfile p in Social.localUser.friends)
+                {
                     friendString += p.userName + "\n";
                 }
+
                 if (friendString == "")
                 {
                     friendString = "No Friends found!";
                 }
             }
-            else {
+            else
+            {
                 Social.localUser.LoadFriends((ok) =>
-                    {
-                        loadedFriends = ok;
-                        Debug.Log("Friends loaded OK: " + ok);
-                    });
+                {
+                    loadedFriends = ok;
+                    Debug.Log("Friends loaded OK: " + ok);
+                });
             }
+
             GUI.Label(
-                CalcGrid(0,5,2,2),
+                CalcGrid(0, 5, 2, 2),
                 "Friends: " + friendString);
 
             if (statsMessage == string.Empty && Social.localUser.authenticated)
             {
                 statsMessage = "loading stats....";
-                ((PlayGamesLocalUser)Social.localUser).GetStats(
+                ((PlayGamesLocalUser) Social.localUser).GetStats(
                     (result, stats) =>
                     {
                         statsMessage = result + " number of sessions: " +
-                        stats.NumberOfSessions;
+                                       stats.NumberOfSessions;
                     });
             }
-            GUI.Label(CalcGrid(0, 7, 2, 1), "Player Stats: " + statsMessage);
 
+            GUI.Label(CalcGrid(0, 7, 2, 1), "Player Stats: " + statsMessage);
 
 
             if (GUI.Button(CalcGrid(0, 8), "Back"))
             {
                 mUi = Ui.Main;
-            } else if (GUI.Button(CalcGrid(1,8), "New AuthCode")) {
+            }
+            else if (GUI.Button(CalcGrid(1, 8), "New AuthCode"))
+            {
                 PlayGamesPlatform.Instance.GetAnotherServerAuthCode(false,
-                      (newAuthCode) => this.authCode = newAuthCode);
+                    (newAuthCode) => this.authCode = newAuthCode);
             }
         }
 
@@ -931,14 +941,8 @@ namespace SmokeTest
 
         internal string Status
         {
-            get
-            {
-                return _mStatus;
-            }
-            set
-            {
-                _mStatus = value;
-            }
+            get { return _mStatus; }
+            set { _mStatus = value; }
         }
 
         internal void DrawStatus()
@@ -948,14 +952,13 @@ namespace SmokeTest
 
         internal void ShowEffect(bool success)
         {
-            Camera.main.backgroundColor = success ?
-                new Color(0.0f, 0.0f, 0.8f, 1.0f) :
-                new Color(0.8f, 0.0f, 0.0f, 1.0f);
+            Camera.main.backgroundColor =
+                success ? new Color(0.0f, 0.0f, 0.8f, 1.0f) : new Color(0.8f, 0.0f, 0.0f, 1.0f);
         }
 
         internal int CalcFontSize()
         {
-            return (int)(Screen.width * FontSizeFactor / 1000.0f);
+            return (int) (Screen.width * FontSizeFactor / 1000.0f);
         }
 
         // Update is called once per frame
@@ -978,7 +981,6 @@ namespace SmokeTest
             }
             else if (Social.localUser.authenticated)
             {
-
                 switch (mUi)
                 {
                     case Ui.Achievements:
@@ -991,7 +993,7 @@ namespace SmokeTest
                         ShowRtmpUi();
                         break;
                     case Ui.RtmpWaiting:
-                        ShowRtmpWaiting ();
+                        ShowRtmpWaiting();
                         break;
                     case Ui.Multiplayer:
                         ShowMultiplayerUi();
@@ -1027,14 +1029,16 @@ namespace SmokeTest
                         // start loading the id token:
                         if (idToken == null)
                         {
-                            idToken = ((PlayGamesLocalUser)Social.localUser).GetIdToken();
+                            idToken = ((PlayGamesLocalUser) Social.localUser).GetIdToken();
                         }
+
                         if (authCode == null)
                         {
                             authCode = PlayGamesPlatform.Instance.GetServerAuthCode();
                         }
+
                         ShowUserInfoUi();
-                    break;
+                        break;
                     default:
                         // check for a status of interest, and if there
                         // is one, then don't touch it.  Otherwise
@@ -1042,9 +1046,10 @@ namespace SmokeTest
                         if (string.IsNullOrEmpty(Status) || Status == "Ready")
                         {
                             Status = "Authenticated. Hello, " +
-                                Social.localUser.userName + " (" +
-                                Social.localUser.id + ")";
+                                     Social.localUser.userName + " (" +
+                                     Social.localUser.id + ")";
                         }
+
                         ShowRegularUi();
                         break;
                 }
@@ -1073,33 +1078,33 @@ namespace SmokeTest
             PlayGamesPlatform.InitializeInstance(ClientConfiguration);
             PlayGamesPlatform.Activate();
             Social.localUser.Authenticate((bool success) =>
+            {
+                EndStandBy();
+                if (success)
                 {
-                    EndStandBy();
-                    if (success)
-                    {
-                        Status = "Authenticated. Hello, " + Social.localUser.userName + " (" +
-                        Social.localUser.id + ")";
+                    Status = "Authenticated. Hello, " + Social.localUser.userName + " (" +
+                             Social.localUser.id + ")";
 
-                        // register delegates
-                        PlayGamesPlatform.Instance.RegisterInvitationDelegate(OnInvitationReceived);
-                        if (PlayGamesPlatform.Instance.TurnBased != null)
-                        {
-                            PlayGamesPlatform.Instance.TurnBased.RegisterMatchDelegate(
-                                OnMatchFromNotification);
-                        }
-                    }
-                    else
+                    // register delegates
+                    PlayGamesPlatform.Instance.RegisterInvitationDelegate(OnInvitationReceived);
+                    if (PlayGamesPlatform.Instance.TurnBased != null)
                     {
-                        Status = "*** Failed to authenticate.";
+                        PlayGamesPlatform.Instance.TurnBased.RegisterMatchDelegate(
+                            OnMatchFromNotification);
                     }
+                }
+                else
+                {
+                    Status = "*** Failed to authenticate.";
+                }
 
-                    ShowEffect(success);
-                });
+                ShowEffect(success);
+            });
         }
 
         internal void DoSignOut()
         {
-            ((PlayGamesPlatform)Social.Active).SignOut();
+            ((PlayGamesPlatform) Social.Active).SignOut();
             Status = "Signing out.";
         }
 
@@ -1133,7 +1138,6 @@ namespace SmokeTest
             uint opponents = players - 1;
             SetStandBy("Starting quick game " + players + " players...");
             PlayGamesPlatform.Instance.RealTime.CreateQuickGame(opponents, opponents, 0, bitmask, this);
-
         }
 
         private void DoCreateGame()
@@ -1178,7 +1182,8 @@ namespace SmokeTest
 
             bool reliable = UnityEngine.Random.Range(0, 2) == 0;
 
-            PlayGamesPlatform.Instance.RealTime.SendMessageToAll(reliable, System.Text.ASCIIEncoding.Default.GetBytes(word));
+            PlayGamesPlatform.Instance.RealTime.SendMessageToAll(reliable,
+                System.Text.ASCIIEncoding.Default.GetBytes(word));
             Status = "Sent message: " + word;
         }
 
@@ -1197,7 +1202,8 @@ namespace SmokeTest
                 reliable,
                 recipient.ParticipantId,
                 System.Text.ASCIIEncoding.Default.GetBytes(word));
-            Status = string.Format("Sent message: {0}, reliable: {1}, recipient: {2}", word, reliable, recipient.ParticipantId);
+            Status = string.Format("Sent message: {0}, reliable: {1}, recipient: {2}", word, reliable,
+                recipient.ParticipantId);
         }
 
         private void DoLeaveRoom()
@@ -1238,14 +1244,14 @@ namespace SmokeTest
         {
             string inviterName = invitation.Inviter != null ? invitation.Inviter.DisplayName : "(null)";
             Status = "!!! Got invitation " + (fromNotification ? " (from notification):" : ":") +
-            " from " + inviterName + ", id " + invitation.InvitationId;
+                     " from " + inviterName + ", id " + invitation.InvitationId;
             mLastInvitationId = invitation.InvitationId;
         }
 
         private void OnMatchFromNotification(TurnBasedMatch match, bool fromNotification)
         {
             Debug.Log("In OnMatchFromNotification: fromNotification: " + fromNotification +
-                " match: " + match);
+                      " match: " + match);
             if (fromNotification)
             {
                 SetUI(Ui.TbmpMatch);
@@ -1256,7 +1262,7 @@ namespace SmokeTest
             else
             {
                 Debug.Log("OnMatchFrom Notification = " + match.MatchId + " "
-                    + match.Status + " " + match.TurnStatus);
+                          + match.Status + " " + match.TurnStatus);
                 mMatch = match;
                 if (mMatch.Status == TurnBasedMatch.MatchStatus.Complete ||
                     mMatch.Status == TurnBasedMatch.MatchStatus.Cancelled)
@@ -1264,9 +1270,9 @@ namespace SmokeTest
                     SetUI(Ui.Tbmp);
                 }
                 else
-                    {
+                {
                     SetUI(Ui.TbmpMatch);
-                    }
+                }
 
                 Status = "Got match a update not from notification: " + mMatch;
             }
@@ -1318,11 +1324,11 @@ namespace SmokeTest
                 (invites) =>
                 {
                     _mStatus = "Got " + invites.Length + " invites";
-                    foreach(Invitation invite in invites)
+                    foreach (Invitation invite in invites)
                     {
                         _mStatus += " " + invite.InvitationId + " (" +
-                            invite.InvitationType + ") from " +
-                            invite.Inviter + "\n";
+                                    invite.InvitationType + ") from " +
+                                    invite.Inviter + "\n";
                     }
                 });
         }
@@ -1333,11 +1339,11 @@ namespace SmokeTest
                 (matches) =>
                 {
                     _mStatus = "Got " + matches.Length + " matches";
-                    foreach(TurnBasedMatch match in matches)
+                    foreach (TurnBasedMatch match in matches)
                     {
                         _mStatus += " " + match.MatchId + " " +
-                            match.Status + " " +
-                            match.TurnStatus + "\n";
+                                    match.Status + " " +
+                                    match.TurnStatus + "\n";
                     }
                 });
         }
@@ -1346,16 +1352,16 @@ namespace SmokeTest
         {
             SetStandBy("Accepting TBMP from inbox...");
             PlayGamesPlatform.Instance.TurnBased.AcceptFromInbox((bool success, TurnBasedMatch match) =>
+            {
+                ShowEffect(success);
+                EndStandBy();
+                mMatch = match;
+                Status = success ? "Successfully accepted from inbox!" : "Failed to accept from inbox";
+                if (success)
                 {
-                    ShowEffect(success);
-                    EndStandBy();
-                    mMatch = match;
-                    Status = success ? "Successfully accepted from inbox!" : "Failed to accept from inbox";
-                    if (success)
-                    {
-                        SetUI(Ui.TbmpMatch);
-                    }
-                });
+                    SetUI(Ui.TbmpMatch);
+                }
+            });
         }
 
         private void DoTbmpAcceptIncoming()
@@ -1374,8 +1380,7 @@ namespace SmokeTest
                     ShowEffect(success);
                     EndStandBy();
                     mMatch = match;
-                    Status = success ? "Successfully accepted invitation!" :
-                    "Failed to accept invitation";
+                    Status = success ? "Successfully accepted invitation!" : "Failed to accept invitation";
                     if (success)
                     {
                         SetUI(Ui.TbmpMatch);
@@ -1412,7 +1417,7 @@ namespace SmokeTest
             }
 
             summary = "Match: [" + data + "], S:" + mMatch.Status + ", T:" + mMatch.TurnStatus + "\n";
-            summary += "Self: " + mMatch.Self+ " me: " + Social.localUser.userName+"\n";
+            summary += "Self: " + mMatch.Self + " me: " + Social.localUser.userName + "\n";
             summary += "With: ";
             foreach (Participant p in mMatch.Participants)
             {
@@ -1475,8 +1480,8 @@ namespace SmokeTest
             {
                 Participant p = participants[(index + j) % participants.Count];
                 if (p.Status == Participant.ParticipantStatus.Joined ||
-                        p.Status == Participant.ParticipantStatus.Invited ||
-                        p.Status == Participant.ParticipantStatus.NotInvitedYet)
+                    p.Status == Participant.ParticipantStatus.Invited ||
+                    p.Status == Participant.ParticipantStatus.NotInvitedYet)
                 {
                     GooglePlayGames.OurUtils.Logger.d("Using index = " + ((index + j) % participants.Count));
                     return p.ParticipantId;
@@ -1647,8 +1652,7 @@ namespace SmokeTest
                 {
                     EndStandBy();
                     ShowEffect(success);
-                    Status = success ? "Successfully left match during turn." :
-                    "Failed to leave match during turn.";
+                    Status = success ? "Successfully left match during turn." : "Failed to leave match during turn.";
                     if (success)
                     {
                         mMatch = null;

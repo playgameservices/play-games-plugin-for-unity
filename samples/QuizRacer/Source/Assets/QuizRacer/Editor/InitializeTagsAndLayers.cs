@@ -48,7 +48,7 @@ namespace QuizRacer.Editor
             Debug.Log("Checking for custom tags and layers");
 
             // Open tag manager
-            SerializedObject tagManager = 
+            SerializedObject tagManager =
                 new SerializedObject(AssetDatabase.LoadAllAssetsAtPath(
                     "ProjectSettings/TagManager.asset")[0]);
 

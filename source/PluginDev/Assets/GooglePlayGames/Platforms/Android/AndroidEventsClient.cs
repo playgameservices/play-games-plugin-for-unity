@@ -17,18 +17,21 @@ namespace GooglePlayGames.Android
         {
             using (var gamesClass = new AndroidJavaClass("com.google.android.gms.games.Games"))
             {
-                mEventsClient = gamesClass.CallStatic<AndroidJavaObject>("getEventsClient", AndroidHelperFragment.GetActivity(), account);
+                mEventsClient = gamesClass.CallStatic<AndroidJavaObject>("getEventsClient",
+                    AndroidHelperFragment.GetActivity(), account);
             }
         }
 
         public void FetchAllEvents(DataSource source, Action<ResponseStatus, List<IEvent>> callback)
         {
             callback = ToOnGameThread(callback);
-            using (var task = mEventsClient.Call<AndroidJavaObject>("load", source == DataSource.ReadNetworkOnly ? true : false))
+            using (var task =
+                mEventsClient.Call<AndroidJavaObject>("load", source == DataSource.ReadNetworkOnly ? true : false))
             {
                 AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
                     task,
-                    annotatedData => {
+                    annotatedData =>
+                    {
                         using (var buffer = annotatedData.Call<AndroidJavaObject>("get"))
                         {
                             int count = buffer.Call<int>("getCount");
@@ -40,6 +43,7 @@ namespace GooglePlayGames.Android
                                     result.Add(CreateEvent(eventJava));
                                 }
                             }
+
                             buffer.Call("release");
                             callback.Invoke(
                                 annotatedData.Call<bool>("isStale")
@@ -52,7 +56,8 @@ namespace GooglePlayGames.Android
 
                 AndroidTaskUtils.AddOnFailureListener(
                     task,
-                    exception => {
+                    exception =>
+                    {
                         Debug.Log("FetchAllEvents failed");
                         callback.Invoke(ResponseStatus.InternalError, null);
                     });
@@ -64,11 +69,13 @@ namespace GooglePlayGames.Android
             callback = ToOnGameThread(callback);
             string[] ids = new string[1];
             ids[0] = eventId;
-            using (var task = mEventsClient.Call<AndroidJavaObject>("loadByIds", source == DataSource.ReadNetworkOnly ? true : false, ids))
+            using (var task = mEventsClient.Call<AndroidJavaObject>("loadByIds",
+                source == DataSource.ReadNetworkOnly ? true : false, ids))
             {
                 AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
                     task,
-                    annotatedData => {
+                    annotatedData =>
+                    {
                         using (var buffer = annotatedData.Call<AndroidJavaObject>("get"))
                         {
                             int count = buffer.Call<int>("getCount");
@@ -93,13 +100,15 @@ namespace GooglePlayGames.Android
                                     null
                                 );
                             }
+
                             buffer.Call("release");
                         }
                     });
 
                 AndroidTaskUtils.AddOnFailureListener(
                     task,
-                    exception => {
+                    exception =>
+                    {
                         Debug.Log("FetchEvent failed");
                         callback.Invoke(ResponseStatus.InternalError, null);
                     });
@@ -108,7 +117,7 @@ namespace GooglePlayGames.Android
 
         public void IncrementEvent(string eventId, uint stepsToIncrement)
         {
-            mEventsClient.Call("increment", eventId, (int)stepsToIncrement);
+            mEventsClient.Call("increment", eventId, (int) stepsToIncrement);
         }
 
         private static Action<T1, T2> ToOnGameThread<T1, T2>(Action<T1, T2> toConvert)
@@ -122,7 +131,7 @@ namespace GooglePlayGames.Android
             string name = eventJava.Call<string>("getName");
             string description = eventJava.Call<string>("getDescription");
             string imageUrl = eventJava.Call<string>("getIconImageUrl");
-            ulong currentCount = (ulong)eventJava.Call<long>("getValue");
+            ulong currentCount = (ulong) eventJava.Call<long>("getValue");
             EventVisibility visibility = eventJava.Call<bool>("isVisible")
                 ? EventVisibility.Revealed
                 : EventVisibility.Hidden;

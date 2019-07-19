@@ -13,6 +13,7 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
+
 #if UNITY_ANDROID
 
 namespace GooglePlayGames.BasicApi
@@ -53,81 +54,48 @@ namespace GooglePlayGames.BasicApi
             get
             {
                 return mStatus == ResponseStatus.Success ||
-                mStatus == ResponseStatus.SuccessWithStale;
+                       mStatus == ResponseStatus.SuccessWithStale;
             }
         }
 
         public ResponseStatus Status
         {
-            get
-            {
-                return mStatus;
-            }
+            get { return mStatus; }
 
-            internal set
-            {
-                mStatus = value;
-            }
+            internal set { mStatus = value; }
         }
 
         public ulong ApproximateCount
         {
-            get
-            {
-                return mApproxCount;
-            }
+            get { return mApproxCount; }
 
-            internal set
-            {
-                mApproxCount  = value;
-            }
+            internal set { mApproxCount = value; }
         }
 
         public string Title
         {
-            get
-            {
-                return mTitle;
-            }
+            get { return mTitle; }
 
-            internal set
-            {
-                mTitle = value;
-            }
+            internal set { mTitle = value; }
         }
 
         public string Id
         {
-            get
-            {
-                return mId;
-            }
+            get { return mId; }
 
-            internal set
-            {
-                mId = value;
-            }
+            internal set { mId = value; }
         }
 
         public IScore PlayerScore
         {
-            get
-            {
-                return mPlayerScore;
-            }
+            get { return mPlayerScore; }
 
-            internal set
-            {
-                mPlayerScore = value;
-            }
+            internal set { mPlayerScore = value; }
         }
 
         public IScore[] Scores
         {
-            get
-            {
-                return mScores.ToArray();
-            }
+            get { return mScores.ToArray(); }
         }
 
         internal int AddScore(PlayGamesScore score)
@@ -138,34 +106,22 @@ namespace GooglePlayGames.BasicApi
 
         public ScorePageToken PrevPageToken
         {
-            get
-            {
-                return mPrevPage;
-            }
+            get { return mPrevPage; }
 
-            internal set
-            {
-                mPrevPage = value;
-            }
+            internal set { mPrevPage = value; }
         }
 
         public ScorePageToken NextPageToken
         {
-            get
-            {
-                return mNextPage;
-            }
+            get { return mNextPage; }
 
-            internal set
-            {
-                mNextPage = value;
-            }
+            internal set { mNextPage = value; }
         }
 
         public override string ToString()
         {
             return string.Format("[LeaderboardScoreData: mId={0}, " +
-                " mStatus={1}, mApproxCount={2}, mTitle={3}]",
+                                 " mStatus={1}, mApproxCount={2}, mTitle={3}]",
                 mId, mStatus, mApproxCount, mTitle);
         }
     }

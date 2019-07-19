@@ -61,12 +61,13 @@ namespace GooglePlayGames.Editor
         public static void MenuItemFileGPGSAndroidSetup()
         {
             EditorWindow window = EditorWindow.GetWindow(
-                                      typeof(GPGSAndroidSetupUI), true, GPGSStrings.AndroidSetup.Title);
+                typeof(GPGSAndroidSetupUI), true, GPGSStrings.AndroidSetup.Title);
             window.minSize = new Vector2(500, 400);
         }
 
         [MenuItem("Window/Google Play Games/Setup/Android setup...", true)]
-        public static bool EnableAndroidMenuItem() {
+        public static bool EnableAndroidMenuItem()
+        {
 #if UNITY_ANDROID
             return true;
 #else
@@ -121,9 +122,9 @@ namespace GooglePlayGames.Editor
 
                 Google.VersionHandler.InvokeStaticMethod(
                     Google.VersionHandler.FindClass(
-                   "Google.JarResolver",
-                   "GooglePlayServices.PlayServicesResolver"),
-                   "MenuResolve", null);
+                        "Google.JarResolver",
+                        "GooglePlayServices.PlayServicesResolver"),
+                    "MenuResolve", null);
 
                 return PerformSetup(
                     clientId,
@@ -168,7 +169,8 @@ namespace GooglePlayGames.Editor
                 return false;
             }
 
-            if (nearbySvcId != null) {
+            if (nearbySvcId != null)
+            {
 #if UNITY_ANDROID
                 if (!NearbyConnectionUI.PerformSetup(nearbySvcId, true))
                 {

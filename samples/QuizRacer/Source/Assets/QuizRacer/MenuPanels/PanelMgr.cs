@@ -16,7 +16,6 @@
 
 namespace QuizRacer.MenuPanels
 {
-    
     using UnityEngine;
     using UnityEngine.EventSystems;
     using UnityEngine.UI;
@@ -24,7 +23,6 @@ namespace QuizRacer.MenuPanels
 
     public class PanelMgr : MonoBehaviour
     {
-
         public GameObject firstPanel;
         public GameObject mainMenu;
         public GameObject gameMenu;
@@ -61,7 +59,6 @@ namespace QuizRacer.MenuPanels
 
         void OpenPanel(GameObject panel)
         {
-
             if (currentPanel == panel)
             {
                 return;
@@ -91,13 +88,11 @@ namespace QuizRacer.MenuPanels
 
         void Update()
         {
-
             StandaloneInputModule mod = EventSystem.current.currentInputModule as StandaloneInputModule;
 
             //handle quirk where the input is mouse mode at the start, so fire the submit event manually
             if (Input.GetKey(KeyCode.JoystickButton0))
             {
-
                 if (mod != null && mod.inputMode == StandaloneInputModule.InputMode.Mouse)
                 {
                     Button b = EventSystem.current.currentSelectedGameObject.GetComponent<Button>();
@@ -108,7 +103,6 @@ namespace QuizRacer.MenuPanels
                     }
                 }
             }
-
         }
 
         void ClosePanel(GameObject panel)
