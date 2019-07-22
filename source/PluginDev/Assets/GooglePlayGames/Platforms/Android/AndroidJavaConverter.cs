@@ -210,14 +210,19 @@ namespace GooglePlayGames.Android
             }
         }
 
-        internal static List<string> ToStringList(AndroidJavaObject list)
+        internal static List<string> ToStringList(AndroidJavaObject stringList)
         {
-            int size = list.Call<int>("size");
+            if (stringList == null)
+            {
+                return new List<string>();
+            }
+            
+            int size = stringList.Call<int>("size");
             List<string> converted = new List<string>(size);
 
             for (int i = 0; i < size ; i++)
             {
-                converted.Add(list.Call<string>("get", i));
+                converted.Add(stringList.Call<string>("get", i));
             }
             return converted;
         }

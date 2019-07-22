@@ -20,7 +20,7 @@ class SelectOpponentsUiRequest implements HelperFragment.Request {
 
     private final int minPlayers;
     private final int maxPlayers;
-    private final boolean realTime;
+    private final boolean isRealTime;
 
     private final TaskCompletionSource<Result> resultTaskSource = new TaskCompletionSource<>();
 
@@ -38,10 +38,10 @@ class SelectOpponentsUiRequest implements HelperFragment.Request {
         }
     }
 
-    SelectOpponentsUiRequest(int minPlayers, int maxPlayers, boolean realTime) {
+    SelectOpponentsUiRequest(int minPlayers, int maxPlayers, boolean isRealTime) {
         this.minPlayers = minPlayers;
         this.maxPlayers = maxPlayers;
-        this.realTime = realTime;
+        this.isRealTime = isRealTime;
     }
 
     Task<Result> getTask() {
@@ -66,7 +66,7 @@ class SelectOpponentsUiRequest implements HelperFragment.Request {
             }
         };
 
-        if (realTime) {
+        if (isRealTime) {
             RealTimeMultiplayerClient client = Games.getRealTimeMultiplayerClient(activity, account);
             client.getSelectOpponentsIntent(minPlayers, maxPlayers)
                 .addOnSuccessListener(activity, onSuccess)

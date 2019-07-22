@@ -116,7 +116,7 @@ namespace GooglePlayGames.Android
         public void CreateWithInvitationScreen(uint minOpponents, uint maxOpponents, uint variant,
             RealTimeMultiplayerListener listener)
         {
-            AndroidHelperFragment.ShowSelectOpponentsUI(minOpponents, maxOpponents, /* realTime= */ true,
+            AndroidHelperFragment.ShowSelectOpponentsUI(minOpponents, maxOpponents, /* isRealTime= */ true,
                 (status, result) =>
                 {
                     if (status != UIStatus.Valid)
@@ -369,7 +369,7 @@ namespace GooglePlayGames.Android
                 List<Participant> participants = GetConnectedParticipants();
                 foreach (Participant participant in participants)
                 {
-                    SendMessage(true, participant.ParticipantId, data);
+                    SendMessage(/* reliable= */ true, participant.ParticipantId, data);
                 }
 
                 return;

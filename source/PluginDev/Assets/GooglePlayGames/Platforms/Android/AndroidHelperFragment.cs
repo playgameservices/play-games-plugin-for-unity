@@ -162,12 +162,12 @@ namespace GooglePlayGames.Android
             }
         }
 
-        public static void ShowSelectOpponentsUI(uint minOpponents, uint maxOpponents, bool realTime,
+        public static void ShowSelectOpponentsUI(uint minOpponents, uint maxOpponents, bool isRealTime,
             Action<UIStatus, InvitationResultHolder> cb)
         {
             using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
             using (var task = helperFragment.CallStatic<AndroidJavaObject>("showSelectOpponentsUi",
-                AndroidHelperFragment.GetActivity(), (int) minOpponents, (int) maxOpponents, realTime))
+                AndroidHelperFragment.GetActivity(), (int) minOpponents, (int) maxOpponents, isRealTime))
             {
                 AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
                     task,
