@@ -357,8 +357,7 @@ namespace GooglePlayGames.Android
         {
             if (reliable)
             {
-                List<Participant> participants =
-                    AndroidJavaConverter.ToParticipantList(mRoom.Call<AndroidJavaObject>("getParticipants"));
+                List<Participant> participants = GetConnectedParticipants();
                 foreach (Participant participant in participants)
                 {
                     SendMessage(true, participant.ParticipantId, data);
@@ -385,6 +384,7 @@ namespace GooglePlayGames.Android
 
         public void SendMessage(bool reliable, string participantId, byte[] data)
         {
+            Debug.Log("SendMessage reliable: " + reliable);
             int roomStatus = GetRoomStatus();
             if (roomStatus != ROOM_STATUS_ACTIVE && roomStatus != ROOM_STATUS_CONNECTING)
             {
@@ -425,8 +425,7 @@ namespace GooglePlayGames.Android
             }
 
             List<Participant> result = new List<Participant>();
-            foreach (Participant participant in AndroidJavaConverter.ToParticipantList(
-                mRoom.Call<AndroidJavaObject>("getParticipants")))
+            foreach (Participant participant in GetParticipantList())
             {
                 if (participant.IsConnectedToRoom)
                 {
@@ -437,6 +436,24 @@ namespace GooglePlayGames.Android
             return result;
         }
 
+        private List<Participant> GetParticipantList()
+        {
+            List<Participant> participants = new List<Participant>();
+            using (var participantsObject = mRoom.Call<AndroidJavaObject>("getParticipants"))
+            {
+                int size = participantsObject.Call<int>("size");
+                for (int i = 0; i < size; i++)
+                {
+                    using (var participant = participantsObject.Call<AndroidJavaObject>("get", i))
+                    {
+                        participants.Add(AndroidJavaConverter.ToParticipant(participant));
+                    }
+                }
+            }
+
+            return participants;
+        }
+
         public Participant GetSelf()
         {
             if (GetRoomStatus() != ROOM_STATUS_ACTIVE)
@@ -444,13 +461,23 @@ namespace GooglePlayGames.Android
                 return null;
             }
 
-            return GetParticipant(mAndroidClient.GetUserId());
+            foreach (var participant in GetParticipantList())
+            {
+                if (participant.Player.id.Equals(mAndroidClient.GetUserId()))
+                {
+                    Debug.Log("self id is " + participant.ParticipantId);
+                    return participant;
+                }
+            }
+
+            return null;
         }
 
         public Participant GetParticipant(string participantId)
         {
             if (GetRoomStatus() != ROOM_STATUS_ACTIVE)
             {
+                Debug.Log("GetParticipant: room status is " + GetRoomStatus());
                 return null;
             }
 
