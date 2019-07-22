@@ -84,8 +84,8 @@ namespace GooglePlayGames.Android
                 {
                     task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
                         e => {
-                            mListener = null;
                             listener.OnRoomConnected(false);
+                            CleanSession();
                         }
                     ));
                 }
@@ -100,6 +100,7 @@ namespace GooglePlayGames.Android
                 if (status != UIStatus.Valid)
                 {
                     listener.OnRoomConnected(false);
+                    CleanSession();
                     return;
                 }
 
@@ -140,8 +141,8 @@ namespace GooglePlayGames.Android
                         task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
                             exception =>
                             {
-                                mListener = null;
                                 listener.OnRoomConnected(false);
+                                CleanSession();
                             }
                         ));
                     }
@@ -167,7 +168,6 @@ namespace GooglePlayGames.Android
             return minParticipantsToStart;
         }
 
-        // need a second check
         private float GetPercentComplete()
         {
             int connectedCount = GetConnectedParticipants().Count;
@@ -236,7 +236,19 @@ namespace GooglePlayGames.Android
 
         public void AcceptFromInbox(RealTimeMultiplayerListener listener)
         {
-            // Task<Intent> getInvitationInboxIntent()
+            AndroidHelperFragment.ShowInvitationInboxUI((status, invitation) => {
+                if (status != UIStatus.Valid)
+                {
+                    OurUtils.Logger.d("User did not complete invitation screen.");
+                    listener.OnRoomConnected(false);
+                    CleanSession();
+                    return;
+                }
+
+                mInvitation = invitation;
+
+                AcceptInvitation(mInvitation.InvitationId, listener);
+            });
         }
 
         public void AcceptInvitation(string invitationId, RealTimeMultiplayerListener listener)
@@ -248,6 +260,8 @@ namespace GooglePlayGames.Android
                 {
                     OurUtils.Logger.e("Received attempt to accept invitation without cleaning up " +
                     "active session.");
+                    listener.OnRoomConnected(false);
+                    CleanSession();
                     return;
                 }
 
@@ -277,8 +291,8 @@ namespace GooglePlayGames.Android
                                 using (var task = mClient.Call<AndroidJavaObject> ("join", mRoomConfig)) {
                                     task.Call<AndroidJavaObject> ("addOnFailureListener", new TaskOnFailedProxy (
                                         e => {
-                                            mInvitation = null;
                                             listener.OnRoomConnected (false);
+                                            CleanSession();
                                         }
                                     ));
                                 }
@@ -403,6 +417,7 @@ namespace GooglePlayGames.Android
             if (mListener != null)
             {
                 mListener.OnRoomConnected(false);
+                CleanSession();
             }
         }
 
@@ -440,6 +455,7 @@ namespace GooglePlayGames.Android
                                 if (invitation.InvitationId == invitationId)
                                 {
                                     callback(invitation);
+                                    return;
                                 }
                             }
                             OurUtils.Logger.e("Invitation with ID " + invitationId + " couldn't be found");
@@ -546,7 +562,6 @@ namespace GooglePlayGames.Android
                 if (mParent.GetRoomStatus() == ROOM_STATUS_ACTIVE)
                 {
                     mParent.mRoom = room;
-                    // do we need to add anything here?
                 }
                 else
                 {
@@ -563,6 +578,7 @@ namespace GooglePlayGames.Android
                 else
                 {
                     handleConnectedSetChanged(room);
+                    mParent.CleanSession();
                 }
             }
 
@@ -628,6 +644,7 @@ namespace GooglePlayGames.Android
                 {
                     OurUtils.Logger.e("Participants disconnected during room setup, failing. " + "Participants were: " + string.Join(",", noLongerConnected.ToArray()));
                     mParent.mListener.OnRoomConnected(false);
+                    mParent.CleanSession();
                     return;
                 }
 
@@ -683,12 +700,21 @@ namespace GooglePlayGames.Android
             public void onLeftRoom( /* @OnLeftRoomStatusCodes */ int statusCode, /* @Nullable */ string roomId)
             {
                 mListener.OnLeftRoom();
+                mParent.CleanSession();
             }
 
             public void onRoomConnected( /* @OnRoomConnectedStatusCodes */ int statusCode, /* @Nullable Room */ AndroidJavaObject room)
             {
                 mListener.OnRoomConnected(true);
             }
+        }
+
+        private void CleanSession()
+        {
+            mRoom = null;
+            mRoomConfig = null;
+            mListener = null;
+            mInvitation = null;
         }
     }
 }

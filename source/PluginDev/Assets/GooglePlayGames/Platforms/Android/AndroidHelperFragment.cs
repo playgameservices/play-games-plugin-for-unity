@@ -244,6 +244,39 @@ namespace GooglePlayGames.Android
             }
         }
 
+        public static void ShowInvitationInboxUI(Action<UIStatus, Invitation> cb)
+        {
+            using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
+            {
+                using (var task = helperFragment.CallStatic<AndroidJavaObject>("showInvitationInboxUI",
+                    AndroidHelperFragment.GetActivity()))
+                {
+                    task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                        result => {
+                            int status = result.Get<int>("status");
+                            if ((UIStatus)status != UIStatus.Valid)
+                            {
+                                cb.Invoke((UIStatus)status, null);
+                                return;
+                            }
+
+                            using (var invitation = result.Get<AndroidJavaObject>("invitation"))
+                            {
+                                cb.Invoke((UIStatus)status, AndroidJavaConverter.ToInvitation(invitation));
+                            }
+                        }
+                    ));
+
+                    task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                        exception => {
+                            Debug.Log("ShowInvitationInboxUI failed with exception");
+                            cb.Invoke(UIStatus.InternalError, null);
+                        }
+                    ));
+                }
+            }
+        }
+
         private static List<string> CreatePlayerIdsToInvite(AndroidJavaObject playerIdsObject)
         {
           int size = playerIdsObject.Call<int>("size");

@@ -36,6 +36,7 @@ import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesActivityResultCodes;
+import com.google.android.gms.games.multiplayer.Invitation;
 import com.google.android.gms.games.multiplayer.realtime.Room;
 import com.google.android.gms.tasks.Task;
 
@@ -54,7 +55,8 @@ public class HelperFragment extends Fragment
     static final int RC_CAPTURE_OVERLAY_UI = 9005;
     static final int RC_INVITATION_UI = 9006;
     static final int RC_SHOW_INBOX_UI = 9007;
-    static final int RC_SHOW_WAITING_ROOM_UI = 9007;
+    static final int RC_SHOW_WAITING_ROOM_UI = 9008;
+    static final int RC_SHOW_INVITATION_INBOX_UI = 9009;
 
     // Pending token request.  There can be only one outstanding request at a
     // time.
@@ -188,6 +190,16 @@ public class HelperFragment extends Fragment
 
         if(!HelperFragment.startRequest(parentActivity, request)) {
             request.setResult(ShowWaitingRoomUiRequest.UI_STATUS_BUSY, null);
+        }
+
+        return request.getTask();
+    }
+
+    public static Task<ShowInvitationInboxUIRequest.Result> showInvitationInboxUI(Activity parentActivity) {
+        ShowInvitationInboxUIRequest request = new ShowInvitationInboxUIRequest();
+
+        if(!HelperFragment.startRequest(parentActivity, request)) {
+            request.setResult(CommonUIStatus.UI_BUSY);
         }
 
         return request.getTask();
