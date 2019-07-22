@@ -91,14 +91,14 @@ namespace GooglePlayGames.Android
                             using (var autoMatchCriteria = matchConfigClass.CallStatic<AndroidJavaObject>(
                                 "createAutoMatchCriteria", result.MinAutomatchingPlayers,
                                 result.MaxAutomatchingPlayers, /* exclusiveBitMask= */ (long) 0))
-                            {
-                                matchConfigBuilder.Call<AndroidJavaObject>("setAutoMatchCriteria", autoMatchCriteria);
-                            }
+                            using (matchConfigBuilder.Call<AndroidJavaObject>("setAutoMatchCriteria",
+                                autoMatchCriteria))
+                                ;
                         }
 
                         if (variant != 0)
                         {
-                            matchConfigBuilder.Call<AndroidJavaObject>("setVariant", (int) variant);
+                            using (matchConfigBuilder.Call<AndroidJavaObject>("setVariant", (int) variant)) ;
                         }
 
                         using (var invitedPlayersObject = new AndroidJavaObject("java.util.ArrayList"))
@@ -108,7 +108,8 @@ namespace GooglePlayGames.Android
                                 invitedPlayersObject.Call<bool>("add", result.PlayerIdsToInvite[i]);
                             }
 
-                            matchConfigBuilder.Call<AndroidJavaObject>("addInvitedPlayers", invitedPlayersObject);
+                            using (matchConfigBuilder.Call<AndroidJavaObject>("addInvitedPlayers", invitedPlayersObject)
+                            ) ;
                         }
 
                         using (var matchConfig = matchConfigBuilder.Call<AndroidJavaObject>("build"))
