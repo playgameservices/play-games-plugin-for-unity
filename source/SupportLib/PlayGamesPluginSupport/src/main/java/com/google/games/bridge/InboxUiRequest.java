@@ -16,19 +16,20 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
 
-class ShowInboxUiRequest implements HelperFragment.Request {
+
+class InboxUiRequest implements HelperFragment.Request {
     private static final String TAG = "SimpleUiRequest";
 
     private final TaskCompletionSource<Result> resultTaskSource = new TaskCompletionSource<>();
 
     public class Result {
-      public int status;
-      public TurnBasedMatch turnBasedMatch;
+        public int status;
+        public TurnBasedMatch turnBasedMatch;
 
-      Result(int status, TurnBasedMatch turnBasedMatch) {
-        this.status = status;
-        this.turnBasedMatch = turnBasedMatch;
-      }
+        Result(int status, TurnBasedMatch turnBasedMatch) {
+            this.status = status;
+            this.turnBasedMatch = turnBasedMatch;
+        }
     }
 
     public Task<Result> getTask() {
@@ -42,24 +43,24 @@ class ShowInboxUiRequest implements HelperFragment.Request {
         client.getInboxIntent()
             .addOnSuccessListener(
                 activity,
-                    new OnSuccessListener<Intent>() {
-                        @Override
-                        public void onSuccess(Intent intent) {
-                            helperFragment.startActivityForResult(intent, HelperFragment.RC_SHOW_INBOX_UI);
-                        }
-                    })
+                new OnSuccessListener<Intent>() {
+                    @Override
+                    public void onSuccess(Intent intent) {
+                        helperFragment.startActivityForResult(intent, HelperFragment.RC_INBOX_UI);
+                    }
+                })
             .addOnFailureListener(
                 activity,
-                    new OnFailureListener() {
-                        @Override
-                        public void onFailure(Exception e) {
-                            setFailure(e);
-                        }
-                    });
+                new OnFailureListener() {
+                    @Override
+                    public void onFailure(Exception e) {
+                        setFailure(e);
+                    }
+                });
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == HelperFragment.RC_SHOW_INBOX_UI) {
+        if (requestCode == HelperFragment.RC_INBOX_UI) {
             if (resultCode == Activity.RESULT_OK) {
                 setResult(CommonUIStatus.VALID, (TurnBasedMatch) data.getParcelableExtra(Multiplayer.EXTRA_TURN_BASED_MATCH));
             } else if (resultCode == Activity.RESULT_CANCELED) {
@@ -80,7 +81,7 @@ class ShowInboxUiRequest implements HelperFragment.Request {
     }
 
     void setResult(Integer result) {
-        setResult(result, null);
+        setResult(result, /* turnBasedMatch= */ null);
     }
 
     void setFailure(Exception e) {

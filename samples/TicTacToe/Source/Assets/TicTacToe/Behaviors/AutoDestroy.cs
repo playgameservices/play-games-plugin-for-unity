@@ -18,11 +18,14 @@ using UnityEngine;
 using System.Collections;
 using System;
 
-public class AutoDestroy : MonoBehaviour {
+public class AutoDestroy : MonoBehaviour
+{
     public float ThresholdY;
 
-    void Update() {
-        if (gameObject.transform.position.y < ThresholdY) {
+    void Update()
+    {
+        if (gameObject.transform.position.y < ThresholdY)
+        {
             GameObject.Destroy(gameObject);
         }
     }

@@ -49,6 +49,7 @@ namespace CubicPilot.UtilCode
             {
                 mRemaining = Util.Clamp(mRemaining - deltaT, 0, mInitial);
             }
+
             if (autoStopOnExpired && Expired)
             {
                 Stop();
@@ -90,58 +91,37 @@ namespace CubicPilot.UtilCode
 
         public bool Expired
         {
-            get
-            {
-                return mActive && mRemaining <= 0;
-            }
+            get { return mActive && mRemaining <= 0; }
         }
 
         public float Initial
         {
-            get
-            {
-                return mInitial;
-            }
+            get { return mInitial; }
         }
 
         public float Remaining
         {
-            get
-            {
-                return mRemaining;
-            }
+            get { return mRemaining; }
         }
 
         public float Elapsed
         {
-            get
-            {
-                return mInitial - mRemaining;
-            }
+            get { return mInitial - mRemaining; }
         }
 
         public float NormalizedElapsed
         {
-            get
-            {
-                return Elapsed / mInitial;
-            }
+            get { return Elapsed / mInitial; }
         }
 
         public float NormalizedRemaining
         {
-            get
-            {
-                return Remaining / mInitial;
-            }
+            get { return Remaining / mInitial; }
         }
 
         public bool Active
         {
-            get
-            {
-                return mActive;
-            }
+            get { return mActive; }
         }
 
         public override string ToString()

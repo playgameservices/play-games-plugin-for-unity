@@ -15,8 +15,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.List;
 
-class InvitePlayerUiRequest implements HelperFragment.Request {
-    private static final String TAG = "InvitePlayerUiRequest";
+class SelectOpponentsUiRequest implements HelperFragment.Request {
+    private static final String TAG = "SelectOpponents";
 
     private final int minPlayers;
     private final int maxPlayers;
@@ -25,27 +25,27 @@ class InvitePlayerUiRequest implements HelperFragment.Request {
     private final TaskCompletionSource<Result> resultTaskSource = new TaskCompletionSource<>();
 
     public class Result {
-      public int status;
-      public int minAutomatchingPlayers;
-      public int maxAutomatchingPlayers;
-      public List<String> playerIdsToInvite;
+        public int status;
+        public int minAutomatchingPlayers;
+        public int maxAutomatchingPlayers;
+        public List<String> playerIdsToInvite;
 
-      Result(int status, int minAutomatchingPlayers, int maxAutomatchingPlayers, List<String> playerIdsToInvite) {
-        this.status = status;
-        this.minAutomatchingPlayers = minAutomatchingPlayers;
-        this.maxAutomatchingPlayers = maxAutomatchingPlayers;
-        this.playerIdsToInvite = playerIdsToInvite;
-      }
+        Result(int status, int minAutomatchingPlayers, int maxAutomatchingPlayers, List<String> playerIdsToInvite) {
+            this.status = status;
+            this.minAutomatchingPlayers = minAutomatchingPlayers;
+            this.maxAutomatchingPlayers = maxAutomatchingPlayers;
+            this.playerIdsToInvite = playerIdsToInvite;
+        }
     }
 
-    InvitePlayerUiRequest(int minPlayers, int maxPlayers, boolean realTime) {
+    SelectOpponentsUiRequest(int minPlayers, int maxPlayers, boolean realTime) {
         this.minPlayers = minPlayers;
         this.maxPlayers = maxPlayers;
         this.realTime = realTime;
     }
 
     Task<Result> getTask() {
-      return resultTaskSource.getTask();
+        return resultTaskSource.getTask();
     }
 
     @Override
@@ -56,7 +56,7 @@ class InvitePlayerUiRequest implements HelperFragment.Request {
         OnSuccessListener onSuccess = new OnSuccessListener<Intent>() {
             @Override
             public void onSuccess(Intent intent) {
-                helperFragment.startActivityForResult(intent, HelperFragment.RC_INVITATION_UI);
+                helperFragment.startActivityForResult(intent, HelperFragment.RC_SELECT_OPPONENTS_UI);
             }
         };
         OnFailureListener onFailure = new OnFailureListener() {
@@ -82,12 +82,12 @@ class InvitePlayerUiRequest implements HelperFragment.Request {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == HelperFragment.RC_INVITATION_UI) {
+        if (requestCode == HelperFragment.RC_SELECT_OPPONENTS_UI) {
             if (resultCode == Activity.RESULT_OK) {
                 setResult(CommonUIStatus.VALID,
-                data.getIntExtra(Multiplayer.EXTRA_MIN_AUTOMATCH_PLAYERS, minPlayers),
-                data.getIntExtra(Multiplayer.EXTRA_MAX_AUTOMATCH_PLAYERS, maxPlayers),
-                data.getStringArrayListExtra(Games.EXTRA_PLAYER_IDS));
+                    data.getIntExtra(Multiplayer.EXTRA_MIN_AUTOMATCH_PLAYERS, minPlayers),
+                    data.getIntExtra(Multiplayer.EXTRA_MAX_AUTOMATCH_PLAYERS, maxPlayers),
+                    data.getStringArrayListExtra(Games.EXTRA_PLAYER_IDS));
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 setResult(CommonUIStatus.CANCELLED);
             } else {
@@ -104,7 +104,10 @@ class InvitePlayerUiRequest implements HelperFragment.Request {
     }
 
     void setResult(Integer status) {
-        setResult(status, 0, 0, null);
+        setResult(status,
+            /* minAutomatchingPlayers= */ 0,
+            /* maxAutomatchingPlayers= */ 0,
+            /* playerIdsToInvite= */ null);
     }
 
     void setFailure(Exception e) {

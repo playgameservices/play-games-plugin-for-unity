@@ -18,7 +18,8 @@ using UnityEngine;
 using System.Collections;
 using System;
 
-public class MotionDetect : MonoBehaviour {
+public class MotionDetect : MonoBehaviour
+{
     private const float MotionThreshold = 0.05f;
 
     // time between consecutive checks
@@ -39,40 +40,47 @@ public class MotionDetect : MonoBehaviour {
     // did we conclude the object is at rest?
     private bool mIsAtRest = false;
 
-    void Start() {
+    void Start()
+    {
         mLastPosition = gameObject.transform.position;
     }
 
-    void Update() {
+    void Update()
+    {
         mCountdownToCheck -= Time.deltaTime;
-        if (mCountdownToCheck < 0) {
+        if (mCountdownToCheck < 0)
+        {
             mCountdownToCheck = CheckInterval;
             Check();
         }
     }
 
-    void Check() {
+    void Check()
+    {
         Vector3 delta = gameObject.transform.position - mLastPosition;
         float displacement = delta.magnitude;
         mLastPosition = gameObject.transform.position;
 
-        if (displacement >= MotionThreshold) {
+        if (displacement >= MotionThreshold)
+        {
             // moved!
             mIsAtRest = false;
             mFailedChecks = 0;
             return;
         }
 
-        if (mFailedChecks < FailedChecksForRest) {
+        if (mFailedChecks < FailedChecksForRest)
+        {
             mFailedChecks++;
-        } else {
+        }
+        else
+        {
             mIsAtRest = true;
         }
     }
 
-    public bool IsAtRest {
-        get {
-            return mIsAtRest;
-        }
+    public bool IsAtRest
+    {
+        get { return mIsAtRest; }
     }
 }

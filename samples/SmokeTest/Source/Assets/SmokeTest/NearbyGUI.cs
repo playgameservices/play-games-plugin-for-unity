@@ -99,7 +99,7 @@ namespace SmokeTest
         {
             Debug.Log("OnEndpointFound");
             mNearbyStatus = "OnEndpointFound" + discoveredEndpoint.Name +
-            " " + discoveredEndpoint.EndpointId;
+                            " " + discoveredEndpoint.EndpointId;
             EndpointHolder holder = new EndpointHolder();
             holder.Endpoint = discoveredEndpoint;
             holder.State = EndpointState.DISCOVERED;
@@ -179,6 +179,7 @@ namespace SmokeTest
                 {
                     mOwner.SetUI(MainGui.Ui.Main);
                 }
+
                 return;
             }
 
@@ -190,7 +191,7 @@ namespace SmokeTest
 
             if (advertising)
             {
-                topStatus += string.Format(" Advertising({0})", (int)mAdvertisingRemaining);
+                topStatus += string.Format(" Advertising({0})", (int) mAdvertisingRemaining);
                 advertButton = "Stop\nAdvertising";
             }
             else
@@ -200,7 +201,7 @@ namespace SmokeTest
 
             if (discovering)
             {
-                topStatus += string.Format(" Disovering({0})", (int)mDiscoveryRemaining);
+                topStatus += string.Format(" Disovering({0})", (int) mDiscoveryRemaining);
                 discoveryButton = "Stop\nDiscovery";
             }
             else
@@ -276,7 +277,7 @@ namespace SmokeTest
                 }
 
                 string msg = "Reliable from " + client.GetServiceId() + " " +
-                         ((int)Time.realtimeSinceStartup);
+                             ((int) Time.realtimeSinceStartup);
                 client.SendReliable(dest, System.Text.Encoding.UTF8.GetBytes(msg));
             }
             else if (GUI.Button(CalcGrid(1, 2), "Send All\nUnreliable"))
@@ -291,7 +292,7 @@ namespace SmokeTest
                 }
 
                 string msg = "Unreliable from " + client.GetServiceId() + " " +
-                         ((int)Time.realtimeSinceStartup);
+                             ((int) Time.realtimeSinceStartup);
                 client.SendUnreliable(dest, System.Text.Encoding.UTF8.GetBytes(msg));
             }
             else if (GUI.Button(CalcGrid(2, 2), "Back"))
@@ -329,8 +330,8 @@ namespace SmokeTest
 
                 GUI.Label(CalcGrid(0, 0), endpt.ToString());
                 if (endpt.State == EndpointState.DISCOVERED ||
-                endpt.State == EndpointState.DISCONNECTED ||
-                endpt.State == EndpointState.REJECTED)
+                    endpt.State == EndpointState.DISCONNECTED ||
+                    endpt.State == EndpointState.REJECTED)
                 {
                     if (GUI.Button(CalcGrid(1, 0), "Connect"))
                     {
@@ -372,7 +373,7 @@ namespace SmokeTest
                         List<string> dest = new List<string>();
                         dest.Add(endpt.Endpoint.EndpointId);
                         string msg = "Reliable from " + client.GetServiceId() + " " +
-                                 ((int)Time.realtimeSinceStartup);
+                                     ((int) Time.realtimeSinceStartup);
                         client.SendReliable(dest, System.Text.Encoding.UTF8.GetBytes(msg));
                     }
 
@@ -382,10 +383,11 @@ namespace SmokeTest
                         List<string> dest = new List<string>();
                         dest.Add(endpt.Endpoint.EndpointId);
                         string msg = "Unreliable from " + client.GetServiceId() + " " +
-                                 ((int)Time.realtimeSinceStartup);
+                                     ((int) Time.realtimeSinceStartup);
                         client.SendReliable(dest, System.Text.Encoding.UTF8.GetBytes(msg));
                     }
                 }
+
                 GUI.EndGroup();
                 index++;
             }
@@ -431,7 +433,7 @@ namespace SmokeTest
                     mEndpoints[response.RemoteEndpointId].State = EndpointState.REJECTED;
                     break;
                 case ConnectionResponse.Status.ErrorAlreadyConnected:
-                // it is an error, but we can treat it like connected.
+                    // it is an error, but we can treat it like connected.
                     mEndpoints[response.RemoteEndpointId].State = EndpointState.CONNECTED;
                     break;
                 case ConnectionResponse.Status.ErrorEndpointNotConnected:
@@ -449,6 +451,7 @@ namespace SmokeTest
                     {
                         mEndpoints[response.RemoteEndpointId].State = EndpointState.ERROR;
                     }
+
                     break;
             }
         }
@@ -456,7 +459,7 @@ namespace SmokeTest
         internal void OnAdvertisingResult(AdvertisingResult result)
         {
             mNearbyStatus = "AdvertisingResult: success:" + result.Succeeded +
-            " " + result.LocalEndpointName;
+                            " " + result.LocalEndpointName;
         }
 
         internal void OnConnectionRequest(ConnectionRequest request)
@@ -484,28 +487,16 @@ namespace SmokeTest
 
             public EndpointDetails Endpoint
             {
-                get
-                {
-                    return this.mEndpoint;
-                }
+                get { return this.mEndpoint; }
 
-                set
-                {
-                    this.mEndpoint = value;
-                }
+                set { this.mEndpoint = value; }
             }
 
             public EndpointState State
             {
-                get
-                {
-                    return this.mState;
-                }
+                get { return this.mState; }
 
-                set
-                {
-                    this.mState = value;
-                }
+                set { this.mState = value; }
             }
 
             public override string ToString()

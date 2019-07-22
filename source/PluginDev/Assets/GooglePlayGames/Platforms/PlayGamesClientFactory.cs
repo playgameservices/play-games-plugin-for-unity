@@ -13,6 +13,7 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
+
 #if UNITY_ANDROID
 
 namespace GooglePlayGames
@@ -31,13 +32,13 @@ namespace GooglePlayGames
                 GooglePlayGames.OurUtils.Logger.d("Creating IPlayGamesClient in editor, using DummyClient.");
                 return new GooglePlayGames.BasicApi.DummyClient();
             }
-            #if UNITY_ANDROID
-                GooglePlayGames.OurUtils.Logger.d("Creating Android IPlayGamesClient Client");
-                return new GooglePlayGames.Android.AndroidClient(config);
-            #else
+#if UNITY_ANDROID
+            GooglePlayGames.OurUtils.Logger.d("Creating Android IPlayGamesClient Client");
+            return new GooglePlayGames.Android.AndroidClient(config);
+#else
                 GooglePlayGames.OurUtils.Logger.d("Cannot create IPlayGamesClient for unknown platform, returning DummyClient");
                 return new GooglePlayGames.BasicApi.DummyClient();
-            #endif
+#endif
         }
     }
 }

@@ -28,15 +28,9 @@ namespace NearbyDroids
 
         public ItemState State
         {
-            get
-            {
-                return state;
-            }
+            get { return state; }
 
-            set
-            {
-                state = value;
-            }
+            set { state = value; }
         }
 
         public void UpdateState()

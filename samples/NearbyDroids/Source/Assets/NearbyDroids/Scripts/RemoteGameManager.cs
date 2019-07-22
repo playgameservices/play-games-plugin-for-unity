@@ -19,6 +19,7 @@ namespace NearbyDroids
     using System.Collections.Generic;
     using UnityEngine;
     using UnityEngine.SceneManagement;
+
     /// <summary>
     /// Remote game manager. used to manage the game state for a player
     /// that is not hosting the room.
@@ -64,13 +65,13 @@ namespace NearbyDroids
             if (data != null)
             {
                 Debug.Log("Initializing using " + data.CurrentPhase + ": " +
-                    data.SerialNumber);
+                          data.SerialNumber);
 
                 // if we are moving to the next level of the game, reload!
                 if (owner.Level != data.Level)
                 {
                     Debug.Log("Going from level " + owner.Level + " to " +
-                        data.Level);
+                              data.Level);
                     owner.GameState = data;
                     owner.LevelManager.DestroyBoard();
                     SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);

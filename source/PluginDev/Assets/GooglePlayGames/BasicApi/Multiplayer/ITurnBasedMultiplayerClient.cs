@@ -13,6 +13,7 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
+
 #if UNITY_ANDROID
 
 namespace GooglePlayGames.BasicApi.Multiplayer
@@ -35,7 +36,7 @@ namespace GooglePlayGames.BasicApi.Multiplayer
         /// If it succeeds, will be called with (true, match); if it fails, will be
         /// called with (false, null).</param>
         void CreateQuickMatch(uint minOpponents, uint maxOpponents, uint variant,
-                              Action<bool, TurnBasedMatch> callback);
+            Action<bool, TurnBasedMatch> callback);
 
         /// <summary>
         /// Starts a game with randomly selected opponent(s) using exclusiveBitMask.
@@ -66,7 +67,7 @@ namespace GooglePlayGames.BasicApi.Multiplayer
         /// <param name="callback">Callback. Will be called with (true, match) on success,
         /// and (false, null) if there is an error or the user cancelled.</param>
         void CreateWithInvitationScreen(uint minOpponents, uint maxOpponents, uint variant,
-                                        Action<bool, TurnBasedMatch> callback);
+            Action<bool, TurnBasedMatch> callback);
 
         /// <summary>
         /// Starts a game with an invitation screen. </summary>
@@ -147,7 +148,7 @@ namespace GooglePlayGames.BasicApi.Multiplayer
         /// <param name="callback">Callback. Will be called with true for success,
         /// false for failure.</param>
         void TakeTurn(TurnBasedMatch match, byte[] data, string pendingParticipantId,
-                      Action<bool> callback);
+            Action<bool> callback);
 
         /// <summary>
         /// Gets the size of the max match data, in bytes.
@@ -190,7 +191,7 @@ namespace GooglePlayGames.BasicApi.Multiplayer
         /// <param name="pendingParticipantId">ID of next participant to play.</param>
         /// <param name="callback">Callback.</param>
         void LeaveDuringTurn(TurnBasedMatch match, string pendingParticipantId,
-                             Action<bool> callback);
+            Action<bool> callback);
 
         /// <summary>
         /// Cancel a match.</summary>
@@ -234,18 +235,18 @@ namespace GooglePlayGames.BasicApi.Multiplayer
     }
 
     /// <summary>
-/// Match delegate. Called when a match arrives.
-/// <param name="shouldAutoLaunch">If this is true, then the game should immediately
-/// proceed to the game screen to play this match, without prompting the user. If
-/// false, you should prompt the user before going to the match screen. As an example,
-/// when a user taps on the "Play" button on a notification in Android, it is
-/// clear that they want to play that match right away, so the plugin calls this
-/// delegate with shouldAutoLaunch = true. However, if we receive an incoming notification
-/// that the player hasn't specifically indicated they wish to accept (for example,
-/// we received one in the background from the server), this delegate will be called
-/// with shouldAutoLaunch=false to indicate that you should confirm with the user
-/// before switching to the game.</param>
-/// </summary>
+    /// Match delegate. Called when a match arrives.
+    /// <param name="shouldAutoLaunch">If this is true, then the game should immediately
+    /// proceed to the game screen to play this match, without prompting the user. If
+    /// false, you should prompt the user before going to the match screen. As an example,
+    /// when a user taps on the "Play" button on a notification in Android, it is
+    /// clear that they want to play that match right away, so the plugin calls this
+    /// delegate with shouldAutoLaunch = true. However, if we receive an incoming notification
+    /// that the player hasn't specifically indicated they wish to accept (for example,
+    /// we received one in the background from the server), this delegate will be called
+    /// with shouldAutoLaunch=false to indicate that you should confirm with the user
+    /// before switching to the game.</param>
+    /// </summary>
     public delegate void MatchDelegate(TurnBasedMatch match, bool shouldAutoLaunch);
 }
 #endif

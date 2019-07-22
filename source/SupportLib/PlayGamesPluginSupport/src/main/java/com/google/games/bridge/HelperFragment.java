@@ -53,8 +53,8 @@ public class HelperFragment extends Fragment
     static final int RC_SIMPLE_UI = 9003;
     static final int RC_SELECT_SNAPSHOT_UI = 9004;
     static final int RC_CAPTURE_OVERLAY_UI = 9005;
-    static final int RC_INVITATION_UI = 9006;
-    static final int RC_SHOW_INBOX_UI = 9007;
+    static final int RC_SELECT_OPPONENTS_UI = 9006;
+    static final int RC_INBOX_UI = 9007;
     static final int RC_SHOW_WAITING_ROOM_UI = 9008;
     static final int RC_SHOW_INVITATION_INBOX_UI = 9009;
 
@@ -185,6 +185,16 @@ public class HelperFragment extends Fragment
         return request.getTask();
     }
 
+    public static Task<SelectOpponentsUiRequest.Result> showSelectOpponentsUi(Activity parentActivity, int minOpponents, int maxOpponents, boolean realTime){
+        SelectOpponentsUiRequest request = new SelectOpponentsUiRequest(minOpponents, maxOpponents, realTime);
+
+        if(!HelperFragment.startRequest(parentActivity, request)) {
+            request.setResult(CommonUIStatus.UI_BUSY);
+        }
+
+        return request.getTask();
+    }
+
     public static Task<ShowWaitingRoomUiRequest.Result> showWaitingRoomUI(Activity parentActivity, Room room, int minParticipantsToStart) {
         ShowWaitingRoomUiRequest request = new ShowWaitingRoomUiRequest(room, minParticipantsToStart);
 
@@ -205,18 +215,8 @@ public class HelperFragment extends Fragment
         return request.getTask();
     }
 
-    public static Task<InvitePlayerUiRequest.Result> invitePlayerUi(Activity parentActivity, int minOpponents, int maxOpponents, boolean realTime){
-        InvitePlayerUiRequest request = new InvitePlayerUiRequest(minOpponents, maxOpponents, realTime);
-
-        if(!HelperFragment.startRequest(parentActivity, request)) {
-            request.setResult(CommonUIStatus.UI_BUSY);
-        }
-
-        return request.getTask();
-    }
-
-    public static Task<ShowInboxUiRequest.Result> showInboxUi(Activity parentActivity){
-        ShowInboxUiRequest request = new ShowInboxUiRequest();
+    public static Task<InboxUiRequest.Result> showInboxUi(Activity parentActivity){
+        InboxUiRequest request = new InboxUiRequest();
 
         if(!HelperFragment.startRequest(parentActivity, request)) {
             request.setResult(CommonUIStatus.UI_BUSY);
@@ -349,5 +349,9 @@ public class HelperFragment extends Fragment
         view.setVisibility(View.INVISIBLE);
         view.setClickable(false);
         return view;
+    }
+
+    public static View getDecorView(Activity activity) {
+        return activity.getWindow().getDecorView();
     }
 }

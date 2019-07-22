@@ -40,7 +40,7 @@ namespace CubicPilot.Gui
             GUI.skin = GuiSkin;
             Gu.SetColor(Color.black);
             Gu.Label(Gu.Center(GameConsts.EndScreen.EndTextX),
-                (int)Util.Interpolate(0.0f, Screen.height, 1.0f,
+                (int) Util.Interpolate(0.0f, Screen.height, 1.0f,
                     Gu.Middle(GameConsts.EndScreen.EndTextY),
                     mTransitionCd.NormalizedElapsed),
                 Gu.Dim(GameConsts.EndScreen.EndTextFontSize),

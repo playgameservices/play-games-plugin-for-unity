@@ -35,23 +35,27 @@ namespace GooglePlayGames.Android
         public AndroidRealTimeMultiplayerClient(AndroidClient androidClient, AndroidJavaObject account)
         {
             mAndroidClient = androidClient;
-            using(var gamesClass = new AndroidJavaClass("com.google.android.gms.games.Games"))
+            using (var gamesClass = new AndroidJavaClass("com.google.android.gms.games.Games"))
             {
                 mClient = gamesClass.CallStatic<AndroidJavaObject>("getRealTimeMultiplayerClient",
-                        AndroidHelperFragment.GetActivity(), account);
-                mInvitationsClient = gamesClass.CallStatic<AndroidJavaObject>("getInvitationsClient", AndroidHelperFragment.GetActivity(), account);
+                    AndroidHelperFragment.GetActivity(), account);
+                mInvitationsClient = gamesClass.CallStatic<AndroidJavaObject>("getInvitationsClient",
+                    AndroidHelperFragment.GetActivity(), account);
             }
         }
 
         public void CreateQuickGame(uint minOpponents, uint maxOpponents, uint variant,
-            RealTimeMultiplayerListener listener) {
+            RealTimeMultiplayerListener listener)
+        {
             CreateQuickGame(minOpponents, maxOpponents, variant, /* exclusiveBitMask= */ 0, listener);
         }
 
         public void CreateQuickGame(uint minOpponents, uint maxOpponents, uint variant,
             ulong exclusiveBitMask,
-            RealTimeMultiplayerListener listener) {
-            AndroidJavaObject roomUpdateCallback = new AndroidJavaObject("com.google.games.bridge.RoomUpdateCallbackProxy",
+            RealTimeMultiplayerListener listener)
+        {
+            AndroidJavaObject roomUpdateCallback = new AndroidJavaObject(
+                "com.google.games.bridge.RoomUpdateCallbackProxy",
                 new RoomUpdateCallbackProxy( /* parent= */ this, listener));
 
             lock (mSessionLock)
@@ -61,93 +65,122 @@ namespace GooglePlayGames.Android
                     OurUtils.Logger.e("Received attempt to create a new room without cleaning up the old one.");
                     return;
                 }
+
                 // build room config
-                using(var roomConfigClass = new AndroidJavaClass("com.google.android.gms.games.multiplayer.realtime.RoomConfig")) {
-                    using(var roomConfigBuilder = roomConfigClass.CallStatic<AndroidJavaObject>("builder", roomUpdateCallback)) {
-                        if(variant > 0) {
-                            roomConfigBuilder.Call<AndroidJavaObject>("setVariant",(int) variant);
-                        }
-                        roomConfigBuilder.Call<AndroidJavaObject>("setAutoMatchCriteria",
-                            roomConfigClass.CallStatic<AndroidJavaObject>("createAutoMatchCriteria",(int) minOpponents,(int) maxOpponents,(long) exclusiveBitMask));
-
-                        AndroidJavaObject messageReceivedListener = new AndroidJavaObject("com.google.games.bridge.RealTimeMessageReceivedListenerProxy", new MessageReceivedListenerProxy(listener));
-                        roomConfigBuilder.Call<AndroidJavaObject>("setOnMessageReceivedListener", messageReceivedListener);
-
-                        AndroidJavaObject roomStatusUpdateCallback = new AndroidJavaObject("com.google.games.bridge.RoomStatusUpdateCallbackProxy", new RoomStatusUpdateCallbackProxy(this, listener));
-                        roomConfigBuilder.Call<AndroidJavaObject>("setRoomStatusUpdateCallback", roomStatusUpdateCallback);
-
-                        mRoomConfig = roomConfigBuilder.Call<AndroidJavaObject>("build");
-                        mListener = listener;
-                    }
-                }
-                using(var task = mClient.Call<AndroidJavaObject>("create", mRoomConfig))
+                using (var roomConfigClass =
+                    new AndroidJavaClass("com.google.android.gms.games.multiplayer.realtime.RoomConfig"))
+                using (var roomConfigBuilder =
+                    roomConfigClass.CallStatic<AndroidJavaObject>("builder", roomUpdateCallback))
                 {
-                    task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
-                        e => {
+                    if (variant > 0)
+                    {
+                        roomConfigBuilder.Call<AndroidJavaObject>("setVariant", (int) variant);
+                    }
+
+                    roomConfigBuilder.Call<AndroidJavaObject>("setAutoMatchCriteria",
+                        roomConfigClass.CallStatic<AndroidJavaObject>("createAutoMatchCriteria", (int) minOpponents,
+                            (int) maxOpponents, (long) exclusiveBitMask));
+
+                    AndroidJavaObject messageReceivedListener = new AndroidJavaObject(
+                        "com.google.games.bridge.RealTimeMessageReceivedListenerProxy",
+                        new MessageReceivedListenerProxy(listener));
+                    roomConfigBuilder.Call<AndroidJavaObject>("setOnMessageReceivedListener",
+                        messageReceivedListener);
+
+                    AndroidJavaObject roomStatusUpdateCallback = new AndroidJavaObject(
+                        "com.google.games.bridge.RoomStatusUpdateCallbackProxy",
+                        new RoomStatusUpdateCallbackProxy(this, listener));
+                    roomConfigBuilder.Call<AndroidJavaObject>("setRoomStatusUpdateCallback",
+                        roomStatusUpdateCallback);
+
+                    mRoomConfig = roomConfigBuilder.Call<AndroidJavaObject>("build");
+                    mListener = listener;
+                }
+
+                using (var task = mClient.Call<AndroidJavaObject>("create", mRoomConfig))
+                {
+                    AndroidTaskUtils.AddOnFailureListener(
+                        task,
+                        e =>
+                        {
                             listener.OnRoomConnected(false);
                             CleanSession();
-                        }
-                    ));
+                        });
                 }
             }
         }
 
         public void CreateWithInvitationScreen(uint minOpponents, uint maxOpponents, uint variant,
-                                        RealTimeMultiplayerListener listener)
+            RealTimeMultiplayerListener listener)
         {
-            AndroidHelperFragment.InvitePlayerUI(minOpponents, maxOpponents, /* realTime= */ true, (status, result) =>
-            {
-                if (status != UIStatus.Valid)
+            AndroidHelperFragment.ShowSelectOpponentsUI(minOpponents, maxOpponents, /* realTime= */ true,
+                (status, result) =>
                 {
-                    listener.OnRoomConnected(false);
-                    CleanSession();
-                    return;
-                }
-
-                lock (mSessionLock)
-                {
-                    using (var roomConfigClass = new AndroidJavaClass ("com.google.android.gms.games.multiplayer.realtime.RoomConfig"))
+                    if (status != UIStatus.Valid)
                     {
-                        AndroidJavaObject roomUpdateCallback = new AndroidJavaObject ("com.google.games.bridge.RoomUpdateCallbackProxy",
-                                new RoomUpdateCallbackProxy ( /* parent= */ this, listener));
+                        listener.OnRoomConnected(false);
+                        CleanSession();
+                        return;
+                    }
 
-                        using (var roomConfigBuilder = roomConfigClass.CallStatic<AndroidJavaObject> ("builder", roomUpdateCallback)) {
+                    lock (mSessionLock)
+                    {
+                        using (var roomConfigClass =
+                            new AndroidJavaClass("com.google.android.gms.games.multiplayer.realtime.RoomConfig"))
+                        {
+                            AndroidJavaObject roomUpdateCallback = new AndroidJavaObject(
+                                "com.google.games.bridge.RoomUpdateCallbackProxy",
+                                new RoomUpdateCallbackProxy( /* parent= */ this, listener));
 
-                            if (result.MinAutomatchingPlayers > 0)
+                            using (var roomConfigBuilder =
+                                roomConfigClass.CallStatic<AndroidJavaObject>("builder", roomUpdateCallback))
                             {
-                                var autoMatchCriteria = roomConfigClass.CallStatic<AndroidJavaObject>("createAutoMatchCriteria", result.MinAutomatchingPlayers, result.MaxAutomatchingPlayers, /* exclusiveBitMask= */ (long) 0);
-                                roomConfigBuilder.Call<AndroidJavaObject>("setAutoMatchCriteria", autoMatchCriteria);
+                                if (result.MinAutomatchingPlayers > 0)
+                                {
+                                    var autoMatchCriteria = roomConfigClass.CallStatic<AndroidJavaObject>(
+                                        "createAutoMatchCriteria", result.MinAutomatchingPlayers,
+                                        result.MaxAutomatchingPlayers, /* exclusiveBitMask= */ (long) 0);
+                                    roomConfigBuilder.Call<AndroidJavaObject>("setAutoMatchCriteria",
+                                        autoMatchCriteria);
+                                }
+
+                                if (variant != 0)
+                                {
+                                    roomConfigBuilder.Call<AndroidJavaObject>("setVariant", (int) variant);
+                                }
+
+                                AndroidJavaObject messageReceivedListener =
+                                    new AndroidJavaObject(
+                                        "com.google.games.bridge.RealTimeMessageReceivedListenerProxy",
+                                        new MessageReceivedListenerProxy(listener));
+                                roomConfigBuilder.Call<AndroidJavaObject>("setOnMessageReceivedListener",
+                                    messageReceivedListener);
+
+                                AndroidJavaObject roomStatusUpdateCallback =
+                                    new AndroidJavaObject("com.google.games.bridge.RoomStatusUpdateCallbackProxy",
+                                        new RoomStatusUpdateCallbackProxy(this, listener));
+                                roomConfigBuilder.Call<AndroidJavaObject>("setRoomStatusUpdateCallback",
+                                    roomStatusUpdateCallback);
+
+                                roomConfigBuilder.Call<AndroidJavaObject>("addPlayersToInvite",
+                                    AndroidJavaConverter.ToJavaStringList(result.PlayerIdsToInvite));
+                                mRoomConfig = roomConfigBuilder.Call<AndroidJavaObject>("build");
+                                mListener = listener;
                             }
+                        }
 
-                            if (variant != 0)
-                            {
-                                roomConfigBuilder.Call<AndroidJavaObject>("setVariant", (int) variant);
-                            }
-
-                            AndroidJavaObject messageReceivedListener = new AndroidJavaObject ("com.google.games.bridge.RealTimeMessageReceivedListenerProxy", new MessageReceivedListenerProxy (listener));
-                            roomConfigBuilder.Call<AndroidJavaObject> ("setOnMessageReceivedListener", messageReceivedListener);
-
-                            AndroidJavaObject roomStatusUpdateCallback = new AndroidJavaObject ("com.google.games.bridge.RoomStatusUpdateCallbackProxy", new RoomStatusUpdateCallbackProxy (this, listener));
-                            roomConfigBuilder.Call<AndroidJavaObject> ("setRoomStatusUpdateCallback", roomStatusUpdateCallback);
-
-                            roomConfigBuilder.Call<AndroidJavaObject>("addPlayersToInvite", AndroidJavaConverter.ToJavaStringList(result.PlayerIdsToInvite));
-                            mRoomConfig = roomConfigBuilder.Call<AndroidJavaObject>("build");
-                            mListener = listener;
+                        using (var task = mClient.Call<AndroidJavaObject>("create", mRoomConfig))
+                        {
+                            AndroidTaskUtils.AddOnFailureListener(
+                                task,
+                                exception =>
+                                {
+                                    listener.OnRoomConnected(false);
+                                    CleanSession();
+                                });
                         }
                     }
-
-                    using (var task = mClient.Call<AndroidJavaObject>("create", mRoomConfig))
-                    {
-                        task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
-                            exception =>
-                            {
-                                listener.OnRoomConnected(false);
-                                CleanSession();
-                            }
-                        ));
-                    }
-                }
-            });
+                });
         }
 
         private int GetMinParticipantsToStart()
@@ -157,7 +190,8 @@ namespace GooglePlayGames.Android
             AndroidJavaObject autoMatchCriteria = mRoom.Call<AndroidJavaObject>("getAutoMatchCriteria");
             if (autoMatchCriteria != null)
             {
-                minParticipantsToStart = minParticipantsToStart + autoMatchCriteria.Call<int>("getInt", "min_automatch_players", 0);
+                minParticipantsToStart = minParticipantsToStart +
+                                         autoMatchCriteria.Call<int>("getInt", "min_automatch_players", 0);
             }
 
             if (mInvitation != null)
@@ -182,8 +216,8 @@ namespace GooglePlayGames.Android
                 return;
             }
 
-            AndroidHelperFragment.ShowWaitingRoomUI(mRoom, GetMinParticipantsToStart(), (response, room) => {
-
+            AndroidHelperFragment.ShowWaitingRoomUI(mRoom, GetMinParticipantsToStart(), (response, room) =>
+            {
                 if (response == AndroidHelperFragment.WaitingRoomUIStatus.Valid)
                 {
                     if (GetRoomStatus() == ROOM_STATUS_ACTIVE)
@@ -207,25 +241,29 @@ namespace GooglePlayGames.Android
             callback = ToOnGameThread(callback);
             using (var task = mInvitationsClient.Call<AndroidJavaObject>("loadInvitations"))
             {
-                task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
-                    annotatedData => {
-                      using (var invitationBuffer = annotatedData.Call<AndroidJavaObject>("get"))
-                      {
-                        int count = invitationBuffer.Call<int>("getCount");
-                        Invitation[] invitations = new Invitation[count];
-                        for (int i=0; i<count; i++) {
-                          Invitation invitation = AndroidJavaConverter.ToInvitation(invitationBuffer.Call<AndroidJavaObject>("get", i));
-                          invitations[i] = invitation;
+                AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
+                    task,
+                    annotatedData =>
+                    {
+                        using (var invitationBuffer = annotatedData.Call<AndroidJavaObject>("get"))
+                        {
+                            int count = invitationBuffer.Call<int>("getCount");
+                            Invitation[] invitations = new Invitation[count];
+                            for (int i = 0; i < count; i++)
+                            {
+                                Invitation invitation =
+                                    AndroidJavaConverter.ToInvitation(
+                                        invitationBuffer.Call<AndroidJavaObject>("get", i));
+                                invitations[i] = invitation;
+                            }
+
+                            callback(invitations);
                         }
-                        callback(invitations);
-                      }
-                    }
-                ));
-                task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
-                    exception => {
-                      callback(null);
-                    }
-                ));
+                    });
+
+                AndroidTaskUtils.AddOnFailureListener(
+                    task,
+                    exception => callback(null));
             }
         }
 
@@ -236,7 +274,8 @@ namespace GooglePlayGames.Android
 
         public void AcceptFromInbox(RealTimeMultiplayerListener listener)
         {
-            AndroidHelperFragment.ShowInvitationInboxUI((status, invitation) => {
+            AndroidHelperFragment.ShowInvitationInboxUI((status, invitation) =>
+            {
                 if (status != UIStatus.Valid)
                 {
                     OurUtils.Logger.d("User did not complete invitation screen.");
@@ -259,46 +298,58 @@ namespace GooglePlayGames.Android
                 if (roomStatus == ROOM_STATUS_ACTIVE)
                 {
                     OurUtils.Logger.e("Received attempt to accept invitation without cleaning up " +
-                    "active session.");
+                                      "active session.");
                     listener.OnRoomConnected(false);
                     CleanSession();
                     return;
                 }
 
                 FindInvitation(invitationId, fail => listener.OnRoomConnected(false),
-                    invitation => {
-
+                    invitation =>
+                    {
                         mInvitation = invitation;
                         // build room config
-                        using (var roomConfigClass = new AndroidJavaClass ("com.google.android.gms.games.multiplayer.realtime.RoomConfig"))
+                        using (var roomConfigClass =
+                            new AndroidJavaClass("com.google.android.gms.games.multiplayer.realtime.RoomConfig"))
                         {
-                            AndroidJavaObject roomUpdateCallback = new AndroidJavaObject ("com.google.games.bridge.RoomUpdateCallbackProxy",
-                                    new RoomUpdateCallbackProxy ( /* parent= */ this, listener));
+                            AndroidJavaObject roomUpdateCallback = new AndroidJavaObject(
+                                "com.google.games.bridge.RoomUpdateCallbackProxy",
+                                new RoomUpdateCallbackProxy( /* parent= */ this, listener));
 
-                            using (var roomConfigBuilder = roomConfigClass.CallStatic<AndroidJavaObject> ("builder", roomUpdateCallback)) {
+                            using (var roomConfigBuilder =
+                                roomConfigClass.CallStatic<AndroidJavaObject>("builder", roomUpdateCallback))
+                            {
+                                AndroidJavaObject messageReceivedListener =
+                                    new AndroidJavaObject(
+                                        "com.google.games.bridge.RealTimeMessageReceivedListenerProxy",
+                                        new MessageReceivedListenerProxy(listener));
+                                roomConfigBuilder.Call<AndroidJavaObject>("setOnMessageReceivedListener",
+                                    messageReceivedListener);
 
-                                AndroidJavaObject messageReceivedListener = new AndroidJavaObject ("com.google.games.bridge.RealTimeMessageReceivedListenerProxy", new MessageReceivedListenerProxy (listener));
-                                roomConfigBuilder.Call<AndroidJavaObject> ("setOnMessageReceivedListener", messageReceivedListener);
+                                AndroidJavaObject roomStatusUpdateCallback =
+                                    new AndroidJavaObject("com.google.games.bridge.RoomStatusUpdateCallbackProxy",
+                                        new RoomStatusUpdateCallbackProxy(this, listener));
+                                roomConfigBuilder.Call<AndroidJavaObject>("setRoomStatusUpdateCallback",
+                                    roomStatusUpdateCallback);
 
-                                AndroidJavaObject roomStatusUpdateCallback = new AndroidJavaObject ("com.google.games.bridge.RoomStatusUpdateCallbackProxy", new RoomStatusUpdateCallbackProxy (this, listener));
-                                roomConfigBuilder.Call<AndroidJavaObject> ("setRoomStatusUpdateCallback", roomStatusUpdateCallback);
+                                roomConfigBuilder.Call<AndroidJavaObject>("setInvitationIdToAccept", invitationId);
 
-                                roomConfigBuilder.Call<AndroidJavaObject> ("setInvitationIdToAccept", invitationId);
-
-                                mRoomConfig = roomConfigBuilder.Call<AndroidJavaObject> ("build");
+                                mRoomConfig = roomConfigBuilder.Call<AndroidJavaObject>("build");
                                 mListener = listener;
 
-                                using (var task = mClient.Call<AndroidJavaObject> ("join", mRoomConfig)) {
-                                    task.Call<AndroidJavaObject> ("addOnFailureListener", new TaskOnFailedProxy (
-                                        e => {
-                                            listener.OnRoomConnected (false);
+                                using (var task = mClient.Call<AndroidJavaObject>("join", mRoomConfig))
+                                {
+                                    AndroidTaskUtils.AddOnFailureListener(
+                                        task,
+                                        e =>
+                                        {
+                                            listener.OnRoomConnected(false);
                                             CleanSession();
-                                        }
-                                    ));
+                                        });
                                 }
                             }
                         }
-                });
+                    });
             }
         }
 
@@ -306,11 +357,13 @@ namespace GooglePlayGames.Android
         {
             if (reliable)
             {
-                List<Participant> participants = AndroidJavaConverter.ToParticipantList(mRoom.Call<AndroidJavaObject>("getParticipants"));
+                List<Participant> participants =
+                    AndroidJavaConverter.ToParticipantList(mRoom.Call<AndroidJavaObject>("getParticipants"));
                 foreach (Participant participant in participants)
                 {
                     SendMessage(true, participant.ParticipantId, data);
                 }
+
                 return;
             }
 
@@ -348,7 +401,9 @@ namespace GooglePlayGames.Android
             string roomId = mRoom.Call<string>("getRoomId");
             if (reliable)
             {
-                mClient.Call<AndroidJavaObject>("sendReliableMessage", data, roomId, participantId, new AndroidJavaObject("com.google.games.bridge.ReliableMessageSentCallbackProxy", new ReliableMessageSentCallbackProxy(this)));
+                mClient.Call<AndroidJavaObject>("sendReliableMessage", data, roomId, participantId,
+                    new AndroidJavaObject("com.google.games.bridge.ReliableMessageSentCallbackProxy",
+                        new ReliableMessageSentCallbackProxy(this)));
             }
             else
             {
@@ -370,7 +425,8 @@ namespace GooglePlayGames.Android
             }
 
             List<Participant> result = new List<Participant>();
-            foreach (Participant participant in AndroidJavaConverter.ToParticipantList(mRoom.Call<AndroidJavaObject>("getParticipants")))
+            foreach (Participant participant in AndroidJavaConverter.ToParticipantList(
+                mRoom.Call<AndroidJavaObject>("getParticipants")))
             {
                 if (participant.IsConnectedToRoom)
                 {
@@ -387,6 +443,7 @@ namespace GooglePlayGames.Android
             {
                 return null;
             }
+
             return GetParticipant(mAndroidClient.GetUserId());
         }
 
@@ -396,6 +453,7 @@ namespace GooglePlayGames.Android
             {
                 return null;
             }
+
             AndroidJavaObject participant = mRoom.Call<AndroidJavaObject>("getParticipant", participantId);
             return AndroidJavaConverter.ToParticipant(participant);
         }
@@ -410,7 +468,7 @@ namespace GooglePlayGames.Android
             mInvitation = null;
             if (GetRoomStatus() == ROOM_STATUS_ACTIVE)
             {
-                mClient.Call<AndroidJavaObject> ("leave", mRoomConfig, mRoom.Call<String>("getRoomId"));
+                mClient.Call<AndroidJavaObject>("leave", mRoomConfig, mRoom.Call<String>("getRoomId"));
                 return;
             }
 
@@ -433,58 +491,60 @@ namespace GooglePlayGames.Android
 
         public void DeclineInvitation(string invitationId)
         {
-            FindInvitation(invitationId, fail => {}, invitation =>
-            {
-                mClient.Call<AndroidJavaObject>("declineInvitation", invitationId);
-            });
+            FindInvitation(invitationId, fail => { },
+                invitation => { mClient.Call<AndroidJavaObject>("declineInvitation", invitationId); });
         }
 
         private void FindInvitation(string invitationId, Action<bool> fail, Action<Invitation> callback)
         {
             using (var task = mInvitationsClient.Call<AndroidJavaObject>("loadInvitations"))
             {
-                task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<AndroidJavaObject>(
+                AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
+                    task,
                     annotatedData =>
                     {
                         using (var invitationBuffer = annotatedData.Call<AndroidJavaObject>("get"))
                         {
                             int count = invitationBuffer.Call<int>("getCount");
-                            for (int i=0; i<count; i++)
+                            for (int i = 0; i < count; i++)
                             {
-                                Invitation invitation = AndroidJavaConverter.ToInvitation(invitationBuffer.Call<AndroidJavaObject>("get", i));
+                                Invitation invitation =
+                                    AndroidJavaConverter.ToInvitation(
+                                        invitationBuffer.Call<AndroidJavaObject>("get", i));
                                 if (invitation.InvitationId == invitationId)
                                 {
                                     callback(invitation);
                                     return;
                                 }
                             }
+
                             OurUtils.Logger.e("Invitation with ID " + invitationId + " couldn't be found");
                             fail(true);
                         }
-                    }
-                ));
-                task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(
+                    });
+
+                AndroidTaskUtils.AddOnFailureListener(
+                    task,
                     exception =>
                     {
                         OurUtils.Logger.e("Couldn't load invitations.");
                         fail(true);
-                    }
-                ));
+                    });
             }
         }
 
-        private class ReliableMessageSentCallbackProxy: AndroidJavaProxy
+        private class ReliableMessageSentCallbackProxy : AndroidJavaProxy
         {
             private AndroidRealTimeMultiplayerClient mParent;
 
-            public ReliableMessageSentCallbackProxy(AndroidRealTimeMultiplayerClient parent) : base("com/google/games/bridge/ReliableMessageSentCallbackProxy$Callback")
+            public ReliableMessageSentCallbackProxy(AndroidRealTimeMultiplayerClient parent) : base(
+                "com/google/games/bridge/ReliableMessageSentCallbackProxy$Callback")
             {
                 mParent = parent;
             }
 
             public void onRealTimeMessageSent(int statusCode, int tokenId, string recipientParticipantId)
             {
-
             }
         }
 
@@ -493,7 +553,9 @@ namespace GooglePlayGames.Android
             private RealTimeMultiplayerListener mListener;
             private AndroidRealTimeMultiplayerClient mParent;
 
-            public RoomStatusUpdateCallbackProxy(AndroidRealTimeMultiplayerClient parent, RealTimeMultiplayerListener listener) : base("com/google/games/bridge/RoomStatusUpdateCallbackProxy$Callback")
+            public RoomStatusUpdateCallbackProxy(AndroidRealTimeMultiplayerClient parent,
+                RealTimeMultiplayerListener listener) : base(
+                "com/google/games/bridge/RoomStatusUpdateCallbackProxy$Callback")
             {
                 mListener = listener;
                 mParent = parent;
@@ -533,16 +595,18 @@ namespace GooglePlayGames.Android
             {
                 mParent.mRoom = room;
                 int size = participantIds.Get<int>("size");
-                for (int i=0; i<size; i++)
+                for (int i = 0; i < size; i++)
                 {
                     String participantId = participantIds.Call<String>("get", i);
-                    Participant participant = AndroidJavaConverter.ToParticipant(mParent.mRoom.Call<AndroidJavaObject>("getParticipant", participantId));
+                    Participant participant =
+                        AndroidJavaConverter.ToParticipant(
+                            mParent.mRoom.Call<AndroidJavaObject>("getParticipant", participantId));
 
                     HashSet<Participant.ParticipantStatus> failedStatus = new HashSet<Participant.ParticipantStatus>
-                            {
-                                Participant.ParticipantStatus.Declined,
-                                Participant.ParticipantStatus.Left
-                            };
+                    {
+                        Participant.ParticipantStatus.Declined,
+                        Participant.ParticipantStatus.Left
+                    };
                     if (!failedStatus.Contains(participant.Status))
                     {
                         continue;
@@ -550,7 +614,8 @@ namespace GooglePlayGames.Android
 
                     mListener.OnParticipantLeft(participant);
 
-                    if (mParent.GetRoomStatus() != ROOM_STATUS_CONNECTING && mParent.GetRoomStatus() != ROOM_STATUS_AUTO_MATCHING)
+                    if (mParent.GetRoomStatus() != ROOM_STATUS_CONNECTING &&
+                        mParent.GetRoomStatus() != ROOM_STATUS_AUTO_MATCHING)
                     {
                         mParent.LeaveRoom();
                     }
@@ -611,7 +676,7 @@ namespace GooglePlayGames.Android
             private void handleConnectedSetChanged(AndroidJavaObject room)
             {
                 HashSet<string> oldConnectedSet = new HashSet<string>();
-                foreach(Participant participant in mParent.GetConnectedParticipants())
+                foreach (Participant participant in mParent.GetConnectedParticipants())
                 {
                     oldConnectedSet.Add(participant.ParticipantId);
                 }
@@ -619,7 +684,7 @@ namespace GooglePlayGames.Android
                 mParent.mRoom = room;
 
                 HashSet<string> connectedSet = new HashSet<string>();
-                foreach(Participant participant in mParent.GetConnectedParticipants())
+                foreach (Participant participant in mParent.GetConnectedParticipants())
                 {
                     connectedSet.Add(participant.ParticipantId);
                 }
@@ -632,9 +697,9 @@ namespace GooglePlayGames.Android
                 }
 
                 List<string> noLongerConnected = new List<string>();
-                foreach(string id in oldConnectedSet)
+                foreach (string id in oldConnectedSet)
                 {
-                    if(!connectedSet.Contains(id))
+                    if (!connectedSet.Contains(id))
                     {
                         noLongerConnected.Add(id);
                     }
@@ -642,7 +707,8 @@ namespace GooglePlayGames.Android
 
                 if (mParent.GetRoomStatus() == ROOM_STATUS_DELETED)
                 {
-                    OurUtils.Logger.e("Participants disconnected during room setup, failing. " + "Participants were: " + string.Join(",", noLongerConnected.ToArray()));
+                    OurUtils.Logger.e("Participants disconnected during room setup, failing. " + "Participants were: " +
+                                      string.Join(",", noLongerConnected.ToArray()));
                     mParent.mListener.OnRoomConnected(false);
                     mParent.CleanSession();
                     return;
@@ -664,7 +730,8 @@ namespace GooglePlayGames.Android
         {
             private RealTimeMultiplayerListener mListener;
 
-            public MessageReceivedListenerProxy(RealTimeMultiplayerListener listener) : base("com/google/games/bridge/RealTimeMessageReceivedListenerProxy$Callback")
+            public MessageReceivedListenerProxy(RealTimeMultiplayerListener listener) : base(
+                "com/google/games/bridge/RealTimeMessageReceivedListenerProxy$Callback")
             {
                 mListener = listener;
             }
@@ -680,19 +747,22 @@ namespace GooglePlayGames.Android
             private RealTimeMultiplayerListener mListener;
             private AndroidRealTimeMultiplayerClient mParent;
 
-            public RoomUpdateCallbackProxy(AndroidRealTimeMultiplayerClient parent, RealTimeMultiplayerListener listener) : base("com/google/games/bridge/RoomUpdateCallbackProxy$Callback")
+            public RoomUpdateCallbackProxy(AndroidRealTimeMultiplayerClient parent,
+                RealTimeMultiplayerListener listener) : base("com/google/games/bridge/RoomUpdateCallbackProxy$Callback")
             {
                 mListener = listener;
                 mParent = parent;
             }
 
-            public void onRoomCreated( /* @OnRoomCreatedStatusCodes */ int statusCode, /* @Nullable Room */ AndroidJavaObject room)
+            public void onRoomCreated( /* @OnRoomCreatedStatusCodes */ int statusCode, /* @Nullable Room */
+                AndroidJavaObject room)
             {
                 mParent.mRoom = room;
                 mListener.OnRoomSetupProgress(mParent.GetPercentComplete());
             }
 
-            public void onJoinedRoom( /* @OnJoinedRoomStatusCodes */ int statusCode, /* @Nullable Room */ AndroidJavaObject room)
+            public void onJoinedRoom( /* @OnJoinedRoomStatusCodes */ int statusCode, /* @Nullable Room */
+                AndroidJavaObject room)
             {
                 mParent.mRoom = room;
             }
@@ -703,7 +773,8 @@ namespace GooglePlayGames.Android
                 mParent.CleanSession();
             }
 
-            public void onRoomConnected( /* @OnRoomConnectedStatusCodes */ int statusCode, /* @Nullable Room */ AndroidJavaObject room)
+            public void onRoomConnected( /* @OnRoomConnectedStatusCodes */ int statusCode, /* @Nullable Room */
+                AndroidJavaObject room)
             {
                 mListener.OnRoomConnected(true);
             }

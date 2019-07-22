@@ -33,10 +33,10 @@ namespace TicTacToe
         /// The required tags for the NearbyDroid sample.
         /// </summary>
         private static string[] requiredTags =
-            {
-                "MarkX",
-                "MarkO"
-            };
+        {
+            "MarkX",
+            "MarkO"
+        };
 
 
         /// <summary>
@@ -49,9 +49,9 @@ namespace TicTacToe
             Debug.Log("Checking for custom tags and layers");
 
             // Open tag manager
-            SerializedObject tagManager = 
+            SerializedObject tagManager =
                 new SerializedObject(AssetDatabase.LoadAllAssetsAtPath(
-                        "ProjectSettings/TagManager.asset")[0]);
+                    "ProjectSettings/TagManager.asset")[0]);
 
             CheckTags(tagManager);
 

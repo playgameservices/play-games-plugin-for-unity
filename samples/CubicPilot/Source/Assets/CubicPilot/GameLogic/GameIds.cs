@@ -26,38 +26,39 @@ namespace CubicPilot.GameLogic
             public const string FullCombo = GPGSIds.achievement_full_combo;
             public const string ClearAllLevels = GPGSIds.achievement_clear_all_levels;
             public const string PerfectAccuracy = GPGSIds.achievement_perfect_accuracy;
-            public readonly static string[] ForRank =
-                {
-                    GPGSIds.achievement_sargent,
-                    GPGSIds.achievement_captain,
-                    GPGSIds.achievement_admiral
-                };
 
-            public readonly static int[] RankRequired = { 3, 6, 10 };
+            public readonly static string[] ForRank =
+            {
+                GPGSIds.achievement_sargent,
+                GPGSIds.achievement_captain,
+                GPGSIds.achievement_admiral
+            };
+
+            public readonly static int[] RankRequired = {3, 6, 10};
 
             public readonly static string[] ForTotalStars =
-                {
-                    GPGSIds.achievement_1_dozen_stars,
-                    GPGSIds.achievement_two_dozen_stars,
-                    GPGSIds.achievement_3_dozen_stars
-                };
+            {
+                GPGSIds.achievement_1_dozen_stars,
+                GPGSIds.achievement_two_dozen_stars,
+                GPGSIds.achievement_3_dozen_stars
+            };
 
-            public readonly static int[] TotalStarsRequired = { 12, 24, 36 };
+            public readonly static int[] TotalStarsRequired = {12, 24, 36};
 
             // incrementals:
             public readonly static string[] IncGameplaySeconds =
-                {
-                    GPGSIds.achievement_five_minute_master,
-                    GPGSIds.achievement_30_minutes_of_excitement,
-                    GPGSIds.achievement_procrastinate_much
-                };
+            {
+                GPGSIds.achievement_five_minute_master,
+                GPGSIds.achievement_30_minutes_of_excitement,
+                GPGSIds.achievement_procrastinate_much
+            };
 
             public readonly static string[] IncGameplayRounds =
-                {
-                    GPGSIds.achievement_played_2_rounds,
-                    GPGSIds.achievement_played_10_rounds,
-                    GPGSIds.achievement_played_25_rounds
-                };
+            {
+                GPGSIds.achievement_played_2_rounds,
+                GPGSIds.achievement_played_10_rounds,
+                GPGSIds.achievement_played_25_rounds
+            };
         }
 
         // Leaderboard ID (as given by Developer Console)

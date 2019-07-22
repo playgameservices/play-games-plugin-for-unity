@@ -17,11 +17,11 @@
 #if UNITY_ANDROID
 namespace GooglePlayGames.OurUtils
 {
-  using UnityEngine;
-  using System;
+    using UnityEngine;
+    using System;
 
-  public static class PlatformUtils
-  {
+    public static class PlatformUtils
+    {
         /// <summary>
         /// Check if the Google Play Games platform is supported at runtime.
         /// </summary>
@@ -30,9 +30,9 @@ namespace GooglePlayGames.OurUtils
         {
             get
             {
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
                 return false;
-    #else
+#else
                 var up = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
                 var ca = up.GetStatic<AndroidJavaObject>("currentActivity");
                 var packageManager = ca.Call<AndroidJavaObject>("getPackageManager");
@@ -41,7 +41,8 @@ namespace GooglePlayGames.OurUtils
                 //if the app is installed, no errors. Else, doesn't get past next line
                 try
                 {
-                    launchIntent = packageManager.Call<AndroidJavaObject>("getLaunchIntentForPackage", "com.google.android.play.games");
+                    launchIntent =
+ packageManager.Call<AndroidJavaObject>("getLaunchIntentForPackage", "com.google.android.play.games");
                 }
                 catch (Exception)
                 {
@@ -49,10 +50,9 @@ namespace GooglePlayGames.OurUtils
                 }
 
                 return launchIntent != null;
-    #endif
+#endif
             }
         }
-  }
+    }
 }
 #endif //UNITY_ANDROID
-

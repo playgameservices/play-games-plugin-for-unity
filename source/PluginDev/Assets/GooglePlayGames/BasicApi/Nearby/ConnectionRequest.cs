@@ -24,7 +24,7 @@ namespace GooglePlayGames.BasicApi.Nearby
         private readonly byte[] mPayload;
 
         public ConnectionRequest(string remoteEndpointId,
-                             string remoteEndpointName, string serviceId, byte[] payload)
+            string remoteEndpointName, string serviceId, byte[] payload)
         {
             Logger.d("Constructing ConnectionRequest");
             mRemoteEndpoint = new EndpointDetails(remoteEndpointId, remoteEndpointName, serviceId);
@@ -33,18 +33,12 @@ namespace GooglePlayGames.BasicApi.Nearby
 
         public EndpointDetails RemoteEndpoint
         {
-            get
-            {
-                return mRemoteEndpoint;
-            }
+            get { return mRemoteEndpoint; }
         }
 
         public byte[] Payload
         {
-            get
-            {
-                return mPayload;
-            }
+            get { return mPayload; }
         }
     }
 }
