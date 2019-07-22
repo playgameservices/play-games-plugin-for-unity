@@ -40,11 +40,9 @@ namespace GooglePlayGames.Android
         public static AndroidJavaObject GetDefaultPopupView()
         {
             using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
+            using (var activity = AndroidHelperFragment.GetActivity())
             {
-                using (var activity = AndroidHelperFragment.GetActivity())
-                {
-                    return helperFragment.CallStatic<AndroidJavaObject>("getDecorView", activity);
-                }
+                return helperFragment.CallStatic<AndroidJavaObject>("getDecorView", activity);
             }
         }
 
@@ -222,26 +220,24 @@ namespace GooglePlayGames.Android
             Action<WaitingRoomUIStatus, AndroidJavaObject> cb)
         {
             using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
+            using (var task = helperFragment.CallStatic<AndroidJavaObject>("showWaitingRoomUI",
+                AndroidHelperFragment.GetActivity(), room, minParticipantsToStart))
             {
-                using (var task = helperFragment.CallStatic<AndroidJavaObject>("showWaitingRoomUI",
-                    AndroidHelperFragment.GetActivity(), room, minParticipantsToStart))
-                {
-                    AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
-                        task,
-                        result =>
-                        {
-                            cb.Invoke((WaitingRoomUIStatus) result.Get<int>("status"),
-                                result.Get<AndroidJavaObject>("room"));
-                        });
+                AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
+                    task,
+                    result =>
+                    {
+                        cb.Invoke((WaitingRoomUIStatus) result.Get<int>("status"),
+                            result.Get<AndroidJavaObject>("room"));
+                    });
 
-                    AndroidTaskUtils.AddOnFailureListener(
-                        task,
-                        exception =>
-                        {
-                            Debug.Log("ShowWaitingRoomUI failed with exception");
-                            cb.Invoke(WaitingRoomUIStatus.InternalError, null);
-                        });
-                }
+                AndroidTaskUtils.AddOnFailureListener(
+                    task,
+                    exception =>
+                    {
+                        Debug.Log("ShowWaitingRoomUI failed with exception");
+                        cb.Invoke(WaitingRoomUIStatus.InternalError, null);
+                    });
             }
         }
 
