@@ -215,7 +215,6 @@ namespace GooglePlayGames.Android
             InternalError = -2,
         }
 
-        // first callback param type will be enumerated.
         public static void ShowWaitingRoomUI(AndroidJavaObject room, int minParticipantsToStart,
             Action<WaitingRoomUIStatus, AndroidJavaObject> cb)
         {

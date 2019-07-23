@@ -15,15 +15,18 @@ namespace GooglePlayGames.Android
 
         private const float InitialPercentComplete = 20.0F;
 
-        private static readonly int ROOM_VARIANT_DEFAULT = -1;
-        private static readonly int ROOM_STATUS_INVITING = 0;
-        private static readonly int ROOM_STATUS_AUTO_MATCHING = 1;
-        private static readonly int ROOM_STATUS_CONNECTING = 2;
-        private static readonly int ROOM_STATUS_ACTIVE = 3;
-        private static readonly int ROOM_STATUS_DELETED = 4;
+        private enum RoomStatus
+        {
+            NotCreated = -1, // to handle null room case.
+            Inviting = 0, // com.google.android.gms.games.multiplayer.realtime.ROOM_STATUS_INVITING
+            AutoMatching = 1, // com.google.android.gms.games.multiplayer.realtime.ROOM_STATUS_AUTO_MATCHING
+            Connecting = 2, // com.google.android.gms.games.multiplayer.realtime.ROOM_STATUS_CONNECTING
+            Active = 3, // com.google.android.gms.games.multiplayer.realtime.ROOM_STATUS_ACTIVE
+            Deleted = 4, // com.google.android.gms.games.multiplayer.realtime.ROOM_STATUS_DELETED
+        };
 
         private volatile AndroidClient mAndroidClient;
-        private volatile AndroidJavaObject mClient;
+        private volatile AndroidJavaObject mRtmpClient;
         private volatile AndroidJavaObject mInvitationsClient;
 
         private AndroidJavaObject mRoom;
@@ -37,7 +40,7 @@ namespace GooglePlayGames.Android
             mAndroidClient = androidClient;
             using (var gamesClass = new AndroidJavaClass("com.google.android.gms.games.Games"))
             {
-                mClient = gamesClass.CallStatic<AndroidJavaObject>("getRealTimeMultiplayerClient",
+                mRtmpClient = gamesClass.CallStatic<AndroidJavaObject>("getRealTimeMultiplayerClient",
                     AndroidHelperFragment.GetActivity(), account);
                 mInvitationsClient = gamesClass.CallStatic<AndroidJavaObject>("getInvitationsClient",
                     AndroidHelperFragment.GetActivity(), account);
@@ -56,7 +59,7 @@ namespace GooglePlayGames.Android
         {
             lock (mSessionLock)
             {
-                if (GetRoomStatus() == ROOM_STATUS_ACTIVE)
+                if (GetRoomStatus() == RoomStatus.Active)
                 {
                     OurUtils.Logger.e("Received attempt to create a new room without cleaning up the old one.");
                     return;
@@ -100,7 +103,7 @@ namespace GooglePlayGames.Android
                     mListener = listener;
                 }
 
-                using (var task = mClient.Call<AndroidJavaObject>("create", mRoomConfig))
+                using (var task = mRtmpClient.Call<AndroidJavaObject>("create", mRoomConfig))
                 {
                     AndroidTaskUtils.AddOnFailureListener(
                         task,
@@ -175,7 +178,7 @@ namespace GooglePlayGames.Android
                             mListener = listener;
                         }
 
-                        using (var task = mClient.Call<AndroidJavaObject>("create", mRoomConfig))
+                        using (var task = mRtmpClient.Call<AndroidJavaObject>("create", mRoomConfig))
                         {
                             AndroidTaskUtils.AddOnFailureListener(
                                 task,
@@ -232,7 +235,7 @@ namespace GooglePlayGames.Android
             {
                 if (response == AndroidHelperFragment.WaitingRoomUIStatus.Valid)
                 {
-                    if (GetRoomStatus() == ROOM_STATUS_ACTIVE)
+                    if (GetRoomStatus() == RoomStatus.Active)
                     {
                         mListener.OnRoomConnected(true);
                     }
@@ -263,13 +266,10 @@ namespace GooglePlayGames.Android
                             Invitation[] invitations = new Invitation[count];
                             for (int i = 0; i < count; i++)
                             {
-                                Invitation invitation;
                                 using (var invitationObject = invitationBuffer.Call<AndroidJavaObject>("get", i))
                                 {
-                                    invitation = AndroidJavaConverter.ToInvitation(invitationObject);
+                                    invitations[i] = AndroidJavaConverter.ToInvitation(invitationObject);
                                 }
-
-                                invitations[i] = invitation;
                             }
 
                             callback(invitations);
@@ -280,11 +280,6 @@ namespace GooglePlayGames.Android
                     task,
                     exception => callback(null));
             }
-        }
-
-        private static Action<T> ToOnGameThread<T>(Action<T> toConvert)
-        {
-            return (val) => PlayGamesHelperObject.RunOnGameThread(() => toConvert(val));
         }
 
         public void AcceptFromInbox(RealTimeMultiplayerListener listener)
@@ -309,13 +304,11 @@ namespace GooglePlayGames.Android
         {
             lock (mSessionLock)
             {
-                int roomStatus = GetRoomStatus();
-                if (roomStatus == ROOM_STATUS_ACTIVE)
+                if (GetRoomStatus() == RoomStatus.Active)
                 {
                     OurUtils.Logger.e("Received attempt to accept invitation without cleaning up " +
                                       "active session.");
                     listener.OnRoomConnected(false);
-                    CleanSession();
                     return;
                 }
 
@@ -347,7 +340,7 @@ namespace GooglePlayGames.Android
                             mRoomConfig = roomConfigBuilder.Call<AndroidJavaObject>("build");
                             mListener = listener;
 
-                            using (var task = mClient.Call<AndroidJavaObject>("join", mRoomConfig))
+                            using (var task = mRtmpClient.Call<AndroidJavaObject>("join", mRoomConfig))
                             {
                                 AndroidTaskUtils.AddOnFailureListener(
                                     task,
@@ -375,15 +368,15 @@ namespace GooglePlayGames.Android
                 return;
             }
 
-            int roomStatus = GetRoomStatus();
-            if (roomStatus != ROOM_STATUS_ACTIVE && roomStatus != ROOM_STATUS_CONNECTING)
+            var roomStatus = GetRoomStatus();
+            if (roomStatus != RoomStatus.Active && roomStatus != RoomStatus.Connecting)
             {
                 OurUtils.Logger.d("Sending message is not allowed in this state.");
                 return;
             }
 
             string roomId = mRoom.Call<string>("getRoomId");
-            mClient.Call<AndroidJavaObject>("sendUnreliableMessageToOthers", data, roomId);
+            using (mRtmpClient.Call<AndroidJavaObject>("sendUnreliableMessageToOthers", data, roomId)) ;
         }
 
         public void SendMessageToAll(bool reliable, byte[] data, int offset, int length)
@@ -393,8 +386,8 @@ namespace GooglePlayGames.Android
 
         public void SendMessage(bool reliable, string participantId, byte[] data)
         {
-            int roomStatus = GetRoomStatus();
-            if (roomStatus != ROOM_STATUS_ACTIVE && roomStatus != ROOM_STATUS_CONNECTING)
+            var roomStatus = GetRoomStatus();
+            if (roomStatus != RoomStatus.Active && roomStatus != RoomStatus.Connecting)
             {
                 OurUtils.Logger.d("Sending message is not allowed in this state.");
                 return;
@@ -409,13 +402,13 @@ namespace GooglePlayGames.Android
             string roomId = mRoom.Call<string>("getRoomId");
             if (reliable)
             {
-                using (mClient.Call<AndroidJavaObject>("sendReliableMessage", data, roomId, participantId,
+                using (mRtmpClient.Call<AndroidJavaObject>("sendReliableMessage", data, roomId, participantId,
                     /* callback= */ null))
                     ;
                 return;
             }
 
-            using (mClient.Call<AndroidJavaObject>("sendUnreliableMessage", data, roomId, participantId)) ;
+            using (mRtmpClient.Call<AndroidJavaObject>("sendUnreliableMessage", data, roomId, participantId)) ;
         }
 
         public void SendMessage(bool reliable, string participantId, byte[] data, int offset, int length)
@@ -425,8 +418,8 @@ namespace GooglePlayGames.Android
 
         public List<Participant> GetConnectedParticipants()
         {
-            int roomStatus = GetRoomStatus();
-            if (roomStatus != ROOM_STATUS_ACTIVE && roomStatus != ROOM_STATUS_CONNECTING)
+            var roomStatus = GetRoomStatus();
+            if (roomStatus != RoomStatus.Active && roomStatus != RoomStatus.Connecting)
             {
                 return new List<Participant>();
             }
@@ -463,7 +456,7 @@ namespace GooglePlayGames.Android
 
         public Participant GetSelf()
         {
-            if (GetRoomStatus() != ROOM_STATUS_ACTIVE)
+            if (GetRoomStatus() != RoomStatus.Active)
             {
                 return null;
             }
@@ -482,7 +475,7 @@ namespace GooglePlayGames.Android
 
         public Participant GetParticipant(string participantId)
         {
-            if (GetRoomStatus() != ROOM_STATUS_ACTIVE)
+            if (GetRoomStatus() != RoomStatus.Active)
             {
                 Debug.Log("GetParticipant: room status is " + GetRoomStatus());
                 return null;
@@ -502,9 +495,9 @@ namespace GooglePlayGames.Android
         public void LeaveRoom()
         {
             mInvitation = null;
-            if (GetRoomStatus() == ROOM_STATUS_ACTIVE)
+            if (GetRoomStatus() == RoomStatus.Active)
             {
-                using (mClient.Call<AndroidJavaObject>("leave", mRoomConfig, mRoom.Call<String>("getRoomId"))) ;
+                using (mRtmpClient.Call<AndroidJavaObject>("leave", mRoomConfig, mRoom.Call<String>("getRoomId"))) ;
                 return;
             }
 
@@ -517,12 +510,12 @@ namespace GooglePlayGames.Android
 
         public bool IsRoomConnected()
         {
-            return GetRoomStatus() == ROOM_STATUS_ACTIVE;
+            return GetRoomStatus() == RoomStatus.Active;
         }
 
-        private int GetRoomStatus()
+        private RoomStatus GetRoomStatus()
         {
-            return mRoom != null ? mRoom.Call<int>("getStatus") : ROOM_VARIANT_DEFAULT;
+            return mRoom != null ? (RoomStatus) mRoom.Call<int>("getStatus") : RoomStatus.NotCreated;
         }
 
         public void DeclineInvitation(string invitationId)
@@ -530,7 +523,7 @@ namespace GooglePlayGames.Android
             FindInvitation(invitationId, fail => { },
                 invitation =>
                 {
-                    using (mClient.Call<AndroidJavaObject>("declineInvitation", invitationId)) ;
+                    using (mRtmpClient.Call<AndroidJavaObject>("declineInvitation", invitationId)) ;
                 });
         }
 
@@ -641,8 +634,8 @@ namespace GooglePlayGames.Android
 
                     mListener.OnParticipantLeft(participant);
 
-                    if (mParent.GetRoomStatus() != ROOM_STATUS_CONNECTING &&
-                        mParent.GetRoomStatus() != ROOM_STATUS_AUTO_MATCHING)
+                    if (mParent.GetRoomStatus() != RoomStatus.Connecting &&
+                        mParent.GetRoomStatus() != RoomStatus.AutoMatching)
                     {
                         mParent.LeaveRoom();
                     }
@@ -651,7 +644,7 @@ namespace GooglePlayGames.Android
 
             public void onConnectedToRoom(AndroidJavaObject room)
             {
-                if (mParent.GetRoomStatus() == ROOM_STATUS_ACTIVE)
+                if (mParent.GetRoomStatus() == RoomStatus.Active)
                 {
                     mParent.mRoom = room;
                 }
@@ -663,7 +656,7 @@ namespace GooglePlayGames.Android
 
             public void onDisconnectedFromRoom(AndroidJavaObject room)
             {
-                if (mParent.GetRoomStatus() == ROOM_STATUS_ACTIVE)
+                if (mParent.GetRoomStatus() == RoomStatus.Active)
                 {
                     mParent.mRoom = room;
                 }
@@ -676,7 +669,7 @@ namespace GooglePlayGames.Android
 
             public void onPeersConnected(AndroidJavaObject room, AndroidJavaObject participantIds)
             {
-                if (mParent.GetRoomStatus() == ROOM_STATUS_ACTIVE)
+                if (mParent.GetRoomStatus() == RoomStatus.Active)
                 {
                     mParent.mRoom = room;
                     mParent.mListener.OnPeersConnected(AndroidJavaConverter.ToStringList(participantIds).ToArray());
@@ -689,7 +682,7 @@ namespace GooglePlayGames.Android
 
             public void onPeersDisconnected(AndroidJavaObject room, AndroidJavaObject participantIds)
             {
-                if (mParent.GetRoomStatus() == ROOM_STATUS_ACTIVE)
+                if (mParent.GetRoomStatus() == RoomStatus.Active)
                 {
                     mParent.mRoom = room;
                     mParent.mListener.OnPeersDisconnected(AndroidJavaConverter.ToStringList(participantIds).ToArray());
@@ -732,7 +725,7 @@ namespace GooglePlayGames.Android
                     }
                 }
 
-                if (mParent.GetRoomStatus() == ROOM_STATUS_DELETED)
+                if (mParent.GetRoomStatus() == RoomStatus.Deleted)
                 {
                     OurUtils.Logger.e("Participants disconnected during room setup, failing. " + "Participants were: " +
                                       string.Join(",", noLongerConnected.ToArray()));
@@ -809,10 +802,18 @@ namespace GooglePlayGames.Android
 
         private void CleanSession()
         {
-            mRoom = null;
-            mRoomConfig = null;
-            mListener = null;
-            mInvitation = null;
+            lock (mSessionLock)
+            {
+                mRoom = null;
+                mRoomConfig = null;
+                mListener = null;
+                mInvitation = null;
+            }
+        }
+
+        private static Action<T> ToOnGameThread<T>(Action<T> toConvert)
+        {
+            return (val) => PlayGamesHelperObject.RunOnGameThread(() => toConvert(val));
         }
     }
 }

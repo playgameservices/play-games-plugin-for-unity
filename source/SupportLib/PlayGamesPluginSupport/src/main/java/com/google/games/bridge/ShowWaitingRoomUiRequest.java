@@ -21,6 +21,10 @@ import com.google.android.gms.tasks.OnSuccessListener;
 class ShowWaitingRoomUiRequest implements HelperFragment.Request {
     private static final String TAG = "ShowWaitingRoomRequest";
 
+    /**
+     * Should be aligned to:
+     * PluginDev/Assets/GooglePlayGames/Platforms/Android/AndroidHelperFragment.cs enum WaitingRoomUIStatus
+     * */
     static final int UI_STATUS_VALID = 1;
     static final int UI_STATUS_CANCELLED = 2;
     static final int UI_STATUS_LEFT_ROOM = 3;

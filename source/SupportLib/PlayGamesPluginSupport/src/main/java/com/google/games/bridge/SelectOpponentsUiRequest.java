@@ -76,8 +76,8 @@ class SelectOpponentsUiRequest implements HelperFragment.Request {
 
         TurnBasedMultiplayerClient client = Games.getTurnBasedMultiplayerClient(activity, account);
         client.getSelectOpponentsIntent(minPlayers, maxPlayers)
-          .addOnSuccessListener(activity, onSuccess)
-          .addOnFailureListener(activity, onFailure);
+            .addOnSuccessListener(activity, onSuccess)
+            .addOnFailureListener(activity, onFailure);
     }
 
     @Override
