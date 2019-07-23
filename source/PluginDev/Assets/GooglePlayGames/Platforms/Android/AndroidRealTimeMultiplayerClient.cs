@@ -369,7 +369,7 @@ namespace GooglePlayGames.Android
                 List<Participant> participants = GetConnectedParticipants();
                 foreach (Participant participant in participants)
                 {
-                    SendMessage(/* reliable= */ true, participant.ParticipantId, data);
+                    SendMessage( /* reliable= */ true, participant.ParticipantId, data);
                 }
 
                 return;
@@ -409,10 +409,8 @@ namespace GooglePlayGames.Android
             string roomId = mRoom.Call<string>("getRoomId");
             if (reliable)
             {
-                using (var callback = new AndroidJavaObject("com.google.games.bridge.ReliableMessageSentCallbackProxy",
-                    new ReliableMessageSentCallbackProxy(this)))
                 using (mClient.Call<AndroidJavaObject>("sendReliableMessage", data, roomId, participantId,
-                    callback))
+                    /* callback= */ null))
                     ;
                 return;
             }
@@ -552,9 +550,9 @@ namespace GooglePlayGames.Android
                                 Invitation invitation;
                                 using (var invitationObject = invitationBuffer.Call<AndroidJavaObject>("get", i))
                                 {
-                                    invitation = AndroidJavaConverter.ToInvitation(invitationObject);    
+                                    invitation = AndroidJavaConverter.ToInvitation(invitationObject);
                                 }
-                                
+
                                 if (invitation.InvitationId == invitationId)
                                 {
                                     callback(invitation);
@@ -574,21 +572,6 @@ namespace GooglePlayGames.Android
                         OurUtils.Logger.e("Couldn't load invitations.");
                         fail(true);
                     });
-            }
-        }
-
-        private class ReliableMessageSentCallbackProxy : AndroidJavaProxy
-        {
-            private AndroidRealTimeMultiplayerClient mParent;
-
-            public ReliableMessageSentCallbackProxy(AndroidRealTimeMultiplayerClient parent) : base(
-                "com/google/games/bridge/ReliableMessageSentCallbackProxy$Callback")
-            {
-                mParent = parent;
-            }
-
-            public void onRealTimeMessageSent(int statusCode, int tokenId, string recipientParticipantId)
-            {
             }
         }
 
