@@ -13,7 +13,7 @@ namespace GooglePlayGames.Android
     {
         private readonly object mSessionLock = new object();
 
-        private const float InitialPercentComplete = 20.0F;
+        private int mMinPlayersToStart = 0;
 
         private enum RoomStatus
         {
@@ -103,6 +103,8 @@ namespace GooglePlayGames.Android
                     mListener = listener;
                 }
 
+                mMinPlayersToStart = (int) minOpponents + 1;
+
                 using (var task = mRtmpClient.Call<AndroidJavaObject>("create", mRoomConfig))
                 {
                     AndroidTaskUtils.AddOnFailureListener(
@@ -178,6 +180,10 @@ namespace GooglePlayGames.Android
                             mListener = listener;
                         }
 
+                        // the min number to start is the number of automatched + the number of named invitations +
+                        // the local player.
+                        mMinPlayersToStart = result.MinAutomatchingPlayers + result.PlayerIdsToInvite.Count + 1;
+
                         using (var task = mRtmpClient.Call<AndroidJavaObject>("create", mRoomConfig))
                         {
                             AndroidTaskUtils.AddOnFailureListener(
@@ -192,36 +198,14 @@ namespace GooglePlayGames.Android
                 });
         }
 
-        private int GetMinParticipantsToStart()
-        {
-            int minParticipantsToStart;
-            using (var participants = mRoom.Call<AndroidJavaObject>("getParticipants"))
-            {
-                minParticipantsToStart = participants.Call<int>("size");
-            }
-
-            using (var autoMatchCriteria = mRoom.Call<AndroidJavaObject>("getAutoMatchCriteria"))
-            {
-                if (autoMatchCriteria != null)
-                {
-                    minParticipantsToStart = minParticipantsToStart +
-                                             autoMatchCriteria.Call<int>("getInt", "min_automatch_players", 0);
-                }
-            }
-
-            if (mInvitation != null)
-            {
-                minParticipantsToStart = minParticipantsToStart + 1;
-            }
-
-            return minParticipantsToStart;
-        }
-
         private float GetPercentComplete()
         {
-            int connectedCount = GetConnectedParticipants().Count;
-            float percentPerParticipant = (100.0F - InitialPercentComplete) / GetMinParticipantsToStart();
-            return InitialPercentComplete + connectedCount * percentPerParticipant;
+            // For a player creating a room, RoomStatusUpdateCallbackProxy.onConnectedToRoom is not called until someone
+            // else joins the room. This makes the percentage of room setup progress go from 0/mMinPlayersToStart
+            // to 2/mMinPlayersToStart. To give a more meaningful percentage until another player joins, we can assume
+            // player creating the room, gets connected to the room when it's created. 
+            var connectedPlayerCount = Math.Max(1, GetConnectedParticipants().Count);
+            return Math.Min(100F * connectedPlayerCount / mMinPlayersToStart, 100F);
         }
 
         public void ShowWaitingRoomUI()
@@ -231,7 +215,7 @@ namespace GooglePlayGames.Android
                 return;
             }
 
-            AndroidHelperFragment.ShowWaitingRoomUI(mRoom, GetMinParticipantsToStart(), (response, room) =>
+            AndroidHelperFragment.ShowWaitingRoomUI(mRoom, mMinPlayersToStart, (response, room) =>
             {
                 if (response == AndroidHelperFragment.WaitingRoomUIStatus.Valid)
                 {
@@ -418,12 +402,6 @@ namespace GooglePlayGames.Android
 
         public List<Participant> GetConnectedParticipants()
         {
-            var roomStatus = GetRoomStatus();
-            if (roomStatus != RoomStatus.Active && roomStatus != RoomStatus.Connecting)
-            {
-                return new List<Participant>();
-            }
-
             List<Participant> result = new List<Participant>();
             foreach (Participant participant in GetParticipantList())
             {
@@ -438,6 +416,11 @@ namespace GooglePlayGames.Android
 
         private List<Participant> GetParticipantList()
         {
+            if (mRoom == null)
+            {
+                return new List<Participant>();
+            }
+
             List<Participant> participants = new List<Participant>();
             using (var participantsObject = mRoom.Call<AndroidJavaObject>("getParticipants"))
             {
@@ -494,18 +477,17 @@ namespace GooglePlayGames.Android
 
         public void LeaveRoom()
         {
-            mInvitation = null;
-            if (GetRoomStatus() == RoomStatus.Active)
+            if (GetRoomStatus() == RoomStatus.NotCreated)
             {
-                using (mRtmpClient.Call<AndroidJavaObject>("leave", mRoomConfig, mRoom.Call<String>("getRoomId"))) ;
                 return;
             }
-
+            
+            using (mRtmpClient.Call<AndroidJavaObject>("leave", mRoomConfig, mRoom.Call<String>("getRoomId"))) ;
             if (mListener != null)
             {
                 mListener.OnRoomConnected(false);
-                CleanSession();
             }
+            CleanSession();
         }
 
         public bool IsRoomConnected()
@@ -785,6 +767,22 @@ namespace GooglePlayGames.Android
                 AndroidJavaObject room)
             {
                 mParent.mRoom = room;
+
+                int minPlayersToStart = 0;
+                using (var autoMatchCriteria = room.Call<AndroidJavaObject>("getAutoMatchCriteria"))
+                {
+                    if (autoMatchCriteria != null)
+                    {
+                        minPlayersToStart += autoMatchCriteria.Call<int>("getInt", "min_automatch_players", 0);
+                    }
+                }
+
+                using (var participantIds = room.Call<AndroidJavaObject>("getParticipantIds"))
+                {
+                    minPlayersToStart += participantIds.Call<int>("size");
+                }
+
+                mParent.mMinPlayersToStart = minPlayersToStart;
             }
 
             public void onLeftRoom( /* @OnLeftRoomStatusCodes */ int statusCode, /* @Nullable */ string roomId)
@@ -808,6 +806,7 @@ namespace GooglePlayGames.Android
                 mRoomConfig = null;
                 mListener = null;
                 mInvitation = null;
+                mMinPlayersToStart = 0;
             }
         }
 
