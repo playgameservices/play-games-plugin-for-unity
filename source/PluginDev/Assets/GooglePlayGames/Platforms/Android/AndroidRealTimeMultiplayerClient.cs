@@ -32,7 +32,6 @@ namespace GooglePlayGames.Android
         private AndroidJavaObject mRoom;
         private AndroidJavaObject mRoomConfig;
         private RealTimeMultiplayerListener mListener;
-
         private Invitation mInvitation;
 
         public AndroidRealTimeMultiplayerClient(AndroidClient androidClient, AndroidJavaObject account)
@@ -210,7 +209,9 @@ namespace GooglePlayGames.Android
 
         public void ShowWaitingRoomUI()
         {
-            if (mRoom == null)
+            var roomStatus = GetRoomStatus();
+            if (roomStatus != RoomStatus.Connecting && roomStatus != RoomStatus.AutoMatching &&
+                roomStatus != RoomStatus.Inviting)
             {
                 return;
             }
@@ -219,6 +220,7 @@ namespace GooglePlayGames.Android
             {
                 if (response == AndroidHelperFragment.WaitingRoomUIStatus.Valid)
                 {
+                    mRoom = room;
                     if (GetRoomStatus() == RoomStatus.Active)
                     {
                         mListener.OnRoomConnected(true);
@@ -274,7 +276,6 @@ namespace GooglePlayGames.Android
                 {
                     OurUtils.Logger.d("User did not complete invitation screen.");
                     listener.OnRoomConnected(false);
-                    CleanSession();
                     return;
                 }
 
@@ -460,7 +461,6 @@ namespace GooglePlayGames.Android
         {
             if (GetRoomStatus() != RoomStatus.Active)
             {
-                Debug.Log("GetParticipant: room status is " + GetRoomStatus());
                 return null;
             }
 
@@ -605,20 +605,16 @@ namespace GooglePlayGames.Android
                         AndroidJavaConverter.ToParticipant(
                             mParent.mRoom.Call<AndroidJavaObject>("getParticipant", participantId));
 
-                    HashSet<Participant.ParticipantStatus> failedStatus = new HashSet<Participant.ParticipantStatus>
-                    {
-                        Participant.ParticipantStatus.Declined,
-                        Participant.ParticipantStatus.Left
-                    };
-                    if (!failedStatus.Contains(participant.Status))
+                    if (participant.Status != Participant.ParticipantStatus.Declined &&
+                        participant.Status != Participant.ParticipantStatus.Left)
                     {
                         continue;
                     }
 
                     mListener.OnParticipantLeft(participant);
 
-                    if (mParent.GetRoomStatus() != RoomStatus.Connecting &&
-                        mParent.GetRoomStatus() != RoomStatus.AutoMatching)
+                    var roomStatus = mParent.GetRoomStatus();
+                    if (roomStatus != RoomStatus.Connecting && roomStatus != RoomStatus.AutoMatching)
                     {
                         mParent.LeaveRoom();
                     }
