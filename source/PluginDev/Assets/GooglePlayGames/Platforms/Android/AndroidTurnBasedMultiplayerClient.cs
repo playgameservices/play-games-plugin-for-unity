@@ -73,7 +73,7 @@ namespace GooglePlayGames.Android
         {
             callback = ToOnGameThread(callback);
 
-            AndroidHelperFragment.ShowSelectOpponentsUI(minOpponents, maxOpponents, /* isRealTime= */ false,
+            AndroidHelperFragment.ShowTbmpSelectOpponentsUI(minOpponents, maxOpponents,
                 (status, result) =>
                 {
                     if (status != UIStatus.Valid)

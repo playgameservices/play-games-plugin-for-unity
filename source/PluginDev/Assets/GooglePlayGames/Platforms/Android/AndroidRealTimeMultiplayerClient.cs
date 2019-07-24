@@ -121,7 +121,7 @@ namespace GooglePlayGames.Android
         public void CreateWithInvitationScreen(uint minOpponents, uint maxOpponents, uint variant,
             RealTimeMultiplayerListener listener)
         {
-            AndroidHelperFragment.ShowSelectOpponentsUI(minOpponents, maxOpponents, /* isRealTime= */ true,
+            AndroidHelperFragment.ShowRtmpSelectOpponentsUI(minOpponents, maxOpponents,
                 (status, result) =>
                 {
                     if (status != UIStatus.Valid)
@@ -203,7 +203,7 @@ namespace GooglePlayGames.Android
             // For a player creating a room, RoomStatusUpdateCallbackProxy.onConnectedToRoom is not called until someone
             // else joins the room. This makes the percentage of room setup progress go from 0/mMinPlayersToStart
             // to 2/mMinPlayersToStart. To give a more meaningful percentage until another player joins, we can assume
-            // player creating the room, gets connected to the room when it's created. 
+            // player creating the room, gets connected to the room when it's created.
             var connectedPlayerCount = Math.Max(1, GetConnectedParticipants().Count);
             return Math.Min(100F * connectedPlayerCount / mMinPlayersToStart, 100F);
         }
@@ -481,12 +481,13 @@ namespace GooglePlayGames.Android
             {
                 return;
             }
-            
+
             using (mRtmpClient.Call<AndroidJavaObject>("leave", mRoomConfig, mRoom.Call<String>("getRoomId"))) ;
             if (mListener != null)
             {
                 mListener.OnRoomConnected(false);
             }
+
             CleanSession();
         }
 

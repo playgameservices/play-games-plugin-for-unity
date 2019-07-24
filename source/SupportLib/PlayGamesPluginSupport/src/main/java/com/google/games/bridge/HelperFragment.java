@@ -185,8 +185,18 @@ public class HelperFragment extends Fragment
         return request.getTask();
     }
 
-    public static Task<SelectOpponentsUiRequest.Result> showSelectOpponentsUi(Activity parentActivity, int minOpponents, int maxOpponents, boolean realTime){
-        SelectOpponentsUiRequest request = new SelectOpponentsUiRequest(minOpponents, maxOpponents, realTime);
+    public static Task<BaseSelectOpponentsUiRequest.Result> showRtmpSelectOpponentsUi(Activity parentActivity, int minOpponents, int maxOpponents) {
+        RtmpSelectOpponentsUiRequest request = new RtmpSelectOpponentsUiRequest(minOpponents, maxOpponents);
+
+        if(!HelperFragment.startRequest(parentActivity, request)) {
+            request.setResult(CommonUIStatus.UI_BUSY);
+        }
+
+        return request.getTask();
+    }
+
+    public static Task<BaseSelectOpponentsUiRequest.Result> showTbmpSelectOpponentsUi(Activity parentActivity, int minOpponents, int maxOpponents) {
+        TbmpSelectOpponentsUiRequest request = new TbmpSelectOpponentsUiRequest(minOpponents, maxOpponents);
 
         if(!HelperFragment.startRequest(parentActivity, request)) {
             request.setResult(CommonUIStatus.UI_BUSY);

@@ -15,12 +15,11 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.List;
 
-class SelectOpponentsUiRequest implements HelperFragment.Request {
+abstract class BaseSelectOpponentsUiRequest implements HelperFragment.Request {
     private static final String TAG = "SelectOpponents";
 
     private final int minPlayers;
     private final int maxPlayers;
-    private final boolean isRealTime;
 
     private final TaskCompletionSource<Result> resultTaskSource = new TaskCompletionSource<>();
 
@@ -38,46 +37,37 @@ class SelectOpponentsUiRequest implements HelperFragment.Request {
         }
     }
 
-    SelectOpponentsUiRequest(int minPlayers, int maxPlayers, boolean isRealTime) {
+    BaseSelectOpponentsUiRequest(int minPlayers, int maxPlayers) {
         this.minPlayers = minPlayers;
         this.maxPlayers = maxPlayers;
-        this.isRealTime = isRealTime;
     }
 
     Task<Result> getTask() {
         return resultTaskSource.getTask();
     }
 
+    abstract Task<Intent> getIntentTask(Activity activity, GoogleSignInAccount account);
+
     @Override
     public void process(final HelperFragment helperFragment) {
         final Activity activity = helperFragment.getActivity();
         GoogleSignInAccount account = HelperFragment.getAccount(activity);
 
-        OnSuccessListener onSuccess = new OnSuccessListener<Intent>() {
-            @Override
-            public void onSuccess(Intent intent) {
-                helperFragment.startActivityForResult(intent, HelperFragment.RC_SELECT_OPPONENTS_UI);
-            }
-        };
-        OnFailureListener onFailure = new OnFailureListener() {
-            @Override
-            public void onFailure(Exception e) {
-                setFailure(e);
-            }
-        };
-
-        if (isRealTime) {
-            RealTimeMultiplayerClient client = Games.getRealTimeMultiplayerClient(activity, account);
-            client.getSelectOpponentsIntent(minPlayers, maxPlayers)
-                .addOnSuccessListener(activity, onSuccess)
-                .addOnFailureListener(activity, onFailure);
-            return;
-        }
-
-        TurnBasedMultiplayerClient client = Games.getTurnBasedMultiplayerClient(activity, account);
-        client.getSelectOpponentsIntent(minPlayers, maxPlayers)
-            .addOnSuccessListener(activity, onSuccess)
-            .addOnFailureListener(activity, onFailure);
+        getIntentTask(activity, account)
+            .addOnSuccessListener(
+                new OnSuccessListener<Intent>() {
+                    @Override
+                    public void onSuccess(Intent intent) {
+                        helperFragment.startActivityForResult(intent, HelperFragment.RC_SELECT_OPPONENTS_UI);
+                    }
+                })
+            .addOnFailureListener(
+                new OnFailureListener() {
+                    @Override
+                    public void onFailure(Exception e) {
+                        setFailure(e);
+                    }
+                });
     }
 
     @Override
@@ -95,6 +85,14 @@ class SelectOpponentsUiRequest implements HelperFragment.Request {
                 setResult(CommonUIStatus.INTERNAL_ERROR);
             }
         }
+    }
+
+    protected int getMinPlayers() {
+        return minPlayers;
+    }
+
+    protected int getMaxPlayers() {
+        return maxPlayers;
     }
 
     void setResult(Integer status, int minAutomatchingPlayers, int maxAutomatchingPlayers, List<String> playerIdsToInvite) {
