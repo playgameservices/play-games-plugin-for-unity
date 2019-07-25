@@ -1,7 +1,6 @@
 package com.google.games.bridge;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import com.google.android.gms.games.multiplayer.realtime.RealTimeMessage;
 import com.google.android.gms.games.multiplayer.realtime.OnRealTimeMessageReceivedListener;
 
