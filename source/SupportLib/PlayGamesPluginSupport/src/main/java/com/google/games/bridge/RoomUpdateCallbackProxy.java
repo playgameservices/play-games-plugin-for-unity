@@ -9,7 +9,6 @@ import com.google.android.gms.games.GamesCallbackStatusCodes.OnLeftRoomStatusCod
 import com.google.android.gms.games.GamesCallbackStatusCodes.OnRoomConnectedStatusCodes;
 import com.google.android.gms.games.GamesCallbackStatusCodes.OnRoomCreatedStatusCodes;
 
-// can be removed if com.google.android.gms.games.multiplayer.InvitationCallback becomes interface
 public class RoomUpdateCallbackProxy extends RoomUpdateCallback {
     private Callback callback;
 

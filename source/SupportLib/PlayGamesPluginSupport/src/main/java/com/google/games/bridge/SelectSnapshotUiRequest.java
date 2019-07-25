@@ -68,20 +68,20 @@ class SelectSnapshotUiRequest implements HelperFragment.Request {
             .getSelectSnapshotIntent(title, allowAddButton, allowDelete, maxSnapshots)
             .addOnSuccessListener(
                 activity,
-                    new OnSuccessListener<Intent>() {
-                        @Override
-                        public void onSuccess(Intent intent) {
-                            helperFragment.startActivityForResult(intent, HelperFragment.RC_SELECT_SNAPSHOT_UI);
-                        }
-                    })
+                new OnSuccessListener<Intent>() {
+                    @Override
+                    public void onSuccess(Intent intent) {
+                        helperFragment.startActivityForResult(intent, HelperFragment.RC_SELECT_SNAPSHOT_UI);
+                    }
+                })
             .addOnFailureListener(
                 activity,
-                    new OnFailureListener() {
-                        @Override
-                        public void onFailure(Exception e) {
-                            setFailure(e);
-                        }
-                    });
+                new OnFailureListener() {
+                    @Override
+                    public void onFailure(Exception e) {
+                        setFailure(e);
+                    }
+                });
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

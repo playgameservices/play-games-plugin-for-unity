@@ -16,11 +16,13 @@
 
 namespace GooglePlayGames.OurUtils
 {
-    using GooglePlayGames.BasicApi.Nearby;
+    using BasicApi.Nearby;
     using System;
     using System.Collections;
     using UnityEngine;
     using System.Collections.Generic;
+    
+#if UNITY_ANDROID
 
     public class NearbyHelperObject : MonoBehaviour
     {
@@ -115,4 +117,5 @@ namespace GooglePlayGames.OurUtils
             }
         }
     }
+#endif
 }

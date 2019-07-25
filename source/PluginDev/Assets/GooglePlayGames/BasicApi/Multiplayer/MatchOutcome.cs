@@ -13,6 +13,7 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
+
 #if UNITY_ANDROID
 
 namespace GooglePlayGames.BasicApi.Multiplayer
@@ -37,6 +38,7 @@ namespace GooglePlayGames.BasicApi.Multiplayer
 
         private List<string> mParticipantIds = new List<string>();
         private Dictionary<string, uint> mPlacements = new Dictionary<string, uint>();
+
         private Dictionary<string, ParticipantResult> mResults =
             new Dictionary<string, ParticipantResult>();
 
@@ -52,7 +54,7 @@ namespace GooglePlayGames.BasicApi.Multiplayer
         /// <param name="result">Result. May be Win, Loss, Tie or None.</param>
         /// <param name="placement">Placement. Use 0 for unset, 1 for 1st, 2 for 2nd, etc.</param>
         public void SetParticipantResult(string participantId, ParticipantResult result,
-                                     uint placement)
+            uint placement)
         {
             if (!mParticipantIds.Contains(participantId))
             {
@@ -85,24 +87,19 @@ namespace GooglePlayGames.BasicApi.Multiplayer
         /// <value>The participant ids.</value>
         public List<string> ParticipantIds
         {
-            get
-            {
-                return mParticipantIds;
-            }
+            get { return mParticipantIds; }
         }
 
         /// Returns the result for the given participant ID.
         public ParticipantResult GetResultFor(string participantId)
         {
-            return mResults.ContainsKey(participantId) ? mResults[participantId] :
-                    ParticipantResult.Unset;
+            return mResults.ContainsKey(participantId) ? mResults[participantId] : ParticipantResult.Unset;
         }
 
         /// Returns the placement for the given participant ID.
         public uint GetPlacementFor(string participantId)
         {
-            return mPlacements.ContainsKey(participantId) ? mPlacements[participantId] :
-                    PlacementUnset;
+            return mPlacements.ContainsKey(participantId) ? mPlacements[participantId] : PlacementUnset;
         }
 
         public override string ToString()

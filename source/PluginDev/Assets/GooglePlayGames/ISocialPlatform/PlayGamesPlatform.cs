@@ -13,6 +13,7 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
+
 #if UNITY_ANDROID
 
 namespace GooglePlayGames
@@ -96,15 +97,9 @@ namespace GooglePlayGames
         /// </returns>
         public static bool DebugLogEnabled
         {
-            get
-            {
-                return GooglePlayGames.OurUtils.Logger.DebugLogEnabled;
-            }
+            get { return GooglePlayGames.OurUtils.Logger.DebugLogEnabled; }
 
-            set
-            {
-                GooglePlayGames.OurUtils.Logger.DebugLogEnabled = value;
-            }
+            set { GooglePlayGames.OurUtils.Logger.DebugLogEnabled = value; }
         }
 
         /// <summary>
@@ -151,49 +146,34 @@ namespace GooglePlayGames
         /// <summary> Gets the real time multiplayer API object</summary>
         public IRealTimeMultiplayerClient RealTime
         {
-            get
-            {
-                return mClient.GetRtmpClient();
-            }
+            get { return mClient.GetRtmpClient(); }
         }
 
         /// <summary> Gets the turn based multiplayer API object</summary>
         public ITurnBasedMultiplayerClient TurnBased
         {
-            get
-            {
-                return mClient.GetTbmpClient();
-            }
+            get { return mClient.GetTbmpClient(); }
         }
 
         /// <summary>Gets the saved game client object.</summary>
         /// <value>The saved game client.</value>
         public ISavedGameClient SavedGame
         {
-            get
-            {
-                return mClient.GetSavedGameClient();
-            }
+            get { return mClient.GetSavedGameClient(); }
         }
 
         /// <summary>Gets the events client object.</summary>
         /// <value>The events client.</value>
         public IEventsClient Events
         {
-            get
-            {
-                return mClient.GetEventsClient();
-            }
+            get { return mClient.GetEventsClient(); }
         }
 
         /// <summary>Gets the video client object.</summary>
         /// <value>The video client.</value>
         public IVideoClient Video
         {
-            get
-            {
-                return mClient.GetVideoClient();
-            }
+            get { return mClient.GetVideoClient(); }
         }
 
         /// <summary>
@@ -204,10 +184,7 @@ namespace GooglePlayGames
         /// </returns>
         public ILocalUser localUser
         {
-            get
-            {
-                return mLocalUser;
-            }
+            get { return mLocalUser; }
         }
 
         /// <summary>
@@ -294,7 +271,8 @@ namespace GooglePlayGames
         /// <remarks>This can only be called after authentication.  It affects
         /// popups for achievements and other game services elements.</remarks>
         /// <param name="gravity">Gravity for the popup.</param>
-        public void SetGravityForPopups(Gravity gravity) {
+        public void SetGravityForPopups(Gravity gravity)
+        {
             mClient.SetGravityForPopups(gravity);
         }
 
@@ -497,6 +475,7 @@ namespace GooglePlayGames
             {
                 return mClient.GetIdToken();
             }
+
             OurUtils.Logger.e("No client available, returning null.");
             return null;
         }
@@ -516,6 +495,7 @@ namespace GooglePlayGames
             {
                 return mClient.GetServerAuthCode();
             }
+
             return null;
         }
 
@@ -532,20 +512,25 @@ namespace GooglePlayGames
         /// <param name="callback">Callback returning the auth code or null
         /// if there was an error.  NOTE: This callback can return immediately.</param>
         public void GetAnotherServerAuthCode(bool reAuthenticateIfNeeded,
-                                             Action<string> callback)
+            Action<string> callback)
         {
-            if(mClient != null && mClient.IsAuthenticated()) {
+            if (mClient != null && mClient.IsAuthenticated())
+            {
                 mClient.GetAnotherServerAuthCode(reAuthenticateIfNeeded, callback);
             }
             else if (mClient != null && reAuthenticateIfNeeded)
             {
-                mClient.Authenticate((success, msg) => {
-                        if (success) {
-                            callback(mClient.GetServerAuthCode());
-                        } else {
-                            OurUtils.Logger.e("Re-authentication failed: " + msg);
-                            callback(null);
-                        }
+                mClient.Authenticate((success, msg) =>
+                {
+                    if (success)
+                    {
+                        callback(mClient.GetServerAuthCode());
+                    }
+                    else
+                    {
+                        OurUtils.Logger.e("Re-authentication failed: " + msg);
+                        callback(null);
+                    }
                 }, false);
             }
             else
@@ -649,14 +634,12 @@ namespace GooglePlayGames
         /// </param>
         public void ReportProgress(string achievementID, double progress, Action<bool> callback)
         {
+            callback = ToOnGameThread(callback);
             if (!IsAuthenticated())
             {
                 GooglePlayGames.OurUtils.Logger.e(
                     "ReportProgress can only be called after authentication.");
-                if (callback != null)
-                {
-                    callback.Invoke(false);
-                }
+                callback.Invoke(false);
 
                 return;
             }
@@ -676,14 +659,21 @@ namespace GooglePlayGames
 
             mClient.LoadAchievements(ach =>
             {
+                if (ach == null)
+                {
+                    GooglePlayGames.OurUtils.Logger.e("Unable to load achievements");
+                    callback.Invoke(false);
+                    return;
+                }
+
                 for (int i = 0; i < ach.Length; i++)
                 {
-                    if (ach[i].Id == achievementID) 
+                    if (ach[i].Id == achievementID)
                     {
-                        if(ach[i].IsIncremental)
+                        if (ach[i].IsIncremental)
                         {
                             GooglePlayGames.OurUtils.Logger.d("Progress " + progress +
-                                " interpreted as incremental target (approximate).");
+                                                              " interpreted as incremental target (approximate).");
 
                             if (progress >= 0.0 && progress <= 1.0)
                             {
@@ -692,11 +682,12 @@ namespace GooglePlayGames
                                     "Progress " + progress +
                                     " is less than or equal to 1. You might be trying to use values in the range of [0,1], while values are expected to be within the range [0,100]. If you are using the latter, you can safely ignore this message.");
                             }
-                            int targetSteps = (int)Math.Round((progress / 100f) * ach[i].TotalSteps);
+
+                            int targetSteps = (int) Math.Round((progress / 100f) * ach[i].TotalSteps);
                             mClient.SetStepsAtLeast(achievementID, targetSteps, callback);
-                        } 
-                        else 
-                        {  
+                        }
+                        else
+                        {
                             if (progress >= 100)
                             {
                                 // unlock it!
@@ -706,23 +697,19 @@ namespace GooglePlayGames
                             else
                             {
                                 // not enough to unlock
-                                GooglePlayGames.OurUtils.Logger.d("Progress " + progress + " not enough to unlock non-incremental achievement.");
-                                if (callback != null)
-                                {
-                                    callback.Invoke(false);
-                                }
+                                GooglePlayGames.OurUtils.Logger.d(
+                                    "Progress " + progress + " not enough to unlock non-incremental achievement.");
+                                callback.Invoke(false);
                             }
                         }
+
                         return;
                     }
                 }
 
                 // Achievement not found
-                if (callback != null)
-                {
-                    GooglePlayGames.OurUtils.Logger.e("Unable to locate achievement " + achievementID);
-                    callback.Invoke(false);
-                }
+                GooglePlayGames.OurUtils.Logger.e("Unable to locate achievement " + achievementID);
+                callback.Invoke(false);
             });
         }
 
@@ -896,6 +883,7 @@ namespace GooglePlayGames
                 {
                     callback.Invoke(null);
                 }
+
                 return;
             }
 
@@ -1005,8 +993,8 @@ namespace GooglePlayGames
             }
 
             GooglePlayGames.OurUtils.Logger.d("ReportScore: score=" + score +
-                ", board=" + board +
-                " metadata=" + metadata);
+                                              ", board=" + board +
+                                              " metadata=" + metadata);
             string leaderboardId = MapId(board);
             mClient.SubmitScore(leaderboardId, score, metadata, callback);
         }
@@ -1085,8 +1073,8 @@ namespace GooglePlayGames
                 GooglePlayGames.OurUtils.Logger.e("LoadMoreScores can only be called after authentication.");
                 callback(
                     new LeaderboardScoreData(
-                    token.LeaderboardId,
-                    ResponseStatus.NotAuthorized));
+                        token.LeaderboardId,
+                        ResponseStatus.NotAuthorized));
                 return;
             }
 
@@ -1193,11 +1181,12 @@ namespace GooglePlayGames
                 {
                     callback(UIStatus.NotAuthorized);
                 }
+
                 return;
             }
 
             GooglePlayGames.OurUtils.Logger.d("ShowLeaderboardUI, lbId=" +
-                leaderboardId + " callback is " + callback);
+                                              leaderboardId + " callback is " + callback);
             mClient.ShowLeaderboardUI(leaderboardId, span, callback);
         }
 
@@ -1285,9 +1274,9 @@ namespace GooglePlayGames
                     break;
             }
 
-            ((PlayGamesLeaderboard)board).loading = true;
+            ((PlayGamesLeaderboard) board).loading = true;
             GooglePlayGames.OurUtils.Logger.d("LoadScores, board=" + board +
-                " callback is " + callback);
+                                              " callback is " + callback);
             mClient.LoadScores(
                 board.id,
                 LeaderboardStart.PlayerCentered,
@@ -1295,7 +1284,7 @@ namespace GooglePlayGames
                 board.userScope == UserScope.FriendsOnly ? LeaderboardCollection.Social : LeaderboardCollection.Public,
                 timeSpan,
                 (scoreData) => HandleLoadingScores(
-                    (PlayGamesLeaderboard)board, scoreData, callback));
+                    (PlayGamesLeaderboard) board, scoreData, callback));
         }
 
         /// <summary>
@@ -1339,7 +1328,7 @@ namespace GooglePlayGames
                     scoreData.NextPageToken,
                     rowCount,
                     (nextScoreData) =>
-                    HandleLoadingScores(board, nextScoreData, callback));
+                        HandleLoadingScores(board, nextScoreData, callback));
             }
             else
             {
@@ -1386,6 +1375,11 @@ namespace GooglePlayGames
             }
 
             return id;
+        }
+
+        private static Action<T> ToOnGameThread<T>(Action<T> toConvert)
+        {
+            return (val) => PlayGamesHelperObject.RunOnGameThread(() => toConvert(val));
         }
     }
 }

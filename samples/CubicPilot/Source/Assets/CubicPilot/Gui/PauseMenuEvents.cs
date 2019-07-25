@@ -21,7 +21,6 @@ namespace CubicPilot.Gui
 
     public class PauseMenuEvents : MonoBehaviour
     {
-
         public GameObject pausedMenu;
 
         private bool mIsPaused;

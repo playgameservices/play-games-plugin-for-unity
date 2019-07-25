@@ -60,6 +60,7 @@ namespace GooglePlayGames
                 mImage = null;
                 mAvatarUrl = avatarUrl;
             }
+
             mImageLoading = false;
         }
 
@@ -67,34 +68,22 @@ namespace GooglePlayGames
 
         public string userName
         {
-            get
-            {
-                return mDisplayName;
-            }
+            get { return mDisplayName; }
         }
 
         public string id
         {
-            get
-            {
-                return mPlayerId;
-            }
+            get { return mPlayerId; }
         }
 
         public bool isFriend
         {
-            get
-            {
-                return true;
-            }
+            get { return true; }
         }
 
         public UserState state
         {
-            get
-            {
-                return UserState.Online;
-            }
+            get { return UserState.Online; }
         }
 
         public Texture2D image
@@ -116,10 +105,7 @@ namespace GooglePlayGames
 
         public string AvatarURL
         {
-            get
-            {
-                return mAvatarUrl;
-            }
+            get { return mAvatarUrl; }
         }
 
         /// <summary>

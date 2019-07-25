@@ -13,6 +13,7 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
+
 #if UNITY_ANDROID
 
 namespace GooglePlayGames
@@ -89,10 +90,7 @@ namespace GooglePlayGames
         /// </summary>
         public IUserProfile[] friends
         {
-            get
-            {
-                return mPlatform.GetFriends();
-            }
+            get { return mPlatform.GetFriends(); }
         }
 
         /// <summary>
@@ -111,10 +109,7 @@ namespace GooglePlayGames
         /// </returns>
         public bool authenticated
         {
-            get
-            {
-                return mPlatform.IsAuthenticated();
-            }
+            get { return mPlatform.IsAuthenticated(); }
         }
 
         /// <summary>
@@ -122,10 +117,7 @@ namespace GooglePlayGames
         /// </summary>
         public bool underage
         {
-            get
-            {
-                return true;
-            }
+            get { return true; }
         }
 
         /// <summary>
@@ -147,6 +139,7 @@ namespace GooglePlayGames
                         ResetIdentity(retval, mPlatform.GetUserId(), mPlatform.GetUserImageUrl());
                     }
                 }
+
                 return retval;
             }
         }
@@ -175,6 +168,7 @@ namespace GooglePlayGames
                         ResetIdentity(mPlatform.GetUserDisplayName(), retval, mPlatform.GetUserImageUrl());
                     }
                 }
+
                 return retval;
             }
         }
@@ -185,10 +179,7 @@ namespace GooglePlayGames
         /// </summary>
         public new bool isFriend
         {
-            get
-            {
-                return true;
-            }
+            get { return true; }
         }
 
         /// <summary>
@@ -197,10 +188,7 @@ namespace GooglePlayGames
         /// </summary>
         public new UserState state
         {
-            get
-            {
-                return UserState.Online;
-            }
+            get { return UserState.Online; }
         }
 
 
@@ -218,6 +206,7 @@ namespace GooglePlayGames
                             mPlatform.GetUserId(), retval);
                     }
                 }
+
                 return retval;
             }
         }
@@ -243,6 +232,7 @@ namespace GooglePlayGames
                     emailAddress = mPlatform.GetUserEmail();
                     emailAddress = emailAddress ?? string.Empty;
                 }
+
                 return authenticated ? emailAddress : string.Empty;
             }
         }

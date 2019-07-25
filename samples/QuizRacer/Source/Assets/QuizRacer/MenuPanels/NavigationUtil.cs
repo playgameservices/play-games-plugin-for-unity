@@ -16,7 +16,6 @@
 
 namespace QuizRacer.MenuPanels
 {
-    
     using UnityEngine;
     using UnityEngine.EventSystems;
     using System.Collections;
@@ -24,7 +23,6 @@ namespace QuizRacer.MenuPanels
     // Utility class to navigate between the various panels in the main scene.
     public static class NavigationUtil
     {
-
         private static PanelMgr theMgr;
 
         public static PanelMgr PanelMgr
@@ -35,6 +33,7 @@ namespace QuizRacer.MenuPanels
                 {
                     theMgr = EventSystem.current.GetComponent<PanelMgr>();
                 }
+
                 return theMgr;
             }
         }

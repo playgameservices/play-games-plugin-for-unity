@@ -31,20 +31,20 @@ class SimpleUiRequest implements HelperFragment.Request {
         getIntent(activity)
             .addOnSuccessListener(
                 activity,
-                    new OnSuccessListener<Intent>() {
-                        @Override
-                        public void onSuccess(Intent intent) {
-                            helperFragment.startActivityForResult(intent, HelperFragment.RC_SIMPLE_UI);
-                        }
-                    })
+                new OnSuccessListener<Intent>() {
+                    @Override
+                    public void onSuccess(Intent intent) {
+                        helperFragment.startActivityForResult(intent, HelperFragment.RC_SIMPLE_UI);
+                    }
+                })
             .addOnFailureListener(
                 activity,
-                    new OnFailureListener() {
-                        @Override
-                        public void onFailure(Exception e) {
-                            setFailure(e);
-                        }
-                    });
+                new OnFailureListener() {
+                    @Override
+                    public void onFailure(Exception e) {
+                        setFailure(e);
+                    }
+                });
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

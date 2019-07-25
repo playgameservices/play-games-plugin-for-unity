@@ -23,21 +23,21 @@ class CaptureOverlayUiRequest implements HelperFragment.Request {
             .getCaptureOverlayIntent()
             .addOnSuccessListener(
                 activity,
-                    new OnSuccessListener<Intent>() {
-                        @Override
-                        public void onSuccess(Intent intent) {
-                            helperFragment.startActivityForResult(intent, HelperFragment.RC_CAPTURE_OVERLAY_UI);
-                            helperFragment.finishRequest(CaptureOverlayUiRequest.this);
-                        }
-                    })
+                new OnSuccessListener<Intent>() {
+                    @Override
+                    public void onSuccess(Intent intent) {
+                        helperFragment.startActivityForResult(intent, HelperFragment.RC_CAPTURE_OVERLAY_UI);
+                        helperFragment.finishRequest(CaptureOverlayUiRequest.this);
+                    }
+                })
             .addOnFailureListener(
                 activity,
-                    new OnFailureListener() {
-                        @Override
-                        public void onFailure(Exception e) {
-                            Log.d(TAG, "Show CaptureOverlay UI failed");
-                        }
-                    });
+                new OnFailureListener() {
+                    @Override
+                    public void onFailure(Exception e) {
+                        Log.d(TAG, "Show CaptureOverlay UI failed");
+                    }
+                });
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

@@ -13,11 +13,11 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
+
 #if UNITY_ANDROID
 
 namespace GooglePlayGames.BasicApi.Multiplayer
 {
-
     /// <summary>
     /// Represents a player. A player is different from a participant! The participant is
     /// an entity that takes part in a particular match; a Player is a real-world person

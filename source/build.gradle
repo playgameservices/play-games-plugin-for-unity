@@ -80,6 +80,7 @@ project.ext {
          'QuizRacer',  'TicTacToe',
          'NearbyDroids', 'SmokeTest']
 
+
     jarresolver_uri = System.getProperty("RESOLVER_PACKAGE_URI")
     jarresolver_repos = [
       'https://github.com/googlesamples/unity-jar-resolver.git'
@@ -349,10 +350,10 @@ task inject_versionIntoMetaFiles() {
     for (fileobj in fileTree("${pluginProj}")) {
       if (fileobj.path.endsWith('.meta')) {
         // Skip the manifest files for any previous versions
-//        if (fileobj.path.contains("Editor/${currentPluginBasename}") &&
-//            !fileobj.path.contains(currentManifestFile)) {
-//          continue
-//        }
+        if (fileobj.path.contains("Editor/${currentPluginBasename}") &&
+            !fileobj.path.contains(currentManifestFile)) {
+          continue
+        }
         def lines = fileobj.text.split('\n')
         def outputLines = []
         def added = false
@@ -537,6 +538,8 @@ task clean() {
     dependsOn clean_support_lib
 }
 
+tasks.findAll { task -> task.ext.has('remoteTaskPhase') && task.ext.remoteTaskPhase == 'build' }*.dependsOn('prebuild')
+tasks.findAll { task -> task.ext.has('remoteTaskPhase') && task.ext.remoteTaskPhase == 'postbuild' }*.dependsOn('build')
 
 // Construct the name of a versioned asset from the source filename and version
 // // string.

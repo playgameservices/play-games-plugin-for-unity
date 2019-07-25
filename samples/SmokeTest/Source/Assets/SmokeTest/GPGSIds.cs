@@ -23,18 +23,24 @@
 
 namespace SmokeTest
 {
-public static class GPGSIds
+    public static class GPGSIds
     {
         /*
          * This file is a placeholder to allow compilation of the sample code
          * The actual values are populated by the plugin when Setup is run
          * using the resource data from the Play Console.
          */
-        public const string achievement_achievementtoincrement = "PLACEHOLDER - This file will be generated."; // <GPGSID>
+        public const string
+            achievement_achievementtoincrement = "PLACEHOLDER - This file will be generated."; // <GPGSID>
+
         public const string achievement_achievementtounlock = "PLACEHOLDER - This file will be generated."; // <GPGSID>
         public const string achievement_achievementtoreveal = "PLACEHOLDER - This file will be generated."; // <GPGSID>
         public const string event_smokingevent = "PLACEHOLDER - This file will be generated."; // <GPGSID>
-        public const string achievement_achievement_hidden_incremental = "PLACEHOLDER - This file will be generated."; // <GPGSID>
-        public const string leaderboard_leaders_in_smoketesting = "PLACEHOLDER - This file will be generated."; // <GPGSID>
+
+        public const string achievement_achievement_hidden_incremental =
+            "PLACEHOLDER - This file will be generated."; // <GPGSID>
+
+        public const string
+            leaderboard_leaders_in_smoketesting = "PLACEHOLDER - This file will be generated."; // <GPGSID>
     }
 }

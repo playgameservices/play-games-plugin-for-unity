@@ -82,7 +82,7 @@ namespace CubicPilot.GameLogic
         public const float BlinkPeriod = 0.75f;
 
         // combo multipliers
-        public static float[] ComboMult = { 1.0f, 1.0f, 1.5f, 2.0f, 2.5f, 3.0f, 3.5f, 4.0f, 4.5f, 5.0f };
+        public static float[] ComboMult = {1.0f, 1.0f, 1.5f, 2.0f, 2.5f, 3.0f, 3.5f, 4.0f, 4.5f, 5.0f};
 
         // Tutorial settings
         public class Tutorial
@@ -274,13 +274,13 @@ namespace CubicPilot.GameLogic
             };
 
             // Player's damage at each level
-            public static int[] Damage = { 0, 1, 1, 2, 2, 2, 3 };
+            public static int[] Damage = {0, 1, 1, 2, 2, 2, 3};
 
             // Player's shield points at each level
-            public static int[] ShieldPoints = { 0, 0, 0, 0, 0, 1, 1, 1, 2, 3 };
+            public static int[] ShieldPoints = {0, 0, 0, 0, 0, 1, 1, 1, 2, 3};
 
             // Player's laser speed
-            public static float[] LaserSpeed = { 0.0f, 20.0f, 22.0f, 24.0f, 26.0f, 28.0f, 30.0f };
+            public static float[] LaserSpeed = {0.0f, 20.0f, 22.0f, 24.0f, 26.0f, 28.0f, 30.0f};
         }
 
         public class EndScreen

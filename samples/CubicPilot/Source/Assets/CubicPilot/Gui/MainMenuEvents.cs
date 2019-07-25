@@ -23,7 +23,6 @@ namespace CubicPilot.Gui
 
     public class MainMenuEvents : MonoBehaviour
     {
-
         public AudioClip UiBeepFx;
         public GameObject playButton;
         public GameObject signinButton;
@@ -40,7 +39,6 @@ namespace CubicPilot.Gui
         // Use this for initialization
         void Start()
         {
-
             // if this is the first time we're running, bring up the sign in flow
             if (sAutoAuthenticate)
             {
@@ -74,8 +72,8 @@ namespace CubicPilot.Gui
                 msg.text = Strings.SignInBlurb;
                 signin.interactable = !levelSelectionPanel.activeSelf;
                 signinButton.GetComponentInChildren<Text>().text = Strings.SignIn;
-
             }
+
             achievementButton.SetActive(authenticated);
             highScoreButton.SetActive(authenticated);
             loadButton.SetActive(authenticated);
@@ -88,6 +86,7 @@ namespace CubicPilot.Gui
             {
                 return;
             }
+
             Beep();
 
             if (GameManager.Instance.Authenticated)
@@ -150,14 +149,14 @@ namespace CubicPilot.Gui
                 // create new local var for closure for click listener
                 int level = i;
                 texts[i].text = "Sector " + Convert.ToChar('A' + i) +
-                "\n" + GameManager.Instance.Progress.GetLevelProgress(i).Score;
+                                "\n" + GameManager.Instance.Progress.GetLevelProgress(i).Score;
                 levels[i].interactable =
-                GameManager.Instance.Progress.IsLevelUnlocked(i);
+                    GameManager.Instance.Progress.IsLevelUnlocked(i);
                 levels[i].onClick.AddListener(() =>
-                    {
-                        Debug.Log("Playing level " + level);
-                        GameManager.Instance.GoToLevel(level);
-                    });
+                {
+                    Debug.Log("Playing level " + level);
+                    GameManager.Instance.GoToLevel(level);
+                });
             }
         }
 
