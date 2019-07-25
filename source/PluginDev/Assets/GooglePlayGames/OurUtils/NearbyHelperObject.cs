@@ -18,10 +18,8 @@ namespace GooglePlayGames.OurUtils
 {
     using BasicApi.Nearby;
     using System;
-    using System.Collections;
     using UnityEngine;
-    using System.Collections.Generic;
-    
+
 #if UNITY_ANDROID
 
     public class NearbyHelperObject : MonoBehaviour
@@ -71,6 +69,7 @@ namespace GooglePlayGames.OurUtils
 
             return span.Value.TotalSeconds;
         }
+
         public static void StartAdvertisingTimer(TimeSpan? span)
         {
             AdvertisingRemaining = ToSeconds(span);

@@ -56,24 +56,12 @@ namespace GooglePlayGames.Android
             Misc.CheckNotNull(recipientEndpointIds);
             Misc.CheckNotNull(payload);
 
-            AndroidJavaObject payloadObject =
-                new AndroidJavaClass("com.google.android.gms.nearby.connection.Payload").CallStatic<AndroidJavaObject>(
-                    "fromBytes", payload);
-            using (var task = mClient.Call<AndroidJavaObject>("sendPayload", createJavaStringList(recipientEndpointIds),
+            using (var payloadClass = new AndroidJavaClass("com.google.android.gms.nearby.connection.Payload"))
+            using (var payloadObject = payloadClass.CallStatic<AndroidJavaObject>("fromBytes", payload))
+            using (var task = mClient.Call<AndroidJavaObject>("sendPayload",
+                AndroidJavaConverter.ToJavaStringList(recipientEndpointIds),
                 payloadObject))
-            {
-            }
-        }
-
-        private AndroidJavaObject createJavaStringList(List<string> list)
-        {
-            AndroidJavaObject javaList = new AndroidJavaObject("java.util.ArrayList");
-            foreach (string str in list)
-            {
-                javaList.Call<bool>("add", str);
-            }
-
-            return javaList;
+                ;
         }
 
         public void StartAdvertising(string name, List<string> appIdentifiers,
@@ -91,12 +79,11 @@ namespace GooglePlayGames.Android
             connectionRequestCallback = ToOnGameThread(connectionRequestCallback);
             resultCallback = ToOnGameThread(resultCallback);
 
-            AdvertisingConnectionLifecycleCallback cb =
-                new AdvertisingConnectionLifecycleCallback(resultCallback, connectionRequestCallback, this);
-            AndroidJavaObject connectionLifecycleCallback =
-                new AndroidJavaObject("com.google.games.bridge.ConnectionLifecycleCallbackProxy", cb);
-            AndroidJavaObject advertisingOptions = CreateAdvertisingOptions();
-
+            AdvertisingConnectionLifecycleCallbackProxy callbackProxy =
+                new AdvertisingConnectionLifecycleCallbackProxy(resultCallback, connectionRequestCallback, this);
+            using (var connectionLifecycleCallback =
+                new AndroidJavaObject("com.google.games.bridge.ConnectionLifecycleCallbackProxy", callbackProxy))
+            using (var advertisingOptions = CreateAdvertisingOptions())
             using (var task = mClient.Call<AndroidJavaObject>("startAdvertising", name, GetServiceId(),
                 connectionLifecycleCallback, advertisingOptions))
             {
@@ -109,21 +96,24 @@ namespace GooglePlayGames.Android
 
         private AndroidJavaObject CreateAdvertisingOptions()
         {
-            AndroidJavaObject strategy =
-                new AndroidJavaClass("com.google.android.gms.nearby.connection.Strategy").GetStatic<AndroidJavaObject>(
-                    "P2P_CLUSTER");
-            return new AndroidJavaObject("com.google.android.gms.nearby.connection.AdvertisingOptions$Builder")
-                .Call<AndroidJavaObject>("setStrategy", strategy).Call<AndroidJavaObject>("build");
+            using (var strategy = new AndroidJavaClass("com.google.android.gms.nearby.connection.Strategy")
+                .GetStatic<AndroidJavaObject>("P2P_CLUSTER"))
+            using (var builder =
+                new AndroidJavaObject("com.google.android.gms.nearby.connection.AdvertisingOptions$Builder"))
+            using (builder.Call<AndroidJavaObject>("setStrategy", strategy))
+            {
+                return builder.Call<AndroidJavaObject>("build");
+            }
         }
 
-        private class AdvertisingConnectionLifecycleCallback : AndroidJavaProxy
+        private class AdvertisingConnectionLifecycleCallbackProxy : AndroidJavaProxy
         {
             private Action<AdvertisingResult> mResultCallback;
             private Action<ConnectionRequest> mConnectionRequestCallback;
             private AndroidNearbyConnectionClient mClient;
             private string mLocalEndpointName;
 
-            public AdvertisingConnectionLifecycleCallback(Action<AdvertisingResult> resultCallback,
+            public AdvertisingConnectionLifecycleCallbackProxy(Action<AdvertisingResult> resultCallback,
                 Action<ConnectionRequest> connectionRequestCallback, AndroidNearbyConnectionClient client) : base(
                 "com/google/games/bridge/ConnectionLifecycleCallbackProxy$Callback")
             {
@@ -141,7 +131,12 @@ namespace GooglePlayGames.Android
 
             public void onConnectionResult(string endpointId, AndroidJavaObject connectionResolution)
             {
-                int statusCode = connectionResolution.Call<AndroidJavaObject>("getStatus").Call<int>("getStatusCode");
+                int statusCode;
+                using (var status = connectionResolution.Call<AndroidJavaObject>("getStatus"))
+                {
+                    statusCode = status.Call<int>("getStatusCode");
+                }
+
                 if (statusCode == 0) // STATUS_OK
                 {
                     mResultCallback(new AdvertisingResult(ResponseStatus.Success, mLocalEndpointName));
@@ -178,26 +173,22 @@ namespace GooglePlayGames.Android
             Misc.CheckNotNull(listener, "listener");
             DiscoveringConnectionLifecycleCallback cb =
                 new DiscoveringConnectionLifecycleCallback(responseCallback, listener, mClient);
-            AndroidJavaObject connectionLifecycleCallback =
-                new AndroidJavaObject("com.google.games.bridge.ConnectionLifecycleCallbackProxy", cb);
-            using (var task = mClient.Call<AndroidJavaObject>("requestConnection", name, remoteEndpointId,
+            using (var connectionLifecycleCallback =
+                new AndroidJavaObject("com.google.games.bridge.ConnectionLifecycleCallbackProxy", cb))
+            using (mClient.Call<AndroidJavaObject>("requestConnection", name, remoteEndpointId,
                 connectionLifecycleCallback))
-            {
-            }
+                ;
         }
 
-        public void AcceptConnectionRequest(string remoteEndpointId, byte[] payload,
-            IMessageListener listener)
+        public void AcceptConnectionRequest(string remoteEndpointId, byte[] payload, IMessageListener listener)
         {
             Misc.CheckNotNull(listener, "listener");
             mAdvertisingMessageListener = listener;
 
-            AndroidJavaObject payloadCallback = new AndroidJavaObject("com.google.games.bridge.PayloadCallbackProxy",
-                new PayloadCallback(listener));
-
-            using (var task = mClient.Call<AndroidJavaObject>("acceptConnection", remoteEndpointId, payloadCallback))
-            {
-            }
+            using (var payloadCallback = new AndroidJavaObject("com.google.games.bridge.PayloadCallbackProxy",
+                new PayloadCallback(listener)))
+            using (mClient.Call<AndroidJavaObject>("acceptConnection", remoteEndpointId, payloadCallback))
+                ;
         }
 
         private class PayloadCallback : AndroidJavaProxy
@@ -232,10 +223,9 @@ namespace GooglePlayGames.Android
                 throw new InvalidOperationException("advertisingDuration must be positive");
             }
 
-            AndroidJavaObject endpointDiscoveryCallback = new AndroidJavaObject(
-                "com.google.games.bridge.EndpointDiscoveryCallbackProxy", new EndpointDiscoveryCallback(listener));
-            AndroidJavaObject discoveryOptions = CreateDiscoveryOptions();
-
+            using (var endpointDiscoveryCallback = new AndroidJavaObject(
+                "com.google.games.bridge.EndpointDiscoveryCallbackProxy", new EndpointDiscoveryCallback(listener)))
+            using (var discoveryOptions = CreateDiscoveryOptions())
             using (var task = mClient.Call<AndroidJavaObject>("startDiscovery", serviceId, endpointDiscoveryCallback,
                 discoveryOptions))
             {
@@ -264,17 +254,20 @@ namespace GooglePlayGames.Android
 
             public void onConnectionInitiated(string endpointId, AndroidJavaObject connectionInfo)
             {
-                AndroidJavaObject payloadCallback =
-                    new AndroidJavaObject("com.google.games.bridge.PayloadCallbackProxy",
-                        new PayloadCallback(mListener));
-                using (var task = mClient.Call<AndroidJavaObject>("acceptConnection", endpointId, payloadCallback))
-                {
-                }
+                using (var payloadCallback = new AndroidJavaObject("com.google.games.bridge.PayloadCallbackProxy",
+                    new PayloadCallback(mListener)))
+                using (mClient.Call<AndroidJavaObject>("acceptConnection", endpointId, payloadCallback))
+                    ;
             }
 
             public void onConnectionResult(string endpointId, AndroidJavaObject connectionResolution)
             {
-                int statusCode = connectionResolution.Call<AndroidJavaObject>("getStatus").Call<int>("getStatusCode");
+                int statusCode;
+                using (var status = connectionResolution.Call<AndroidJavaObject>("getStatus"))
+                {
+                    statusCode = status.Call<int>("getStatusCode");
+                }
+
                 if (statusCode == 0) // STATUS_OK
                 {
                     mResponseCallback(ConnectionResponse.Accepted(GmscoreNearbyClientId, endpointId, new byte[0]));
@@ -298,11 +291,15 @@ namespace GooglePlayGames.Android
 
         private AndroidJavaObject CreateDiscoveryOptions()
         {
-            AndroidJavaObject strategy =
+            using (var strategy =
                 new AndroidJavaClass("com.google.android.gms.nearby.connection.Strategy").GetStatic<AndroidJavaObject>(
-                    "P2P_CLUSTER");
-            return new AndroidJavaObject("com.google.android.gms.nearby.connection.DiscoveryOptions$Builder")
-                .Call<AndroidJavaObject>("setStrategy", strategy).Call<AndroidJavaObject>("build");
+                    "P2P_CLUSTER"))
+            using (var builder =
+                new AndroidJavaObject("com.google.android.gms.nearby.connection.DiscoveryOptions$Builder"))
+            using (builder.Call<AndroidJavaObject>("setStrategy", strategy))
+            {
+                return builder.Call<AndroidJavaObject>("build");
+            }
         }
 
         private class EndpointDiscoveryCallback : AndroidJavaProxy
@@ -343,9 +340,7 @@ namespace GooglePlayGames.Android
         public void RejectConnectionRequest(string requestingEndpointId)
         {
             Misc.CheckNotNull(requestingEndpointId, "requestingEndpointId");
-            using (var task = mClient.Call<AndroidJavaObject>("rejectConnection", requestingEndpointId))
-            {
-            }
+            using (var task = mClient.Call<AndroidJavaObject>("rejectConnection", requestingEndpointId)) ;
         }
 
         public void DisconnectFromEndpoint(string remoteEndpointId)
@@ -377,13 +372,16 @@ namespace GooglePlayGames.Android
             using (var activity = AndroidHelperFragment.GetActivity())
             {
                 string packageName = activity.Call<string>("getPackageName");
-                AndroidJavaObject pm = activity.Call<AndroidJavaObject>("getPackageManager");
-                AndroidJavaObject appInfo =
-                    pm.Call<AndroidJavaObject>("getApplicationInfo", packageName, (int) 0x00000080);
-                AndroidJavaObject bundle = appInfo.Get<AndroidJavaObject>("metaData");
-                string sysId = bundle.Call<string>("getString", "com.google.android.gms.nearby.connection.SERVICE_ID");
-                Debug.Log("SystemId from Manifest: " + sysId);
-                return sysId;
+                using (var pm = activity.Call<AndroidJavaObject>("getPackageManager"))
+                using (var appInfo =
+                    pm.Call<AndroidJavaObject>("getApplicationInfo", packageName, (int) 0x00000080))
+                using (var bundle = appInfo.Get<AndroidJavaObject>("metaData"))
+                {
+                    string sysId = bundle.Call<string>("getString",
+                        "com.google.android.gms.nearby.connection.SERVICE_ID");
+                    Debug.Log("SystemId from Manifest: " + sysId);
+                    return sysId;
+                }
             }
         }
 
