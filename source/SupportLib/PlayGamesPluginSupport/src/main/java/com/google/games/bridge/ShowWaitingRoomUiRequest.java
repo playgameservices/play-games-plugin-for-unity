@@ -96,7 +96,7 @@ class ShowWaitingRoomUiRequest implements HelperFragment.Request {
         }
     }
 
-    void setResult(Integer status, Room room) {
+    void setResult(int status, Room room) {
         Result result = new Result(status, room);
         resultTaskSource.setResult(result);
         HelperFragment.finishRequest(this);
