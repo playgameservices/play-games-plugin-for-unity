@@ -21,6 +21,7 @@ namespace SmokeTest
     using GooglePlayGames;
     using GooglePlayGames.BasicApi.Nearby;
     using UnityEngine;
+    using UnityEngine.Android;
 
     public class NearbyGUI : MonoBehaviour, IDiscoveryListener, IMessageListener
     {
@@ -68,6 +69,8 @@ namespace SmokeTest
             mEndpointsViewVector = new Vector2();
             mMessageLog = new List<string>();
             mKnownEndpoints = new HashSet<string>();
+            Permission.RequestUserPermission(Permission.FineLocation);
+            Permission.RequestUserPermission(Permission.CoarseLocation);
         }
 
         internal enum EndpointState

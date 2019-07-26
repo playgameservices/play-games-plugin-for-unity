@@ -95,13 +95,13 @@ abstract class BaseSelectOpponentsUiRequest implements HelperFragment.Request {
         return maxPlayers;
     }
 
-    void setResult(Integer status, int minAutomatchingPlayers, int maxAutomatchingPlayers, List<String> playerIdsToInvite) {
+    void setResult(int status, int minAutomatchingPlayers, int maxAutomatchingPlayers, List<String> playerIdsToInvite) {
         Result result = new Result(status, minAutomatchingPlayers, maxAutomatchingPlayers, playerIdsToInvite);
         resultTaskSource.setResult(result);
         HelperFragment.finishRequest(this);
     }
 
-    void setResult(Integer status) {
+    void setResult(int status) {
         setResult(status,
             /* minAutomatchingPlayers= */ 0,
             /* maxAutomatchingPlayers= */ 0,
