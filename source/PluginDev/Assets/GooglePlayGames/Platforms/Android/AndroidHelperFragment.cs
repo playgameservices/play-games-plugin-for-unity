@@ -40,11 +40,9 @@ namespace GooglePlayGames.Android
         public static AndroidJavaObject GetDefaultPopupView()
         {
             using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
+            using (var activity = AndroidHelperFragment.GetActivity())
             {
-                using (var activity = AndroidHelperFragment.GetActivity())
-                {
-                    return helperFragment.CallStatic<AndroidJavaObject>("getDecorView", activity);
-                }
+                return helperFragment.CallStatic<AndroidJavaObject>("getDecorView", activity);
             }
         }
 
@@ -164,11 +162,24 @@ namespace GooglePlayGames.Android
             }
         }
 
-        public static void ShowSelectOpponentsUI(uint minOpponents, uint maxOpponents,
+        public static void ShowRtmpSelectOpponentsUI(uint minOpponents, uint maxOpponents,
             Action<UIStatus, InvitationResultHolder> cb)
         {
+            ShowSelectOpponentsUI(minOpponents, maxOpponents, /* isRealTime= */ true, cb);
+        }
+
+        public static void ShowTbmpSelectOpponentsUI(uint minOpponents, uint maxOpponents,
+            Action<UIStatus, InvitationResultHolder> cb)
+        {
+            ShowSelectOpponentsUI(minOpponents, maxOpponents, /* isRealTime= */ false, cb);
+        }
+
+        private static void ShowSelectOpponentsUI(uint minOpponents, uint maxOpponents, bool isRealTime,
+            Action<UIStatus, InvitationResultHolder> cb)
+        {
+            string methodName = isRealTime ? "showRtmpSelectOpponentsUi" : "showTbmpSelectOpponentsUi";
             using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
-            using (var task = helperFragment.CallStatic<AndroidJavaObject>("showSelectOpponentsUi",
+            using (var task = helperFragment.CallStatic<AndroidJavaObject>(methodName,
                 AndroidHelperFragment.GetActivity(), (int) minOpponents, (int) maxOpponents))
             {
                 AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
@@ -207,6 +218,41 @@ namespace GooglePlayGames.Android
             }
         }
 
+        public enum WaitingRoomUIStatus
+        {
+            Valid = 1,
+            Cancelled = 2,
+            LeftRoom = 3,
+            InvalidRoom = 4,
+            Busy = -1,
+            InternalError = -2,
+        }
+
+        public static void ShowWaitingRoomUI(AndroidJavaObject room, int minParticipantsToStart,
+            Action<WaitingRoomUIStatus, AndroidJavaObject> cb)
+        {
+            using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
+            using (var task = helperFragment.CallStatic<AndroidJavaObject>("showWaitingRoomUI",
+                AndroidHelperFragment.GetActivity(), room, minParticipantsToStart))
+            {
+                AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
+                    task,
+                    result =>
+                    {
+                        cb.Invoke((WaitingRoomUIStatus) result.Get<int>("status"),
+                            result.Get<AndroidJavaObject>("room"));
+                    });
+
+                AndroidTaskUtils.AddOnFailureListener(
+                    task,
+                    exception =>
+                    {
+                        Debug.Log("ShowWaitingRoomUI failed with exception");
+                        cb.Invoke(WaitingRoomUIStatus.InternalError, null);
+                    });
+            }
+        }
+
         public static void ShowInboxUI(Action<UIStatus, TurnBasedMatch> cb)
         {
             using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
@@ -235,6 +281,39 @@ namespace GooglePlayGames.Android
                     exception =>
                     {
                         Debug.Log("showInboxUi failed with exception");
+                        cb.Invoke(UIStatus.InternalError, null);
+                    });
+            }
+        }
+
+        public static void ShowInvitationInboxUI(Action<UIStatus, Invitation> cb)
+        {
+            using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
+            using (var task = helperFragment.CallStatic<AndroidJavaObject>("showInvitationInboxUI",
+                AndroidHelperFragment.GetActivity()))
+            {
+                AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
+                    task,
+                    result =>
+                    {
+                        int status = result.Get<int>("status");
+                        if ((UIStatus) status != UIStatus.Valid)
+                        {
+                            cb.Invoke((UIStatus) status, null);
+                            return;
+                        }
+
+                        using (var invitation = result.Get<AndroidJavaObject>("invitation"))
+                        {
+                            cb.Invoke((UIStatus) status, AndroidJavaConverter.ToInvitation(invitation));
+                        }
+                    });
+
+                AndroidTaskUtils.AddOnFailureListener(
+                    task,
+                    exception =>
+                    {
+                        Debug.Log("ShowInvitationInboxUI failed with exception");
                         cb.Invoke(UIStatus.InternalError, null);
                     });
             }

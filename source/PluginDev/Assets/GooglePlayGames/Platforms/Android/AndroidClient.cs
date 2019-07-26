@@ -150,7 +150,7 @@ namespace GooglePlayGames.Android
                                             }
 
                                             mVideoClient = new AndroidVideoClient(isCaptureSupported, account);
-                                            mRealTimeClient = new AndroidRealTimeMultiplayerClient(account);
+                                            mRealTimeClient = new AndroidRealTimeMultiplayerClient(this, account);
                                             mTurnBasedClient = new AndroidTurnBasedMultiplayerClient(account);
                                             mTurnBasedClient.RegisterMatchDelegate(mConfiguration.MatchDelegate);
                                         }

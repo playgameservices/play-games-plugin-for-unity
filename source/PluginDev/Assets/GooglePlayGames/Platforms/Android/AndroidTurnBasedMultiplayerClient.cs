@@ -73,57 +73,59 @@ namespace GooglePlayGames.Android
         {
             callback = ToOnGameThread(callback);
 
-            AndroidHelperFragment.ShowSelectOpponentsUI(minOpponents, maxOpponents, (status, result) =>
-            {
-                if (status != UIStatus.Valid)
+            AndroidHelperFragment.ShowTbmpSelectOpponentsUI(minOpponents, maxOpponents,
+                (status, result) =>
                 {
-                    callback(status, null);
-                    return;
-                }
-
-                using (var matchConfigClass =
-                    new AndroidJavaClass("com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig"))
-                using (var matchConfigBuilder = matchConfigClass.CallStatic<AndroidJavaObject>("builder"))
-                {
-                    if (result.MinAutomatchingPlayers > 0)
+                    if (status != UIStatus.Valid)
                     {
-                        using (var autoMatchCriteria = matchConfigClass.CallStatic<AndroidJavaObject>(
-                            "createAutoMatchCriteria", result.MinAutomatchingPlayers,
-                            result.MaxAutomatchingPlayers, /* exclusiveBitMask= */ (long) 0))
-                        {
-                            matchConfigBuilder.Call<AndroidJavaObject>("setAutoMatchCriteria", autoMatchCriteria);
-                        }
+                        callback(status, null);
+                        return;
                     }
 
-                    if (variant != 0)
+                    using (var matchConfigClass =
+                        new AndroidJavaClass("com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig"))
+                    using (var matchConfigBuilder = matchConfigClass.CallStatic<AndroidJavaObject>("builder"))
                     {
-                        matchConfigBuilder.Call<AndroidJavaObject>("setVariant", (int) variant);
-                    }
-
-                    using (var invitedPlayersObject = new AndroidJavaObject("java.util.ArrayList"))
-                    {
-                        for (int i = 0; i < result.PlayerIdsToInvite.Count; ++i)
+                        if (result.MinAutomatchingPlayers > 0)
                         {
-                            invitedPlayersObject.Call<bool>("add", result.PlayerIdsToInvite[i]);
+                            using (var autoMatchCriteria = matchConfigClass.CallStatic<AndroidJavaObject>(
+                                "createAutoMatchCriteria", result.MinAutomatchingPlayers,
+                                result.MaxAutomatchingPlayers, /* exclusiveBitMask= */ (long) 0))
+                            using (matchConfigBuilder.Call<AndroidJavaObject>("setAutoMatchCriteria",
+                                autoMatchCriteria))
+                                ;
                         }
 
-                        matchConfigBuilder.Call<AndroidJavaObject>("addInvitedPlayers", invitedPlayersObject);
-                    }
+                        if (variant != 0)
+                        {
+                            using (matchConfigBuilder.Call<AndroidJavaObject>("setVariant", (int) variant)) ;
+                        }
 
-                    using (var matchConfig = matchConfigBuilder.Call<AndroidJavaObject>("build"))
-                    using (var task = mClient.Call<AndroidJavaObject>("createMatch", matchConfig))
-                    {
-                        AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
-                            task,
-                            turnBasedMatch =>
-                                callback(UIStatus.Valid, AndroidJavaConverter.ToTurnBasedMatch(turnBasedMatch)));
+                        using (var invitedPlayersObject = new AndroidJavaObject("java.util.ArrayList"))
+                        {
+                            for (int i = 0; i < result.PlayerIdsToInvite.Count; ++i)
+                            {
+                                invitedPlayersObject.Call<bool>("add", result.PlayerIdsToInvite[i]);
+                            }
 
-                        AndroidTaskUtils.AddOnFailureListener(
-                            task,
-                            exception => callback(UIStatus.InternalError, null));
+                            using (matchConfigBuilder.Call<AndroidJavaObject>("addInvitedPlayers", invitedPlayersObject)
+                            ) ;
+                        }
+
+                        using (var matchConfig = matchConfigBuilder.Call<AndroidJavaObject>("build"))
+                        using (var task = mClient.Call<AndroidJavaObject>("createMatch", matchConfig))
+                        {
+                            AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
+                                task,
+                                turnBasedMatch =>
+                                    callback(UIStatus.Valid, AndroidJavaConverter.ToTurnBasedMatch(turnBasedMatch)));
+
+                            AndroidTaskUtils.AddOnFailureListener(
+                                task,
+                                exception => callback(UIStatus.InternalError, null));
+                        }
                     }
-                }
-            });
+                });
         }
 
         private AndroidJavaObject StringListToAndroidJavaObject(List<string> list)
