@@ -61,6 +61,7 @@ namespace GooglePlayGames.Android
                 if (GetRoomStatus() == RoomStatus.Active)
                 {
                     OurUtils.Logger.e("Received attempt to create a new room without cleaning up the old one.");
+                    listener.OnRoomConnected(false);
                     return;
                 }
 
@@ -120,18 +121,25 @@ namespace GooglePlayGames.Android
         public void CreateWithInvitationScreen(uint minOpponents, uint maxOpponents, uint variant,
             RealTimeMultiplayerListener listener)
         {
-            AndroidHelperFragment.ShowRtmpSelectOpponentsUI(minOpponents, maxOpponents,
-                (status, result) =>
+            lock (mSessionLock)
+            {
+                if (GetRoomStatus() == RoomStatus.Active)
                 {
-                    if (status != UIStatus.Valid)
-                    {
-                        listener.OnRoomConnected(false);
-                        CleanSession();
-                        return;
-                    }
+                    OurUtils.Logger.e("Received attempt to create a new room without cleaning up the old one.");
+                    listener.OnRoomConnected(false);
+                    return;
+                }
 
-                    lock (mSessionLock)
+                AndroidHelperFragment.ShowRtmpSelectOpponentsUI(minOpponents, maxOpponents,
+                    (status, result) =>
                     {
+                        if (status != UIStatus.Valid)
+                        {
+                            listener.OnRoomConnected(false);
+                            CleanSession();
+                            return;
+                        }
+
                         using (var roomConfigClass =
                             new AndroidJavaClass("com.google.android.gms.games.multiplayer.realtime.RoomConfig"))
                         using (var roomUpdateCallback = new AndroidJavaObject(
@@ -193,8 +201,8 @@ namespace GooglePlayGames.Android
                                     CleanSession();
                                 });
                         }
-                    }
-                });
+                    });
+            }
         }
 
         private float GetPercentComplete()
@@ -270,19 +278,30 @@ namespace GooglePlayGames.Android
 
         public void AcceptFromInbox(RealTimeMultiplayerListener listener)
         {
-            AndroidHelperFragment.ShowInvitationInboxUI((status, invitation) =>
+            lock (mSessionLock)
             {
-                if (status != UIStatus.Valid)
+                if (GetRoomStatus() == RoomStatus.Active)
                 {
-                    OurUtils.Logger.d("User did not complete invitation screen.");
+                    OurUtils.Logger.e("Received attempt to accept invitation without cleaning up " +
+                                      "active session.");
                     listener.OnRoomConnected(false);
                     return;
                 }
 
-                mInvitation = invitation;
+                AndroidHelperFragment.ShowInvitationInboxUI((status, invitation) =>
+                {
+                    if (status != UIStatus.Valid)
+                    {
+                        OurUtils.Logger.d("User did not complete invitation screen.");
+                        listener.OnRoomConnected(false);
+                        return;
+                    }
 
-                AcceptInvitation(mInvitation.InvitationId, listener);
-            });
+                    mInvitation = invitation;
+
+                    AcceptInvitation(mInvitation.InvitationId, listener);
+                });
+            }
         }
 
         public void AcceptInvitation(string invitationId, RealTimeMultiplayerListener listener)
@@ -440,11 +459,6 @@ namespace GooglePlayGames.Android
 
         public Participant GetSelf()
         {
-            if (GetRoomStatus() != RoomStatus.Active)
-            {
-                return null;
-            }
-
             foreach (var participant in GetParticipantList())
             {
                 if (participant.Player.id.Equals(mAndroidClient.GetUserId()))
@@ -464,9 +478,16 @@ namespace GooglePlayGames.Android
                 return null;
             }
 
-            using (var participant = mRoom.Call<AndroidJavaObject>("getParticipant", participantId))
+            try
             {
-                return AndroidJavaConverter.ToParticipant(participant);
+                using (var participant = mRoom.Call<AndroidJavaObject>("getParticipant", participantId))
+                {
+                    return AndroidJavaConverter.ToParticipant(participant);
+                }
+            }
+            catch (Exception e)
+            {
+                return null;
             }
         }
 
@@ -756,6 +777,12 @@ namespace GooglePlayGames.Android
             public void onRoomCreated( /* @OnRoomCreatedStatusCodes */ int statusCode, /* @Nullable Room */
                 AndroidJavaObject room)
             {
+                if (room == null)
+                {
+                    mListener.OnRoomConnected(false);
+                    return;
+                }
+
                 mParent.mRoom = room;
                 mListener.OnRoomSetupProgress(mParent.GetPercentComplete());
             }
@@ -763,6 +790,12 @@ namespace GooglePlayGames.Android
             public void onJoinedRoom( /* @OnJoinedRoomStatusCodes */ int statusCode, /* @Nullable Room */
                 AndroidJavaObject room)
             {
+                if (room == null)
+                {
+                    mListener.OnRoomConnected(false);
+                    return;
+                }
+
                 mParent.mRoom = room;
 
                 int minPlayersToStart = 0;
@@ -791,6 +824,13 @@ namespace GooglePlayGames.Android
             public void onRoomConnected( /* @OnRoomConnectedStatusCodes */ int statusCode, /* @Nullable Room */
                 AndroidJavaObject room)
             {
+                if (room == null)
+                {
+                    mListener.OnRoomConnected(false);
+                    return;
+                }
+
+                mParent.mRoom = room;
                 mListener.OnRoomConnected(true);
             }
         }
