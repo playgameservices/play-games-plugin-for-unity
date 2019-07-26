@@ -463,7 +463,6 @@ namespace GooglePlayGames.Android
             {
                 if (participant.Player.id.Equals(mAndroidClient.GetUserId()))
                 {
-                    Debug.Log("self id is " + participant.ParticipantId);
                     return participant;
                 }
             }
