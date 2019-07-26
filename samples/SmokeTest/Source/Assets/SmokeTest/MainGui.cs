@@ -37,13 +37,7 @@ namespace SmokeTest
         private const int GridCols = 2;
         private const int GridRows = 10;
 
-        private static readonly PlayGamesClientConfiguration ClientConfiguration =
-            new PlayGamesClientConfiguration.Builder()
-                .EnableSavedGames()
-                .RequestEmail()
-                .RequestServerAuthCode(false)
-                .RequestIdToken()
-                .Build();
+        private static PlayGamesClientConfiguration ClientConfiguration;
 
         private Ui mUi = Ui.Main;
 
@@ -272,12 +266,37 @@ namespace SmokeTest
         {
             this.DrawTitle(null);
             this.DrawStatus();
-            if (GUI.Button(this.CalcGrid(0, 1), "Authenticate"))
+            if (GUI.Button(this.CalcGrid(0, 1), "Authenticate - Simple"))
             {
-                this.DoAuthenticate();
+                this.DoAuthenticate(new PlayGamesClientConfiguration.Builder().Build());
             }
-
-            if (GUI.Button(this.CalcGrid(1, 1), "Nearby Connections"))
+            else if (GUI.Button(this.CalcGrid(1, 1), "Authenticate - Token"))
+            {
+                this.DoAuthenticate(new PlayGamesClientConfiguration.Builder()
+                    .RequestIdToken()
+                    .Build());
+            }
+            else if (GUI.Button(this.CalcGrid(0, 2), "Authenticate - Authcode"))
+            {
+                this.DoAuthenticate(new PlayGamesClientConfiguration.Builder()
+                    .RequestServerAuthCode(false)
+                    .Build());
+            }
+            else if (GUI.Button(this.CalcGrid(1, 2), "Authenticate - Saved Game"))
+            {
+                this.DoAuthenticate(new PlayGamesClientConfiguration.Builder()
+                    .EnableSavedGames()
+                    .Build());
+            }
+            else if (GUI.Button(this.CalcGrid(0, 3), "Authenticate - Full"))
+            {
+                this.DoAuthenticate(new PlayGamesClientConfiguration.Builder()
+                    .RequestIdToken()
+                    .RequestServerAuthCode(false)
+                    .EnableSavedGames()
+                    .Build());
+            }
+            else if (GUI.Button(this.CalcGrid(1, 3), "Nearby Connections"))
             {
                 SetUI(Ui.NearbyConnections);
             }
@@ -873,7 +892,7 @@ namespace SmokeTest
                 SetUI(Ui.Main);
             }
         }
-        
+
         private void ShowPopupGravityUi()
         {
             DrawStatus();
@@ -908,7 +927,6 @@ namespace SmokeTest
                 SetUI(Ui.Main);
                 ShowEffect(true);
             }
-            
         }
 
         internal void ShowUserInfoUi()
@@ -1124,10 +1142,11 @@ namespace SmokeTest
             mStandby = false;
         }
 
-        internal void DoAuthenticate()
+        internal void DoAuthenticate(PlayGamesClientConfiguration configuration)
         {
             SetStandBy("Authenticating...");
 
+            ClientConfiguration = configuration;
             PlayGamesPlatform.InitializeInstance(ClientConfiguration);
             PlayGamesPlatform.Activate();
             Social.localUser.Authenticate((bool success) =>
@@ -1280,6 +1299,7 @@ namespace SmokeTest
                 Status = "Invitation is null";
                 return;
             }
+
             string inviterName = invitation.Inviter != null ? invitation.Inviter.DisplayName : "(null)";
             Status = "Invitation " + " from " + inviterName + ", id " + invitation.InvitationId;
         }
