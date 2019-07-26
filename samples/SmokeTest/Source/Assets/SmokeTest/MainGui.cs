@@ -292,6 +292,7 @@ namespace SmokeTest
             {
                 this.DoAuthenticate(new PlayGamesClientConfiguration.Builder()
                     .RequestIdToken()
+                    .RequestEmail()
                     .RequestServerAuthCode(false)
                     .EnableSavedGames()
                     .Build());
