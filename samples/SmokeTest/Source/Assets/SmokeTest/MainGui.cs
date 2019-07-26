@@ -97,7 +97,8 @@ namespace SmokeTest
             Achievements,
             Leaderboards,
             Video,
-            UserInfo
+            UserInfo,
+            PopupGravity
         }
 
         public void Start()
@@ -320,7 +321,11 @@ namespace SmokeTest
             {
                 SetUI(Ui.NearbyConnections);
             }
-            else if (GUI.Button(this.CalcGrid(0, 5), "Sign Out"))
+            else if (GUI.Button(this.CalcGrid(0, 5), "Popup Gravity"))
+            {
+                SetUI(Ui.PopupGravity);
+            }
+            else if (GUI.Button(this.CalcGrid(1, 5), "Sign Out"))
             {
                 this.DoSignOut();
             }
@@ -868,6 +873,43 @@ namespace SmokeTest
                 SetUI(Ui.Main);
             }
         }
+        
+        private void ShowPopupGravityUi()
+        {
+            DrawStatus();
+            DrawTitle("PopupGravity Ui");
+            if (GUI.Button(CalcGrid(0, 1), "Top"))
+            {
+                PlayGamesPlatform.Instance.SetGravityForPopups(Gravity.TOP);
+                Status = "Popup will appear on top";
+            }
+            else if (GUI.Button(CalcGrid(1, 1), "Bottom"))
+            {
+                PlayGamesPlatform.Instance.SetGravityForPopups(Gravity.BOTTOM);
+                Status = "Popup will appear at bottom";
+            }
+            else if (GUI.Button(CalcGrid(0, 2), "Left"))
+            {
+                PlayGamesPlatform.Instance.SetGravityForPopups(Gravity.LEFT);
+                Status = "Popup will appear on left";
+            }
+            else if (GUI.Button(CalcGrid(1, 2), "Right"))
+            {
+                PlayGamesPlatform.Instance.SetGravityForPopups(Gravity.RIGHT);
+                Status = "Popup will appear on right";
+            }
+            else if (GUI.Button(CalcGrid(0, 3), "Center horizontal"))
+            {
+                PlayGamesPlatform.Instance.SetGravityForPopups(Gravity.CENTER_HORIZONTAL);
+                Status = "Popup will appear on center";
+            }
+            else if (GUI.Button(CalcGrid(1, 3), "Back"))
+            {
+                SetUI(Ui.Main);
+                ShowEffect(true);
+            }
+            
+        }
 
         internal void ShowUserInfoUi()
         {
@@ -1046,6 +1088,9 @@ namespace SmokeTest
                         }
 
                         ShowUserInfoUi();
+                        break;
+                    case Ui.PopupGravity:
+                        ShowPopupGravityUi();
                         break;
                     default:
                         // check for a status of interest, and if there
