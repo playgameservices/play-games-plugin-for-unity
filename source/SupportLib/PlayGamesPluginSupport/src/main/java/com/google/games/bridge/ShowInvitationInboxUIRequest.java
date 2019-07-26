@@ -78,13 +78,13 @@ class ShowInvitationInboxUIRequest implements HelperFragment.Request {
         }
     }
 
-    void setResult(Integer status, Invitation invitation) {
+    void setResult(int status, Invitation invitation) {
         Result result = new Result(status, invitation);
         resultTaskSource.setResult(result);
         HelperFragment.finishRequest(this);
     }
 
-    void setResult(Integer status) {
+    void setResult(int status) {
         setResult(status, null);
     }
 
