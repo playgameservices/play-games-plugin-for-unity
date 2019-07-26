@@ -706,7 +706,15 @@ namespace SmokeTest
             {
                 DoLeaveRoom();
             }
-            else if (GUI.Button(CalcGrid(1, 6), "Back"))
+            else if (GUI.Button(CalcGrid(1, 6), "Is Room Connected"))
+            {
+                DoIsRoomConnected();
+            }
+            else if (GUI.Button(CalcGrid(0, 7), "Get Invitation"))
+            {
+                DoGetInvitation();
+            }
+            else if (GUI.Button(CalcGrid(1, 7), "Back"))
             {
                 SetUI(Ui.Multiplayer);
                 ShowEffect(true);
@@ -1210,6 +1218,25 @@ namespace SmokeTest
         {
             Status = "Requested to leave room.";
             PlayGamesPlatform.Instance.RealTime.LeaveRoom();
+        }
+
+        private void DoIsRoomConnected()
+        {
+            Status = "Room is " +
+                     (PlayGamesPlatform.Instance.RealTime.IsRoomConnected() ? "" : "not ") +
+                     "connected.";
+        }
+
+        private void DoGetInvitation()
+        {
+            var invitation = PlayGamesPlatform.Instance.RealTime.GetInvitation();
+            if (invitation == null)
+            {
+                Status = "Invitation is null";
+                return;
+            }
+            string inviterName = invitation.Inviter != null ? invitation.Inviter.DisplayName : "(null)";
+            Status = "Invitation " + " from " + inviterName + ", id " + invitation.InvitationId;
         }
 
         private void DoWaitingRoom()
