@@ -13,7 +13,8 @@ namespace GooglePlayGames.Android
     {
         private volatile AndroidJavaObject mClient;
         private readonly static string ServiceId = ReadServiceId();
-        private readonly static long GmscoreNearbyClientId = 0L;
+        private readonly static long NearbyClientId = 0L;
+        private readonly static int ApplicationInfoFlags = 0x00000080;
         protected IMessageListener mAdvertisingMessageListener;
 
         public AndroidNearbyConnectionClient()
@@ -266,17 +267,17 @@ namespace GooglePlayGames.Android
 
                 if (statusCode == 0) // STATUS_OK
                 {
-                    mResponseCallback(ConnectionResponse.Accepted(GmscoreNearbyClientId, endpointId, new byte[0]));
+                    mResponseCallback(ConnectionResponse.Accepted(NearbyClientId, endpointId, new byte[0]));
                     return;
                 }
 
                 if (statusCode == 8002) // STATUS_ALREADY_DISCOVERING
                 {
-                    mResponseCallback(ConnectionResponse.AlreadyConnected(GmscoreNearbyClientId, endpointId));
+                    mResponseCallback(ConnectionResponse.AlreadyConnected(NearbyClientId, endpointId));
                     return;
                 }
 
-                mResponseCallback(ConnectionResponse.Rejected(GmscoreNearbyClientId, endpointId));
+                mResponseCallback(ConnectionResponse.Rejected(NearbyClientId, endpointId));
             }
 
             public void onDisconnected(string endpointId)
@@ -370,7 +371,7 @@ namespace GooglePlayGames.Android
                 string packageName = activity.Call<string>("getPackageName");
                 using (var pm = activity.Call<AndroidJavaObject>("getPackageManager"))
                 using (var appInfo =
-                    pm.Call<AndroidJavaObject>("getApplicationInfo", packageName, (int) 0x00000080))
+                    pm.Call<AndroidJavaObject>("getApplicationInfo", packageName, ApplicationInfoFlags))
                 using (var bundle = appInfo.Get<AndroidJavaObject>("metaData"))
                 {
                     string sysId = bundle.Call<string>("getString",

@@ -34,7 +34,6 @@ namespace GooglePlayGames
                 callback.Invoke(new GooglePlayGames.BasicApi.Nearby.DummyNearbyConnectionClient());
             }
 
-            // Not implemented
             callback.Invoke(new GooglePlayGames.Android.AndroidNearbyConnectionClient());
         }
     }

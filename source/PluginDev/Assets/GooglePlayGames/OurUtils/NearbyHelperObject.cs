@@ -29,7 +29,7 @@ namespace GooglePlayGames.OurUtils
             if (Application.isPlaying)
             {
                 // add an invisible game object to the scene
-                GameObject obj = new GameObject("PlayGames_QueueRunner");
+                GameObject obj = new GameObject("PlayGames_NearbyHelper");
                 DontDestroyOnLoad(obj);
                 instance = obj.AddComponent<NearbyHelperObject>();
             }

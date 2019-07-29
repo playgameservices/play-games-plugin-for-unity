@@ -29,5 +29,4 @@ public class ConnectionLifecycleCallbackProxy extends ConnectionLifecycleCallbac
         void onDisconnected(@NonNull String endpointId);
         void onConnectionInitiated(@NonNull String endpointId, @NonNull ConnectionInfo connectionInfo);
     }
-
 }
