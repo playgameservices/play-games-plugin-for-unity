@@ -1,18 +1,4 @@
-// <copyright file="PlayGamesHelperObject.cs" company="Google Inc.">
-// Copyright (C) 2014 Google Inc.
-//
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//  http://www.apache.org/licenses/LICENSE-2.0
-//
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//    limitations under the License.
-// </copyright>
+#if UNITY_ANDROID
 
 namespace GooglePlayGames.OurUtils
 {
@@ -20,16 +6,14 @@ namespace GooglePlayGames.OurUtils
     using System;
     using UnityEngine;
 
-#if UNITY_ANDROID
-
     public class NearbyHelperObject : MonoBehaviour
     {
         // our (singleton) instance
         private static NearbyHelperObject instance = null;
 
         // timers to keep track of discovery and advertising
-        private static double AdvertisingRemaining = 0;
-        private static double DiscoveryRemaining = 0;
+        private static double mAdvertisingRemaining = 0;
+        private static double mDiscoveryRemaining = 0;
 
         // nearby client to stop discovery and to stop advertising
         private static INearbyConnectionClient mClient = null;
@@ -72,12 +56,12 @@ namespace GooglePlayGames.OurUtils
 
         public static void StartAdvertisingTimer(TimeSpan? span)
         {
-            AdvertisingRemaining = ToSeconds(span);
+            mAdvertisingRemaining = ToSeconds(span);
         }
 
         public static void StartDiscoveryTimer(TimeSpan? span)
         {
-            DiscoveryRemaining = ToSeconds(span);
+            mDiscoveryRemaining = ToSeconds(span);
         }
 
         public void Awake()
@@ -96,25 +80,25 @@ namespace GooglePlayGames.OurUtils
         public void Update()
         {
             // check if currently advertising
-            if (AdvertisingRemaining > 0)
+            if (mAdvertisingRemaining > 0)
             {
-                AdvertisingRemaining -= Time.deltaTime;
-                if (AdvertisingRemaining < 0)
+                mAdvertisingRemaining -= Time.deltaTime;
+                if (mAdvertisingRemaining < 0)
                 {
                     mClient.StopAdvertising();
                 }
             }
 
             // check if currently discovering
-            if (DiscoveryRemaining > 0)
+            if (mDiscoveryRemaining > 0)
             {
-                DiscoveryRemaining -= Time.deltaTime;
-                if (DiscoveryRemaining < 0)
+                mDiscoveryRemaining -= Time.deltaTime;
+                if (mDiscoveryRemaining < 0)
                 {
                     mClient.StopDiscovery(mClient.GetServiceId());
                 }
             }
         }
     }
-#endif
 }
+#endif

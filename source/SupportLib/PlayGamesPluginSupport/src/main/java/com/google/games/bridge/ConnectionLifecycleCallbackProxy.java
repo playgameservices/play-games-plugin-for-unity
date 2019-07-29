@@ -2,7 +2,6 @@ package com.google.games.bridge;
 
 import com.google.android.gms.nearby.connection.ConnectionLifecycleCallback;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import com.google.android.gms.nearby.connection.ConnectionInfo;
 import com.google.android.gms.nearby.connection.ConnectionResolution;
 

@@ -3,15 +3,11 @@
 namespace GooglePlayGames.Android
 {
     using System;
-    using System.Linq;
     using System.Collections.Generic;
-    using System.Threading;
     using GooglePlayGames.BasicApi;
     using GooglePlayGames.BasicApi.Nearby;
     using GooglePlayGames.OurUtils;
     using UnityEngine;
-    using UnityEngine.Android;
-    using UnityEngine.SocialPlatforms;
 
     public class AndroidNearbyConnectionClient : INearbyConnectionClient
     {
@@ -87,7 +83,7 @@ namespace GooglePlayGames.Android
             using (var task = mClient.Call<AndroidJavaObject>("startAdvertising", name, GetServiceId(),
                 connectionLifecycleCallback, advertisingOptions))
             {
-                AndroidTaskUtils.AddOnFailureListener(
+                AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
                     task,
                     v => NearbyHelperObject.StartAdvertisingTimer(advertisingDuration)
                 );
