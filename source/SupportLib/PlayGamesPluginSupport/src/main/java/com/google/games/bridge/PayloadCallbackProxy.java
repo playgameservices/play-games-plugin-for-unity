@@ -8,7 +8,7 @@ import android.support.annotation.NonNull;
 public class PayloadCallbackProxy extends PayloadCallback {
 	private Callback callback;
 
-    public PayloadCallbackProxy(Callback callback) {
+	public PayloadCallbackProxy(Callback callback) {
 		this.callback = callback;
 	}
 
@@ -19,7 +19,7 @@ public class PayloadCallbackProxy extends PayloadCallback {
 	public void onPayloadTransferUpdate(@NonNull String endpointId, @NonNull PayloadTransferUpdate update) {
 	}
 
-    public interface Callback {
+	public interface Callback {
 		void onPayloadReceived(@NonNull String endpointId, @NonNull Payload payload);
 	}
 }
