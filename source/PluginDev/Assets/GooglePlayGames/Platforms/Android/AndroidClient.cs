@@ -155,7 +155,6 @@ namespace GooglePlayGames.Android
                                             mTurnBasedClient.RegisterMatchDelegate(mConfiguration.MatchDelegate);
                                         }
 
-
                                         mAuthState = AuthState.Authenticated;
                                         InvokeCallbackOnGameThread(callback, true, "Authentication succeed");
                                         try
