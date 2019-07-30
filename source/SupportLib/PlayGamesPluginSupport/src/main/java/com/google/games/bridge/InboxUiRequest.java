@@ -74,13 +74,13 @@ class InboxUiRequest implements HelperFragment.Request {
         }
     }
 
-    void setResult(Integer status, TurnBasedMatch turnBasedMatch) {
+    void setResult(int status, TurnBasedMatch turnBasedMatch) {
         Result result = new Result(status, turnBasedMatch);
         resultTaskSource.setResult(result);
         HelperFragment.finishRequest(this);
     }
 
-    void setResult(Integer result) {
+    void setResult(int result) {
         setResult(result, /* turnBasedMatch= */ null);
     }
 
