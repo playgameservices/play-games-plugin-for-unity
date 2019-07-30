@@ -139,32 +139,32 @@ namespace GooglePlayGames.Android
                     {
                         if (dataOrConflict.Call<bool>("isConflict"))
                         {
-                            using (var conflict = dataOrConflict.Call<AndroidJavaObject>("getConflict"))
-                            {
-                                AndroidSnapshotMetadata original =
-                                    new AndroidSnapshotMetadata(conflict.Call<AndroidJavaObject>("getSnapshot"));
-                                AndroidSnapshotMetadata unmerged =
-                                    new AndroidSnapshotMetadata(
-                                        conflict.Call<AndroidJavaObject>("getConflictingSnapshot"));
+                            var conflict = dataOrConflict.Call<AndroidJavaObject>("getConflict");
+                            AndroidSnapshotMetadata original =
+                                new AndroidSnapshotMetadata(conflict.Call<AndroidJavaObject>("getSnapshot"));
+                            AndroidSnapshotMetadata unmerged =
+                                new AndroidSnapshotMetadata(
+                                    conflict.Call<AndroidJavaObject>("getConflictingSnapshot"));
 
-                                // Instantiate the conflict resolver. Note that the retry callback closes over
-                                // all the parameters we need to retry the open attempt. Once the conflict is
-                                // resolved by invoking the appropriate resolution method on
-                                // AndroidConflictResolver, the resolver will invoke this callback, which will
-                                // result in this method being re-executed. This recursion will continue until
-                                // all conflicts are resolved or an error occurs.
-                                AndroidConflictResolver resolver = new AndroidConflictResolver(
-                                    mSnapshotsClient,
-                                    conflict,
-                                    original,
-                                    unmerged,
-                                    completedCallback,
-                                    () => InternalOpen(filename, source, resolutionStrategy,
-                                        prefetchDataOnConflict,
-                                        conflictCallback, completedCallback));
+                            // Instantiate the conflict resolver. Note that the retry callback closes over
+                            // all the parameters we need to retry the open attempt. Once the conflict is
+                            // resolved by invoking the appropriate resolution method on
+                            // AndroidConflictResolver, the resolver will invoke this callback, which will
+                            // result in this method being re-executed. This recursion will continue until
+                            // all conflicts are resolved or an error occurs.
+                            AndroidConflictResolver resolver = new AndroidConflictResolver(
+                                mSnapshotsClient,
+                                conflict,
+                                original,
+                                unmerged,
+                                completedCallback,
+                                () => InternalOpen(filename, source, resolutionStrategy,
+                                    prefetchDataOnConflict,
+                                    conflictCallback, completedCallback));
 
-                                conflictCallback(resolver, original, null, unmerged, null);
-                            }
+                            var originalBytes = original.JavaContents.Call<byte[]>("readFully");
+                            var unmergedBytes = unmerged.JavaContents.Call<byte[]>("readFully");
+                            conflictCallback(resolver, original, originalBytes, unmerged, unmergedBytes);
                         }
                         else
                         {
@@ -398,7 +398,7 @@ namespace GooglePlayGames.Android
                     using (var task = mSnapshotsClient.Call<AndroidJavaObject>(
                         "resolveConflict",
                         mConflict.Call<string>("getConflictId"),
-                        convertedMetadata.JavaSnapshot.Call<string>("getSnapshotId"),
+                        convertedMetadata.JavaMetadata.Call<string>("getSnapshotId"),
                         convertedMetadataChange,
                         contentUpdate))
                     {
