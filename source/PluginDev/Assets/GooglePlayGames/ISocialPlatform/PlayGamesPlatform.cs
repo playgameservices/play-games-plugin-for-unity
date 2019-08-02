@@ -196,7 +196,7 @@ namespace GooglePlayGames
         /// <param name="configuration">Configuration to use when initializing.</param>
         public static void InitializeInstance(PlayGamesClientConfiguration configuration)
         {
-            if (sInstance == null || !sInstance.mConfiguration.IsEqualTo(configuration))
+            if (sInstance == null || sInstance.mConfiguration != configuration)
             {
                 sInstance = new PlayGamesPlatform(configuration);
                 return;
