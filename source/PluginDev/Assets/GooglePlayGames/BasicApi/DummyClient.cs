@@ -492,6 +492,22 @@ namespace GooglePlayGames.BasicApi
         {
             Logger.d("Received method call on DummyClient - using stub implementation.");
         }
+
+        /// <summary>
+        /// Shows the Player Games Profile UI for the given player Id.
+        /// </summary>
+        /// <param name="playerId">Player Id. This cannot be null.</param>
+        /// <param name="callback">Callback to invoke when complete.</param>
+        public void ShowPlayerProfileUI(
+            string playerId,
+            Action<UIStatus> callback)
+        {
+            LogUsage();
+            if (callback != null)
+            {
+                callback.Invoke(UIStatus.VersionUpdateRequired);
+            }
+        }
     }
 }
 #endif

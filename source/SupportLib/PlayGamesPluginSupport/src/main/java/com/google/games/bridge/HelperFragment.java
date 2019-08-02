@@ -36,6 +36,7 @@ import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesActivityResultCodes;
+import com.google.android.gms.games.Player;
 import com.google.android.gms.games.multiplayer.Invitation;
 import com.google.android.gms.games.multiplayer.realtime.Room;
 import com.google.android.gms.tasks.Task;
@@ -166,6 +167,16 @@ public class HelperFragment extends Fragment
 
     public static Task<Integer> showLeaderboardUi(Activity parentActivity, String leaderboardId, int timeSpan) {
         LeaderboardUiRequest request = new LeaderboardUiRequest(leaderboardId, timeSpan);
+
+        if(!HelperFragment.startRequest(parentActivity, request)) {
+            request.setResult(CommonUIStatus.UI_BUSY);
+        }
+
+        return request.getTask();
+    }
+
+    public static Task<Integer> showPlayerProfileUi(Activity parentActivity, Player player) {
+        PlayerProfileUiRequest request = new PlayerProfileUiRequest(player);
 
         if(!HelperFragment.startRequest(parentActivity, request)) {
             request.setResult(CommonUIStatus.UI_BUSY);
