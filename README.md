@@ -659,7 +659,7 @@ The standard UI for selecting or creating a saved game entry is displayed by cal
 
 ```csharp
     void ShowSelectUI() {
-        int maxNumToDisplay = 5;
+        uint maxNumToDisplay = 5;
         bool allowCreateNew = false;
         bool allowDelete = true;
 
