@@ -349,7 +349,11 @@ namespace Google.Developers
                 }
                 else if (t == typeof(byte))
                 {
+#if UNITY_2019_1_OR_NEWER
+                    return (T)(object)AndroidJNI.CallSByteMethod(raw, method, jArgs);
+#else
                     return (T)(object)AndroidJNI.CallByteMethod(raw, method, jArgs);
+#endif
                 }
                 else if (t == typeof(char))
                 {
@@ -414,8 +418,13 @@ namespace Google.Developers
                 }
                 else if (t == typeof(byte))
                 {
+#if UNITY_2019_1_OR_NEWER
+                    return (T)(object)AndroidJNI.CallStaticSByteMethod(
+                        rawClass, method, jArgs);
+#else
                     return (T)(object)AndroidJNI.CallStaticByteMethod(
                         rawClass, method, jArgs);
+#endif
                 }
                 else if (t == typeof(char))
                 {
