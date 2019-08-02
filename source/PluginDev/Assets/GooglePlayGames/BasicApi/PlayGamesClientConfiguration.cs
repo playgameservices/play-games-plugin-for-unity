@@ -414,6 +414,29 @@ namespace GooglePlayGames.BasicApi
                 return mInvitationDelegate;
             }
         }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 31 + EnableSavedGames.GetHashCode();
+                hash = hash * 31 + IsForcingRefresh.GetHashCode();
+                hash = hash * 31 + IsHidingPopups.GetHashCode();
+                hash = hash * 31 + IsRequestingEmail.GetHashCode();
+                hash = hash * 31 + IsRequestingAuthCode.GetHashCode();
+                hash = hash * 31 + Scopes.GetHashCode();
+                hash = hash * 31 + AccountName.GetHashCode();
+                hash = hash * 31 + InvitationDelegate.GetHashCode();
+                hash = hash * 31 + MatchDelegate.GetHashCode();
+                return hash;
+            }
+        }
+
+        public override bool Equals(object obj)
+        {
+            return this == (PlayGamesClientConfiguration) obj;
+        }
     }
 }
 #endif
