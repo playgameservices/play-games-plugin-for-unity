@@ -270,25 +270,31 @@ namespace SmokeTest
             {
                 this.DoAuthenticate(new PlayGamesClientConfiguration.Builder().Build());
             }
-            else if (GUI.Button(this.CalcGrid(1, 1), "Authenticate - Token"))
+            else if (GUI.Button(this.CalcGrid(1, 1), "Authenticate - ID Token"))
             {
                 this.DoAuthenticate(new PlayGamesClientConfiguration.Builder()
                     .RequestIdToken()
                     .Build());
             }
-            else if (GUI.Button(this.CalcGrid(0, 2), "Authenticate - Authcode"))
+            else if (GUI.Button(this.CalcGrid(0, 2), "Authenticate - Server Auth Code"))
             {
                 this.DoAuthenticate(new PlayGamesClientConfiguration.Builder()
                     .RequestServerAuthCode(false)
                     .Build());
             }
-            else if (GUI.Button(this.CalcGrid(1, 2), "Authenticate - Saved Game"))
+            else if (GUI.Button(this.CalcGrid(1, 2), "Authenticate - Enable Saved Games"))
             {
                 this.DoAuthenticate(new PlayGamesClientConfiguration.Builder()
                     .EnableSavedGames()
                     .Build());
             }
-            else if (GUI.Button(this.CalcGrid(0, 3), "Authenticate - Full"))
+            else if (GUI.Button(this.CalcGrid(0, 3), "Authenticate - Hide Popups"))
+            {
+                this.DoAuthenticate(new PlayGamesClientConfiguration.Builder()
+                    .EnableHidePopups()
+                    .Build());
+            }
+            else if (GUI.Button(this.CalcGrid(1, 3), "Authenticate - Full"))
             {
                 this.DoAuthenticate(new PlayGamesClientConfiguration.Builder()
                     .RequestIdToken()
@@ -297,7 +303,7 @@ namespace SmokeTest
                     .EnableSavedGames()
                     .Build());
             }
-            else if (GUI.Button(this.CalcGrid(1, 3), "Nearby Connections"))
+            else if (GUI.Button(this.CalcGrid(0, 4), "Nearby Connections"))
             {
                 SetUI(Ui.NearbyConnections);
             }
