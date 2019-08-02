@@ -714,6 +714,28 @@ namespace GooglePlayGames
         }
 
         /// <summary>
+        /// Shows the Player Profile UI for the given player Id
+        /// </summary>
+        /// <param name="playerId">Player ID. It cannot be null.</param>
+        /// <param name="callback">Callback to call. If null, nothing is called.</param>
+        public void ShowPlayerProfileUI(string playerId, Action<UIStatus> callback)
+        {
+            if (!IsAuthenticated())
+            {
+                GooglePlayGames.OurUtils.Logger.e("ShowPlayerProfileUI can only be called after authentication.");
+                if (callback != null)
+                {
+                    callback(UIStatus.NotAuthorized);
+                }
+
+                return;
+            }
+            GooglePlayGames.OurUtils.Logger.d("ShowPlayerProfileUI, playerId=" +
+                                              playerId + " callback is " + callback);
+            mClient.ShowPlayerProfileUI(playerId, callback);
+        }
+
+        /// <summary>
         /// Reveals the achievement with the passed identifier. This is a Play Games extension of the ISocialPlatform API.
         /// </summary>
         /// <remarks>If the operation succeeds, the callback

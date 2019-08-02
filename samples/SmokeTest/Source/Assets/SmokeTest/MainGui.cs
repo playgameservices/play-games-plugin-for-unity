@@ -920,15 +920,20 @@ namespace SmokeTest
 
             GUI.Label(CalcGrid(0, 7, 2, 1), "Player Stats: " + statsMessage);
 
-
-            if (GUI.Button(CalcGrid(0, 8), "Back"))
+            if (GUI.Button(CalcGrid(0, 8), "View Profile"))
             {
-                mUi = Ui.Main;
-            }
-            else if (GUI.Button(CalcGrid(1, 8), "New AuthCode"))
+                PlayGamesPlatform.Instance.ShowPlayerProfileUI(Social.localUser.id, (success) => 
+                {
+                    Debug.Log("Show the current user's profile");
+                });
+            } else if (GUI.Button(CalcGrid(1, 8), "New AuthCode"))
             {
                 PlayGamesPlatform.Instance.GetAnotherServerAuthCode(false,
                     (newAuthCode) => this.authCode = newAuthCode);
+            } else
+            if (GUI.Button(CalcGrid(1, 8), "Back"))
+            {
+                mUi = Ui.Main;
             }
         }
 
