@@ -196,14 +196,14 @@ namespace GooglePlayGames
         /// <param name="configuration">Configuration to use when initializing.</param>
         public static void InitializeInstance(PlayGamesClientConfiguration configuration)
         {
-            if (sInstance != null)
+            if (sInstance == null || !sInstance.mConfiguration.IsEqualTo(configuration))
             {
-                GooglePlayGames.OurUtils.Logger.w(
-                    "PlayGamesPlatform already initialized. Ignoring this call.");
+                sInstance = new PlayGamesPlatform(configuration);
                 return;
             }
 
-            sInstance = new PlayGamesPlatform(configuration);
+            GooglePlayGames.OurUtils.Logger.w(
+                "PlayGamesPlatform already initialized. Ignoring this call.");
         }
 
         /// <summary>

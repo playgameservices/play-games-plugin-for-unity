@@ -154,6 +154,20 @@ namespace GooglePlayGames.BasicApi
             get { return mScopes; }
         }
 
+        public bool IsEqualTo(PlayGamesClientConfiguration configuration)
+        {
+            if (mEnableSavedGames != configuration.EnableSavedGames ||
+                mForceRefresh != configuration.IsForcingRefresh || mHidePopups != configuration.IsHidingPopups ||
+                mRequestEmail != configuration.IsRequestingEmail ||
+                mRequestAuthCode != configuration.IsRequestingAuthCode ||
+                !mScopes.Equals(configuration.Scopes) || mAccountName != configuration.AccountName)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         /// <summary>
         /// Gets the invitation delegate.
         /// </summary>
