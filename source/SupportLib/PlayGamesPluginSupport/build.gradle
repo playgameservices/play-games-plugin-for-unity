@@ -45,7 +45,7 @@ android {
         minSdkVersion 16
 
     }
-    compileSdkVersion 27
+    compileSdkVersion 28
 }
 
 // Rename the .aar file to be .srcaar to work around
