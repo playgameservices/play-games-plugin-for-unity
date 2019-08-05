@@ -1,7 +1,6 @@
 package com.google.games.bridge;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import com.google.android.gms.nearby.connection.DiscoveredEndpointInfo;
 import com.google.android.gms.nearby.connection.EndpointDiscoveryCallback;
 

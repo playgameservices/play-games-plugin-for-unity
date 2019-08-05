@@ -99,13 +99,13 @@ class SelectSnapshotUiRequest implements HelperFragment.Request {
         }
     }
 
-    void setResult(Integer status, SnapshotMetadata metadata) {
+    void setResult(int status, SnapshotMetadata metadata) {
         Result result = new Result(status, metadata);
         resultTaskSource.setResult(result);
         HelperFragment.finishRequest(this);
     }
 
-    void setResult(Integer status) {
+    void setResult(int status) {
         setResult(status, /* metadata= */null);
     }
 

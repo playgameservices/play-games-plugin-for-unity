@@ -60,7 +60,7 @@ class SimpleUiRequest implements HelperFragment.Request {
         }
     }
 
-    void setResult(Integer result) {
+    void setResult(int result) {
         resultTaskSource.setResult(result);
         HelperFragment.finishRequest(this);
     }
