@@ -97,7 +97,7 @@ uploadArchives {
 
 dependencies {
     implementation 'androidx.annotation:annotation:1.1.0'
-    implementation 'com.google.android.gms:play-services-games:18.0.0'
+    implementation 'com.google.android.gms:play-services-games:18.0.1'
     implementation 'com.google.android.gms:play-services-auth:17.0.0'
     implementation 'com.google.android.gms:play-services-nearby:17.0.0'
 }
