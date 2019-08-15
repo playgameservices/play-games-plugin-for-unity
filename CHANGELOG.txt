@@ -1,6 +1,8 @@
 Version 0.10.01
     Other:
       * Reimplementation of the plugin without using C++ SDK.
+    New Features:
+      * Updated play-services-games version to 18.0.1
 
 Version 0.9.64
     New Features:
