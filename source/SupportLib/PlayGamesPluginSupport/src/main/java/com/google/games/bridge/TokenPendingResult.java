@@ -16,7 +16,7 @@
 
 package com.google.games.bridge;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.api.CommonStatusCodes;
@@ -138,7 +138,7 @@ public class TokenPendingResult extends PendingResult<TokenResult> {
         }
 
     }
-    
+
     public void setAccount(GoogleSignInAccount account) {
         result.setAccount(account);
     }
