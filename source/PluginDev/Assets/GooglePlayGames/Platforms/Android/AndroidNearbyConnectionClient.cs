@@ -12,9 +12,9 @@ namespace GooglePlayGames.Android
     public class AndroidNearbyConnectionClient : INearbyConnectionClient
     {
         private volatile AndroidJavaObject mClient;
-        private readonly static string ServiceId = ReadServiceId();
         private readonly static long NearbyClientId = 0L;
         private readonly static int ApplicationInfoFlags = 0x00000080;
+        private readonly static string ServiceId = ReadServiceId();
         protected IMessageListener mAdvertisingMessageListener;
 
         public AndroidNearbyConnectionClient()
