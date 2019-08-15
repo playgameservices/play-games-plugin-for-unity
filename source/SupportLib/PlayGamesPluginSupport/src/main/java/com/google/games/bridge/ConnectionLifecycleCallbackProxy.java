@@ -1,8 +1,8 @@
 package com.google.games.bridge;
 
-import com.google.android.gms.nearby.connection.ConnectionLifecycleCallback;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.google.android.gms.nearby.connection.ConnectionInfo;
+import com.google.android.gms.nearby.connection.ConnectionLifecycleCallback;
 import com.google.android.gms.nearby.connection.ConnectionResolution;
 
 public class ConnectionLifecycleCallbackProxy extends ConnectionLifecycleCallback {
