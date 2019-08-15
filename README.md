@@ -10,6 +10,10 @@ _Unity&reg; is a trademark of Unity Technologies._
 
 _iOS is a trademark of Apple, Inc._
 
+## New Plugin Is Available 
+A new Google Play Games plugin is now publicly available. Please go to [the announcement post](https://github.com/playgameservices/play-games-plugin-for-unity/issues/2687) to learn more about it. 
+
+
 ## Overview
 
 The Google Play Games plugin for Unity allows you to access the Google Play Games
