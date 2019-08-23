@@ -27,6 +27,7 @@ namespace SmokeTest
     {
         private MainGui mOwner;
         private string mStatus;
+        private LeaderboardScoreData mScoreData;
 
         // Constructed by the main gui
         internal LeaderboardGUI(MainGui owner)
@@ -71,6 +72,14 @@ namespace SmokeTest
                 DoSocialLoadScores();
             }
 
+            if (GUILayout.Button("Load More Scores", GUILayout.Height(height), GUILayout.ExpandWidth(true)))
+            {
+                DoLoadMoreScores();
+            }
+
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal(GUILayout.Height(height));
+
             if (GUILayout.Button("Back", GUILayout.Height(height), GUILayout.ExpandWidth(true)))
             {
                 mOwner.SetUI(MainGui.Ui.Main);
@@ -113,13 +122,14 @@ namespace SmokeTest
             PlayGamesPlatform.Instance.LoadScores(
                 GPGSIds.leaderboard_leaders_in_smoketesting,
                 LeaderboardStart.PlayerCentered,
-                100,
+                /* rowCount= */ 25,
                 LeaderboardCollection.Social,
                 LeaderboardTimeSpan.AllTime,
                 (data) =>
                 {
                     mStatus = "Leaderboard data valid: " + data.Valid;
                     mStatus += "\n approx:" + data.ApproximateCount + " have " + data.Scores.Length;
+                    mScoreData = data;
                 });
         }
 
@@ -128,7 +138,7 @@ namespace SmokeTest
             PlayGamesPlatform.Instance.LoadScores(
                 GPGSIds.leaderboard_leaders_in_smoketesting,
                 LeaderboardStart.PlayerCentered,
-                100,
+                /* rowCount= */ 25,
                 LeaderboardCollection.Public,
                 LeaderboardTimeSpan.AllTime,
                 (data) =>
@@ -136,7 +146,35 @@ namespace SmokeTest
                     mStatus = "LB data Status: " + data.Status;
                     mStatus += " valid: " + data.Valid;
                     mStatus += "\n approx:" + data.ApproximateCount + " have " + data.Scores.Length;
+                    mScoreData = data;
                 });
+        }
+
+        internal void DoLoadMoreScores()
+        {
+            if (mScoreData == null)
+            {
+                mStatus = "mScoreData is null.";
+                return;
+            }
+
+            PlayGamesPlatform.Instance.LoadMoreScores(mScoreData.NextPageToken, 10,
+                (data) =>
+                {
+                    if (data.Status == ResponseStatus.InternalError)
+                    {
+                        mStatus = "Internal error";
+                        mScoreData = null;
+                    }
+                    else
+                    {
+                        mStatus = "LB data Status: " + data.Status;
+                        mStatus += " valid: " + data.Valid;
+                        mStatus += "\n approx:" + data.ApproximateCount + " have " + data.Scores.Length;
+                        mScoreData = data;
+                    }
+                }
+            );
         }
 
         internal void DoLoadLeaderboard()
