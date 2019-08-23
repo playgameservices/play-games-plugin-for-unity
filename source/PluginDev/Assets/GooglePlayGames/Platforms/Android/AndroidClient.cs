@@ -464,25 +464,26 @@ namespace GooglePlayGames.Android
                 InvokeCallbackOnGameThread(callback, UIStatus.NotAuthorized);
                 return;
             }
-            using (var playersClient = getPlayersClient()) 
-            using (var task = playersClient.Call<AndroidJavaObject>("loadPlayer", playerId)) 
-            { 
-                AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>( 
-                    task, annotatedData => 
-                    { 
+
+            using (var playersClient = getPlayersClient())
+            using (var task = playersClient.Call<AndroidJavaObject>("loadPlayer", playerId))
+            {
+                AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
+                    task, annotatedData =>
+                    {
                         using (var player = annotatedData.Call<AndroidJavaObject>("get"))
                         {
                             AndroidHelperFragment.ShowPlayerProfileUI(player, AsOnGameThreadCallback(callback));
                         }
+
                         return;
                     });
-                AndroidTaskUtils.AddOnFailureListener(task, exception => 
-                { 
-                    InvokeCallbackOnGameThread(callback, UIStatus.NotAuthorized); 
+                AndroidTaskUtils.AddOnFailureListener(task, exception =>
+                {
+                    InvokeCallbackOnGameThread(callback, UIStatus.NotAuthorized);
                     return;
-                }); 
+                });
             }
-            
         }
 
         ///<summary></summary>
