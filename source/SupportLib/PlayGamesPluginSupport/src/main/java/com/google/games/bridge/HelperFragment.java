@@ -118,26 +118,6 @@ public class HelperFragment extends Fragment
         return request.getPendingResponse();
     }
 
-    /**
-     * This calls silent signin and gets the user info including the auth code.
-     * If silent sign-in fails, the failure is returned.
-     * @return PendingResult for waiting on result.
-     */
-    public static PendingResult getAnotherAuthCode(Activity parentActivity,
-                                                   final boolean reauthIfNeeded,
-                                                   String webClientId) {
-        return fetchToken(parentActivity,
-                          /* silent= */!reauthIfNeeded,
-                          /* requestAuthCode= */true,
-                          /* requestEmail= */false,
-                          /* requestIdToken= */false,
-                          /* webClientId= */webClientId,
-                          /* forceRefreshToken= */false,
-                          /* additionalScopes= */null,
-                          /* hidePopups= */true,
-                          /* accountName= */null);
-    }
-
     public static Task<Integer> showAchievementUi(Activity parentActivity) {
         AchievementUiRequest request = new AchievementUiRequest();
 
