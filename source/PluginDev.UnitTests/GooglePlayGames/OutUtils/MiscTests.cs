@@ -13,15 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 using System;
 using NUnit.Framework;
 using GooglePlayGames.OurUtils;
 
-namespace GooglePlayGames.UnitTests.OurUtils {
+namespace GooglePlayGames.UnitTests.OurUtils
+{
     [TestFixture]
-    public class MiscTests {
+    public class MiscTests
+    {
         [Test]
-        public void BuffersAreIdenticalHandlesNull() {
+        public void BuffersAreIdenticalHandlesNull()
+        {
             byte[] nonNull = {0, 1, 2};
 
             AssertBuffersIdenticalInBothOrders(false, nonNull, null);
@@ -29,7 +33,8 @@ namespace GooglePlayGames.UnitTests.OurUtils {
         }
 
         [Test]
-        public void BuffersAreIdenticalHandlesDifferentLengthArrays() {
+        public void BuffersAreIdenticalHandlesDifferentLengthArrays()
+        {
             byte[] one = {0};
             byte[] two = {0, 1};
             byte[] three = {0, 1, 2};
@@ -40,7 +45,8 @@ namespace GooglePlayGames.UnitTests.OurUtils {
         }
 
         [Test]
-        public void BuffersAreIdenticalHandlesSameLengthArrays() {
+        public void BuffersAreIdenticalHandlesSameLengthArrays()
+        {
             byte[] arrayOne = {0};
             byte[] arrayTwo = {0};
             byte[] different = {1};
@@ -51,33 +57,38 @@ namespace GooglePlayGames.UnitTests.OurUtils {
 
         [Test]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void GetSubsetBytesDisallowsNullArray() {
+        public void GetSubsetBytesDisallowsNullArray()
+        {
             Misc.GetSubsetBytes(null, 0, 100);
         }
 
         [Test]
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
-        public void GetSubsetBytesDisallowsNegativeOffset() {
+        public void GetSubsetBytesDisallowsNegativeOffset()
+        {
             byte[] sentinel = {10};
             Misc.GetSubsetBytes(sentinel, -10, 1);
         }
 
         [Test]
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
-        public void GetSubsetBytesDisallowsToLargeLength() {
+        public void GetSubsetBytesDisallowsToLargeLength()
+        {
             byte[] sentinel = {10};
             Misc.GetSubsetBytes(sentinel, 0, 10);
         }
 
         [Test]
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
-        public void GetSubsetBytesDisallowsOverflowingLength() {
+        public void GetSubsetBytesDisallowsOverflowingLength()
+        {
             byte[] sentinel = {1, 2};
             Misc.GetSubsetBytes(sentinel, 1, 2);
         }
 
         [Test]
-        public void GetSubsetBytesWorksWithNoOffset() {
+        public void GetSubsetBytesWorksWithNoOffset()
+        {
             byte[] exampleArray = {1, 2, 3};
             Assert.AreEqual(new byte[] {1}, Misc.GetSubsetBytes(exampleArray, 0, 1));
             Assert.AreEqual(new byte[] {1, 2}, Misc.GetSubsetBytes(exampleArray, 0, 2));
@@ -85,7 +96,8 @@ namespace GooglePlayGames.UnitTests.OurUtils {
         }
 
         [Test]
-        public void GetSubsetBytesWorksWithOffset() {
+        public void GetSubsetBytesWorksWithOffset()
+        {
             byte[] exampleArray = {1, 2, 3};
             Assert.AreEqual(new byte[] {2}, Misc.GetSubsetBytes(exampleArray, 1, 1));
             Assert.AreEqual(new byte[] {3}, Misc.GetSubsetBytes(exampleArray, 2, 1));
@@ -93,10 +105,10 @@ namespace GooglePlayGames.UnitTests.OurUtils {
         }
 
         private static void AssertBuffersIdenticalInBothOrders(
-            bool expected, byte[] arrayOne, byte[] arrayTwo) {
+            bool expected, byte[] arrayOne, byte[] arrayTwo)
+        {
             Assert.AreEqual(expected, Misc.BuffersAreIdentical(arrayOne, arrayTwo));
             Assert.AreEqual(expected, Misc.BuffersAreIdentical(arrayTwo, arrayOne));
         }
     }
 }
-

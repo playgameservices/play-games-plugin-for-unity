@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 using System;
 using System.Collections.Generic;
 using System.Collections;
@@ -20,103 +21,125 @@ using GooglePlayGames.BasicApi;
 using GooglePlayGames.BasicApi.Multiplayer;
 using GooglePlayGames.BasicApi.SavedGame;
 
-namespace GooglePlayGames.UnitTests {
+namespace GooglePlayGames.UnitTests
+{
+    class BaseMockPlayGamesClient : IPlayGamesClient
+    {
+        internal bool Authenticated { get; set; }
 
-class BaseMockPlayGamesClient : IPlayGamesClient {
+        internal BaseMockPlayGamesClient()
+        {
+            Authenticated = true;
+        }
 
-    internal bool Authenticated { get; set; }
+        public virtual void Authenticate(System.Action<bool> callback, bool silent)
+        {
+            throw new NotSupportedException("unsupported");
+        }
 
-    internal BaseMockPlayGamesClient() {
-        Authenticated = true;
-    }
+        public bool IsAuthenticated()
+        {
+            return Authenticated;
+        }
 
-    public virtual void Authenticate(System.Action<bool> callback, bool silent) {
-        throw new NotSupportedException("unsupported");
-    }
+        public virtual void SignOut()
+        {
+            throw new NotSupportedException("unsupported");
+        }
 
-    public bool IsAuthenticated() {
-        return Authenticated;
-    }
+        public virtual string GetUserId()
+        {
+            throw new NotSupportedException("unsupported");
+        }
 
-    public virtual void SignOut() {
-        throw new NotSupportedException("unsupported");
-    }
+        public virtual string GetUserDisplayName()
+        {
+            throw new NotSupportedException("unsupported");
+        }
 
-    public virtual string GetUserId() {
-        throw new NotSupportedException("unsupported");
-    }
+        public string GetUserImageUrl()
+        {
+            throw new NotImplementedException("unsupported");
+        }
 
-    public virtual string GetUserDisplayName() {
-        throw new NotSupportedException("unsupported");
-    }
+        public List<Achievement> GetAchievements()
+        {
+            throw new NotSupportedException("unsupported");
+        }
 
-    public string GetUserImageUrl() {
-        throw new NotImplementedException("unsupported");
-    }
+        public virtual void UnlockAchievement(string achId, Action<bool> callback)
+        {
+            throw new NotSupportedException("unsupported");
+        }
 
-    public List<Achievement> GetAchievements() {
-        throw new NotSupportedException("unsupported");
-    }
+        public virtual void RevealAchievement(string achId, Action<bool> callback)
+        {
+            throw new NotSupportedException("unsupported");
+        }
 
-    public virtual void UnlockAchievement(string achId, Action<bool> callback) {
-        throw new NotSupportedException("unsupported");
-    }
+        public virtual void IncrementAchievement(string achId, int steps, Action<bool> callback)
+        {
+            throw new NotSupportedException("unsupported");
+        }
 
-    public virtual void RevealAchievement(string achId, Action<bool> callback) {
-        throw new NotSupportedException("unsupported");
-    }
+        public virtual void ShowAchievementsUI()
+        {
+            throw new NotSupportedException("unsupported");
+        }
 
-    public virtual void IncrementAchievement(string achId, int steps, Action<bool> callback) {
-        throw new NotSupportedException("unsupported");
-    }
+        public virtual void ShowLeaderboardUI(string lbId)
+        {
+            throw new NotSupportedException("unsupported");
+        }
 
-    public virtual void ShowAchievementsUI() {
-        throw new NotSupportedException("unsupported");
-    }
+        public virtual void SubmitScore(string lbId, long score, Action<bool> callback)
+        {
+            throw new NotSupportedException("unsupported");
+        }
 
-    public virtual void ShowLeaderboardUI(string lbId) {
-        throw new NotSupportedException("unsupported");
-    }
+        public virtual void LoadState(int slot, OnStateLoadedListener listener)
+        {
+            throw new NotSupportedException("unsupported");
+        }
 
-    public virtual void SubmitScore(string lbId, long score, Action<bool> callback) {
-        throw new NotSupportedException("unsupported");
-    }
+        public virtual void UpdateState(int slot, byte[] data, OnStateLoadedListener listener)
+        {
+            throw new NotSupportedException("unsupported");
+        }
 
-    public virtual void LoadState(int slot, OnStateLoadedListener listener) {
-        throw new NotSupportedException("unsupported");
-    }
+        public BasicApi.Multiplayer.IRealTimeMultiplayerClient GetRtmpClient()
+        {
+            throw new NotSupportedException("unsupported");
+        }
 
-    public virtual void UpdateState(int slot, byte[] data, OnStateLoadedListener listener) {
-        throw new NotSupportedException("unsupported");
-    }
+        public BasicApi.Multiplayer.ITurnBasedMultiplayerClient GetTbmpClient()
+        {
+            throw new NotSupportedException("unsupported");
+        }
 
-    public BasicApi.Multiplayer.IRealTimeMultiplayerClient GetRtmpClient() {
-        throw new NotSupportedException("unsupported");
-    }
+        public BasicApi.SavedGame.ISavedGameClient GetSavedGameClient()
+        {
+            throw new NotSupportedException("unsupported");
+        }
 
-    public BasicApi.Multiplayer.ITurnBasedMultiplayerClient GetTbmpClient() {
-        throw new NotSupportedException("unsupported");
-    }
+        public void RegisterInvitationDelegate(InvitationReceivedDelegate deleg)
+        {
+            throw new NotSupportedException("unsupported");
+        }
 
-    public BasicApi.SavedGame.ISavedGameClient GetSavedGameClient() {
-        throw new NotSupportedException("unsupported");
-    }
+        public Invitation GetInvitationFromNotification()
+        {
+            throw new NotSupportedException("unsupported");
+        }
 
-    public void RegisterInvitationDelegate(InvitationReceivedDelegate deleg) {
-        throw new NotSupportedException("unsupported");
-    }
+        public bool HasInvitationFromNotification()
+        {
+            throw new NotSupportedException("unsupported");
+        }
 
-    public Invitation GetInvitationFromNotification() {
-        throw new NotSupportedException("unsupported");
-    }
-
-    public bool HasInvitationFromNotification() {
-        throw new NotSupportedException("unsupported");
-    }
-
-    static void NotSupported() {
-        throw new NotSupportedException("unsupported");
+        static void NotSupported()
+        {
+            throw new NotSupportedException("unsupported");
+        }
     }
 }
-}
-
