@@ -890,36 +890,34 @@ namespace GooglePlayGames.Android
             AndroidJavaObject leaderboardScoresJava)
         {
             LeaderboardScoreData leaderboardScoreData = new LeaderboardScoreData(leaderboardId, status);
-            using (var scoresBuffer = leaderboardScoresJava.Call<AndroidJavaObject>("getScores"))
+            var scoresBuffer = leaderboardScoresJava.Call<AndroidJavaObject>("getScores");
+            int count = scoresBuffer.Call<int>("getCount");
+            for (int i = 0; i < count; ++i)
             {
-                int count = scoresBuffer.Call<int>("getCount");
-                for (int i = 0; i < count; ++i)
+                using (var leaderboardScore = scoresBuffer.Call<AndroidJavaObject>("get", i))
                 {
-                    using (var leaderboardScore = scoresBuffer.Call<AndroidJavaObject>("get", i))
+                    long timestamp = leaderboardScore.Call<long>("getTimestampMillis");
+                    System.DateTime date = AndroidJavaConverter.ToDateTime(timestamp);
+
+                    ulong rank = (ulong) leaderboardScore.Call<long>("getRank");
+                    string scoreHolderId = "";
+                    using (var scoreHolder = leaderboardScore.Call<AndroidJavaObject>("getScoreHolder"))
                     {
-                        long timestamp = leaderboardScore.Call<long>("getTimestampMillis");
-                        System.DateTime date = AndroidJavaConverter.ToDateTime(timestamp);
-
-                        ulong rank = (ulong) leaderboardScore.Call<long>("getRank");
-                        string scoreHolderId = "";
-                        using (var scoreHolder = leaderboardScore.Call<AndroidJavaObject>("getScoreHolder"))
-                        {
-                            scoreHolderId = scoreHolder.Call<string>("getPlayerId");
-                        }
-
-                        ulong score = (ulong) leaderboardScore.Call<long>("getRawScore");
-                        string metadata = leaderboardScore.Call<string>("getScoreTag");
-
-                        leaderboardScoreData.AddScore(new PlayGamesScore(date, leaderboardId,
-                            rank, scoreHolderId, score, metadata));
+                        scoreHolderId = scoreHolder.Call<string>("getPlayerId");
                     }
-                }
 
-                leaderboardScoreData.NextPageToken = new ScorePageToken(scoresBuffer, leaderboardId, collection,
-                    timespan, ScorePageDirection.Forward);
-                leaderboardScoreData.NextPageToken = new ScorePageToken(scoresBuffer, leaderboardId, collection,
-                    timespan, ScorePageDirection.Backward);
+                    ulong score = (ulong) leaderboardScore.Call<long>("getRawScore");
+                    string metadata = leaderboardScore.Call<string>("getScoreTag");
+
+                    leaderboardScoreData.AddScore(new PlayGamesScore(date, leaderboardId,
+                        rank, scoreHolderId, score, metadata));
+                }
             }
+
+            leaderboardScoreData.NextPageToken = new ScorePageToken(scoresBuffer, leaderboardId, collection,
+                timespan, ScorePageDirection.Forward);
+            leaderboardScoreData.PrevPageToken = new ScorePageToken(scoresBuffer, leaderboardId, collection,
+                timespan, ScorePageDirection.Backward);
 
             using (var leaderboard = leaderboardScoresJava.Call<AndroidJavaObject>("getLeaderboard"))
             using (var variants = leaderboard.Call<AndroidJavaObject>("getVariants"))
