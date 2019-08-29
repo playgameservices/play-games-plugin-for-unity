@@ -350,8 +350,10 @@ task inject_versionIntoMetaFiles() {
     for (fileobj in fileTree("${pluginProj}")) {
       if (fileobj.path.endsWith('.meta')) {
         // Skip the manifest files for any previous versions
+        // Skip any files in 'PackageCache' subdirectory
         if (fileobj.path.contains("Editor/${currentPluginBasename}") &&
-            !fileobj.path.contains(currentManifestFile)) {
+            !fileobj.path.contains(currentManifestFile) ||
+                fileobj.path.contains("PackageCache")) {
           continue
         }
         def lines = fileobj.text.split('\n')
