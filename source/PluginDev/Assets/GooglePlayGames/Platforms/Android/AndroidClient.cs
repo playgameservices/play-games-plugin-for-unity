@@ -928,11 +928,10 @@ namespace GooglePlayGames.Android
                 {
                     System.DateTime date = AndroidJavaConverter.ToDateTime(0);
                     ulong rank = (ulong) variant.Call<long>("getPlayerRank");
-                    string scoreHolderId = "me";
                     ulong score = (ulong) variant.Call<long>("getRawPlayerScore");
                     string metadata = variant.Call<string>("getPlayerScoreTag");
                     leaderboardScoreData.PlayerScore = new PlayGamesScore(date, leaderboardId,
-                        rank, scoreHolderId, score, metadata);
+                        rank, mUser.id, score, metadata);
                 }
 
                 leaderboardScoreData.ApproximateCount = (ulong) variant.Call<long>("getNumScores");
