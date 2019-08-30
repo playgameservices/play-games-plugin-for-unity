@@ -6,6 +6,7 @@ import android.util.Log;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.multiplayer.Multiplayer;
+import com.google.android.gms.games.GamesActivityResultCodes;
 import com.google.android.gms.games.TurnBasedMultiplayerClient;
 import com.google.android.gms.games.RealTimeMultiplayerClient;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -80,6 +81,8 @@ abstract class BaseSelectOpponentsUiRequest implements HelperFragment.Request {
                     data.getStringArrayListExtra(Games.EXTRA_PLAYER_IDS));
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 setResult(CommonUIStatus.CANCELLED);
+            } else if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) {
+                setResult(CommonUIStatus.NOT_AUTHORIZED);
             } else {
                 Log.d(TAG, "onActivityResult unknown resultCode: " + resultCode);
                 setResult(CommonUIStatus.INTERNAL_ERROR);

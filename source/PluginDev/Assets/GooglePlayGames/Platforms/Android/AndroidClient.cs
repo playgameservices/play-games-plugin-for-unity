@@ -156,7 +156,7 @@ namespace GooglePlayGames.Android
 
                                             mVideoClient = new AndroidVideoClient(isCaptureSupported, account);
                                             mRealTimeClient = new AndroidRealTimeMultiplayerClient(this, account);
-                                            mTurnBasedClient = new AndroidTurnBasedMultiplayerClient(account);
+                                            mTurnBasedClient = new AndroidTurnBasedMultiplayerClient(this, account);
                                             mTurnBasedClient.RegisterMatchDelegate(mConfiguration.MatchDelegate);
                                         }
 
@@ -434,6 +434,12 @@ namespace GooglePlayGames.Android
         /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.SignOut"/>
         public void SignOut()
         {
+            SignOut( /* uiCallback= */ null);
+        }
+
+
+        public void SignOut(Action uiCallback)
+        {
             if (mTokenClient == null)
             {
                 return;
@@ -452,6 +458,7 @@ namespace GooglePlayGames.Android
                             mInvitationCallback = null;
                             mTokenClient.Signout();
                             mAuthState = AuthState.Unauthenticated;
+                            uiCallback?.Invoke();
                         });
                 }
             }
@@ -459,6 +466,7 @@ namespace GooglePlayGames.Android
             {
                 mTokenClient.Signout();
                 mAuthState = AuthState.Unauthenticated;
+                uiCallback?.Invoke();
             }
         }
 
@@ -766,7 +774,7 @@ namespace GooglePlayGames.Android
                 return;
             }
 
-            AndroidHelperFragment.ShowAchievementsUI(AsOnGameThreadCallback(callback));
+            AndroidHelperFragment.ShowAchievementsUI(GetUiSignOutCallbackOnGameThread(callback));
         }
 
         ///<summary></summary>
@@ -788,12 +796,30 @@ namespace GooglePlayGames.Android
 
             if (leaderboardId == null)
             {
-                AndroidHelperFragment.ShowAllLeaderboardsUI(AsOnGameThreadCallback(callback));
+                AndroidHelperFragment.ShowAllLeaderboardsUI(GetUiSignOutCallbackOnGameThread(callback));
             }
             else
             {
-                AndroidHelperFragment.ShowLeaderboardUI(leaderboardId, span, AsOnGameThreadCallback(callback));
+                AndroidHelperFragment.ShowLeaderboardUI(leaderboardId, span, 
+                    GetUiSignOutCallbackOnGameThread(callback));
             }
+        }
+
+        private Action<UIStatus> GetUiSignOutCallbackOnGameThread(Action<UIStatus> callback)
+        {
+            Action<UIStatus> uiCallback = (status) =>
+            {
+                if (status == UIStatus.NotAuthorized)
+                {
+                    SignOut(() => callback(status));
+                }
+                else
+                {
+                    callback(status);
+                }
+            };
+
+            return AsOnGameThreadCallback(uiCallback);
         }
 
         ///<summary></summary>
