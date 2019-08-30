@@ -1,6 +1,5 @@
 package com.google.games.bridge;
 
-import androidx.annotation.NonNull;
 import com.google.android.gms.nearby.connection.DiscoveredEndpointInfo;
 import com.google.android.gms.nearby.connection.EndpointDiscoveryCallback;
 
@@ -11,16 +10,16 @@ public class EndpointDiscoveryCallbackProxy extends EndpointDiscoveryCallback {
         this.callback = callback;
     }
 
-    public void onEndpointFound(@NonNull String endpointId, @NonNull DiscoveredEndpointInfo info) {
+    public void onEndpointFound(/* @NonNull */ String endpointId, /* @NonNull */ DiscoveredEndpointInfo info) {
         callback.onEndpointFound(endpointId, info);
     }
 
-    public void onEndpointLost(@NonNull String endpointId) {
+    public void onEndpointLost(/* @NonNull */ String endpointId) {
         callback.onEndpointLost(endpointId);
     }
 
     public interface Callback {
-        void onEndpointFound(@NonNull String endpointId, @NonNull DiscoveredEndpointInfo info);
-        void onEndpointLost(@NonNull String endpointId);
+        void onEndpointFound(/* @NonNull */ String endpointId, /* @NonNull */ DiscoveredEndpointInfo info);
+        void onEndpointLost(/* @NonNull */ String endpointId);
     }
 }
