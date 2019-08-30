@@ -2,7 +2,6 @@ package com.google.games.bridge;
 
 import android.app.Activity;
 import android.content.Intent;
-import androidx.annotation.NonNull;
 import android.util.Log;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -48,7 +47,7 @@ class SelectSnapshotUiRequest implements HelperFragment.Request {
         }
     }
 
-    SelectSnapshotUiRequest(@NonNull String title, boolean allowAddButton, boolean allowDelete, int maxSnapshots)
+    SelectSnapshotUiRequest(/* @NonNull */ String title, boolean allowAddButton, boolean allowDelete, int maxSnapshots)
     {
         this.title = title;
         this.allowAddButton = allowAddButton;

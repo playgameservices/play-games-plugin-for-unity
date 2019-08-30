@@ -20,7 +20,6 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
-import androidx.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -155,7 +154,7 @@ public class HelperFragment extends Fragment
     }
 
     public static Task<SelectSnapshotUiRequest.Result> showSelectSnapshotUi(
-            Activity parentActivity, @NonNull String title, boolean allowAddButton, boolean allowDelete, int maxSnapshots) {
+            Activity parentActivity, /* @NonNull */ String title, boolean allowAddButton, boolean allowDelete, int maxSnapshots) {
         SelectSnapshotUiRequest request = new SelectSnapshotUiRequest(title, allowAddButton, allowDelete, maxSnapshots);
 
         if(!HelperFragment.startRequest(parentActivity, request)) {

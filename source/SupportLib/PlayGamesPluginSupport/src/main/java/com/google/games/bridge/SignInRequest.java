@@ -2,7 +2,6 @@ package com.google.games.bridge;
 
 import android.app.Activity;
 import android.content.Intent;
-import androidx.annotation.NonNull;
 import android.util.Log;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -112,7 +111,7 @@ class SignInRequest implements HelperFragment.Request {
                     Games.getGamesClient(activity, account).getAppId()
                         .addOnCompleteListener(new OnCompleteListener<String>() {
                             @Override
-                            public void onComplete(@NonNull Task<String> task) {
+                            public void onComplete(/* @NonNull */ Task<String> task) {
                                 if (task.isSuccessful()) {
                                     Log.d(TAG, "Signed-in with the last signed-in account.");
                                     setSuccess(account);
@@ -120,7 +119,7 @@ class SignInRequest implements HelperFragment.Request {
                                     signInClient.signOut().addOnCompleteListener(
                                         new OnCompleteListener<Void>() {
                                             @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
+                                            public void onComplete(/* @NonNull */ Task<Void> task) {
                                                 if (task.isSuccessful()) {
                                                     Log.d(TAG, "Can't reuse the last signed-in account. Second attempt after sign out.");
                                                     // Last signed account should be null now
