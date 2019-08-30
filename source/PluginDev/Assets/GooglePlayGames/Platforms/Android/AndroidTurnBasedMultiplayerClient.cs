@@ -12,10 +12,12 @@ namespace GooglePlayGames.Android
     internal class AndroidTurnBasedMultiplayerClient : ITurnBasedMultiplayerClient
     {
         private volatile AndroidJavaObject mClient;
+        private volatile AndroidClient mAndroidClient;
         private volatile Action<TurnBasedMatch, bool> mMatchDelegate;
 
-        public AndroidTurnBasedMultiplayerClient(AndroidJavaObject account)
+        public AndroidTurnBasedMultiplayerClient(AndroidClient androidClient, AndroidJavaObject account)
         {
+            mAndroidClient = androidClient;
             using (var gamesClass = new AndroidJavaClass("com.google.android.gms.games.Games"))
             {
                 mClient = gamesClass.CallStatic<AndroidJavaObject>("getTurnBasedMultiplayerClient",
@@ -76,6 +78,12 @@ namespace GooglePlayGames.Android
             AndroidHelperFragment.ShowTbmpSelectOpponentsUI(minOpponents, maxOpponents,
                 (status, result) =>
                 {
+                    if (status == UIStatus.NotAuthorized)
+                    {
+                        mAndroidClient.SignOut((() => callback(status, null)));
+                        return;
+                    }
+                    
                     if (status != UIStatus.Valid)
                     {
                         callback(status, null);
@@ -272,6 +280,12 @@ namespace GooglePlayGames.Android
 
             AndroidHelperFragment.ShowInboxUI((status, turnBasedMatch) =>
             {
+                if (status == UIStatus.NotAuthorized)
+                {
+                    mAndroidClient.SignOut(() => callback(false, null));
+                    return;
+                }
+                
                 if (status != UIStatus.Valid)
                 {
                     callback(false, null);

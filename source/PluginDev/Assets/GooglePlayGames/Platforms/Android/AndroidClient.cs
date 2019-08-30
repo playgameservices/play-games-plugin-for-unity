@@ -156,7 +156,7 @@ namespace GooglePlayGames.Android
 
                                             mVideoClient = new AndroidVideoClient(isCaptureSupported, account);
                                             mRealTimeClient = new AndroidRealTimeMultiplayerClient(this, account);
-                                            mTurnBasedClient = new AndroidTurnBasedMultiplayerClient(account);
+                                            mTurnBasedClient = new AndroidTurnBasedMultiplayerClient(this, account);
                                             mTurnBasedClient.RegisterMatchDelegate(mConfiguration.MatchDelegate);
                                         }
 
@@ -438,7 +438,7 @@ namespace GooglePlayGames.Android
         }
 
 
-        private void SignOut(Action uiCallback)
+        public void SignOut(Action uiCallback)
         {
             if (mTokenClient == null)
             {
