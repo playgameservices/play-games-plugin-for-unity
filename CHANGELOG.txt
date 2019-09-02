@@ -1,3 +1,7 @@
+Version 0.10.03
+    Bug fixes:
+    * Fixed the exception caused by ui callbacks.
+    
 Version 0.10.02
     Bug Fixes:
     * Fixed LoadMoreScores.
@@ -5,7 +9,6 @@ Version 0.10.02
     * GetAnotherServerAuthCode uses the same scopes used in sign in.
     * Local user id is returned instead of "me" in LoadScores.
     * Removed AndroidX dependency.
-
 Version 0.10.01
     Other:
       * Reimplementation of the plugin without using C++ SDK
