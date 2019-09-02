@@ -811,11 +811,11 @@ namespace GooglePlayGames.Android
             {
                 if (status == UIStatus.NotAuthorized)
                 {
-                    SignOut(() => callback(status));
+                    SignOut(() => callback?.Invoke(status));
                 }
                 else
                 {
-                    callback(status);
+                    callback?.Invoke(status);
                 }
             };
 
