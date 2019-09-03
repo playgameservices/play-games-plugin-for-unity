@@ -13,31 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 using System;
 using NUnit.Framework;
 using GooglePlayGames.BasicApi;
 using GooglePlayGames.BasicApi.Multiplayer;
 using GooglePlayGames.OurUtils;
 
-namespace GooglePlayGames.UnitTests
-{
+namespace GooglePlayGames.UnitTests {
     [TestFixture]
-    public class PlayGamesPlatformTest
-    {
-        private static readonly Action<bool> SentinelCallback = ignored => { };
+    public class PlayGamesPlatformTest {
+
+        private static readonly Action<bool> SentinelCallback = ignored => {};
 
         [SetUp]
-        public void SetUp()
-        {
+        public void SetUp() {
             // Ensure that our internal logger is disabled
             Logger.WarningLogEnabled = false;
             Logger.DebugLogEnabled = false;
         }
 
         // Achievement tests
-        class AchievementClient : BaseMockPlayGamesClient
-        {
+        class AchievementClient : BaseMockPlayGamesClient {
             public string RevealedId { get; set; }
             public Action<bool> RevealedCallback { get; set; }
 
@@ -52,34 +48,29 @@ namespace GooglePlayGames.UnitTests
 
             public int ShownUiCount { get; set; }
 
-            public override void RevealAchievement(string achId, Action<bool> callback)
-            {
+            public override void RevealAchievement(string achId, Action<bool> callback) {
                 RevealedId = achId;
                 RevealedCallback = callback;
             }
 
-            public override void UnlockAchievement(string achId, Action<bool> callback)
-            {
+            public override void UnlockAchievement(string achId, Action<bool> callback) {
                 UnlockedId = achId;
                 UnlockedCallback = callback;
             }
 
-            public override void IncrementAchievement(string achId, int steps, Action<bool> callback)
-            {
+            public override void IncrementAchievement(string achId, int steps, Action<bool> callback) {
                 IncrementedId = achId;
                 IncrementedSteps = steps;
                 IncrementedCallback = callback;
             }
 
-            public override void ShowAchievementsUI()
-            {
+            public override void ShowAchievementsUI() {
                 ShownUiCount++;
             }
         }
 
         [Test]
-        public void AchievementReportProgressFailsWhenNotAuthenticated()
-        {
+        public void AchievementReportProgressFailsWhenNotAuthenticated() {
             var mockClient = new AchievementClient();
             var platform = new PlayGamesPlatform(mockClient);
             mockClient.Authenticated = false;
@@ -91,8 +82,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void AchievementReportProgressIsRevealNoMapping()
-        {
+        public void AchievementReportProgressIsRevealNoMapping() {
             var mockClient = new AchievementClient();
             var platform = new PlayGamesPlatform(mockClient);
 
@@ -102,8 +92,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void AchievementReportProgressIsRevealWithMapping()
-        {
+        public void AchievementReportProgressIsRevealWithMapping() {
             var mockClient = new AchievementClient();
             var platform = new PlayGamesPlatform(mockClient);
             platform.AddIdMapping("mappedId", "realId");
@@ -114,8 +103,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void AchievementReportProgressNonIncremental()
-        {
+        public void AchievementReportProgressNonIncremental() {
             var mockClient = new AchievementClient();
             var platform = new PlayGamesPlatform(mockClient);
 
@@ -129,8 +117,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void AchievementReportProgressUnknownAchievementTreatedAsNonIncremental()
-        {
+        public void AchievementReportProgressUnknownAchievementTreatedAsNonIncremental() {
             var mockClient = new AchievementClient();
             var platform = new PlayGamesPlatform(mockClient);
 
@@ -141,8 +128,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void AchievementReportProgressIncrementalAllInOneGo()
-        {
+        public void AchievementReportProgressIncrementalAllInOneGo() {
             var mockClient = new AchievementClient();
             var platform = new PlayGamesPlatform(mockClient);
 
@@ -153,8 +139,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void AchievementReportProgressIncrementalProgressSmallAmount()
-        {
+        public void AchievementReportProgressIncrementalProgressSmallAmount() {
             var mockClient = new AchievementClient();
             var platform = new PlayGamesPlatform(mockClient);
 
@@ -165,8 +150,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void AchievementReportProgressIncrementalBuildsOnInitialProgress()
-        {
+        public void AchievementReportProgressIncrementalBuildsOnInitialProgress() {
             var mockClient = new AchievementClient();
             var platform = new PlayGamesPlatform(mockClient);
 
@@ -178,8 +162,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void AchievementReportProgressIncrementalIgnoresProgressDecrease()
-        {
+        public void AchievementReportProgressIncrementalIgnoresProgressDecrease() {
             var mockClient = new AchievementClient();
             var platform = new PlayGamesPlatform(mockClient);
 
@@ -190,8 +173,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void AchievementReportProgressIncrementalIgnoresZeroIncrement()
-        {
+        public void AchievementReportProgressIncrementalIgnoresZeroIncrement() {
             var mockClient = new AchievementClient();
             var platform = new PlayGamesPlatform(mockClient);
 
@@ -202,8 +184,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void AchievementReportProgressIncrementalAllowsMoreThanOneHundredPercent()
-        {
+        public void AchievementReportProgressIncrementalAllowsMoreThanOneHundredPercent() {
             var mockClient = new AchievementClient();
             var platform = new PlayGamesPlatform(mockClient);
 
@@ -214,8 +195,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void AchievementIncrementRequiresAuthentication()
-        {
+        public void AchievementIncrementRequiresAuthentication() {
             var mockClient = new AchievementClient();
             var platform = new PlayGamesPlatform(mockClient);
             var capturingCallback = new CapturingAction<bool>();
@@ -228,8 +208,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void AchievementIncrementForUnmappedId()
-        {
+        public void AchievementIncrementForUnmappedId() {
             var mockClient = new AchievementClient();
             var platform = new PlayGamesPlatform(mockClient);
 
@@ -241,8 +220,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void AchievementIncrementForMappedId()
-        {
+        public void AchievementIncrementForMappedId() {
             var mockClient = new AchievementClient();
             var platform = new PlayGamesPlatform(mockClient);
             platform.AddIdMapping("unmapped", "mapped");
@@ -255,8 +233,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void ShowAchievementsUiWorksWhenAuthenticated()
-        {
+        public void ShowAchievementsUiWorksWhenAuthenticated() {
             var mockClient = new AchievementClient();
             var platform = new PlayGamesPlatform(mockClient);
 
@@ -266,8 +243,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void ShowAchievementsUiIsNoOpWhenUnauthenticated()
-        {
+        public void ShowAchievementsUiIsNoOpWhenUnauthenticated() {
             var mockClient = new AchievementClient();
             var platform = new PlayGamesPlatform(mockClient);
 
@@ -279,8 +255,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         static void IncrementViaReportProgress(AchievementClient mockClient, PlayGamesPlatform platform,
-            int current, int total, double progress)
-        {
+                                       int current, int total, double progress) {
             Achievement incremental = new Achievement();
             incremental.IsIncremental = true;
             incremental.CurrentSteps = current;
@@ -290,8 +265,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         // Leaderboard tests
-        class LeaderboardClient : BaseMockPlayGamesClient
-        {
+        class LeaderboardClient : BaseMockPlayGamesClient {
             public string SubmittedId { get; set; }
             public long? SubmittedScore { get; set; }
             public Action<bool> SubmitCallback { get; set; }
@@ -299,23 +273,20 @@ namespace GooglePlayGames.UnitTests
             public bool UIShown { get; set; }
             public string ShownId { get; set; }
 
-            public override void SubmitScore(string leaderboardId, long score, Action<bool> callback)
-            {
+            public override void SubmitScore(string leaderboardId, long score, Action<bool> callback) {
                 SubmittedId = leaderboardId;
                 SubmittedScore = score;
                 SubmitCallback = callback;
             }
 
-            public override void ShowLeaderboardUI(string leaderboardId)
-            {
+            public override void ShowLeaderboardUI(string leaderboardId) {
                 UIShown = true;
                 ShownId = leaderboardId;
             }
         }
 
         [Test]
-        public void ReportScoreIsNoOpWhenUnauthenticated()
-        {
+        public void ReportScoreIsNoOpWhenUnauthenticated() {
             var mockClient = new LeaderboardClient();
             var platform = new PlayGamesPlatform(mockClient);
             var capturingCallback = new CapturingAction<bool>();
@@ -329,8 +300,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void ReportScoreIsWorksWhenAuthenticated()
-        {
+        public void ReportScoreIsWorksWhenAuthenticated() {
             var mockClient = new LeaderboardClient();
             var platform = new PlayGamesPlatform(mockClient);
 
@@ -341,8 +311,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void ReportScoreIsWorksWhenIdMapped()
-        {
+        public void ReportScoreIsWorksWhenIdMapped() {
             var mockClient = new LeaderboardClient();
             var platform = new PlayGamesPlatform(mockClient);
 
@@ -356,8 +325,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void ShowLeaderboardUINoOpWhenUnauthenticated()
-        {
+        public void ShowLeaderboardUINoOpWhenUnauthenticated() {
             var mockClient = new LeaderboardClient();
             var platform = new PlayGamesPlatform(mockClient);
 
@@ -369,8 +337,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void ShowLeaderboardUIWorksWhenAuthenticatedAndNoDefaultLeaderboard()
-        {
+        public void ShowLeaderboardUIWorksWhenAuthenticatedAndNoDefaultLeaderboard() {
             var mockClient = new LeaderboardClient();
             var platform = new PlayGamesPlatform(mockClient);
 
@@ -381,8 +348,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void ShowLeaderboardUIWorksWhenAuthenticatedAndUnmappedDefaultLeaderboard()
-        {
+        public void ShowLeaderboardUIWorksWhenAuthenticatedAndUnmappedDefaultLeaderboard() {
             var mockClient = new LeaderboardClient();
             var platform = new PlayGamesPlatform(mockClient);
             platform.SetDefaultLeaderboardForUI("default");
@@ -394,8 +360,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void ShowLeaderboardUIWorksWhenAuthenticatedAndMappedDefaultLeaderboard()
-        {
+        public void ShowLeaderboardUIWorksWhenAuthenticatedAndMappedDefaultLeaderboard() {
             var mockClient = new LeaderboardClient();
             var platform = new PlayGamesPlatform(mockClient);
             platform.AddIdMapping("unmappedDefault", "mappedDefault");
@@ -408,8 +373,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void ShowLeaderboardUIWithIdIsNoOpWhenUnauthenticated()
-        {
+        public void ShowLeaderboardUIWithIdIsNoOpWhenUnauthenticated() {
             var mockClient = new LeaderboardClient();
             var platform = new PlayGamesPlatform(mockClient);
             mockClient.Authenticated = false;
@@ -420,8 +384,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void ShowLeaderboardUIWithIdIsWorksWhenAuthenticated()
-        {
+        public void ShowLeaderboardUIWithIdIsWorksWhenAuthenticated() {
             var mockClient = new LeaderboardClient();
             var platform = new PlayGamesPlatform(mockClient);
 
@@ -432,8 +395,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void ShowLeaderboardUIWithIdIsWorksWhenMapped()
-        {
+        public void ShowLeaderboardUIWithIdIsWorksWhenMapped() {
             var mockClient = new LeaderboardClient();
             var platform = new PlayGamesPlatform(mockClient);
             platform.AddIdMapping("unmappedLeaderboard", "mappedLeaderboard");
@@ -445,8 +407,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         // Authentication tests
-        class LoginClient : BaseMockPlayGamesClient
-        {
+        class LoginClient : BaseMockPlayGamesClient {
             public bool? AuthenticatedSilently { get; set; }
             public Action<bool> AuthenticationCallback { get; set; }
 
@@ -455,31 +416,26 @@ namespace GooglePlayGames.UnitTests
 
             public int SignOutCount { get; set; }
 
-            public override void Authenticate(Action<bool> callback, bool silent)
-            {
+            public override void Authenticate(Action<bool> callback, bool silent) {
                 AuthenticatedSilently = silent;
                 AuthenticationCallback = callback;
             }
 
-            public override string GetUserId()
-            {
+            public override string GetUserId() {
                 return UserId;
             }
 
-            public override string GetUserDisplayName()
-            {
+            public override string GetUserDisplayName() {
                 return UserDisplayName;
             }
 
-            public override void SignOut()
-            {
+            public override void SignOut() {
                 SignOutCount++;
             }
         }
 
         [Test]
-        public void AuthenticateProxiedToClient()
-        {
+        public void AuthenticateProxiedToClient() {
             var mockClient = new LoginClient();
             var platform = new PlayGamesPlatform(mockClient);
 
@@ -490,8 +446,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void AuthenticateSilentlyProxied()
-        {
+        public void AuthenticateSilentlyProxied() {
             var mockClient = new LoginClient();
             var platform = new PlayGamesPlatform(mockClient);
 
@@ -502,8 +457,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void AuthenticateLoudlyProxied()
-        {
+        public void AuthenticateLoudlyProxied() {
             var mockClient = new LoginClient();
             var platform = new PlayGamesPlatform(mockClient);
 
@@ -514,8 +468,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void GetUserId()
-        {
+        public void GetUserId() {
             var mockClient = new LoginClient();
             var platform = new PlayGamesPlatform(mockClient);
 
@@ -525,8 +478,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void GetUserDisplayName()
-        {
+        public void GetUserDisplayName() {
             var mockClient = new LoginClient();
             var platform = new PlayGamesPlatform(mockClient);
 
@@ -536,8 +488,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void SignOutWorks()
-        {
+        public void SignOutWorks() {
             var mockClient = new LoginClient();
             var platform = new PlayGamesPlatform(mockClient);
 
@@ -547,54 +498,46 @@ namespace GooglePlayGames.UnitTests
         }
 
         // CloudSave tests
-        class CloudSaveClient : BaseMockPlayGamesClient
-        {
+        class CloudSaveClient : BaseMockPlayGamesClient {
             public int? Slot { get; set; }
             public OnStateLoadedListener Listener { get; set; }
             public byte[] Data { get; set; }
 
-            public override void LoadState(int slot, OnStateLoadedListener listener)
-            {
+            public override void LoadState(int slot, OnStateLoadedListener listener) {
                 Slot = slot;
                 Listener = listener;
             }
 
-            public override void UpdateState(int slot, byte[] data, OnStateLoadedListener listener)
-            {
+            public override void UpdateState(int slot, byte[] data, OnStateLoadedListener listener) {
                 Slot = slot;
                 Data = data;
                 Listener = listener;
             }
         }
 
-        class CapturingStateListener : OnStateLoadedListener
-        {
+        class CapturingStateListener : OnStateLoadedListener {
             public bool? LastOperationSucceeded { get; private set; }
             public int? SlotForLastOperation { get; private set; }
             public byte[] DataForLastOperation { get; private set; }
 
-            public void OnStateLoaded(bool success, int slot, byte[] data)
-            {
+            public void OnStateLoaded(bool success, int slot, byte[] data) {
                 LastOperationSucceeded = success;
                 SlotForLastOperation = slot;
                 DataForLastOperation = data;
             }
 
-            public byte[] OnStateConflict(int slot, byte[] localData, byte[] serverData)
-            {
+            public byte[] OnStateConflict(int slot, byte[] localData, byte[] serverData) {
                 return null;
             }
 
-            public void OnStateSaved(bool success, int slot)
-            {
+            public void OnStateSaved(bool success, int slot) {
                 LastOperationSucceeded = success;
                 SlotForLastOperation = slot;
             }
         }
 
         [Test]
-        public void LoadStateFailsWhenNotLoggedIn()
-        {
+        public void LoadStateFailsWhenNotLoggedIn() {
             var mockClient = new CloudSaveClient();
             var platform = new PlayGamesPlatform(mockClient);
             var listener = new CapturingStateListener();
@@ -609,8 +552,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void LoadStateSucceedsWhenLoggedIn()
-        {
+        public void LoadStateSucceedsWhenLoggedIn() {
             var mockClient = new CloudSaveClient();
             var platform = new PlayGamesPlatform(mockClient);
             var listener = new CapturingStateListener();
@@ -622,8 +564,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void UpdateStateFailsWhenNotLoggedIn()
-        {
+        public void UpdateStateFailsWhenNotLoggedIn() {
             var mockClient = new CloudSaveClient();
             var platform = new PlayGamesPlatform(mockClient);
             var listener = new CapturingStateListener();
@@ -637,8 +578,7 @@ namespace GooglePlayGames.UnitTests
         }
 
         [Test]
-        public void UpdateStateSucceedsWhenLoggedIn()
-        {
+        public void UpdateStateSucceedsWhenLoggedIn() {
             var mockClient = new CloudSaveClient();
             var platform = new PlayGamesPlatform(mockClient);
             var listener = new CapturingStateListener();
@@ -652,30 +592,27 @@ namespace GooglePlayGames.UnitTests
         }
     }
 
-    class CapturingAction<T>
-    {
+    class CapturingAction<T> {
         internal bool Invoked { get; private set; }
 
         private T captured;
 
-        internal T Captured
-        {
-            get { return captured; }
-            set
-            {
-                if (this.Invoked)
-                {
+        internal T Captured {
+            get {
+                return captured;
+            }
+            set {
+                if (this.Invoked) {
                     throw new InvalidOperationException();
                 }
-
                 Invoked = true;
                 captured = value;
             }
         }
 
-        public void invoke(T value)
-        {
+        public void invoke(T value) {
             Captured = value;
         }
     }
 }
+

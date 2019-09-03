@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 using System;
 using NUnit.Framework;
 using GooglePlayGames;
@@ -46,13 +45,12 @@ namespace GooglePlayGames.UnitTests
         [Test]
         public void ReportProgressUsesCorrectState()
         {
-            string capturedId = "initial";
+            string capturedId = "initial" ;
             double capturedProgress = 0.0;
             Action<bool> capturedCallback = null;
 
             PlayGamesAchievement achievement = new PlayGamesAchievement(
-                (id, progress, callback) =>
-                {
+                (id, progress, callback) => {
                     capturedId = id;
                     capturedProgress = progress;
                     capturedCallback = callback;
@@ -68,5 +66,7 @@ namespace GooglePlayGames.UnitTests
             Assert.AreEqual("expectedId", capturedId);
             Assert.AreEqual(50.0, capturedProgress);
         }
+
     }
 }
+
