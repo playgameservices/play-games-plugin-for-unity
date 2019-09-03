@@ -128,6 +128,30 @@ namespace GooglePlayGames.Android
             }
         }
 
+        public static void ShowPlayerProfileUI(AndroidJavaObject player, Action<UIStatus> cb)
+        { 
+            using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
+            using (var task = helperFragment.CallStatic<AndroidJavaObject>("showPlayerProfileUi",
+                AndroidHelperFragment.GetActivity(), player))
+            {
+                AndroidTaskUtils.AddOnSuccessListener<int>(
+                    task,
+                    uiCode =>
+                    {
+                        Debug.Log("ShowPlayerProfileUI result " + uiCode);
+                        cb.Invoke((UIStatus) uiCode);
+                    });
+                AndroidTaskUtils.AddOnFailureListener(
+                    task,
+                    exception =>
+                    {
+                        Debug.Log("ShowPlayerProfileUI failed with exception");
+                        cb.Invoke(UIStatus.InternalError);
+                    });
+            }
+        }
+
+
         public static void ShowSelectSnapshotUI(bool showCreateSaveUI, bool showDeleteSaveUI,
             int maxDisplayedSavedGames, string uiTitle, Action<SelectUIStatus, ISavedGameMetadata> cb)
         {
