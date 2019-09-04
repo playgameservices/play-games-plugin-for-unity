@@ -37,13 +37,7 @@ namespace SmokeTest
         private const int GridCols = 2;
         private const int GridRows = 10;
 
-        private static readonly PlayGamesClientConfiguration ClientConfiguration =
-            new PlayGamesClientConfiguration.Builder()
-                .EnableSavedGames()
-                .RequestEmail()
-                .RequestServerAuthCode(false)
-                .RequestIdToken()
-                .Build();
+        private static PlayGamesClientConfiguration ClientConfiguration;
 
         private Ui mUi = Ui.Main;
 
@@ -97,7 +91,8 @@ namespace SmokeTest
             Achievements,
             Leaderboards,
             Video,
-            UserInfo
+            UserInfo,
+            PopupGravity
         }
 
         public void Start()
@@ -271,12 +266,44 @@ namespace SmokeTest
         {
             this.DrawTitle(null);
             this.DrawStatus();
-            if (GUI.Button(this.CalcGrid(0, 1), "Authenticate"))
+            if (GUI.Button(this.CalcGrid(0, 1), "Authenticate - Simple"))
             {
-                this.DoAuthenticate();
+                this.DoAuthenticate(new PlayGamesClientConfiguration.Builder().Build());
             }
-
-            if (GUI.Button(this.CalcGrid(1, 1), "Nearby Connections"))
+            else if (GUI.Button(this.CalcGrid(1, 1), "Authenticate - ID Token"))
+            {
+                this.DoAuthenticate(new PlayGamesClientConfiguration.Builder()
+                    .RequestIdToken()
+                    .Build());
+            }
+            else if (GUI.Button(this.CalcGrid(0, 2), "Authenticate - Server Auth Code"))
+            {
+                this.DoAuthenticate(new PlayGamesClientConfiguration.Builder()
+                    .RequestServerAuthCode(false)
+                    .Build());
+            }
+            else if (GUI.Button(this.CalcGrid(1, 2), "Authenticate - Enable Saved Games"))
+            {
+                this.DoAuthenticate(new PlayGamesClientConfiguration.Builder()
+                    .EnableSavedGames()
+                    .Build());
+            }
+            else if (GUI.Button(this.CalcGrid(0, 3), "Authenticate - Hide Popups"))
+            {
+                this.DoAuthenticate(new PlayGamesClientConfiguration.Builder()
+                    .EnableHidePopups()
+                    .Build());
+            }
+            else if (GUI.Button(this.CalcGrid(1, 3), "Authenticate - Full"))
+            {
+                this.DoAuthenticate(new PlayGamesClientConfiguration.Builder()
+                    .RequestIdToken()
+                    .RequestEmail()
+                    .RequestServerAuthCode(false)
+                    .EnableSavedGames()
+                    .Build());
+            }
+            else if (GUI.Button(this.CalcGrid(0, 4), "Nearby Connections"))
             {
                 SetUI(Ui.NearbyConnections);
             }
@@ -320,7 +347,11 @@ namespace SmokeTest
             {
                 SetUI(Ui.NearbyConnections);
             }
-            else if (GUI.Button(this.CalcGrid(0, 5), "Sign Out"))
+            else if (GUI.Button(this.CalcGrid(0, 5), "Popup Gravity"))
+            {
+                SetUI(Ui.PopupGravity);
+            }
+            else if (GUI.Button(this.CalcGrid(1, 5), "Sign Out"))
             {
                 this.DoSignOut();
             }
@@ -706,7 +737,15 @@ namespace SmokeTest
             {
                 DoLeaveRoom();
             }
-            else if (GUI.Button(CalcGrid(1, 6), "Back"))
+            else if (GUI.Button(CalcGrid(1, 6), "Is Room Connected"))
+            {
+                DoIsRoomConnected();
+            }
+            else if (GUI.Button(CalcGrid(0, 7), "Get Invitation"))
+            {
+                DoGetInvitation();
+            }
+            else if (GUI.Button(CalcGrid(1, 7), "Back"))
             {
                 SetUI(Ui.Multiplayer);
                 ShowEffect(true);
@@ -858,6 +897,42 @@ namespace SmokeTest
             if (GUI.Button(CalcGrid(1, 6), "Back"))
             {
                 SetUI(Ui.Main);
+            }
+        }
+
+        private void ShowPopupGravityUi()
+        {
+            DrawStatus();
+            DrawTitle("PopupGravity Ui");
+            if (GUI.Button(CalcGrid(0, 1), "Top"))
+            {
+                PlayGamesPlatform.Instance.SetGravityForPopups(Gravity.TOP);
+                Status = "Popup will appear on top";
+            }
+            else if (GUI.Button(CalcGrid(1, 1), "Bottom"))
+            {
+                PlayGamesPlatform.Instance.SetGravityForPopups(Gravity.BOTTOM);
+                Status = "Popup will appear at bottom";
+            }
+            else if (GUI.Button(CalcGrid(0, 2), "Left"))
+            {
+                PlayGamesPlatform.Instance.SetGravityForPopups(Gravity.LEFT);
+                Status = "Popup will appear on left";
+            }
+            else if (GUI.Button(CalcGrid(1, 2), "Right"))
+            {
+                PlayGamesPlatform.Instance.SetGravityForPopups(Gravity.RIGHT);
+                Status = "Popup will appear on right";
+            }
+            else if (GUI.Button(CalcGrid(0, 3), "Center horizontal"))
+            {
+                PlayGamesPlatform.Instance.SetGravityForPopups(Gravity.CENTER_HORIZONTAL);
+                Status = "Popup will appear on center";
+            }
+            else if (GUI.Button(CalcGrid(1, 3), "Back"))
+            {
+                SetUI(Ui.Main);
+                ShowEffect(true);
             }
         }
 
@@ -1044,6 +1119,9 @@ namespace SmokeTest
 
                         ShowUserInfoUi();
                         break;
+                    case Ui.PopupGravity:
+                        ShowPopupGravityUi();
+                        break;
                     default:
                         // check for a status of interest, and if there
                         // is one, then don't touch it.  Otherwise
@@ -1076,10 +1154,11 @@ namespace SmokeTest
             mStandby = false;
         }
 
-        internal void DoAuthenticate()
+        internal void DoAuthenticate(PlayGamesClientConfiguration configuration)
         {
             SetStandBy("Authenticating...");
 
+            ClientConfiguration = configuration;
             PlayGamesPlatform.InitializeInstance(ClientConfiguration);
             PlayGamesPlatform.Activate();
             Social.localUser.Authenticate((bool success) =>
@@ -1215,6 +1294,26 @@ namespace SmokeTest
         {
             Status = "Requested to leave room.";
             PlayGamesPlatform.Instance.RealTime.LeaveRoom();
+        }
+
+        private void DoIsRoomConnected()
+        {
+            Status = "Room is " +
+                     (PlayGamesPlatform.Instance.RealTime.IsRoomConnected() ? "" : "not ") +
+                     "connected.";
+        }
+
+        private void DoGetInvitation()
+        {
+            var invitation = PlayGamesPlatform.Instance.RealTime.GetInvitation();
+            if (invitation == null)
+            {
+                Status = "Invitation is null";
+                return;
+            }
+
+            string inviterName = invitation.Inviter != null ? invitation.Inviter.DisplayName : "(null)";
+            Status = "Invitation " + " from " + inviterName + ", id " + invitation.InvitationId;
         }
 
         private void DoWaitingRoom()

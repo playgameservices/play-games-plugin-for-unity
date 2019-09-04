@@ -1,6 +1,5 @@
 package com.google.games.bridge;
 
-import android.support.annotation.NonNull;
 import com.google.android.gms.games.multiplayer.realtime.RealTimeMessage;
 import com.google.android.gms.games.multiplayer.realtime.OnRealTimeMessageReceivedListener;
 
@@ -11,7 +10,7 @@ public class RealTimeMessageReceivedListenerProxy implements OnRealTimeMessageRe
         this.callback = callback;
     }
 
-    public void onRealTimeMessageReceived(@NonNull RealTimeMessage message) {
+    public void onRealTimeMessageReceived(/* @NonNull */ RealTimeMessage message) {
         callback.onRealTimeMessageReceived(message.isReliable(),
             message.getSenderParticipantId(), message.getMessageData());
     }

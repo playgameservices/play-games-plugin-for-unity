@@ -16,8 +16,6 @@
 
 package com.google.games.bridge;
 
-import android.support.annotation.NonNull;
-
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.PendingResult;
@@ -45,7 +43,7 @@ public class TokenPendingResult extends PendingResult<TokenResult> {
         result = new TokenResult();
     }
 
-    @NonNull
+    /* @NonNull */
     @Override
     public TokenResult await() {
 
@@ -58,9 +56,9 @@ public class TokenPendingResult extends PendingResult<TokenResult> {
         return getResult();
     }
 
-    @NonNull
+    /* @NonNull */
     @Override
-    public TokenResult await(long l, @NonNull TimeUnit timeUnit) {
+    public TokenResult await(long l, /* @NonNull */ TimeUnit timeUnit) {
         try {
             if (!latch.await(l, timeUnit)) {
                 setStatus(CommonStatusCodes.TIMEOUT);
@@ -84,7 +82,7 @@ public class TokenPendingResult extends PendingResult<TokenResult> {
 
     @Override
     public void setResultCallback(
-            @NonNull ResultCallback<? super TokenResult> resultCallback) {
+            /* @NonNull */ ResultCallback<? super TokenResult> resultCallback) {
 
         // Handle adding the callback when the latch has already counted down.  This
         // can happen if there is an error right away.
@@ -97,8 +95,8 @@ public class TokenPendingResult extends PendingResult<TokenResult> {
 
     @Override
     public void setResultCallback(
-            @NonNull ResultCallback<? super TokenResult> resultCallback, long l,
-            @NonNull TimeUnit timeUnit) {
+            /* @NonNull */ ResultCallback<? super TokenResult> resultCallback, long l,
+            /* @NonNull */ TimeUnit timeUnit) {
         try {
             if (!latch.await(l, timeUnit)) {
                 setStatus(CommonStatusCodes.TIMEOUT);
@@ -138,7 +136,7 @@ public class TokenPendingResult extends PendingResult<TokenResult> {
         }
 
     }
-    
+
     public void setAccount(GoogleSignInAccount account) {
         result.setAccount(account);
     }

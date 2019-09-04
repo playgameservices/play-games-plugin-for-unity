@@ -20,7 +20,6 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -119,26 +118,6 @@ public class HelperFragment extends Fragment
         return request.getPendingResponse();
     }
 
-    /**
-     * This calls silent signin and gets the user info including the auth code.
-     * If silent sign-in fails, the failure is returned.
-     * @return PendingResult for waiting on result.
-     */
-    public static PendingResult getAnotherAuthCode(Activity parentActivity,
-                                                   final boolean reauthIfNeeded,
-                                                   String webClientId) {
-        return fetchToken(parentActivity,
-                          /* silent= */!reauthIfNeeded,
-                          /* requestAuthCode= */true,
-                          /* requestEmail= */false,
-                          /* requestIdToken= */false,
-                          /* webClientId= */webClientId,
-                          /* forceRefreshToken= */false,
-                          /* additionalScopes= */null,
-                          /* hidePopups= */true,
-                          /* accountName= */null);
-    }
-
     public static Task<Integer> showAchievementUi(Activity parentActivity) {
         AchievementUiRequest request = new AchievementUiRequest();
 
@@ -186,7 +165,7 @@ public class HelperFragment extends Fragment
     }
 
     public static Task<SelectSnapshotUiRequest.Result> showSelectSnapshotUi(
-            Activity parentActivity, @NonNull String title, boolean allowAddButton, boolean allowDelete, int maxSnapshots) {
+            Activity parentActivity, /* @NonNull */ String title, boolean allowAddButton, boolean allowDelete, int maxSnapshots) {
         SelectSnapshotUiRequest request = new SelectSnapshotUiRequest(title, allowAddButton, allowDelete, maxSnapshots);
 
         if(!HelperFragment.startRequest(parentActivity, request)) {

@@ -33,7 +33,7 @@ namespace GooglePlayGames.Editor
             public const string Title = "Google Play Games Plugin for Unity";
 
             public const string Text = "The Google Play Games Plugin for Unity version $VERSION " +
-                                       "is now ready to use. If this is a new installation or of you have " +
+                                       "is now ready to use. If this is a new installation or if you have " +
                                        "just upgraded from a previous version, please click the 'Google Play Games' " +
                                        "menu and select 'Android Setup' to set up your project.";
         }

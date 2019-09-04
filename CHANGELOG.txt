@@ -1,3 +1,75 @@
+Version 0.10.03
+    Bug fixes:
+    * Fixed the exception caused by ui callbacks.
+    
+Version 0.10.02
+    Bug Fixes:
+    * Fixed LoadMoreScores.
+    * Fixed sign out issues when signed out from ui.
+    * GetAnotherServerAuthCode uses the same scopes used in sign in.
+    * Local user id is returned instead of "me" in LoadScores.
+    * Removed AndroidX dependency.
+Version 0.10.01
+    Other:
+      * Reimplementation of the plugin without using C++ SDK
+    New Features:
+      * Updated play-services-games version to 18.0.1
+      * Migrated java code to AndroidX
+Version 0.9.64
+    New Features:
+      * Updated gradle version to 5.4.1 and tools to 3.4.0
+    Bug Fixes:
+      * #2553 NullReferenceException with new v0.9.63 Achievements system
+      * #2545 Soft crash when opening achievements
+      * #2549 PlayerStats.AvgSessonLength is a typo
+Version 0.9.63
+    New Features:
+      * Updated gradle version to 3.3.2
+      * Updated play-services-games version to 17.0
+      * [TBMP] Added GetMatch method
+      * [TBMP] Added Dismiss method
+      * [TBMP] Expose creation and update timestamps of match
+      * [TBMP] Expose creation time of invitation
+    Bug Fixes:
+      * Improved sign-in time.
+      * Refactored achievements implementation. Now it uses less server calls and massive achievement increement will not block Achievement UI.
+      * Log DateTime guard
+      * Fix DirectoryNotFoundException in GPGSUtil.GenerateAndroidManifest
+      * Fixed readme
+      * #2482 Warning in AndroidTokenClient when building for device
+      * #2486 CanRematch in TBM always false
+    Other:
+      * Removed GetAchievement method. Use LoadAchievements instead.
+Version 0.9.62
+    Bug Fixes:
+      * #2475 ANRs 0.9.61 TokenFragment
+      * #2473 GetAnotherServerAuthCode email scope not granted
+      * #2465 Crash during sign-in failure at TokenFragment
+      * Additional check if Play Games is installed.
+Version 0.9.61
+    Bug Fixes:
+      * #2442 GetAnotherServerAuthCode doesn't honor OAuth scope
+      * #2444 Crash during sign-in failure at TokenFragment line 258
+Version 0.9.60
+    Bug Fixes:
+      * #2439 UnityWebRequestTexture class is not contained at unity 5.6
+Version 0.9.59
+    Bug Fixes:
+      * #2430 Fixed sign-in issues with Android version 7 and less
+      * #2417 Windows. System.UnauthorizedAccessException: Access to the path is denied
+      * Replaces WWW with UnityWebRequest
+    New Features:
+      * Updated PlayServicesResolver to 1.2.100.0
+Version 0.9.58
+    Bug Fixes:
+      * #2409 GetAnotherServerAuthCode always requests email permission
+      * #2406 IL2CPP managed stripping level
+      * #2401 Fix for missing TokenFragment class
+      * #2400 Many crash in Unity 2018.3.0f2
+      * #2395 Not working with Unity 2018.3.0f2
+    New Features:
+      * Updated PlayServicesResolver to 1.2.98.0
+      * Updated gradle version to 3.3.0
 Version 0.9.57
     Bug Fixes:
       * Fixed issue with unable to sign-in if Google Play Services or Google Play Games need to be updated.

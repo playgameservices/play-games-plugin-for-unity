@@ -2,12 +2,12 @@ package com.google.games.bridge;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.games.Games;
+import com.google.android.gms.games.GamesActivityResultCodes;
 import com.google.android.gms.games.InvitationsClient;
 import com.google.android.gms.games.multiplayer.Invitation;
 import com.google.android.gms.games.multiplayer.Multiplayer;
@@ -71,6 +71,8 @@ class ShowInvitationInboxUIRequest implements HelperFragment.Request {
                 setResult(CommonUIStatus.VALID, invitation);
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 setResult(CommonUIStatus.CANCELLED);
+            } else if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) {
+                setResult(CommonUIStatus.NOT_AUTHORIZED);
             } else {
                 Log.d(TAG, "onActivityResult unknown resultCode: " + resultCode);
                 setResult(CommonUIStatus.INTERNAL_ERROR);

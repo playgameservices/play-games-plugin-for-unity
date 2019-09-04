@@ -1,6 +1,5 @@
 package com.google.games.bridge;
 
-import android.support.annotation.NonNull;
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch;
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchUpdateCallback;
 
@@ -11,16 +10,16 @@ public class TurnBasedMatchUpdateCallbackProxy extends TurnBasedMatchUpdateCallb
         this.callback = callback;
     }
 
-    public void onTurnBasedMatchReceived(@NonNull TurnBasedMatch match) {
+    public void onTurnBasedMatchReceived(/* @NonNull */ TurnBasedMatch match) {
         callback.onTurnBasedMatchReceived(match);
     }
 
-    public void onTurnBasedMatchRemoved(@NonNull String matchId) {
+    public void onTurnBasedMatchRemoved(/* @NonNull */ String matchId) {
         callback.onTurnBasedMatchRemoved(matchId);
     }
 
     public interface Callback {
-        void onTurnBasedMatchReceived(@NonNull TurnBasedMatch match);
-        void onTurnBasedMatchRemoved(@NonNull String matchId);
+        void onTurnBasedMatchReceived(/* @NonNull */ TurnBasedMatch match);
+        void onTurnBasedMatchRemoved(/* @NonNull */ String matchId);
     }
 }

@@ -133,6 +133,16 @@ namespace GooglePlayGames.Android
                 AndroidHelperFragment.ShowRtmpSelectOpponentsUI(minOpponents, maxOpponents,
                     (status, result) =>
                     {
+                        if (status == UIStatus.NotAuthorized)
+                        {
+                            mAndroidClient.SignOut((() =>
+                            {
+                                listener.OnRoomConnected(false);
+                                CleanSession();
+                            }));
+                            return;
+                        }
+                        
                         if (status != UIStatus.Valid)
                         {
                             listener.OnRoomConnected(false);
@@ -290,6 +300,12 @@ namespace GooglePlayGames.Android
 
                 AndroidHelperFragment.ShowInvitationInboxUI((status, invitation) =>
                 {
+                    if (status == UIStatus.NotAuthorized)
+                    {
+                        mAndroidClient.SignOut((() => listener.OnRoomConnected(false)));
+                        return;
+                    }
+                    
                     if (status != UIStatus.Valid)
                     {
                         OurUtils.Logger.d("User did not complete invitation screen.");
