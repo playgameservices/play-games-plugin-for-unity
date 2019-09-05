@@ -13,6 +13,7 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
+
 #if UNITY_ANDROID
 
 namespace GooglePlayGames.BasicApi
@@ -100,7 +101,7 @@ namespace GooglePlayGames.BasicApi
         }
 
         public void GetAnotherServerAuthCode(bool reAuthenticateIfNeeded,
-                                             Action<string> callback)
+            Action<string> callback)
         {
             LogUsage();
             callback(null);
@@ -306,8 +307,8 @@ namespace GooglePlayGames.BasicApi
             if (callback != null)
             {
                 callback(new LeaderboardScoreData(
-                        leaderboardId,
-                        ResponseStatus.LicenseCheckFailed));
+                    leaderboardId,
+                    ResponseStatus.LicenseCheckFailed));
             }
         }
 
@@ -330,8 +331,8 @@ namespace GooglePlayGames.BasicApi
             if (callback != null)
             {
                 callback(new LeaderboardScoreData(
-                        token.LeaderboardId,
-                        ResponseStatus.LicenseCheckFailed));
+                    token.LeaderboardId,
+                    ResponseStatus.LicenseCheckFailed));
             }
         }
 
@@ -479,7 +480,8 @@ namespace GooglePlayGames.BasicApi
         /// <remarks>This can only be called after authentication.  It affects
         /// popups for achievements and other game services elements.</remarks>
         /// <param name="gravity">Gravity for the popup.</param>
-        public void SetGravityForPopups(Gravity gravity) {
+        public void SetGravityForPopups(Gravity gravity)
+        {
             LogUsage();
         }
 
@@ -489,6 +491,22 @@ namespace GooglePlayGames.BasicApi
         private static void LogUsage()
         {
             Logger.d("Received method call on DummyClient - using stub implementation.");
+        }
+
+        /// <summary>
+        /// Shows the Player Games Profile UI for the given player Id.
+        /// </summary>
+        /// <param name="userId">User Identifier. This cannot be null.</param>
+        /// <param name="callback">Callback to invoke when complete.</param>
+        public void ShowCompareProfileUI(
+            string userId,
+            Action<UIStatus> callback)
+        {
+            LogUsage();
+            if (callback != null)
+            {
+                callback.Invoke(UIStatus.VersionUpdateRequired);
+            }
         }
     }
 }
