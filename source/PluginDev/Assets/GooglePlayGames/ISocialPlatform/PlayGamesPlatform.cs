@@ -714,6 +714,28 @@ namespace GooglePlayGames
         }
 
         /// <summary>
+        /// Shows the Player Profile UI for the given user identifier.
+        /// </summary>
+        /// <param name="userId">User Identifier.</param>
+        /// <param name="callback">Callback invoked upon completion.</param>
+        public void ShowCompareProfileUI(string userId, Action<UIStatus> callback)
+        {
+            if (!IsAuthenticated())
+            {
+                GooglePlayGames.OurUtils.Logger.e("ShowCompareProfileUI can only be called after authentication.");
+                if (callback != null)
+                {
+                    callback(UIStatus.NotAuthorized);
+                }
+
+                return;
+            }
+            GooglePlayGames.OurUtils.Logger.d("ShowCompareProfileUI, userId=" +
+                                              userId + " callback is " + callback);
+            mClient.ShowCompareProfileUI(userId, callback);
+        }
+
+        /// <summary>
         /// Reveals the achievement with the passed identifier. This is a Play Games extension of the ISocialPlatform API.
         /// </summary>
         /// <remarks>If the operation succeeds, the callback

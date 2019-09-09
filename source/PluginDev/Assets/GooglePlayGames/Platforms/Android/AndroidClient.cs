@@ -568,6 +568,34 @@ namespace GooglePlayGames.Android
                     });
             }
         }
+        
+        ///<summary></summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.ShowCompareProfileUI"/>
+        public void ShowCompareProfileUI(string userId, Action<UIStatus> callback)
+        {
+            if (!IsAuthenticated())
+            {
+                InvokeCallbackOnGameThread(callback, UIStatus.NotAuthorized);
+                return;
+            }
+
+            using (var playersClient = getPlayersClient())
+            using (var task = playersClient.Call<AndroidJavaObject>("loadPlayer", userId))
+            {
+                AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
+                    task, annotatedData =>
+                    {
+                        using (var user = annotatedData.Call<AndroidJavaObject>("get"))
+                        {
+                            AndroidHelperFragment.ShowCompareProfileUI(user, AsOnGameThreadCallback(callback));
+                        }
+                    });
+                AndroidTaskUtils.AddOnFailureListener(task, exception =>
+                {
+                    InvokeCallbackOnGameThread(callback, UIStatus.NotAuthorized);
+                });
+            }
+        }
 
         ///<summary></summary>
         /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.LoadUsers"/>
