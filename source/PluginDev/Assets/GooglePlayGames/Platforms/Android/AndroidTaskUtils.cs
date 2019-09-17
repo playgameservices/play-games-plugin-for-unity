@@ -13,7 +13,13 @@ namespace GooglePlayGames.Android
 
         public static void AddOnSuccessListener<T>(AndroidJavaObject task, Action<T> callback)
         {
-            using (task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<T>(callback))) ;
+            using (task.Call<AndroidJavaObject>("addOnSuccessListener",
+                new TaskOnSuccessProxy<T>(callback, /* disposeResult= */ true))) ;
+        }
+
+        public static void AddOnSuccessListener<T>(AndroidJavaObject task, bool disposeResult, Action<T> callback)
+        {
+            using (task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<T>(callback, disposeResult))) ;
         }
 
         public static void AddOnFailureListener(AndroidJavaObject task, Action<AndroidJavaObject> callback)
@@ -56,16 +62,18 @@ namespace GooglePlayGames.Android
         {
             private Action<T> mCallback;
             private Action<AndroidJavaObject> mCallback2;
+            private bool mDisposeResult;
 
-            public TaskOnSuccessProxy(Action<T> callback)
+            public TaskOnSuccessProxy(Action<T> callback, bool disposeResult)
                 : base("com/google/android/gms/tasks/OnSuccessListener")
             {
                 mCallback = callback;
+                mDisposeResult = disposeResult;
             }
 
             public void onSuccess(T result)
             {
-                if (result is IDisposable)
+                if (result is IDisposable && mDisposeResult)
                 {
                     using ((IDisposable) result)
                     {
