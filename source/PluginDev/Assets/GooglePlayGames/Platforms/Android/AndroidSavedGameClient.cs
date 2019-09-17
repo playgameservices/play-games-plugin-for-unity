@@ -273,6 +273,7 @@ namespace GooglePlayGames.Android
             {
                 AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
                     task,
+                    /* disposeResult= */ false,
                     snapshotMetadata =>
                     {
                         Debug.Log("commitAndClose.succeed");
