@@ -60,7 +60,7 @@ public class HelperFragment extends Fragment
     // Pending token request.  There can be only one outstanding request at a
     // time.
     private static final Object lock = new Object();
-    private static Request pendingRequest;
+    private static Request pendingRequest, runningRequest;
     private static HelperFragment helperFragment;
 
     private static boolean mStartUpSignInCheckPerformed = false;
@@ -219,13 +219,14 @@ public class HelperFragment extends Fragment
         signInClient.signOut();
         synchronized (lock) {
             pendingRequest = null;
+            runningRequest = null;
         }
     }
 
     private static boolean startRequest(Activity parentActivity, Request request) {
         boolean ok = false;
         synchronized (lock) {
-            if (pendingRequest == null) {
+            if (pendingRequest == null && runningRequest == null) {
                 pendingRequest = request;
                 ok = true;
             }
@@ -263,7 +264,12 @@ public class HelperFragment extends Fragment
     private void processRequest() {
         Request request;
         synchronized (lock) {
+            if (runningRequest != null) {
+                return;
+            }
             request = pendingRequest;
+            pendingRequest = null;
+            runningRequest = request;
         }
         // no request, no need to continue.
         if (request == null) {
@@ -291,7 +297,7 @@ public class HelperFragment extends Fragment
         super.onActivityResult(requestCode, resultCode, data);
         Request request;
         synchronized (lock) {
-            request = pendingRequest;
+            request = runningRequest;
         }
         // no request, no need to continue.
         if (request == null) {
@@ -318,8 +324,8 @@ public class HelperFragment extends Fragment
 
     static void finishRequest(Request request) {
         synchronized (lock) {
-            if(pendingRequest == request) {
-                pendingRequest = null;
+            if(runningRequest == request) {
+                runningRequest = null;
             }
         }
     }
