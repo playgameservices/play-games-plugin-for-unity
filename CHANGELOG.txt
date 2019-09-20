@@ -1,7 +1,12 @@
+Version 0.10.04
+    Bug fixes:
+    * Updated the way of handling requests to prevent them being processed twice.
+    * Fixed the callback not being triggered in CommitUpdate issue.
+    * RealTimeMultiplayerListener runs on the game thread.
+
 Version 0.10.03
     Bug fixes:
     * Fixed the exception caused by ui callbacks.
-    
 Version 0.10.02
     Bug Fixes:
     * Fixed LoadMoreScores.
