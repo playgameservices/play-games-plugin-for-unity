@@ -1,4 +1,4 @@
-**Warning:** Real-time and turn-based multiplayer services are deprecated as of September 16th, 2019. These services are unavailable for new games. For more information, see 
+> **Warning:** Real-time and turn-based multiplayer services are deprecated as of September 16th, 2019. These services are unavailable for new games. For more information, see 
   [Ending support for multiplayer APIs in Play Games Services](https://support.google.com/googleplay/android-developer/answer/9469745).
 
 # Google Play Games plugin for Unity:<br> Turn-Based Multiplayer
