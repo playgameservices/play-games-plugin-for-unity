@@ -168,8 +168,9 @@ namespace GooglePlayGames.Android
             Action<ConnectionResponse> responseCallback, IMessageListener listener)
         {
             Misc.CheckNotNull(listener, "listener");
+            var listenerOnGameThread = new OnGameThreadMessageListener(listener);
             DiscoveringConnectionLifecycleCallback cb =
-                new DiscoveringConnectionLifecycleCallback(responseCallback, listener, mClient);
+                new DiscoveringConnectionLifecycleCallback(responseCallback, listenerOnGameThread, mClient);
             using (var connectionLifecycleCallback =
                 new AndroidJavaObject("com.google.games.bridge.ConnectionLifecycleCallbackProxy", cb))
             using (mClient.Call<AndroidJavaObject>("requestConnection", name, remoteEndpointId,
@@ -180,7 +181,7 @@ namespace GooglePlayGames.Android
         public void AcceptConnectionRequest(string remoteEndpointId, byte[] payload, IMessageListener listener)
         {
             Misc.CheckNotNull(listener, "listener");
-            mAdvertisingMessageListener = listener;
+            mAdvertisingMessageListener = new OnGameThreadMessageListener(listener);
 
             using (var payloadCallback = new AndroidJavaObject("com.google.games.bridge.PayloadCallbackProxy",
                 new PayloadCallback(listener)))
@@ -326,6 +327,29 @@ namespace GooglePlayGames.Android
                     endpointInfo.Call<string>("getEndpointName"),
                     endpointInfo.Call<string>("getServiceId")
                 );
+            }
+        }
+
+        private class OnGameThreadMessageListener : IMessageListener
+        {
+            private readonly IMessageListener mListener;
+
+            public OnGameThreadMessageListener(IMessageListener listener)
+            {
+                mListener = Misc.CheckNotNull(listener);
+            }
+
+            public void OnMessageReceived(string remoteEndpointId, byte[] data,
+                bool isReliableMessage)
+            {
+                PlayGamesHelperObject.RunOnGameThread(() => mListener.OnMessageReceived(
+                    remoteEndpointId, data, isReliableMessage));
+            }
+
+            public void OnRemoteEndpointDisconnected(string remoteEndpointId)
+            {
+                PlayGamesHelperObject.RunOnGameThread(
+                    () => mListener.OnRemoteEndpointDisconnected(remoteEndpointId));
             }
         }
 
