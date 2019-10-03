@@ -458,7 +458,10 @@ namespace GooglePlayGames.Android
                             mInvitationCallback = null;
                             mTokenClient.Signout();
                             mAuthState = AuthState.Unauthenticated;
-                            uiCallback?.Invoke();
+                            if (uiCallback != null)
+                            {
+                                uiCallback();
+                            }
                         });
                 }
             }
@@ -466,7 +469,10 @@ namespace GooglePlayGames.Android
             {
                 mTokenClient.Signout();
                 mAuthState = AuthState.Unauthenticated;
-                uiCallback?.Invoke();
+                if (uiCallback != null)
+                {
+                    uiCallback();
+                }
             }
         }
 
@@ -800,7 +806,7 @@ namespace GooglePlayGames.Android
             }
             else
             {
-                AndroidHelperFragment.ShowLeaderboardUI(leaderboardId, span, 
+                AndroidHelperFragment.ShowLeaderboardUI(leaderboardId, span,
                     GetUiSignOutCallbackOnGameThread(callback));
             }
         }
@@ -811,11 +817,20 @@ namespace GooglePlayGames.Android
             {
                 if (status == UIStatus.NotAuthorized)
                 {
-                    SignOut(() => callback?.Invoke(status));
+                    SignOut(() =>
+                    {
+                        if (callback != null)
+                        {
+                            callback(status);
+                        }
+                    });
                 }
                 else
                 {
-                    callback?.Invoke(status);
+                    if (callback != null)
+                    {
+                        callback(status);
+                    }
                 }
             };
 
