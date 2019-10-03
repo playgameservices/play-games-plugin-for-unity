@@ -481,7 +481,7 @@ namespace GooglePlayGames.Android
         {
             foreach (var participant in GetParticipantList())
             {
-                if (participant.Player.id.Equals(mAndroidClient.GetUserId()))
+                if (participant.Player != null && participant.Player.id.Equals(mAndroidClient.GetUserId()))
                 {
                     return participant;
                 }
