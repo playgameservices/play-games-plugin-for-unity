@@ -216,13 +216,15 @@ namespace GooglePlayGames.Android
             Misc.CheckNotNull(serviceId, "serviceId");
             Misc.CheckNotNull(listener, "listener");
 
+            var listenerOnGameThread = new OnGameThreadDiscoveryListener(listener);
+
             if (advertisingDuration.HasValue && advertisingDuration.Value.Ticks < 0)
             {
                 throw new InvalidOperationException("advertisingDuration must be positive");
             }
 
             using (var endpointDiscoveryCallback = new AndroidJavaObject(
-                "com.google.games.bridge.EndpointDiscoveryCallbackProxy", new EndpointDiscoveryCallback(listener)))
+                "com.google.games.bridge.EndpointDiscoveryCallbackProxy", new EndpointDiscoveryCallback(listenerOnGameThread)))
             using (var discoveryOptions = CreateDiscoveryOptions())
             using (var task = mClient.Call<AndroidJavaObject>("startDiscovery", serviceId, endpointDiscoveryCallback,
                 discoveryOptions))
@@ -353,6 +355,24 @@ namespace GooglePlayGames.Android
             }
         }
 
+        private class OnGameThreadDiscoveryListener : IDiscoveryListener
+        {
+            private readonly IDiscoveryListener mListener;
+            public OnGameThreadDiscoveryListener(IDiscoveryListener listener)
+            {
+                mListener = listener;
+            }
+            public void OnEndpointFound(EndpointDetails discoveredEndpoint)
+            {
+                PlayGamesHelperObject.RunOnGameThread(() => mListener.OnEndpointFound(discoveredEndpoint));
+            }
+
+            public void OnEndpointLost(string lostEndpointId)
+            {
+                PlayGamesHelperObject.RunOnGameThread(() => mListener.OnEndpointLost(lostEndpointId));
+            }
+        }
+        
         public void StopDiscovery(string serviceId)
         {
             mClient.Call("stopDiscovery");
