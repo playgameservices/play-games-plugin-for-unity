@@ -137,6 +137,11 @@ namespace GooglePlayGames.Android
 
         internal static Player ToPlayer(AndroidJavaObject player)
         {
+            if (player == null)
+            {
+                return null;
+            }
+
             string displayName = player.Call<String>("getDisplayName");
             string playerId = player.Call<String>("getPlayerId");
             string avatarUrl = player.Call<String>("getIconImageUrl");
