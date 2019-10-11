@@ -35,6 +35,7 @@ import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesActivityResultCodes;
+import com.google.android.gms.games.Player;
 import com.google.android.gms.games.multiplayer.Invitation;
 import com.google.android.gms.games.multiplayer.realtime.Room;
 import com.google.android.gms.tasks.Task;
@@ -173,6 +174,17 @@ public class HelperFragment extends Fragment
 
         return request.getTask();
     }
+    
+        public static Task<Integer> showCompareProfileUI(Activity parentActivity, Player player) {
+            CompareProfileUiRequest request = new CompareProfileUiRequest(player);
+    
+            if(!HelperFragment.startRequest(parentActivity, request)) {
+                request.setResult(CommonUIStatus.UI_BUSY);
+            }
+    
+            return request.getTask();
+        }
+
 
     public static Task<BaseSelectOpponentsUiRequest.Result> showTbmpSelectOpponentsUi(Activity parentActivity, int minOpponents, int maxOpponents) {
         TbmpSelectOpponentsUiRequest request = new TbmpSelectOpponentsUiRequest(minOpponents, maxOpponents);

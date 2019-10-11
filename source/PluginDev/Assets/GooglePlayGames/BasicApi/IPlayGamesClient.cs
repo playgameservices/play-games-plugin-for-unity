@@ -350,6 +350,13 @@ namespace GooglePlayGames.BasicApi
         /// popups for achievements and other game services elements.</remarks>
         /// <param name="gravity">Gravity for the popup.</param>
         void SetGravityForPopups(Gravity gravity);
+        
+        /// <summary>
+        /// Shows the Play Games Player Profile UI for a specific user identifier.
+        /// </summary>
+        /// <param name="userId">User identifier.</param>
+        /// <param name="callback">Callback invoked upon completion.</param>
+        void ShowCompareProfileUI(string userId, Action<UIStatus> callback);
     }
 
     /// <summary>
