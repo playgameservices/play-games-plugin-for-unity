@@ -15,6 +15,7 @@
 // </copyright>
 
 // Android only feature
+
 #if (UNITY_ANDROID)
 namespace GooglePlayGames
 {
@@ -26,7 +27,6 @@ namespace GooglePlayGames
 
     public static class NearbyConnectionClientFactory
     {
-
         public static void Create(Action<INearbyConnectionClient> callback)
         {
             if (Application.isEditor)
@@ -34,6 +34,7 @@ namespace GooglePlayGames
                 GooglePlayGames.OurUtils.Logger.d("Creating INearbyConnection in editor, using DummyClient.");
                 callback.Invoke(new GooglePlayGames.BasicApi.Nearby.DummyNearbyConnectionClient());
             }
+
             GooglePlayGames.OurUtils.Logger.d("Creating real INearbyConnectionClient");
             GooglePlayGames.Native.NativeNearbyConnectionClientFactory.Create(callback);
         }
@@ -56,4 +57,3 @@ namespace GooglePlayGames
     }
 }
 #endif //UNITY_ANDROID
-

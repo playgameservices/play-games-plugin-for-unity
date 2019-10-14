@@ -13,6 +13,7 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
+
 #if UNITY_ANDROID
 
 namespace GooglePlayGames
@@ -41,7 +42,7 @@ namespace GooglePlayGames
         private double mPercentComplete = 0.0;
         private bool mCompleted = false;
         private bool mHidden = false;
-        private DateTime mLastModifiedTime = new DateTime (1970, 1, 1, 0, 0, 0, 0);
+        private DateTime mLastModifiedTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
         private string mTitle = string.Empty;
         private string mRevealedImageUrl = string.Empty;
         private string mUnlockedImageUrl = string.Empty;
@@ -75,7 +76,7 @@ namespace GooglePlayGames
                 if (ach.TotalSteps > 0)
                 {
                     this.mPercentComplete =
-                        ((double)ach.CurrentSteps / (double)ach.TotalSteps) * 100.0;
+                        ((double) ach.CurrentSteps / (double) ach.TotalSteps) * 100.0;
                 }
                 else
                 {
@@ -86,6 +87,7 @@ namespace GooglePlayGames
             {
                 this.mPercentComplete = ach.IsUnlocked ? 100.0 : 0.0;
             }
+
             this.mCompleted = ach.IsUnlocked;
             this.mHidden = !ach.IsRevealed;
             this.mLastModifiedTime = ach.LastModifiedTime;
@@ -94,7 +96,6 @@ namespace GooglePlayGames
             this.mPoints = ach.Points;
             this.mRevealedImageUrl = ach.RevealedImageUrl;
             this.mUnlockedImageUrl = ach.UnlockedImageUrl;
-
         }
 
         /// <summary>
@@ -119,10 +120,12 @@ namespace GooglePlayGames
         /// </summary>
         private Texture2D LoadImage()
         {
-            if (hidden) {
+            if (hidden)
+            {
                 // return null, we dont have images for hidden achievements.
                 return null;
             }
+
             string url = completed ? mUnlockedImageUrl : mRevealedImageUrl;
 
             // the url can be null if the image is not configured.
@@ -169,15 +172,9 @@ namespace GooglePlayGames
         /// </returns>
         public string id
         {
-            get
-            {
-                return mId;
-            }
+            get { return mId; }
 
-            set
-            {
-                mId = value;
-            }
+            set { mId = value; }
         }
 
         /// <summary>
@@ -189,10 +186,7 @@ namespace GooglePlayGames
         /// <returns><c>true</c> if incremental; otherwise, <c>false</c>.</returns>
         public bool isIncremental
         {
-            get
-            {
-                return mIsIncremental;
-            }
+            get { return mIsIncremental; }
         }
 
         /// <summary>
@@ -206,10 +200,7 @@ namespace GooglePlayGames
         /// <returns>The current steps.</returns>
         public int currentSteps
         {
-            get
-            {
-                return mCurrentSteps;
-            }
+            get { return mCurrentSteps; }
         }
 
         /// <summary>
@@ -223,10 +214,7 @@ namespace GooglePlayGames
         /// <returns>The total steps.</returns>
         public int totalSteps
         {
-            get
-            {
-                return mTotalSteps;
-            }
+            get { return mTotalSteps; }
         }
 
         /// <summary>
@@ -237,15 +225,9 @@ namespace GooglePlayGames
         /// </returns>
         public double percentCompleted
         {
-            get
-            {
-                return mPercentComplete;
-            }
+            get { return mPercentComplete; }
 
-            set
-            {
-                mPercentComplete = value;
-            }
+            set { mPercentComplete = value; }
         }
 
         /// <summary>
@@ -258,10 +240,7 @@ namespace GooglePlayGames
         /// <returns><c>true</c> if completed; otherwise, <c>false</c>.</returns>
         public bool completed
         {
-            get
-            {
-                return this.mCompleted;
-            }
+            get { return this.mCompleted; }
         }
 
         /// <summary>
@@ -270,59 +249,38 @@ namespace GooglePlayGames
         /// <value><c>true</c> if hidden; otherwise, <c>false</c>.</value>
         public bool hidden
         {
-            get
-            {
-                return this.mHidden;
-            }
+            get { return this.mHidden; }
         }
 
         public DateTime lastReportedDate
         {
-            get
-            {
-                return mLastModifiedTime;
-            }
+            get { return mLastModifiedTime; }
         }
 
         public String title
         {
-            get
-            {
-                return mTitle;
-            }
+            get { return mTitle; }
         }
+
         public Texture2D image
         {
-            get
-            {
-                return LoadImage();
-            }
+            get { return LoadImage(); }
         }
 
         public string achievedDescription
         {
-            get
-            {
-                return mDescription;
-            }
+            get { return mDescription; }
         }
 
         public string unachievedDescription
         {
-            get
-            {
-                return mDescription;
-            }
+            get { return mDescription; }
         }
 
         public int points
         {
-            get
-            {
-                return (int) mPoints;
-            }
+            get { return (int) mPoints; }
         }
-
     }
 }
 #endif

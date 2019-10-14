@@ -13,6 +13,7 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
+
 #if UNITY_ANDROID
 
 namespace GooglePlayGames.BasicApi
@@ -32,47 +33,27 @@ namespace GooglePlayGames.BasicApi
         /// <remarks>
         /// Note that a PlayerStats with all stats unset may still be valid.
         /// </remarks>
-        public bool Valid
-        {
-            get;
-            set;
-        }
+        public bool Valid { get; set; }
 
         /// <summary>
         /// The number of in-app purchases.
         /// </summary>
-        public int NumberOfPurchases
-        {
-            get;
-            set;
-        }
+        public int NumberOfPurchases { get; set; }
 
         /// <summary>
         /// The length of the avg sesson in minutes.
         /// </summary>
-        public float AvgSessonLength
-        {
-            get;
-            set;
-        }
+        public float AvgSessonLength { get; set; }
 
         /// <summary>
         /// The days since last played.
         /// </summary>
-        public int DaysSinceLastPlayed
-        {
-            get;
-            set;
-        }
+        public int DaysSinceLastPlayed { get; set; }
 
         /// <summary>
         /// The number of sessions based on sign-ins.
         /// </summary>
-        public int NumberOfSessions
-        {
-            get;
-            set;
-        }
+        public int NumberOfSessions { get; set; }
 
         /// <summary>
         /// The approximation of sessions percentile for the player.
@@ -84,11 +65,7 @@ namespace GooglePlayGames.BasicApi
         /// Higher numbers indicate that this player has played more sessions.
         /// A return value less than zero indicates this value is not available.
         /// </remarks>
-        public float SessPercentile
-        {
-            get;
-            set;
-        }
+        public float SessPercentile { get; set; }
 
         /// <summary>
         /// The approximate spend percentile of the player.
@@ -100,11 +77,7 @@ namespace GooglePlayGames.BasicApi
         /// numbers indicate that this player has spent more.
         /// A return value less than zero indicates this value is not available.
         /// </remarks>
-        public float SpendPercentile
-        {
-            get;
-            set;
-        }
+        public float SpendPercentile { get; set; }
 
         /// <summary>
         /// The approximate probability of the player choosing to spend in this game.
@@ -114,11 +87,7 @@ namespace GooglePlayGames.BasicApi
         ///  Higher values indicate that a player is more likely to spend.
         /// A return value less than zero indicates this value is not available.
         /// </remarks>
-        public float SpendProbability
-        {
-            get;
-            set;
-        }
+        public float SpendProbability { get; set; }
 
         /// <summary>
         /// The approximate probability of the player not returning to play the game.
@@ -127,35 +96,24 @@ namespace GooglePlayGames.BasicApi
         /// Higher values indicate that a player is less likely to return.
         /// A return value less than zero indicates this value is not available.
         /// </remarks>
-        public float ChurnProbability
-        {
-            get;
-            set;
-        }
+        public float ChurnProbability { get; set; }
 
         /// <summary>
         /// The high spender probability of this player.
         /// </summary>
-        public float HighSpenderProbability
-        {
-            get;
-            set;
-        }
+        public float HighSpenderProbability { get; set; }
 
         /// <summary>
         /// The predicted total spend of this player over the next 28 days.
         /// </summary>
-        public float TotalSpendNext28Days
-        {
-            get;
-            set;
-        }
+        public float TotalSpendNext28Days { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GooglePlayGames.BasicApi.PlayerStats"/> class.
         /// Sets all values to -1.
         /// </summary>
-        public PlayerStats() {
+        public PlayerStats()
+        {
             Valid = false;
         }
 
@@ -165,7 +123,7 @@ namespace GooglePlayGames.BasicApi
         /// <returns><c>true</c> if this instance has NumberOfPurchases; otherwise, <c>false</c>.</returns>
         public bool HasNumberOfPurchases()
         {
-            return NumberOfPurchases != (int)UNSET_VALUE;
+            return NumberOfPurchases != (int) UNSET_VALUE;
         }
 
         /// <summary>
@@ -183,7 +141,7 @@ namespace GooglePlayGames.BasicApi
         /// <returns><c>true</c> if this instance has DaysSinceLastPlayed; otherwise, <c>false</c>.</returns>
         public bool HasDaysSinceLastPlayed()
         {
-            return DaysSinceLastPlayed != (int)UNSET_VALUE;
+            return DaysSinceLastPlayed != (int) UNSET_VALUE;
         }
 
         /// <summary>
@@ -192,7 +150,7 @@ namespace GooglePlayGames.BasicApi
         /// <returns><c>true</c> if this instance has NumberOfSessions; otherwise, <c>false</c>.</returns>
         public bool HasNumberOfSessions()
         {
-            return NumberOfSessions != (int)UNSET_VALUE;
+            return NumberOfSessions != (int) UNSET_VALUE;
         }
 
         /// <summary>
@@ -239,7 +197,6 @@ namespace GooglePlayGames.BasicApi
         {
             return TotalSpendNext28Days != UNSET_VALUE;
         }
-
     }
 }
 #endif

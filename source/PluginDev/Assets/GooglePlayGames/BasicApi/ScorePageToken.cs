@@ -13,6 +13,7 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
+
 #if UNITY_ANDROID
 
 namespace GooglePlayGames.BasicApi
@@ -25,7 +26,6 @@ namespace GooglePlayGames.BasicApi
     /// </summary>
     public class ScorePageToken
     {
-
         private string mId;
         private object mInternalObject;
         private LeaderboardCollection mCollection;
@@ -42,34 +42,22 @@ namespace GooglePlayGames.BasicApi
 
         public LeaderboardCollection Collection
         {
-            get
-            {
-                return mCollection;
-            }
+            get { return mCollection; }
         }
 
         public LeaderboardTimeSpan TimeSpan
         {
-            get
-            {
-                return mTimespan;
-            }
+            get { return mTimespan; }
         }
 
         public string LeaderboardId
         {
-            get
-            {
-                return mId;
-            }
+            get { return mId; }
         }
 
         internal object InternalObject
         {
-            get
-            {
-                return mInternalObject;
-            }
+            get { return mInternalObject; }
         }
     }
 }

@@ -38,7 +38,7 @@ namespace GooglePlayGames.BasicApi.Nearby
         private readonly byte[] mPayload;
 
         private ConnectionResponse(long localClientId, string remoteEndpointId, Status code,
-                                   byte[] payload)
+            byte[] payload)
         {
             this.mLocalClientId = localClientId;
             this.mRemoteEndpointId = Misc.CheckNotNull(remoteEndpointId);
@@ -48,34 +48,22 @@ namespace GooglePlayGames.BasicApi.Nearby
 
         public long LocalClientId
         {
-            get
-            {
-                return mLocalClientId;
-            }
+            get { return mLocalClientId; }
         }
 
         public string RemoteEndpointId
         {
-            get
-            {
-                return mRemoteEndpointId;
-            }
+            get { return mRemoteEndpointId; }
         }
 
         public Status ResponseStatus
         {
-            get
-            {
-                return mResponseStatus;
-            }
+            get { return mResponseStatus; }
         }
 
         public byte[] Payload
         {
-            get
-            {
-                return mPayload;
-            }
+            get { return mPayload; }
         }
 
         public static ConnectionResponse Rejected(long localClientId, string remoteEndpointId)
@@ -103,14 +91,14 @@ namespace GooglePlayGames.BasicApi.Nearby
         }
 
         public static ConnectionResponse Accepted(long localClientId, string remoteEndpointId,
-                                                  byte[] payload)
+            byte[] payload)
         {
             return new ConnectionResponse(localClientId, remoteEndpointId, Status.Accepted,
                 payload);
         }
 
         public static ConnectionResponse AlreadyConnected(long localClientId,
-                                                          string remoteEndpointId)
+            string remoteEndpointId)
         {
             return new ConnectionResponse(localClientId, remoteEndpointId,
                 Status.ErrorAlreadyConnected,
