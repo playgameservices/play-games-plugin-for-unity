@@ -25,8 +25,7 @@ namespace QuizRacer.MenuPanels
     // should be associated with the GameMenu panel in the main scene.
     public class GameMenuEvents : MonoBehaviour
     {
-
-        private  System.Action<bool> mAuthCallback;
+        private System.Action<bool> mAuthCallback;
         private bool mAuthOnStart = true;
         private bool mSigningIn = false;
 
@@ -35,7 +34,6 @@ namespace QuizRacer.MenuPanels
         {
             mAuthCallback = (bool success) =>
             {
-
                 Debug.Log("In Auth callback, success = " + success);
 
                 mSigningIn = false;
@@ -53,9 +51,9 @@ namespace QuizRacer.MenuPanels
             // on your production app, you probably don't want this turned 
             // on by default, as it will fill the user's logs with debug info).
             var config = new PlayGamesClientConfiguration.Builder()
-            .WithInvitationDelegate(InvitationManager.Instance.OnInvitationReceived)
-            .Build();
-            PlayGamesPlatform.InitializeInstance(config);        
+                .WithInvitationDelegate(InvitationManager.Instance.OnInvitationReceived)
+                .Build();
+            PlayGamesPlatform.InitializeInstance(config);
             PlayGamesPlatform.DebugLogEnabled = true;
 
             // try silent authentication
@@ -63,7 +61,6 @@ namespace QuizRacer.MenuPanels
             {
                 Authorize(true);
             }
-
         }
 
         // Link this to the play button on click event list.

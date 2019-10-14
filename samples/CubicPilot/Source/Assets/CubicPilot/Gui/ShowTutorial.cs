@@ -27,9 +27,11 @@ namespace CubicPilot.Gui
         public float DelayBeforeStart;
 
         private Countdown mCountdown = new Countdown(false,
-                                           GameConsts.Tutorial.PhaseDuration);
+            GameConsts.Tutorial.PhaseDuration);
+
         private Countdown mTransitionCd = new Countdown(false,
-                                              GameConsts.Menu.TransitionDuration);
+            GameConsts.Menu.TransitionDuration);
+
         int phase = 0;
         const int Phases = 3;
 
@@ -45,6 +47,7 @@ namespace CubicPilot.Gui
             {
                 phase = 3;
             }
+
             if (GameManager.Instance.Level > 0)
             {
                 // no tutorial
@@ -69,6 +72,7 @@ namespace CubicPilot.Gui
                 {
                     this.enabled = false;
                 }
+
                 mCountdown.Start();
                 mTransitionCd.Start();
             }
@@ -76,12 +80,11 @@ namespace CubicPilot.Gui
 
         void OnGUI()
         {
-
             if (Time.timeScale == 0)
             {
                 return;
             }
-        
+
             if (DelayBeforeStart > 0)
             {
                 return;
@@ -91,27 +94,27 @@ namespace CubicPilot.Gui
             switch (phase)
             {
                 case 0:
-                    float aspect = ArrowTex.width / (float)ArrowTex.height;
+                    float aspect = ArrowTex.width / (float) ArrowTex.height;
                     GUI.DrawTexture(new Rect(Gu.Left(GameConsts.Tutorial.SteerArrowX),
-                            Gu.Top(0), aspect * Screen.height,
-                            (int)(mTransitionCd.NormalizedElapsed * Screen.height)), ArrowTex);
+                        Gu.Top(0), aspect * Screen.height,
+                        (int) (mTransitionCd.NormalizedElapsed * Screen.height)), ArrowTex);
                     Gu.Label(
                         Gu.Left(GameConsts.Tutorial.SteerTextX),
-                        (int)Util.Interpolate(0.0f, 0.0f, 1.0f, Gu.Middle(0),
+                        (int) Util.Interpolate(0.0f, 0.0f, 1.0f, Gu.Middle(0),
                             mTransitionCd.NormalizedElapsed),
                         Gu.Dim(GameConsts.Tutorial.FontSize),
                         Strings.Tutorial1);
                     break;
                 case 1:
                     Gu.Label(Gu.Right(GameConsts.Tutorial.FireTextX),
-                        (int)Util.Interpolate(0.0f, Screen.height, 1.0f, Gu.Middle(0),
+                        (int) Util.Interpolate(0.0f, Screen.height, 1.0f, Gu.Middle(0),
                             mTransitionCd.NormalizedElapsed),
                         Gu.Dim(GameConsts.Tutorial.FontSize),
                         Strings.Tutorial2);
                     break;
                 default:
                     Gu.Label(Gu.Center(0),
-                        (int)(Util.Interpolate(0.0f, 0.0f, 1.0f, Gu.Middle(0),
+                        (int) (Util.Interpolate(0.0f, 0.0f, 1.0f, Gu.Middle(0),
                             mTransitionCd.NormalizedElapsed)),
                         Gu.Dim(GameConsts.Tutorial.FontSize),
                         Strings.Tutorial3);

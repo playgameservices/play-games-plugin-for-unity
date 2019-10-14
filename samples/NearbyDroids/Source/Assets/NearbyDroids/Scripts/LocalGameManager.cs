@@ -176,8 +176,8 @@ namespace NearbyDroids
             PlayerInfo p = PlayerInfo.AddPendingPlayer(endpointId, null, data);
 
             GameObject obj = owner.LevelManager.CreatePlayer(
-                                 p.AvatarIndex,
-                                 p.DeviceId);
+                p.AvatarIndex,
+                p.DeviceId);
 
             PlayerController ctl = obj.GetComponent<PlayerController>();
             if (ctl != null)

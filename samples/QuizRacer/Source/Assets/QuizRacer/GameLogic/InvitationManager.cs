@@ -25,10 +25,7 @@ namespace QuizRacer.GameLogic
 
         public static InvitationManager Instance
         {
-            get
-            {
-                return sInstance;
-            }
+            get { return sInstance; }
         }
 
         private Invitation mInvitation = null;
@@ -42,18 +39,12 @@ namespace QuizRacer.GameLogic
 
         public Invitation Invitation
         {
-            get
-            {
-                return mInvitation;
-            }
+            get { return mInvitation; }
         }
 
         public bool ShouldAutoAccept
         {
-            get
-            {
-                return mShouldAutoAccept;
-            }
+            get { return mShouldAutoAccept; }
         }
 
         public void DeclineInvitation()
@@ -62,6 +53,7 @@ namespace QuizRacer.GameLogic
             {
                 PlayGamesPlatform.Instance.RealTime.DeclineInvitation(mInvitation.InvitationId);
             }
+
             Clear();
         }
 

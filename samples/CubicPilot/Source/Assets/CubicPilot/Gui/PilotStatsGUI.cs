@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 namespace CubicPilot.Gui
 {
     using CubicPilot.GameLogic;
@@ -35,10 +36,8 @@ namespace CubicPilot.Gui
         {
             Gu.SetColor(Color.black);
             PilotStats stats = GameManager.Instance.Progress.CurPilotStats;
-            float fontSize = SmallFormat ? GameConsts.Menu.PilotInfoFontSizeSmall :
-            GameConsts.Menu.PilotInfoFontSize;
-            float y = SmallFormat ? GameConsts.Menu.PilotInfoYSmallFont :
-            GameConsts.Menu.PilotInfoY;
+            float fontSize = SmallFormat ? GameConsts.Menu.PilotInfoFontSizeSmall : GameConsts.Menu.PilotInfoFontSize;
+            float y = SmallFormat ? GameConsts.Menu.PilotInfoYSmallFont : GameConsts.Menu.PilotInfoY;
 
             // show summary info
             string summary;

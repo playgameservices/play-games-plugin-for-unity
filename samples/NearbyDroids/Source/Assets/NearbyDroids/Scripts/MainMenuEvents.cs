@@ -55,7 +55,7 @@ namespace NearbyDroids
 
             PlayerInfo.AddPendingPlayer(
                 new NearbyPlayer(defaultPlayerName), avatarIndex);
-            
+
             GameManager.Instance.StartPlaying(GameManager.GameType.SinglePlayer);
         }
 

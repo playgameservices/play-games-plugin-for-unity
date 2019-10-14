@@ -19,24 +19,28 @@ using GooglePlayGames.BasicApi;
 using GooglePlayGames.BasicApi.Multiplayer;
 using UnityEngine;
 
-public class WelcomeGui : BaseGui {
+public class WelcomeGui : BaseGui
+{
     WidgetConfig TitleCfg = new WidgetConfig(0.0f, -0.3f, 1.0f, 0.2f, 100, "Tic Tac Toss");
     WidgetConfig PlayCfg = new WidgetConfig(0.0f, 0.0f, 0.8f, 0.2f, 60, "Play!");
     bool mAuthOnStart = true;
     bool mInMatch = false;
     System.Action<bool> mAuthCallback;
 
-    void Start() {
+    void Start()
+    {
         Screen.orientation = ScreenOrientation.Portrait;
-        mAuthCallback = (bool success) => {
+        mAuthCallback = (bool success) =>
+        {
             EndStandBy();
-            if (success && !mInMatch) {
+            if (success && !mInMatch)
+            {
                 SwitchToMain();
             }
         };
 
-        PlayGamesClientConfiguration config = 
-              new PlayGamesClientConfiguration.Builder()
+        PlayGamesClientConfiguration config =
+            new PlayGamesClientConfiguration.Builder()
                 .WithInvitationDelegate(OnGotInvitation)
                 .WithMatchDelegate(OnGotMatch)
                 .Build();
@@ -51,41 +55,50 @@ public class WelcomeGui : BaseGui {
         PlayGamesPlatform.DebugLogEnabled = true;
 
         // try silent authentication
-        if (mAuthOnStart) {
+        if (mAuthOnStart)
+        {
             SetStandBy("Please wait...");
             PlayGamesPlatform.Instance.Authenticate(mAuthCallback, true);
         }
     }
 
-    protected override void DoGUI() {
+    protected override void DoGUI()
+    {
         GuiLabel(TitleCfg);
-        if (GuiButton(PlayCfg)) {
+        if (GuiButton(PlayCfg))
+        {
             SetStandBy("Signing in...");
             PlayGamesPlatform.Instance.localUser.Authenticate(mAuthCallback);
         }
     }
 
 
-    protected void OnGotInvitation(Invitation invitation, bool shouldAutoAccept) {
-        if (invitation.InvitationType != Invitation.InvType.TurnBased) {
+    protected void OnGotInvitation(Invitation invitation, bool shouldAutoAccept)
+    {
+        if (invitation.InvitationType != Invitation.InvType.TurnBased)
+        {
             // wrong type of invitation!
             return;
         }
+
         mInMatch = true;
         gameObject.GetComponent<MainMenuGui>().HandleInvitation(invitation, shouldAutoAccept);
     }
 
-    protected void OnGotMatch(TurnBasedMatch match, bool shouldAutoLaunch) {
+    protected void OnGotMatch(TurnBasedMatch match, bool shouldAutoLaunch)
+    {
         mInMatch = true;
         gameObject.GetComponent<MainMenuGui>().HandleMatchTurn(match, shouldAutoLaunch);
     }
 
 
-    void SwitchToMain() {
+    void SwitchToMain()
+    {
         gameObject.GetComponent<MainMenuGui>().MakeActive();
     }
 
-    public void SetAuthOnStart(bool authOnStart) {
+    public void SetAuthOnStart(bool authOnStart)
+    {
         mAuthOnStart = authOnStart;
     }
 }

@@ -23,13 +23,12 @@
 
 namespace QuizRacer
 {
-public static class GPGSIds
-{
+    public static class GPGSIds
+    {
         public const string achievement_score = "PLACEHOLDER"; // <GPGSID>
         public const string achievement_play = "PLACEHOLDER"; // <GPGSID>
         public const string achievement_lose = "PLACEHOLDER"; // <GPGSID>
         public const string achievement_dont_play = "PLACEHOLDER"; // <GPGSID>
         public const string achievement_win = "PLACEHOLDER"; // <GPGSID>
-
-}
+    }
 }
