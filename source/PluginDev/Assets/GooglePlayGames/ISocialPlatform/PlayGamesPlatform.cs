@@ -1379,6 +1379,13 @@ namespace GooglePlayGames
 
         private static Action<T> ToOnGameThread<T>(Action<T> toConvert)
         {
+            if (toConvert == null)
+            {
+                return delegate
+                {
+                };
+            }
+
             return (val) => PlayGamesHelperObject.RunOnGameThread(() => toConvert(val));
         }
     }

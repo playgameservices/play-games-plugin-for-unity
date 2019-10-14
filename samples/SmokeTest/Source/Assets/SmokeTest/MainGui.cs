@@ -63,6 +63,7 @@ namespace SmokeTest
         private string idToken = "";
         private string authCode = "";
         private bool loadedFriends = false;
+        private bool loadingFriends = false;
 
         private volatile TurnBasedMatch mMatch = null;
 

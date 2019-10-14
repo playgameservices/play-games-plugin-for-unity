@@ -101,6 +101,32 @@ namespace GooglePlayGames.Android
             });
         }
 
+        /// <summary>Gets the email selected by the current player.</summary>
+        /// <remarks>This is not necessarily the email address of the player.  It
+        /// is just the account selected by the player from a list of accounts
+        /// present on the device.
+        /// </remarks>
+        /// <returns>A string representing the email.</returns>
+        public string GetEmail()
+        {
+            return email;
+        }
+
+        public string GetAuthCode()
+        {
+            return authCode;
+        }
+
+        /// <summary>Gets the OpenID Connect ID token for authentication with a server backend.</summary>
+        /// <param name="serverClientId">Server client ID from console.developers.google.com or the Play Games
+        /// services console.</param>
+        /// <param name="idTokenCallback"> A callback to be invoked after token is retrieved. Will be passed null value
+        /// on failure. </param>
+        public string GetIdToken()
+        {
+            return idToken;
+        }
+
         public void FetchTokens(bool silent, Action<int> callback)
         {
             PlayGamesHelperObject.RunOnGameThread(() => DoFetchToken(silent, callback));
@@ -146,32 +172,6 @@ namespace GooglePlayGames.Android
         public AndroidJavaObject GetAccount()
         {
             return account;
-        }
-
-        /// <summary>Gets the email selected by the current player.</summary>
-        /// <remarks>This is not necessarily the email address of the player.  It
-        /// is just the account selected by the player from a list of accounts
-        /// present on the device.
-        /// </remarks>
-        /// <returns>A string representing the email.</returns>
-        public string GetEmail()
-        {
-            return email;
-        }
-
-        public string GetAuthCode()
-        {
-            return authCode;
-        }
-
-        /// <summary>Gets the OpenID Connect ID token for authentication with a server backend.</summary>
-        /// <param name="serverClientId">Server client ID from console.developers.google.com or the Play Games
-        /// services console.</param>
-        /// <param name="idTokenCallback"> A callback to be invoked after token is retrieved. Will be passed null value
-        /// on failure. </param>
-        public string GetIdToken()
-        {
-            return idToken;
         }
 
         /// <summary>

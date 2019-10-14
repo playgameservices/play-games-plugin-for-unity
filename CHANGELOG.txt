@@ -79,7 +79,6 @@ Version 0.9.57
     Bug Fixes:
       * Fixed issue with unable to sign-in if Google Play Services or Google Play Games need to be updated.
       * #2388 IVideoClient not in package
-
 Version 0.9.56
     Bug Fixes:
       * #2387 ISavedGameClient null if Authentication Failed.
