@@ -33,12 +33,12 @@ namespace CubicPilot.Editor
         /// The required tags for the NearbyDroid sample.
         /// </summary>
         private static string[] requiredTags =
-            {
-                "LevelController",
-                "Civilian",
-                "Enemy"
-            };
-        
+        {
+            "LevelController",
+            "Civilian",
+            "Enemy"
+        };
+
         /// <summary>
         /// Initializes static members of the <see cref="InitializeTagsAndLayers"/> class.
         /// The static constructor is called by the Unity editor. because of the
@@ -49,7 +49,7 @@ namespace CubicPilot.Editor
             Debug.Log("Checking for custom tags and layers");
 
             // Open tag manager
-            SerializedObject tagManager = 
+            SerializedObject tagManager =
                 new SerializedObject(AssetDatabase.LoadAllAssetsAtPath(
                     "ProjectSettings/TagManager.asset")[0]);
 
