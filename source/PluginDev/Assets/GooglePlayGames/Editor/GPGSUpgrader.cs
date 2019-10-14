@@ -134,7 +134,6 @@ namespace GooglePlayGames.Editor
             }
         }
 
-
         private static string Upgrade942(string prevVer)
         {
             string file = "Assets/Plugins/Android/play-games-plugin-support.aar";

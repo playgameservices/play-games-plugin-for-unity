@@ -214,7 +214,7 @@ namespace GooglePlayGames.Android
                                             // handle null return
                                         }
 
-                                        LoadAchievements(ignore => {});
+                                        LoadAchievements(ignore => { });
                                     }
                                     else
                                     {

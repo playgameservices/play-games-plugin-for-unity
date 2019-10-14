@@ -1381,9 +1381,7 @@ namespace GooglePlayGames
         {
             if (toConvert == null)
             {
-                return delegate
-                {
-                };
+                return delegate { };
             }
 
             return (val) => PlayGamesHelperObject.RunOnGameThread(() => toConvert(val));

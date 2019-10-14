@@ -19,7 +19,8 @@ namespace GooglePlayGames.Android
 
         public static void AddOnSuccessListener<T>(AndroidJavaObject task, bool disposeResult, Action<T> callback)
         {
-            using (task.Call<AndroidJavaObject>("addOnSuccessListener", new TaskOnSuccessProxy<T>(callback, disposeResult))) ;
+            using (task.Call<AndroidJavaObject>("addOnSuccessListener",
+                new TaskOnSuccessProxy<T>(callback, disposeResult))) ;
         }
 
         public static void AddOnFailureListener(AndroidJavaObject task, Action<AndroidJavaObject> callback)

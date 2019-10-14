@@ -224,7 +224,8 @@ namespace GooglePlayGames.Android
             }
 
             using (var endpointDiscoveryCallback = new AndroidJavaObject(
-                "com.google.games.bridge.EndpointDiscoveryCallbackProxy", new EndpointDiscoveryCallback(listenerOnGameThread)))
+                "com.google.games.bridge.EndpointDiscoveryCallbackProxy",
+                new EndpointDiscoveryCallback(listenerOnGameThread)))
             using (var discoveryOptions = CreateDiscoveryOptions())
             using (var task = mClient.Call<AndroidJavaObject>("startDiscovery", serviceId, endpointDiscoveryCallback,
                 discoveryOptions))
@@ -358,10 +359,12 @@ namespace GooglePlayGames.Android
         private class OnGameThreadDiscoveryListener : IDiscoveryListener
         {
             private readonly IDiscoveryListener mListener;
+
             public OnGameThreadDiscoveryListener(IDiscoveryListener listener)
             {
                 mListener = listener;
             }
+
             public void OnEndpointFound(EndpointDetails discoveredEndpoint)
             {
                 PlayGamesHelperObject.RunOnGameThread(() => mListener.OnEndpointFound(discoveredEndpoint));
@@ -372,7 +375,7 @@ namespace GooglePlayGames.Android
                 PlayGamesHelperObject.RunOnGameThread(() => mListener.OnEndpointLost(lostEndpointId));
             }
         }
-        
+
         public void StopDiscovery(string serviceId)
         {
             mClient.Call("stopDiscovery");
