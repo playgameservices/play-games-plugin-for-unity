@@ -25,7 +25,7 @@ namespace GooglePlayGames.Editor
 
     public static class GPGSPostBuild
     {
-        [PostProcessBuild (99999)]
+        [PostProcessBuild(99999)]
         public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
         {
             if (!GPGSProjectSettings.Instance.GetBool(GPGSUtil.ANDROIDSETUPDONEKEY, false))
@@ -34,9 +34,9 @@ namespace GooglePlayGames.Editor
                     "Warning!!  Google Play Games was not configured, Game Services will not work correctly.",
                     "OK");
             }
+
             return;
         }
     }
 }
 #endif //UNITY_ANDROID
-

@@ -25,7 +25,6 @@ namespace SmokeTest
 
     public class LeaderboardGUI : MonoBehaviour
     {
-
         private MainGui mOwner;
         private string mStatus;
 
@@ -39,38 +38,44 @@ namespace SmokeTest
         internal void OnGUI()
         {
             float height = Screen.height / 11f;
-            GUILayout.BeginVertical(GUILayout.Height(Screen.height),GUILayout.Width(Screen.width));
+            GUILayout.BeginVertical(GUILayout.Height(Screen.height), GUILayout.Width(Screen.width));
             GUILayout.Label("SmokeTest: Leaderboards", GUILayout.Height(height));
             GUILayout.BeginHorizontal(GUILayout.Height(height));
-            if (GUILayout.Button("LB Show UI", GUILayout.Height(height),GUILayout.ExpandWidth(true)))
+            if (GUILayout.Button("LB Show UI", GUILayout.Height(height), GUILayout.ExpandWidth(true)))
             {
                 DoLeaderboardUI();
             }
-            if (GUILayout.Button("Post Score", GUILayout.Height(height),GUILayout.ExpandWidth(true)))
+
+            if (GUILayout.Button("Post Score", GUILayout.Height(height), GUILayout.ExpandWidth(true)))
             {
                 DoPostScore();
             }
+
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal(GUILayout.Height(height));
-            if (GUILayout.Button("Load Public Scores", GUILayout.Height(height),GUILayout.ExpandWidth(true)))
+            if (GUILayout.Button("Load Public Scores", GUILayout.Height(height), GUILayout.ExpandWidth(true)))
             {
                 DoPublicLoadScores();
             }
-            if (GUILayout.Button("Load Leaderboard", GUILayout.Height(height),GUILayout.ExpandWidth(true)))
+
+            if (GUILayout.Button("Load Leaderboard", GUILayout.Height(height), GUILayout.ExpandWidth(true)))
             {
                 DoLoadLeaderboard();
             }
+
             GUILayout.EndHorizontal();
             GUILayout.Space(20);
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Load Social Scores", GUILayout.Height(height),GUILayout.ExpandWidth(true)))
+            if (GUILayout.Button("Load Social Scores", GUILayout.Height(height), GUILayout.ExpandWidth(true)))
             {
                 DoSocialLoadScores();
             }
-            if (GUILayout.Button("Back",GUILayout.Height(height),GUILayout.ExpandWidth(true)))
+
+            if (GUILayout.Button("Back", GUILayout.Height(height), GUILayout.ExpandWidth(true)))
             {
                 mOwner.SetUI(MainGui.Ui.Main);
             }
+
             GUILayout.EndHorizontal();
             GUILayout.FlexibleSpace();
             GUILayout.Label(mStatus);
@@ -79,7 +84,7 @@ namespace SmokeTest
 
         internal long GenScore()
         {
-            return (long)DateTime.Today.Subtract(new DateTime(2013, 1, 1, 0, 0, 0)).TotalSeconds;
+            return (long) DateTime.Today.Subtract(new DateTime(2013, 1, 1, 0, 0, 0)).TotalSeconds;
         }
 
         internal void DoPostScore()
@@ -92,8 +97,7 @@ namespace SmokeTest
                 (bool success) =>
                 {
                     EndStandBy();
-                    mStatus = success ? "Successfully reported score " + score :
-                        "*** Failed to report score " + score;
+                    mStatus = success ? "Successfully reported score " + score : "*** Failed to report score " + score;
                     ShowEffect(success);
                 });
         }
@@ -115,7 +119,7 @@ namespace SmokeTest
                 (data) =>
                 {
                     mStatus = "Leaderboard data valid: " + data.Valid;
-                    mStatus += "\n approx:" +data.ApproximateCount + " have " + data.Scores.Length;
+                    mStatus += "\n approx:" + data.ApproximateCount + " have " + data.Scores.Length;
                 });
         }
 
@@ -129,9 +133,9 @@ namespace SmokeTest
                 LeaderboardTimeSpan.AllTime,
                 (data) =>
                 {
-                    mStatus  = "LB data Status: " + data.Status;
+                    mStatus = "LB data Status: " + data.Status;
                     mStatus += " valid: " + data.Valid;
-                    mStatus += "\n approx:" +data.ApproximateCount + " have " + data.Scores.Length;
+                    mStatus += "\n approx:" + data.ApproximateCount + " have " + data.Scores.Length;
                 });
         }
 
@@ -141,16 +145,16 @@ namespace SmokeTest
             lb.userScope = UserScope.FriendsOnly;
             lb.id = GPGSIds.leaderboard_leaders_in_smoketesting;
             lb.LoadScores(ok =>
+            {
+                if (ok)
                 {
-                    if (ok)
-                    {
-                        LoadUsersAndDisplay(lb);
-                    }
-                    else
-                    {
-                        mStatus = "Leaderboard loading: " + lb.title + " ok = " + ok;
-                    }
-                });
+                    LoadUsersAndDisplay(lb);
+                }
+                else
+                {
+                    mStatus = "Leaderboard loading: " + lb.title + " ok = " + ok;
+                }
+            });
         }
 
         internal void LoadUsersAndDisplay(ILeaderboard lb)
@@ -158,21 +162,23 @@ namespace SmokeTest
             // get the use ids
             List<string> userIds = new List<string>();
 
-            foreach(IScore score in lb.scores)
+            foreach (IScore score in lb.scores)
             {
                 userIds.Add(score.userID);
             }
+
             Social.LoadUsers(userIds.ToArray(), (users) =>
+            {
+                mStatus = "Leaderboard loading: " + lb.title + " count = " +
+                          lb.scores.Length;
+                foreach (IScore score in lb.scores)
                 {
-                    mStatus = "Leaderboard loading: " + lb.title + " count = " +
-                        lb.scores.Length;
-                    foreach(IScore score in lb.scores) {
-                        IUserProfile user = FindUser(users, score.userID);
-                        mStatus += "\n" + score.formattedValue + " by " +
-                            (string)(
-                                (user != null) ? user.userName : "**unk_" + score.userID + "**");
-                    }
-                });
+                    IUserProfile user = FindUser(users, score.userID);
+                    mStatus += "\n" + score.formattedValue + " by " +
+                               (string) (
+                                   (user != null) ? user.userName : "**unk_" + score.userID + "**");
+                }
+            });
         }
 
         private IUserProfile FindUser(IUserProfile[] users, string userid)
@@ -184,6 +190,7 @@ namespace SmokeTest
                     return user;
                 }
             }
+
             return null;
         }
 
@@ -199,11 +206,8 @@ namespace SmokeTest
 
         internal void ShowEffect(bool success)
         {
-            Camera.main.backgroundColor = success ?
-                new Color(0.0f, 0.0f, 0.8f, 1.0f) :
-                new Color(0.8f, 0.0f, 0.0f, 1.0f);
+            Camera.main.backgroundColor =
+                success ? new Color(0.0f, 0.0f, 0.8f, 1.0f) : new Color(0.8f, 0.0f, 0.0f, 1.0f);
         }
-
     }
-
 }

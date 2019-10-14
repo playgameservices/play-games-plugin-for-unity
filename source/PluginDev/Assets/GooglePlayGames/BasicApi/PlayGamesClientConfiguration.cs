@@ -13,6 +13,7 @@
 //  See the License for the specific language governing permissions and
 //    limitations under the License.
 // </copyright>
+
 #if UNITY_ANDROID
 
 namespace GooglePlayGames.BasicApi
@@ -34,7 +35,8 @@ namespace GooglePlayGames.BasicApi
         /// </summary>
         public static readonly PlayGamesClientConfiguration DefaultConfiguration =
             new Builder()
-           .Build();
+                .Build();
+
         /// <summary>
         /// Flag indicating to enable saved games API.
         /// </summary>
@@ -110,58 +112,37 @@ namespace GooglePlayGames.BasicApi
         /// <value><c>true</c> if enable saved games; otherwise, <c>false</c>.</value>
         public bool EnableSavedGames
         {
-            get
-            {
-                return mEnableSavedGames;
-            }
+            get { return mEnableSavedGames; }
         }
 
         public bool IsHidingPopups
         {
-            get
-            {
-                return mHidePopups;
-            }
+            get { return mHidePopups; }
         }
 
         public bool IsRequestingAuthCode
         {
-            get
-            {
-                return mRequestAuthCode;
-            }
+            get { return mRequestAuthCode; }
         }
 
         public bool IsForcingRefresh
         {
-            get
-            {
-                return mForceRefresh;
-            }
+            get { return mForceRefresh; }
         }
 
         public bool IsRequestingEmail
         {
-            get
-            {
-                return mRequestEmail;
-            }
+            get { return mRequestEmail; }
         }
 
         public bool IsRequestingIdToken
         {
-            get
-            {
-                return mRequestIdToken;
-            }
+            get { return mRequestIdToken; }
         }
 
         public string AccountName
         {
-            get
-            {
-                return mAccountName;
-            }
+            get { return mAccountName; }
         }
 
         /// <summary>
@@ -170,10 +151,7 @@ namespace GooglePlayGames.BasicApi
         /// <value>String array of scopes.</value>
         public string[] Scopes
         {
-            get
-            {
-                return mScopes;
-            }
+            get { return mScopes; }
         }
 
         /// <summary>
@@ -182,10 +160,7 @@ namespace GooglePlayGames.BasicApi
         /// <value>The invitation delegate.</value>
         public InvitationReceivedDelegate InvitationDelegate
         {
-            get
-            {
-                return mInvitationDelegate;
-            }
+            get { return mInvitationDelegate; }
         }
 
         /// <summary>
@@ -194,10 +169,7 @@ namespace GooglePlayGames.BasicApi
         /// <value>The match delegate.</value>
         public MatchDelegate MatchDelegate
         {
-            get
-            {
-                return mMatchDelegate;
-            }
+            get { return mMatchDelegate; }
         }
 
         /// <summary>
@@ -251,16 +223,12 @@ namespace GooglePlayGames.BasicApi
             /// <summary>
             /// The invitation delegate.  Default is a no-op;
             /// </summary>
-            private InvitationReceivedDelegate mInvitationDelegate = delegate
-            {
-            };
+            private InvitationReceivedDelegate mInvitationDelegate = delegate { };
 
             /// <summary>
             /// The match delegate.  Default is a no-op.
             /// </summary>
-            private MatchDelegate mMatchDelegate = delegate
-            {
-            };
+            private MatchDelegate mMatchDelegate = delegate { };
 
             /// <summary>
             /// Enables the saved games.
@@ -284,9 +252,9 @@ namespace GooglePlayGames.BasicApi
 
             public Builder RequestServerAuthCode(bool forceRefresh)
             {
-              mRequestAuthCode = true;
-              mForceRefresh = forceRefresh;
-              return this;
+                mRequestAuthCode = true;
+                mForceRefresh = forceRefresh;
+                return this;
             }
 
             public Builder RequestEmail()
@@ -401,8 +369,9 @@ namespace GooglePlayGames.BasicApi
             /// Gets the Oauth scopes to be requested from the user.
             /// </summary>
             /// <returns>String array of scopes.</returns>
-            internal string[] getScopes() {
-                return mScopes == null? new string[0] : mScopes.ToArray();
+            internal string[] getScopes()
+            {
+                return mScopes == null ? new string[0] : mScopes.ToArray();
             }
 
             /// <summary>
@@ -422,7 +391,6 @@ namespace GooglePlayGames.BasicApi
             {
                 return mInvitationDelegate;
             }
-
         }
     }
 }

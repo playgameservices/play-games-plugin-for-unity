@@ -44,28 +44,19 @@ namespace GooglePlayGames.BasicApi.Video
         /// <summary>Returns whether the service is currently capturing or not.</summary>
         public bool IsCapturing
         {
-            get
-            {
-                return mIsCapturing;
-            }
+            get { return mIsCapturing; }
         }
 
         /// <summary>Returns the capture mode of the current capture.</summary>
         public VideoCaptureMode CaptureMode
         {
-            get
-            {
-                return mCaptureMode;
-            }
+            get { return mCaptureMode; }
         }
 
         /// <summary>Returns the quality level of the current capture.</summary>
         public VideoQualityLevel QualityLevel
         {
-            get
-            {
-                return mQualityLevel;
-            }
+            get { return mQualityLevel; }
         }
 
         /// <summary>
@@ -76,10 +67,7 @@ namespace GooglePlayGames.BasicApi.Video
         /// </remarks>
         public bool IsOverlayVisible
         {
-            get
-            {
-                return mIsOverlayVisible;
-            }
+            get { return mIsOverlayVisible; }
         }
 
         /// <summary>
@@ -90,16 +78,13 @@ namespace GooglePlayGames.BasicApi.Video
         /// </remarks>
         public bool IsPaused
         {
-            get
-            {
-                return mIsPaused;
-            }
+            get { return mIsPaused; }
         }
 
         public override string ToString()
         {
             return string.Format("[VideoCaptureState: mIsCapturing={0}, mCaptureMode={1}, mQualityLevel={2}, " +
-                "mIsOverlayVisible={3}, mIsPaused={4}]",
+                                 "mIsOverlayVisible={3}, mIsPaused={4}]",
                 mIsCapturing,
                 mCaptureMode.ToString(),
                 mQualityLevel.ToString(),

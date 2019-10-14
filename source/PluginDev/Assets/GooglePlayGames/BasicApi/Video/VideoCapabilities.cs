@@ -44,28 +44,19 @@ namespace GooglePlayGames.BasicApi.Video
         /// <summary>Returns whether the device has a front-facing camera and we can use it.</summary>
         public bool IsCameraSupported
         {
-            get
-            {
-                return mIsCameraSupported;
-            }
+            get { return mIsCameraSupported; }
         }
 
         /// <summary>Returns whether the device has a microphone and we can use it.</summary>
         public bool IsMicSupported
         {
-            get
-            {
-                return mIsMicSupported;
-            }
+            get { return mIsMicSupported; }
         }
 
         /// <summary>Returns whether the device has an external storage device and we can use it.</summary>
         public bool IsWriteStorageSupported
         {
-            get
-            {
-                return mIsWriteStorageSupported;
-            }
+            get { return mIsWriteStorageSupported; }
         }
 
         /// <summary>Returns whether the device supports the given capture mode.</summary>
@@ -73,7 +64,7 @@ namespace GooglePlayGames.BasicApi.Video
         {
             if (captureMode != VideoCaptureMode.Unknown)
             {
-                return mCaptureModesSupported[(int)captureMode];
+                return mCaptureModesSupported[(int) captureMode];
             }
             else
             {
@@ -87,7 +78,7 @@ namespace GooglePlayGames.BasicApi.Video
         {
             if (qualityLevel != VideoQualityLevel.Unknown)
             {
-                return mQualityLevelsSupported[(int)qualityLevel];
+                return mQualityLevelsSupported[(int) qualityLevel];
             }
             else
             {
@@ -98,7 +89,8 @@ namespace GooglePlayGames.BasicApi.Video
 
         public override string ToString()
         {
-            return string.Format("[VideoCapabilities: mIsCameraSupported={0}, mIsMicSupported={1}, mIsWriteStorageSupported={2}, " +
+            return string.Format(
+                "[VideoCapabilities: mIsCameraSupported={0}, mIsMicSupported={1}, mIsWriteStorageSupported={2}, " +
                 "mCaptureModesSupported={3}, mQualityLevelsSupported={4}]",
                 mIsCameraSupported,
                 mIsMicSupported,
