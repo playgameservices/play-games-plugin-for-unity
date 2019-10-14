@@ -44,9 +44,10 @@ namespace CubicPilot.UtilCode
         // f(x) is 0.0 for all other x.
         public static float Trapezoid(float length, float climbEndX, float x)
         {
-            return x < 0.0f ? 0.0f : x > length ? 0.0f :
-            x < climbEndX ? (x / climbEndX) :
-            x > length - climbEndX ? (length - x) / climbEndX : 1.0f;
+            return x < 0.0f ? 0.0f :
+                x > length ? 0.0f :
+                x < climbEndX ? (x / climbEndX) :
+                x > length - climbEndX ? (length - x) / climbEndX : 1.0f;
         }
 
         // The laziest star graphics ever made! :-D
@@ -56,6 +57,7 @@ namespace CubicPilot.UtilCode
             {
                 return "";
             }
+
             const string YesStar = "\u2605";
             const string NoStar = "\u2606";
             string s = "";
@@ -64,6 +66,7 @@ namespace CubicPilot.UtilCode
             {
                 s += (stars > i ? YesStar : NoStar) + " ";
             }
+
             return s.Trim();
         }
 
@@ -74,7 +77,7 @@ namespace CubicPilot.UtilCode
         }
 
         public static bool CalcTargetedDisplacement(float startValue, float target,
-                                                float maxDisplac, out float outDisplac)
+            float maxDisplac, out float outDisplac)
         {
             maxDisplac = Mathf.Abs(maxDisplac);
             if (Mathf.Abs(startValue - target) <= maxDisplac)
@@ -96,8 +99,7 @@ namespace CubicPilot.UtilCode
 
         public static string GetLevelLetter(int levelNo)
         {
-            return (levelNo >= 0 && levelNo <= GameConsts.MaxLevel) ?
-            ((char)(65 + levelNo)).ToString() : "?";
+            return (levelNo >= 0 && levelNo <= GameConsts.MaxLevel) ? ((char) (65 + levelNo)).ToString() : "?";
         }
 
         public static void ShowObject(GameObject o, bool show)
@@ -106,6 +108,7 @@ namespace CubicPilot.UtilCode
             {
                 o.GetComponent<Renderer>().enabled = show;
             }
+
             int i;
             for (i = 0; i < o.transform.childCount; i++)
             {

@@ -119,7 +119,7 @@ namespace NearbyDroids
                 {
                     // Choose a random tile from our array of floor tile
                     // prefabs and prepare to instantiate it.
-                    GameObject toInstantiate = 
+                    GameObject toInstantiate =
                         floorTiles[Random.Range(0, floorTiles.Length)];
                     Quaternion rot = Quaternion.identity;
 
@@ -129,7 +129,7 @@ namespace NearbyDroids
                         toInstantiate = outerWallTiles[1];
                         rot = Quaternion.Euler(0, 0, 90);
                     }
-                        
+
                     if (y == -1 || y == rows)
                     {
                         toInstantiate = outerWallTiles[0];
@@ -140,9 +140,9 @@ namespace NearbyDroids
                     // toInstantiate at the Vector3 corresponding to
                     // current grid position in loop, cast it to GameObject.
                     GameObject instance = Instantiate(
-                                              toInstantiate,
-                                              new Vector3(x, y, 0f),
-                                              rot) as GameObject;
+                        toInstantiate,
+                        new Vector3(x, y, 0f),
+                        rot) as GameObject;
 
                     // Set the parent of our newly instantiated object
                     // instance to boardHolder,
@@ -217,13 +217,13 @@ namespace NearbyDroids
                 // Instantiate tileChoice at the position returned by
                 // RandomPosition with no change in rotation
                 GameObject obj = Instantiate(
-                                     tileChoice,
-                                     randomPosition,
-                                     Quaternion.identity) as GameObject;
-                
+                    tileChoice,
+                    randomPosition,
+                    Quaternion.identity) as GameObject;
+
                 string objName = tileSet + "_" + randomPosition.x +
                                  "_" + randomPosition.y;
-                
+
                 obj.name = objName;
 
                 ItemState item = new ItemState();
@@ -345,7 +345,7 @@ namespace NearbyDroids
                     dropCount.maximum));
 
             // use a log progression to get harder
-            int logval = (int)Mathf.Log(level, 2f);
+            int logval = (int) Mathf.Log(level, 2f);
 
             int enemyCount = logval * 3;
 
@@ -429,15 +429,15 @@ namespace NearbyDroids
                 }
                 else
                 {
-                    Debug.LogWarning("Unknown tile set: " + 
-                        item.TileSetName + " for item " + item.Name);
+                    Debug.LogWarning("Unknown tile set: " +
+                                     item.TileSetName + " for item " + item.Name);
                     continue;
                 }
 
                 GameObject obj = Instantiate(
-                                     prefab,
-                                     item.Position,
-                                     item.Rotation) as GameObject;
+                    prefab,
+                    item.Position,
+                    item.Rotation) as GameObject;
                 obj.name = item.Name;
                 Debug.Log("Creating " + obj.name + " at " + obj.transform.position);
                 obj.SetActive(item.Enabled);

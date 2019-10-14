@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 namespace CubicPilot.GameLogic
 {
-
     public static class Strings
     {
         public const string GameTitle = "Cubic Pilot";
@@ -43,7 +43,8 @@ namespace CubicPilot.GameLogic
         public const string AccuracyFmt = "Accuracy: {0}%";
 
         public static string[] StarsMessage =
-        { "",
+        {
+            "",
             "That was ok, but you missed a lot of shots.\nTo get 2\u2605, improve your accuracy to 50%!",
             "Great performance!\nTo get 3\u2605, improve your accuracy to 75%!",
             "Awesome performance!"
@@ -53,9 +54,10 @@ namespace CubicPilot.GameLogic
         public const string Leaderboards = "High Scores";
 
         public const string SignInBlurb = "Sign in to unlock achievements, post scores\n" +
-                                      "and save your progress to the cloud!";
+                                          "and save your progress to the cloud!";
+
         public const string SignedInBlurb = "You are signed in with your Google account.\n" +
-                                        "Your progress will be saved to the cloud automatically!";
+                                            "Your progress will be saved to the cloud automatically!";
 
         public const string ComboFmt = "COMBO {0:F1}x";
 

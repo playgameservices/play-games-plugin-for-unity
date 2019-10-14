@@ -34,10 +34,10 @@ namespace CubicPilot.GameLogic
         private string mAuthProgressMessage = Strings.SigningIn;
 
         // list of achievements we know we have unlocked (to avoid making repeated calls to the API)
-        private Dictionary<string,bool> mUnlockedAchievements = new Dictionary<string, bool>();
+        private Dictionary<string, bool> mUnlockedAchievements = new Dictionary<string, bool>();
 
         // achievement increments we are accumulating locally, waiting to send to the games API
-        private Dictionary<string,int> mPendingIncrements = new Dictionary<string, int>();
+        private Dictionary<string, int> mPendingIncrements = new Dictionary<string, int>();
 
         // what is the highest score we have posted to the leaderboard?
         private int mHighestPostedScore = 0;
@@ -52,18 +52,12 @@ namespace CubicPilot.GameLogic
 
         public static GameManager Instance
         {
-            get
-            {
-                return sInstance;
-            }
+            get { return sInstance; }
         }
 
         public int Level
         {
-            get
-            {
-                return mLevel;
-            }
+            get { return mLevel; }
         }
 
         private GameManager()
@@ -80,9 +74,10 @@ namespace CubicPilot.GameLogic
             AutoSave();
         }
 
-        internal void GoToScene(string scene) {
+        internal void GoToScene(string scene)
+        {
 #if UNITY_5_3_OR_NEWER
-          UnityEngine.SceneManagement.SceneManager.LoadScene(scene);
+            UnityEngine.SceneManagement.SceneManager.LoadScene(scene);
 #else
           Application.LoadLevel("2_GameplayScene");
 #endif
@@ -107,7 +102,7 @@ namespace CubicPilot.GameLogic
             }
             else
             {
-               GoToScene("3_FinaleScene");
+                GoToScene("3_FinaleScene");
             }
         }
 
@@ -140,18 +135,13 @@ namespace CubicPilot.GameLogic
 
         public GameProgress Progress
         {
-            get
-            {
-                return mProgress;
-            }
+            get { return mProgress; }
         }
 
         public void SaveProgress()
         {
-
             mProgress.SaveToDisk();
             SaveToCloud(null);
-
         }
 
         public void AutoSave()
@@ -186,9 +176,7 @@ namespace CubicPilot.GameLogic
         {
             if (Authenticated && !mUnlockedAchievements.ContainsKey(achId))
             {
-                Social.ReportProgress(achId, 100.0f, (bool success) =>
-                    {
-                    });
+                Social.ReportProgress(achId, 100.0f, (bool success) => { });
                 mUnlockedAchievements[achId] = true;
             }
         }
@@ -199,6 +187,7 @@ namespace CubicPilot.GameLogic
             {
                 steps += mPendingIncrements[achId];
             }
+
             mPendingIncrements[achId] = steps;
         }
 
@@ -212,11 +201,10 @@ namespace CubicPilot.GameLogic
                     // that's specific to the Play Games API and not part of the
                     // ISocialPlatform spec, so we have to break the abstraction and
                     // use the PlayGamesPlatform rather than ISocialPlatform
-                    PlayGamesPlatform p = (PlayGamesPlatform)Social.Active;
-                    p.IncrementAchievement(ach, mPendingIncrements[ach], (bool success) =>
-                        {
-                        });
+                    PlayGamesPlatform p = (PlayGamesPlatform) Social.Active;
+                    p.IncrementAchievement(ach, mPendingIncrements[ach], (bool success) => { });
                 }
+
                 mPendingIncrements.Clear();
             }
         }
@@ -243,25 +231,25 @@ namespace CubicPilot.GameLogic
             PlayGamesPlatform.Activate();
 
             // Set the default leaderboard for the leaderboards UI
-            ((PlayGamesPlatform)Social.Active).SetDefaultLeaderboardForUI(GameIds.LeaderboardId);
+            ((PlayGamesPlatform) Social.Active).SetDefaultLeaderboardForUI(GameIds.LeaderboardId);
 
             // Sign in to Google Play Games
             mAuthenticating = true;
             Social.localUser.Authenticate((bool success) =>
+            {
+                mAuthenticating = false;
+                if (success)
                 {
-                    mAuthenticating = false;
-                    if (success)
-                    {
-                        // if we signed in successfully, load data from cloud
-                        Debug.Log("Login successful!");
-                    }
-                    else
-                    {
-                        // no need to show error message (error messages are shown automatically
-                        // by plugin)
-                        Debug.LogWarning("Failed to sign in with Google Play Games.");
-                    }
-                });
+                    // if we signed in successfully, load data from cloud
+                    Debug.Log("Login successful!");
+                }
+                else
+                {
+                    // no need to show error message (error messages are shown automatically
+                    // by plugin)
+                    Debug.LogWarning("Failed to sign in with Google Play Games.");
+                }
+            });
         }
 
         void ProcessCloudData(byte[] cloudData)
@@ -271,6 +259,7 @@ namespace CubicPilot.GameLogic
                 Debug.Log("No data saved to the cloud yet...");
                 return;
             }
+
             Debug.Log("Decoding cloud data from bytes.");
             GameProgress progress = GameProgress.FromBytes(cloudData);
             Debug.Log("Merging with existing game progress.");
@@ -283,7 +272,7 @@ namespace CubicPilot.GameLogic
             // so we have to break the abstraction and use PlayGamesPlatform:
             Debug.Log("Loading game progress from the cloud.");
             mSaving = false;
-            ((PlayGamesPlatform)Social.Active).SavedGame.ShowSelectSavedGameUI("Select saved game to load",
+            ((PlayGamesPlatform) Social.Active).SavedGame.ShowSelectSavedGameUI("Select saved game to load",
                 4, false, false, SavedGameSelected);
         }
 
@@ -297,13 +286,13 @@ namespace CubicPilot.GameLogic
                 mSaving = true;
                 if (filename == null)
                 {
-                    ((PlayGamesPlatform)Social.Active).SavedGame.ShowSelectSavedGameUI("Save game progress",
+                    ((PlayGamesPlatform) Social.Active).SavedGame.ShowSelectSavedGameUI("Save game progress",
                         4, true, true, SavedGameSelected);
                 }
                 else
                 {
                     // save to named file
-                    ((PlayGamesPlatform)Social.Active).SavedGame.OpenWithAutomaticConflictResolution(filename,
+                    ((PlayGamesPlatform) Social.Active).SavedGame.OpenWithAutomaticConflictResolution(filename,
                         DataSource.ReadCacheOrNetwork,
                         ConflictResolutionStrategy.UseLongestPlaytime,
                         SavedGameOpened);
@@ -313,7 +302,6 @@ namespace CubicPilot.GameLogic
 
         public void SavedGameSelected(SelectUIStatus status, ISavedGameMetadata game)
         {
-
             if (status == SelectUIStatus.SavedGameSelected)
             {
                 string filename = game.Filename;
@@ -322,8 +310,9 @@ namespace CubicPilot.GameLogic
                 {
                     filename = "save" + DateTime.Now.ToBinary();
                 }
+
                 //open the data.
-                ((PlayGamesPlatform)Social.Active).SavedGame.OpenWithAutomaticConflictResolution(filename,
+                ((PlayGamesPlatform) Social.Active).SavedGame.OpenWithAutomaticConflictResolution(filename,
                     DataSource.ReadCacheOrNetwork,
                     ConflictResolutionStrategy.UseLongestPlaytime,
                     SavedGameOpened);
@@ -332,7 +321,6 @@ namespace CubicPilot.GameLogic
             {
                 Debug.LogWarning("Error selecting save game: " + status);
             }
-
         }
 
         public void SavedGameOpened(SavedGameRequestStatus status, ISavedGameMetadata game)
@@ -345,12 +333,13 @@ namespace CubicPilot.GameLogic
                     {
                         CaptureScreenshot();
                     }
+
                     byte[] pngData = (mScreenImage != null) ? mScreenImage.EncodeToPNG() : null;
                     Debug.Log("Saving to " + game);
                     byte[] data = mProgress.ToBytes();
                     TimeSpan playedTime = mProgress.TotalPlayingTime;
-                    SavedGameMetadataUpdate.Builder builder = new 
-                    SavedGameMetadataUpdate.Builder()
+                    SavedGameMetadataUpdate.Builder builder = new
+                            SavedGameMetadataUpdate.Builder()
                         .WithUpdatedPlayedTime(playedTime)
                         .WithUpdatedDescription("Saved Game at " + DateTime.Now);
 
@@ -363,13 +352,15 @@ namespace CubicPilot.GameLogic
                     {
                         Debug.Log("No image avail");
                     }
+
                     SavedGameMetadataUpdate updatedMetadata = builder.Build();
-                    ((PlayGamesPlatform)Social.Active).SavedGame.CommitUpdate(game, updatedMetadata, data, SavedGameWritten);
+                    ((PlayGamesPlatform) Social.Active).SavedGame.CommitUpdate(game, updatedMetadata, data,
+                        SavedGameWritten);
                 }
                 else
                 {
                     mAutoSaveName = game.Filename;
-                    ((PlayGamesPlatform)Social.Active).SavedGame.ReadBinaryData(game, SavedGameLoaded);
+                    ((PlayGamesPlatform) Social.Active).SavedGame.ReadBinaryData(game, SavedGameLoaded);
                 }
             }
             else
@@ -405,31 +396,22 @@ namespace CubicPilot.GameLogic
 
         public bool Authenticating
         {
-            get
-            {
-                return mAuthenticating;
-            }
+            get { return mAuthenticating; }
         }
 
         public bool Authenticated
         {
-            get
-            {
-                return Social.Active.localUser.authenticated;
-            }
+            get { return Social.Active.localUser.authenticated; }
         }
 
         public void SignOut()
         {
-            ((PlayGamesPlatform)Social.Active).SignOut();
+            ((PlayGamesPlatform) Social.Active).SignOut();
         }
 
         public string AuthProgressMessage
         {
-            get
-            {
-                return mAuthProgressMessage;
-            }
+            get { return mAuthProgressMessage; }
         }
 
         public void ShowLeaderboardUI()
@@ -454,15 +436,13 @@ namespace CubicPilot.GameLogic
             if (Authenticated && score > mHighestPostedScore)
             {
                 // post score to the leaderboard
-                Social.ReportScore(score, GameIds.LeaderboardId, (bool success) =>
-                    {
-                    });
+                Social.ReportScore(score, GameIds.LeaderboardId, (bool success) => { });
                 mHighestPostedScore = score;
             }
             else
             {
                 Debug.LogWarning("Not reporting score, auth = " + Authenticated + " " +
-                    score + " <= " + mHighestPostedScore);
+                                 score + " <= " + mHighestPostedScore);
             }
         }
     }

@@ -33,7 +33,7 @@ namespace NearbyDroids
         public static string DeadlyTileSet = "Deadlies";
         public static string ExitTileSet = "exit";
         public static string PlayerTileSet = "players";
-       
+
         private bool enabled;
         private string name;
         private string tileSetName;
@@ -41,15 +41,13 @@ namespace NearbyDroids
 
         // don't serialize the vector3, but keep it for
         // ease of use.
-        [NonSerialized]
-        private Vector3 position = Vector3.zero;
+        [NonSerialized] private Vector3 position = Vector3.zero;
         private float x;
         private float y;
         private float z;
 
         // just of ease of use.
-        [NonSerialized]
-        private Quaternion rotation = Quaternion.identity;
+        [NonSerialized] private Quaternion rotation = Quaternion.identity;
         private float qw;
         private float qz;
         private float qy;
@@ -61,15 +59,9 @@ namespace NearbyDroids
         /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
         public bool Enabled
         {
-            get
-            {
-                return enabled;
-            }
+            get { return enabled; }
 
-            set
-            {
-                enabled = value;
-            }
+            set { enabled = value; }
         }
 
         /// <summary>
@@ -78,15 +70,9 @@ namespace NearbyDroids
         /// <value>The name.</value>
         public string Name
         {
-            get
-            {
-                return name;
-            }
+            get { return name; }
 
-            set
-            {
-                name = value;
-            }
+            set { name = value; }
         }
 
         /// <summary>
@@ -95,15 +81,9 @@ namespace NearbyDroids
         /// <value>The name of the tile set.</value>
         public string TileSetName
         {
-            get
-            {
-                return tileSetName;
-            }
+            get { return tileSetName; }
 
-            set
-            {
-                tileSetName = value;
-            }
+            set { tileSetName = value; }
         }
 
         /// <summary>
@@ -112,15 +92,9 @@ namespace NearbyDroids
         /// <value>The index of the prefab.</value>
         public int PrefabIndex
         {
-            get
-            {
-                return prefabIndex;
-            }
+            get { return prefabIndex; }
 
-            set
-            {
-                prefabIndex = value;
-            }
+            set { prefabIndex = value; }
         }
 
         /// <summary>
@@ -143,7 +117,7 @@ namespace NearbyDroids
             set
             {
                 position = value;
-               
+
                 x = position.x;
                 y = position.y;
                 z = position.z;
@@ -160,9 +134,9 @@ namespace NearbyDroids
             {
                 if (rotation == Quaternion.identity &&
                     (Mathf.Abs(qx - Quaternion.identity.x) > float.Epsilon ||
-                        Mathf.Abs(qy - Quaternion.identity.y) > float.Epsilon ||
-                        Mathf.Abs(qz - Quaternion.identity.z) > float.Epsilon ||
-                        Mathf.Abs(qw - Quaternion.identity.w) > float.Epsilon))
+                     Mathf.Abs(qy - Quaternion.identity.y) > float.Epsilon ||
+                     Mathf.Abs(qz - Quaternion.identity.z) > float.Epsilon ||
+                     Mathf.Abs(qw - Quaternion.identity.w) > float.Epsilon))
                 {
                     rotation = new Quaternion(qx, qy, qz, qw);
                 }

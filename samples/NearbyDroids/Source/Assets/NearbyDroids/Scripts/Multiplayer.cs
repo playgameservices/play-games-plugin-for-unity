@@ -64,26 +64,20 @@ namespace NearbyDroids
 
         public bool Joining
         {
-            get
-            {
-                return joining;
-            }
+            get { return joining; }
 
-            set
-            {
-                joining = value;
-            }
+            set { joining = value; }
         }
 
         internal void Awake()
         {
             // Heavy handed, but reset the nearby connections state.
             PlayGamesPlatform.InitializeNearby((client) =>
-                {
-                    Debug.Log("Nearby connections initialized");
-                    client.StopAllConnections();
-                });
-    
+            {
+                Debug.Log("Nearby connections initialized");
+                client.StopAllConnections();
+            });
+
             // initialize saved preferences.
             string defaultRoomName = PlayerPrefs.GetString(RoomNameKey);
             if (defaultRoomName != null && roomNameField != null)
@@ -218,7 +212,7 @@ namespace NearbyDroids
                 PlayerInfo.AddPendingPlayer(
                     new NearbyPlayer(localPlayerName),
                     localAvatarIndex);
-                
+
                 GameManager.Instance.StartPlaying(GameManager.GameType.MultiplayerLocal);
             }
             else
@@ -284,7 +278,7 @@ namespace NearbyDroids
                             else
                             {
                                 Debug.LogError("Cannot find NearbyPlayer for " +
-                                    t.gameObject.name);
+                                               t.gameObject.name);
                             }
                         }
                     }
@@ -294,7 +288,7 @@ namespace NearbyDroids
                 {
                     GameManager.Instance.Room.CloseRoom();
                 }
-            
+
                 Debug.Log("Starting Game!");
 
                 GameManager.Instance.StartPlaying(GameManager.GameType.MultiplayerLocal);
@@ -308,10 +302,10 @@ namespace NearbyDroids
         /// <param name="data">Data.</param>
         internal void OnPlayerFound(string endpointId, byte[] data)
         {
-            PlayerInfo player = PlayerInfo.AddPendingPlayer (endpointId, null, data);
+            PlayerInfo player = PlayerInfo.AddPendingPlayer(endpointId, null, data);
             GameObject obj = Instantiate(itemChoicePrefab) as GameObject;
             obj.transform.SetParent(lobbyListArea.transform, false);
-            obj.GetComponentInChildren<Text> ().text = player.Player.Name;
+            obj.GetComponentInChildren<Text>().text = player.Player.Name;
             Toggle t = obj.GetComponentInChildren<Toggle>();
             t.gameObject.name = player.DeviceId;
             t.isOn = true;

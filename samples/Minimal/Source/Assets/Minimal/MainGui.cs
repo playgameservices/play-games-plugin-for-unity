@@ -32,17 +32,17 @@ public class MainGui : MonoBehaviour
 
     void OnGUI()
     {
-        GUI.skin.button.fontSize = (int)(FontSizeMult * Screen.height);
-        GUI.skin.label.fontSize = (int)(FontSizeMult * Screen.height);
+        GUI.skin.button.fontSize = (int) (FontSizeMult * Screen.height);
+        GUI.skin.label.fontSize = (int) (FontSizeMult * Screen.height);
 
         GUI.Label(new Rect(20, 20, Screen.width, Screen.height * 0.25f),
-                  mStatusText);
+            mStatusText);
 
         Rect buttonRect = new Rect(0.25f * Screen.width, 0.10f * Screen.height,
-                          0.5f * Screen.width, 0.25f * Screen.height);
+            0.5f * Screen.width, 0.25f * Screen.height);
         Rect imageRect = new Rect(buttonRect.x + buttonRect.width / 4f,
-                                  buttonRect.y + buttonRect.height * 1.1f,
-                                  buttonRect.width / 2f, buttonRect.width / 2f);
+            buttonRect.y + buttonRect.height * 1.1f,
+            buttonRect.width / 2f, buttonRect.width / 2f);
 
         if (mWaitingForAuth)
         {
@@ -58,15 +58,17 @@ public class MainGui : MonoBehaviour
             if (Social.localUser.image != null)
             {
                 GUI.DrawTexture(imageRect, Social.localUser.image,
-                                ScaleMode.ScaleToFit);
+                    ScaleMode.ScaleToFit);
             }
-            else {
+            else
+            {
                 GUI.Label(imageRect, "No image available");
             }
 
             mStatusText = "Ready";
         }
-        else {
+        else
+        {
             buttonLabel = "Authenticate";
         }
 
@@ -84,15 +86,17 @@ public class MainGui : MonoBehaviour
                     {
                         mStatusText = "Welcome " + Social.localUser.userName;
                     }
-                    else {
+                    else
+                    {
                         mStatusText = "Authentication failed.";
                     }
                 });
             }
-            else {
+            else
+            {
                 // Sign out!
                 mStatusText = "Signing out.";
-                ((GooglePlayGames.PlayGamesPlatform)Social.Active).SignOut();
+                ((GooglePlayGames.PlayGamesPlatform) Social.Active).SignOut();
             }
         }
     }

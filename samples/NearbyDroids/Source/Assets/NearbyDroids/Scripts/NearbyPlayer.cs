@@ -40,18 +40,23 @@ namespace NearbyDroids
         // the human friendly name of the player/room.
         private string name;
 
-    private static string localDeviceId;
-    public static string LocalDeviceId {
-        get {
-            localDeviceId = PlayerPrefs.GetString ("_NearbyLocalDeviceID_", null);
-            if (string.IsNullOrEmpty(localDeviceId)) {
-                localDeviceId = System.Guid.NewGuid ().ToString();
-                PlayerPrefs.SetString ("_NearbyLocalDeviceID_", localDeviceId);
-                PlayerPrefs.Save ();
+        private static string localDeviceId;
+
+        public static string LocalDeviceId
+        {
+            get
+            {
+                localDeviceId = PlayerPrefs.GetString("_NearbyLocalDeviceID_", null);
+                if (string.IsNullOrEmpty(localDeviceId))
+                {
+                    localDeviceId = System.Guid.NewGuid().ToString();
+                    PlayerPrefs.SetString("_NearbyLocalDeviceID_", localDeviceId);
+                    PlayerPrefs.Save();
+                }
+
+                return localDeviceId;
             }
-            return localDeviceId;
         }
-    }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NearbyDroids.NearbyPlayer"/> class.
@@ -90,36 +95,27 @@ namespace NearbyDroids
 
             if (deviceId != null)
             {
-                allPlayers [deviceId] = this;
+                allPlayers[deviceId] = this;
             }
             else
             {
-                Debug.Log ("Skipping registering player: " + endpointId + " (" + name + ") with null device ID");
+                Debug.Log("Skipping registering player: " + endpointId + " (" + name + ") with null device ID");
             }
         }
 
         public string DeviceId
         {
-            get
-            {
-                return this.deviceId;
-            }
+            get { return this.deviceId; }
         }
 
         public string EndpointId
         {
-            get
-            {
-                return this.endpointId;
-            }
+            get { return this.endpointId; }
         }
 
         public string Name
         {
-            get
-            {
-                return this.name;
-            }
+            get { return this.name; }
         }
 
         /// <summary>
@@ -128,10 +124,7 @@ namespace NearbyDroids
         /// <value><c>true</c> if this instance is local; otherwise, <c>false</c>.</value>
         public bool IsLocal
         {
-            get
-            {
-                return DeviceId == NearbyPlayer.LocalDeviceId;
-            }
+            get { return DeviceId == NearbyPlayer.LocalDeviceId; }
         }
 
         /// <summary>
@@ -148,15 +141,17 @@ namespace NearbyDroids
                     return p;
                 }
             }
+
             return null;
         }
 
         public static NearbyPlayer FindByDeviceId(string key)
         {
-            if (allPlayers.ContainsKey (key))
+            if (allPlayers.ContainsKey(key))
             {
-                return allPlayers [key];
+                return allPlayers[key];
             }
+
             return null;
         }
     }
