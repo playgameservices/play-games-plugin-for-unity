@@ -28,9 +28,6 @@ namespace GooglePlayGames.BasicApi.Multiplayer
     /// </summary>
     public class TurnBasedMatch
     {
-        static readonly DateTime UnixEpoch =
-            new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-
         public enum MatchStatus
         {
             Active,
@@ -62,13 +59,13 @@ namespace GooglePlayGames.BasicApi.Multiplayer
         private MatchStatus mMatchStatus;
         private uint mVariant;
         private uint mVersion;
-        private long mCreationTime;
-        private long mLastUpdateTime;
+        private DateTime mCreationTime;
+        private DateTime mLastUpdateTime;
 
         internal TurnBasedMatch(string matchId, byte[] data, bool canRematch,
             string selfParticipantId, List<Participant> participants, uint availableAutomatchSlots,
             string pendingParticipantId, MatchTurnStatus turnStatus, MatchStatus matchStatus,
-            uint variant, uint version, ulong creationTime, ulong lastUpdateTime)
+            uint variant, uint version, DateTime creationTime, DateTime lastUpdateTime)
         {
             mMatchId = matchId;
             mData = data;
@@ -85,20 +82,20 @@ namespace GooglePlayGames.BasicApi.Multiplayer
             mMatchStatus = matchStatus;
             mVariant = variant;
             mVersion = version;
-            mCreationTime = (long) creationTime;
-            mLastUpdateTime = (long) lastUpdateTime;
+            mCreationTime = creationTime;
+            mLastUpdateTime = lastUpdateTime;
         }
 
         /// Creation time
         public DateTime CreationTime
         {
-            get { return UnixEpoch.AddMilliseconds(mCreationTime); }
+            get { return mCreationTime; }
         }
 
         // Last update time
         public DateTime LastUpdateTime
         {
-            get { return UnixEpoch.AddMilliseconds(mLastUpdateTime); }
+            get { return mLastUpdateTime; }
         }
 
 

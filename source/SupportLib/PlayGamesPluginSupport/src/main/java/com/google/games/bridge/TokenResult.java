@@ -16,6 +16,7 @@
 
 package com.google.games.bridge;
 
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.api.Result;
 import com.google.android.gms.common.api.Status;
 
@@ -25,19 +26,10 @@ import com.google.android.gms.common.api.Status;
  */
 public class TokenResult implements Result {
     private Status status;
-    private String authCode;
-    private String idToken;
-    private String email;
+    private GoogleSignInAccount account;
 
     public TokenResult() {
 
-    }
-
-    TokenResult(String authCode, String email, String idToken, int resultCode) {
-        status = new Status(resultCode);
-        this.authCode = authCode;
-        this.idToken = idToken;
-        this.email = email;
     }
 
     /**
@@ -55,9 +47,8 @@ public class TokenResult implements Result {
      */
     @Override
     public String toString() {
-        return "Status: " + status + " email: " + (email==null?"<null>":email) + " id:" +
-                (idToken==null?"<null>":idToken) + " access: " +
-                (authCode==null?"<null>":authCode);
+        return "Status: " + status + " email: " + getEmail() + " id:" +
+                getIdToken() + " access: " + getAuthCode();
     }
 
     @Override
@@ -67,31 +58,30 @@ public class TokenResult implements Result {
 
     public int getStatusCode() { return status.getStatusCode();}
 
+    public GoogleSignInAccount getAccount() {
+        return account;
+    }
+
     public String getAuthCode() {
-        return authCode == null ? "" : authCode;
+        String result = account == null ? "" : account.getServerAuthCode();
+        return result == null ? "" : result;
     }
 
     public String getIdToken() {
-        return idToken == null ? "" : idToken;
+        String result = account == null ? "" : account.getIdToken();
+        return result == null ? "" : result;
     }
 
     public String getEmail() {
-        return email == null ? "" : email;
+        String result = account == null ? "" : account.getEmail();
+        return result == null ? "" : result;
     }
 
     public void setStatus(int status) {
         this.status = new Status(status);
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setAuthCode(String authCode) {
-        this.authCode = authCode;
-    }
-
-    public void setIdToken(String idToken) {
-        this.idToken = idToken;
+    public void setAccount(GoogleSignInAccount account) {
+        this.account = account;
     }
 }

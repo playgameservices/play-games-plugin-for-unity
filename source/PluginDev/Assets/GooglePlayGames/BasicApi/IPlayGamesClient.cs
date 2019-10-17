@@ -155,7 +155,6 @@ namespace GooglePlayGames.BasicApi
         /// <param name="callback">Callback.</param>
         void LoadUsers(string[] userIds, Action<IUserProfile[]> callback);
 
-
         /// <summary>
         /// Loads the achievements for the current signed in user and invokes
         /// the callback.
@@ -343,12 +342,6 @@ namespace GooglePlayGames.BasicApi
         void RegisterInvitationDelegate(InvitationReceivedDelegate invitationDelegate);
 
         IUserProfile[] GetFriends();
-
-        /// <summary>
-        /// Gets the Android API client.  Returns null on non-Android players.
-        /// </summary>
-        /// <returns>The API client.</returns>
-        IntPtr GetApiClient();
 
         /// <summary>
         /// Sets the gravity for popups (Android only).

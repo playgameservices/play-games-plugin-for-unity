@@ -18,32 +18,9 @@ namespace GooglePlayGames
 {
     public class PluginVersion
     {
-        // older versions, used when upgrading to other versions
-        public const string VersionKeyCPP = "00911";
-
-        public const string VersionKeyU5 = "00915";
-
-        // patched 0.9.27 version for Unity 5.3 changes.
-        public const string VersionKey27Patch = "00927a";
-
-        public const string VersionKeyJarResolver = "00928";
-        public const string VersionKeyNativeCRM = "00930";
-
-        // Using JNI to get spendprobability - so don't delete the Games.cs files.
-        public const string VersionKeyJNIStats = "00934";
-
-        // New and improved jar resolver
-        public const string VersionKeyJarResolverDLL = "00935";
-
         // Current Version.
-        public const int VersionInt = 0x0964;
-        public const string VersionString = "0.9.64";
-        public const string VersionKey = "00964";
-
-        // used to check for the correct min version or play services: 10.2
-        public const int MinGmsCoreVersionCode = 10200000;
-
-        // used to get the right version of dependencies.
-        public const string PlayServicesVersionConstraint = "10+";
+        public const int VersionInt = 0x01004;
+        public const string VersionString = "0.10.04";
+        public const string VersionKey = "01004";
     }
 }

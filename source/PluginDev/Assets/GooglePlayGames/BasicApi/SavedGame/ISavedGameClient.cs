@@ -138,7 +138,9 @@ namespace GooglePlayGames.BasicApi.SavedGame
         /// The request failed because it was given bad input (e.g. a filename with 200 characters).
         /// </summary>
         ///
-        BadInputError = -4
+        BadInputError = -4,
+
+        UiBusy = -5
     }
 
     ///

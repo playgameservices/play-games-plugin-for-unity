@@ -85,12 +85,12 @@ namespace GooglePlayGames.BasicApi
 
         /// <summary>The installed version of Google Play services is out of date.</summary>
         VersionUpdateRequired = -4,
-        Timeout = -5,
 
         /// <summary>Timed out while awaiting the result.</summary>
-        UserClosedUI = -6,
+        Timeout = -5,
 
         /// <summary>UI closed by user.</summary>
+        UserClosedUI = -6,
         UiBusy = -12,
 
         /// <summary>The player left the multiplayer room.</summary>

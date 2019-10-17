@@ -21,6 +21,7 @@ namespace GooglePlayGames.BasicApi
     using GooglePlayGames.BasicApi.Multiplayer;
     using GooglePlayGames.OurUtils;
     using System.Collections.Generic;
+    using System.Linq;
 
     /// <summary>
     /// Provides configuration for <see cref="PlayGamesPlatform"/>. If you wish to use either Saved
@@ -152,6 +153,27 @@ namespace GooglePlayGames.BasicApi
         public string[] Scopes
         {
             get { return mScopes; }
+        }
+
+        public static bool operator ==(PlayGamesClientConfiguration c1, PlayGamesClientConfiguration c2)
+        {
+            if (c1.EnableSavedGames != c2.EnableSavedGames ||
+                c1.IsForcingRefresh != c2.IsForcingRefresh ||
+                c1.IsHidingPopups != c2.IsHidingPopups ||
+                c1.IsRequestingEmail != c2.IsRequestingEmail ||
+                c1.IsRequestingAuthCode != c2.IsRequestingAuthCode ||
+                !c1.Scopes.SequenceEqual(c2.Scopes) ||
+                c1.AccountName != c2.AccountName)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public static bool operator !=(PlayGamesClientConfiguration c1, PlayGamesClientConfiguration c2)
+        {
+            return !(c1 == c2);
         }
 
         /// <summary>
@@ -391,6 +413,29 @@ namespace GooglePlayGames.BasicApi
             {
                 return mInvitationDelegate;
             }
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 31 + EnableSavedGames.GetHashCode();
+                hash = hash * 31 + IsForcingRefresh.GetHashCode();
+                hash = hash * 31 + IsHidingPopups.GetHashCode();
+                hash = hash * 31 + IsRequestingEmail.GetHashCode();
+                hash = hash * 31 + IsRequestingAuthCode.GetHashCode();
+                hash = hash * 31 + Scopes.GetHashCode();
+                hash = hash * 31 + AccountName.GetHashCode();
+                hash = hash * 31 + InvitationDelegate.GetHashCode();
+                hash = hash * 31 + MatchDelegate.GetHashCode();
+                return hash;
+            }
+        }
+
+        public override bool Equals(object obj)
+        {
+            return this == (PlayGamesClientConfiguration) obj;
         }
     }
 }

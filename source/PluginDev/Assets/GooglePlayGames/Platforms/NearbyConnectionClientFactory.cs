@@ -23,7 +23,6 @@ namespace GooglePlayGames
     using System;
     using GooglePlayGames.OurUtils;
     using GooglePlayGames.BasicApi.Nearby;
-    using S = GooglePlayGames.Native.Cwrapper.NearbyConnectionsStatus;
 
     public static class NearbyConnectionClientFactory
     {
@@ -35,24 +34,7 @@ namespace GooglePlayGames
                 callback.Invoke(new GooglePlayGames.BasicApi.Nearby.DummyNearbyConnectionClient());
             }
 
-            GooglePlayGames.OurUtils.Logger.d("Creating real INearbyConnectionClient");
-            GooglePlayGames.Native.NativeNearbyConnectionClientFactory.Create(callback);
-        }
-
-        private static InitializationStatus ToStatus(S.InitializationStatus status)
-        {
-            switch (status)
-            {
-                case S.InitializationStatus.VALID:
-                    return InitializationStatus.Success;
-                case S.InitializationStatus.ERROR_INTERNAL:
-                    return InitializationStatus.InternalError;
-                case S.InitializationStatus.ERROR_VERSION_UPDATE_REQUIRED:
-                    return InitializationStatus.VersionUpdateRequired;
-                default:
-                    GooglePlayGames.OurUtils.Logger.w("Unknown initialization status: " + status);
-                    return InitializationStatus.InternalError;
-            }
+            callback.Invoke(new GooglePlayGames.Android.AndroidNearbyConnectionClient());
         }
     }
 }

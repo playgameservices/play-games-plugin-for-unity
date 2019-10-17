@@ -196,14 +196,14 @@ namespace GooglePlayGames
         /// <param name="configuration">Configuration to use when initializing.</param>
         public static void InitializeInstance(PlayGamesClientConfiguration configuration)
         {
-            if (sInstance != null)
+            if (sInstance == null || sInstance.mConfiguration != configuration)
             {
-                GooglePlayGames.OurUtils.Logger.w(
-                    "PlayGamesPlatform already initialized. Ignoring this call.");
+                sInstance = new PlayGamesPlatform(configuration);
                 return;
             }
 
-            sInstance = new PlayGamesPlatform(configuration);
+            GooglePlayGames.OurUtils.Logger.w(
+                "PlayGamesPlatform already initialized. Ignoring this call.");
         }
 
         /// <summary>
@@ -263,16 +263,6 @@ namespace GooglePlayGames
             GooglePlayGames.OurUtils.Logger.d(
                 "PlayGamesPlatform activated: " + Social.Active);
             return PlayGamesPlatform.Instance;
-        }
-
-        /// <summary>Gets pointer to the Google API client.</summary>
-        /// <remarks>This is provided as a helper to making additional JNI calls.
-        /// This connection is initialized and controlled by the underlying SDK.
-        /// </remarks>
-        /// <returns>The pointer of the client.  Zero on non-android platforms.</returns>
-        public IntPtr GetApiClient()
-        {
-            return mClient.GetApiClient();
         }
 
         /// <summary>
@@ -669,13 +659,6 @@ namespace GooglePlayGames
 
             mClient.LoadAchievements(ach =>
             {
-                if (ach == null)
-                {
-                    GooglePlayGames.OurUtils.Logger.e("Unable to load achievements");
-                    callback.Invoke(false);
-                    return;
-                }
-
                 for (int i = 0; i < ach.Length; i++)
                 {
                     if (ach[i].Id == achievementID)

@@ -16,9 +16,7 @@
 
 package com.google.games.bridge;
 
-import android.util.Log;
-import androidx.annotation.NonNull;
-
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -45,35 +43,35 @@ public class TokenPendingResult extends PendingResult<TokenResult> {
         result = new TokenResult();
     }
 
-    @NonNull
+    /* @NonNull */
     @Override
     public TokenResult await() {
 
         try {
             latch.await();
         } catch (InterruptedException e) {
-            setResult(null, null, null, CommonStatusCodes.INTERRUPTED);
+            setStatus(CommonStatusCodes.INTERRUPTED);
         }
 
         return getResult();
     }
 
-    @NonNull
+    /* @NonNull */
     @Override
-    public TokenResult await(long l, @NonNull TimeUnit timeUnit) {
+    public TokenResult await(long l, /* @NonNull */ TimeUnit timeUnit) {
         try {
             if (!latch.await(l, timeUnit)) {
-                setResult(null, null, null, CommonStatusCodes.TIMEOUT);
+                setStatus(CommonStatusCodes.TIMEOUT);
             }
         } catch (InterruptedException e) {
-            setResult(null, null, null, CommonStatusCodes.INTERRUPTED);
+            setStatus(CommonStatusCodes.INTERRUPTED);
         }
         return getResult();
     }
 
     @Override
     public void cancel() {
-        setResult(null, null, null, CommonStatusCodes.CANCELED);
+        setStatus(CommonStatusCodes.CANCELED);
         latch.countDown();
     }
 
@@ -84,7 +82,7 @@ public class TokenPendingResult extends PendingResult<TokenResult> {
 
     @Override
     public void setResultCallback(
-            @NonNull ResultCallback<? super TokenResult> resultCallback) {
+            /* @NonNull */ ResultCallback<? super TokenResult> resultCallback) {
 
         // Handle adding the callback when the latch has already counted down.  This
         // can happen if there is an error right away.
@@ -97,14 +95,14 @@ public class TokenPendingResult extends PendingResult<TokenResult> {
 
     @Override
     public void setResultCallback(
-            @NonNull ResultCallback<? super TokenResult> resultCallback, long l,
-            @NonNull TimeUnit timeUnit) {
+            /* @NonNull */ ResultCallback<? super TokenResult> resultCallback, long l,
+            /* @NonNull */ TimeUnit timeUnit) {
         try {
             if (!latch.await(l, timeUnit)) {
-                setResult(null, null, null, CommonStatusCodes.TIMEOUT);
+                setStatus(CommonStatusCodes.TIMEOUT);
             }
         } catch (InterruptedException e) {
-            setResult(null, null, null, CommonStatusCodes.INTERRUPTED);
+            setStatus(CommonStatusCodes.INTERRUPTED);
         }
 
         resultCallback.onResult(getResult());
@@ -117,25 +115,6 @@ public class TokenPendingResult extends PendingResult<TokenResult> {
 
     private synchronized ResultCallback<? super TokenResult> getCallback() {
         return this.resultCallback;
-    }
-
-    /**
-     * Set the result.  If any of the values are null, and a previous non-null value was set,
-     * the non-null value is retained.
-     *
-     * @param authCode - the access token
-     * @param email     - the id token
-     * @param idToken       - user's email  (aka accountName).
-     * @param resultCode  - the result code.
-     */
-    private synchronized void setResult(String authCode, String email, String
-            idToken, int resultCode) {
-        String atok = (result != null && authCode == null) ? result.getAuthCode()
-                : authCode;
-        String itok = (result != null && idToken == null) ? result.getIdToken() : idToken;
-        String em = (result != null && email == null) ? result.getEmail() : email;
-
-        result = new TokenResult(atok, em, itok, resultCode);
     }
 
     private synchronized TokenResult getResult() {
@@ -153,21 +132,12 @@ public class TokenPendingResult extends PendingResult<TokenResult> {
         ResultCallback<? super TokenResult> cb = getCallback();
         TokenResult res = getResult();
         if (cb != null) {
-            Log.d(TAG,"Calling onResult for result: " + res);
             getCallback().onResult(res);
         }
 
     }
 
-    public void setEmail(String email) {
-        result.setEmail(email);
-    }
-
-    public void setAuthCode(String accessToken) {
-        result.setAuthCode(accessToken);
-    }
-
-    public void setIdToken(String idToken) {
-       result.setIdToken(idToken);
+    public void setAccount(GoogleSignInAccount account) {
+        result.setAccount(account);
     }
 }

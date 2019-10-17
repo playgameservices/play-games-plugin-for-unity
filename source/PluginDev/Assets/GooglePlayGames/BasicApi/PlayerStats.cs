@@ -27,33 +27,90 @@ namespace GooglePlayGames.BasicApi
     {
         private static float UNSET_VALUE = -1.0f;
 
+        public PlayerStats(
+            int numberOfPurchases,
+            float avgSessionLength,
+            int daysSinceLastPlayed,
+            int numberOfSessions,
+            float sessPercentile,
+            float spendPercentile,
+            float spendProbability,
+            float churnProbability,
+            float highSpenderProbability,
+            float totalSpendNext28Days)
+        {
+            mValid = true;
+            mNumberOfPurchases = numberOfPurchases;
+            mAvgSessionLength = avgSessionLength;
+            mDaysSinceLastPlayed = daysSinceLastPlayed;
+            mNumberOfSessions = numberOfSessions;
+            mSessPercentile = sessPercentile;
+            mSpendPercentile = spendPercentile;
+            mSpendProbability = spendProbability;
+            mChurnProbability = churnProbability;
+            mHighSpenderProbability = highSpenderProbability;
+            mTotalSpendNext28Days = totalSpendNext28Days;
+        }
+
+        public PlayerStats()
+        {
+            mValid = false;
+        }
+
+        private bool mValid;
+        private int mNumberOfPurchases;
+        private float mAvgSessionLength;
+        private int mDaysSinceLastPlayed;
+        private int mNumberOfSessions;
+        private float mSessPercentile;
+        private float mSpendPercentile;
+        private float mSpendProbability;
+        private float mChurnProbability;
+        private float mHighSpenderProbability;
+        private float mTotalSpendNext28Days;
+
         /// <summary>
         /// If this PlayerStats object is valid (i.e. successfully retrieved from games services).
         /// </summary>
         /// <remarks>
         /// Note that a PlayerStats with all stats unset may still be valid.
         /// </remarks>
-        public bool Valid { get; set; }
+        public bool Valid
+        {
+            get { return mValid; }
+        }
 
         /// <summary>
         /// The number of in-app purchases.
         /// </summary>
-        public int NumberOfPurchases { get; set; }
+        public int NumberOfPurchases
+        {
+            get { return mNumberOfPurchases; }
+        }
 
         /// <summary>
-        /// The length of the avg sesson in minutes.
+        /// The length of the avg session in minutes.
         /// </summary>
-        public float AvgSessonLength { get; set; }
+        public float AvgSessionLength
+        {
+            get { return mAvgSessionLength; }
+        }
 
         /// <summary>
         /// The days since last played.
         /// </summary>
-        public int DaysSinceLastPlayed { get; set; }
+        public int DaysSinceLastPlayed
+        {
+            get { return mDaysSinceLastPlayed; }
+        }
 
         /// <summary>
         /// The number of sessions based on sign-ins.
         /// </summary>
-        public int NumberOfSessions { get; set; }
+        public int NumberOfSessions
+        {
+            get { return mNumberOfSessions; }
+        }
 
         /// <summary>
         /// The approximation of sessions percentile for the player.
@@ -65,7 +122,10 @@ namespace GooglePlayGames.BasicApi
         /// Higher numbers indicate that this player has played more sessions.
         /// A return value less than zero indicates this value is not available.
         /// </remarks>
-        public float SessPercentile { get; set; }
+        public float SessPercentile
+        {
+            get { return mSessPercentile; }
+        }
 
         /// <summary>
         /// The approximate spend percentile of the player.
@@ -77,7 +137,10 @@ namespace GooglePlayGames.BasicApi
         /// numbers indicate that this player has spent more.
         /// A return value less than zero indicates this value is not available.
         /// </remarks>
-        public float SpendPercentile { get; set; }
+        public float SpendPercentile
+        {
+            get { return mSpendPercentile; }
+        }
 
         /// <summary>
         /// The approximate probability of the player choosing to spend in this game.
@@ -87,7 +150,10 @@ namespace GooglePlayGames.BasicApi
         ///  Higher values indicate that a player is more likely to spend.
         /// A return value less than zero indicates this value is not available.
         /// </remarks>
-        public float SpendProbability { get; set; }
+        public float SpendProbability
+        {
+            get { return mSpendProbability; }
+        }
 
         /// <summary>
         /// The approximate probability of the player not returning to play the game.
@@ -96,25 +162,25 @@ namespace GooglePlayGames.BasicApi
         /// Higher values indicate that a player is less likely to return.
         /// A return value less than zero indicates this value is not available.
         /// </remarks>
-        public float ChurnProbability { get; set; }
+        public float ChurnProbability
+        {
+            get { return mChurnProbability; }
+        }
 
         /// <summary>
         /// The high spender probability of this player.
         /// </summary>
-        public float HighSpenderProbability { get; set; }
+        public float HighSpenderProbability
+        {
+            get { return mHighSpenderProbability; }
+        }
 
         /// <summary>
         /// The predicted total spend of this player over the next 28 days.
         /// </summary>
-        public float TotalSpendNext28Days { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="GooglePlayGames.BasicApi.PlayerStats"/> class.
-        /// Sets all values to -1.
-        /// </summary>
-        public PlayerStats()
+        public float TotalSpendNext28Days
         {
-            Valid = false;
+            get { return mTotalSpendNext28Days; }
         }
 
         /// <summary>
@@ -127,12 +193,12 @@ namespace GooglePlayGames.BasicApi
         }
 
         /// <summary>
-        /// Determines whether this instance has AvgSessonLength.
+        /// Determines whether this instance has AvgSessionLength.
         /// </summary>
-        /// <returns><c>true</c> if this instance has AvgSessonLength; otherwise, <c>false</c>.</returns>
-        public bool HasAvgSessonLength()
+        /// <returns><c>true</c> if this instance has AvgSessionLength; otherwise, <c>false</c>.</returns>
+        public bool HasAvgSessionLength()
         {
-            return AvgSessonLength != UNSET_VALUE;
+            return AvgSessionLength != UNSET_VALUE;
         }
 
         /// <summary>
