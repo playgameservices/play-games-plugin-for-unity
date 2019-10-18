@@ -523,9 +523,6 @@ If the from parameter is non-positive, then the results returned are
 player-centered, meaning the scores around the current player's score are
 returned.
 
-Note: the play game services API only supports paging, so retrieving using a
-high 'from' position will have a performance impact.
-
 ```csharp
     ILeaderboard lb = PlayGamesPlatform.Instance.CreateLeaderboard();
     lb.id = "MY_LEADERBOARD_ID";
