@@ -252,7 +252,7 @@ In order to use nearby connections, a service id which uniquely identifies the
 set of applications that can interact needs to be configured.
 This is done by clicking the **Window > Google Play Games > Nearby Connections setup...**
 menu item. This will display the
-nearby conections setup screen.  On this screen enter the service ID you want to use.
+nearby connections setup screen.  On this screen enter the service ID you want to use.
 It should be something that identifies your application, and  follows the
 same rules as the bundle id (for example: com.example.myawesomegame.nearby).
 Once you enter the id, press **Setup**.
@@ -345,7 +345,7 @@ completes.
 
 ## Player Statistics
 
-The Player Stats API let you tailor game experiences to specific segments
+The Player Stats API lets you tailor game experiences to specific segments
 of players and different stages of the player lifecycle. You can build
 tailored experiences for each player segment based on how players are
 progressing, spending, and engaging. For example, you can use this API to
@@ -376,7 +376,7 @@ The player stats are available after authenticating:
 ## Setting popup gravity
 
 You can set the gravity used by popups when showing game services elements
-such as achievement notificartions.  The default is TOP.  This can only
+such as achievement notifications.  The default is TOP.  This can only
 be set after authentication.  For example:
 
 ```csharp
@@ -1020,7 +1020,7 @@ That way, you can even submit scores and achievements simultaneously to two or m
 ```
 ## Special Thanks
 
-This section lists people who have contributed to this project by writing code, improving documentation or fixing bugs.
+This section lists people who have contributed to this project by writing code, improving the documentation or fixing bugs.
 
 * [Dgizusse](https://github.com/Dgizusse) for figuring out that setting JAVA_HOME is necessary on Windows.
 * [antonlicht](https://github.com/antonlicht) for fixing a bug with the parameter type of showErrorDialog on the support library.
