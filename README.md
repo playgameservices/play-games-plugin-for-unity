@@ -252,7 +252,7 @@ In order to use nearby connections, a service id which uniquely identifies the
 set of applications that can interact needs to be configured.
 This is done by clicking the **Window > Google Play Games > Nearby Connections setup...**
 menu item. This will display the
-nearby conections setup screen.  On this screen enter the service ID you want to use.
+nearby connections setup screen.  On this screen enter the service ID you want to use.
 It should be something that identifies your application, and  follows the
 same rules as the bundle id (for example: com.example.myawesomegame.nearby).
 Once you enter the id, press **Setup**.
