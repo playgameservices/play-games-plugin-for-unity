@@ -1,9 +1,14 @@
+Version 0.10.05
+    Bug fixes:
+    * #2753 VersionHandlerImpl.UpdateVersionedAssets not found.
+    * Fixed the issues caused by Nearby and RTMP callbacks not being on the main thread.
+    * Fixed detecting AndroidSdkRoot when unity embedded is used.
+
 Version 0.10.04
     Bug fixes:
     * Updated the way of handling requests to prevent them being processed twice.
     * Fixed the callback not being triggered in CommitUpdate issue.
     * RealTimeMultiplayerListener runs on the game thread.
-
 Version 0.10.03
     Bug fixes:
     * Fixed the exception caused by ui callbacks.
