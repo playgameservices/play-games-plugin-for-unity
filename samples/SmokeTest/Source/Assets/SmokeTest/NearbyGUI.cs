@@ -21,7 +21,7 @@ namespace SmokeTest
     using GooglePlayGames;
     using GooglePlayGames.BasicApi.Nearby;
     using UnityEngine;
-#if UNITY_ANDROID
+#if UNITY_ANDROID && UNITY_2019
     using UnityEngine.Android;
 #endif
 
@@ -72,7 +72,7 @@ namespace SmokeTest
             mMessageLog = new List<string>();
             mKnownEndpoints = new HashSet<string>();
             
-#if UNITY_ANDROID
+#if UNITY_ANDROID && UNITY_2019
             Permission.RequestUserPermission(Permission.FineLocation);
             Permission.RequestUserPermission(Permission.CoarseLocation);
 #endif
