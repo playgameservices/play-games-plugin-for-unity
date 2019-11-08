@@ -1,9 +1,13 @@
+Version 0.10.06
+    Bug fixes:
+    * #2776 Crashes due to uninstalled Play Games App.
+    * #2766, #2772 Android SDK path detection in versions older than 2019.x.
+
 Version 0.10.05
     Bug fixes:
     * #2753 VersionHandlerImpl.UpdateVersionedAssets not found.
     * Fixed the issues caused by Nearby and RTMP callbacks not being on the main thread.
     * Fixed detecting AndroidSdkRoot when unity embedded is used.
-
 Version 0.10.04
     Bug fixes:
     * Updated the way of handling requests to prevent them being processed twice.

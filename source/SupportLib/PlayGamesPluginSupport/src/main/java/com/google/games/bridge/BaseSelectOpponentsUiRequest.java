@@ -59,7 +59,7 @@ abstract class BaseSelectOpponentsUiRequest implements HelperFragment.Request {
                 new OnSuccessListener<Intent>() {
                     @Override
                     public void onSuccess(Intent intent) {
-                        helperFragment.startActivityForResult(intent, HelperFragment.RC_SELECT_OPPONENTS_UI);
+                        Utils.startActivityForResult(helperFragment, intent, HelperFragment.RC_SELECT_OPPONENTS_UI);
                     }
                 })
             .addOnFailureListener(

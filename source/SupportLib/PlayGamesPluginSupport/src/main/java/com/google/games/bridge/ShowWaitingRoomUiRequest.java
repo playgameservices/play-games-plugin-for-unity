@@ -64,7 +64,7 @@ class ShowWaitingRoomUiRequest implements HelperFragment.Request {
                     new OnSuccessListener<Intent>() {
                         @Override
                         public void onSuccess(Intent intent) {
-                            helperFragment.startActivityForResult(intent, HelperFragment.RC_SHOW_WAITING_ROOM_UI);
+                            Utils.startActivityForResult(helperFragment, intent, HelperFragment.RC_SHOW_WAITING_ROOM_UI);
                         }
                     })
             .addOnFailureListener(

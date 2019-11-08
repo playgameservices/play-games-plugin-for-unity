@@ -45,7 +45,7 @@ class InboxUiRequest implements HelperFragment.Request {
                 new OnSuccessListener<Intent>() {
                     @Override
                     public void onSuccess(Intent intent) {
-                        helperFragment.startActivityForResult(intent, HelperFragment.RC_INBOX_UI);
+                        Utils.startActivityForResult(helperFragment, intent, HelperFragment.RC_INBOX_UI);
                     }
                 })
             .addOnFailureListener(
