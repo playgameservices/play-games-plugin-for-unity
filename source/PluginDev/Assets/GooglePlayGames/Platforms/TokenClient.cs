@@ -67,6 +67,8 @@ namespace GooglePlayGames
         void SetHidePopups(bool flag);
 
         void FetchTokens(bool silent, Action<int> callback);
+
+        bool HasPermissions(string[] scopes);
     }
 }
 #endif

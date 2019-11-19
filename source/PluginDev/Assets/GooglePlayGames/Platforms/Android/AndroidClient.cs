@@ -1019,6 +1019,13 @@ namespace GooglePlayGames.Android
             }
         }
 
+        /// <summary>Returns whether or not user has given permissions for given scopes.</summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.HasPermissions"/>
+        public bool HasPermissions(string[] scopes)
+        {
+            return mTokenClient.HasPermissions(scopes);
+        }
+
         ///<summary></summary>
         /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.GetRtmpClient"/>
         public IRealTimeMultiplayerClient GetRtmpClient()

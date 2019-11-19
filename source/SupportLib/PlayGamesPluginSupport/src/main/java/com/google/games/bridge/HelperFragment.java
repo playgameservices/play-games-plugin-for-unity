@@ -214,6 +214,15 @@ public class HelperFragment extends Fragment
         return request.getTask();
     }
 
+    public static boolean hasPermissions(Activity parentActivity, String[] scopeUris) {
+        Scope[] scopes = new Scope[scopeUris.length];
+        for (int i = 0; i < scopeUris.length; i++) {
+            scopes[i] = new Scope(scopeUris[i]);
+        }
+
+        return GoogleSignIn.hasPermissions(getAccount(parentActivity), scopes);
+    }
+
     public static void signOut(Activity activity) {
         GoogleSignInClient signInClient = GoogleSignIn.getClient(activity, GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
         signInClient.signOut();

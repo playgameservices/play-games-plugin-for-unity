@@ -132,6 +132,18 @@ namespace GooglePlayGames.Android
             PlayGamesHelperObject.RunOnGameThread(() => DoFetchToken(silent, callback));
         }
 
+        /// <summary>Returns whether or not user has given permissions for given scopes.</summary>
+        /// <param name="scopes">array of scopes</param>
+        /// <returns><c>true</c>, if given, <c>false</c> otherwise.</returns>
+        public bool HasPermissions(string[] scopes)
+        {
+            using (var bridgeClass = new AndroidJavaClass(HelperFragmentClass))
+            using (var currentActivity = AndroidHelperFragment.GetActivity())
+            {
+                return bridgeClass.CallStatic<bool>("hasPermissions", currentActivity, scopes);
+            }
+        }
+
         private void DoFetchToken(bool silent, Action<int> callback)
         {
             try

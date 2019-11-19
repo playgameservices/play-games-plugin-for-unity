@@ -1280,6 +1280,29 @@ namespace GooglePlayGames
                     (PlayGamesLeaderboard) board, scoreData, callback));
         }
 
+        /// <summary>Returns whether or not user has given permissions for given scopes.</summary>
+        /// <param name="scope">scope</param>
+        /// <returns><c>true</c>, if given, <c>false</c> otherwise.</returns>
+        public bool HasPermission(string scope)
+        {
+            return HasPermissions(new string[] {scope});
+        }
+        
+        /// <summary>Returns whether or not user has given permissions for given scopes.</summary>
+        /// <param name="scopes">array of scopes</param>
+        /// <returns><c>true</c>, if given, <c>false</c> otherwise.</returns>
+        public bool HasPermissions(string[] scopes)
+        {
+            if (!IsAuthenticated())
+            {
+                GooglePlayGames.OurUtils.Logger.e(
+                    "HasPermissions can only be called after authentication.");
+                return false;
+            }
+            
+            return mClient.HasPermissions(scopes);
+        }
+
         /// <summary>
         /// Check if the leaderboard is currently loading.
         /// </summary>
