@@ -92,7 +92,8 @@ namespace SmokeTest
             Leaderboards,
             Video,
             UserInfo,
-            PopupGravity
+            PopupGravity,
+            Permissions
         }
 
         public void Start()
@@ -351,7 +352,11 @@ namespace SmokeTest
             {
                 SetUI(Ui.PopupGravity);
             }
-            else if (GUI.Button(this.CalcGrid(1, 5), "Sign Out"))
+            else if (GUI.Button(this.CalcGrid(1, 5), "Permissions"))
+            {
+                SetUI(Ui.Permissions);
+            }
+            else if (GUI.Button(this.CalcGrid(0, 6), "Sign Out"))
             {
                 this.DoSignOut();
             }
@@ -936,6 +941,38 @@ namespace SmokeTest
             }
         }
 
+        private void ShowPermissionsUi()
+        {
+            DrawStatus();
+            DrawTitle("PopupGravity Ui");
+
+            if (GUI.Button(CalcGrid(0, 1), "Has Drive - AppData"))
+            {
+                Status = "Drive - AppData Permission " + PlayGamesPlatform.Instance.HasPermission(
+                             /* scope= */ "https://www.googleapis.com/auth/drive.appdata");
+            }
+            else if (GUI.Button(CalcGrid(1, 1), "Has Games Lite"))
+            {
+                Status = "Games Lite Permission " + PlayGamesPlatform.Instance.HasPermission(
+                             /* scope= */ "https://www.googleapis.com/auth/games_lite");
+            }
+            else if (GUI.Button(CalcGrid(0, 2), "Has User Info - Profile"))
+            {
+                Status = "User Info - Profile Permission " + PlayGamesPlatform.Instance.HasPermission(
+                             /* scope= */ "https://www.googleapis.com/auth/userinfo.profile");
+            }
+            else if (GUI.Button(CalcGrid(1, 2), "Has Play Games Activity"))
+            {
+                Status = "Play Games Activity Permission " + PlayGamesPlatform.Instance.HasPermission(
+                             /* scope= */ "https://www.googleapis.com/auth/games	");
+            }
+            else if (GUI.Button(CalcGrid(1, 4), "Back"))
+            {
+                SetUI(Ui.Main);
+                ShowEffect(true);
+            }
+        }
+
         internal void ShowUserInfoUi()
         {
             GUI.Label(
@@ -1116,6 +1153,9 @@ namespace SmokeTest
                         break;
                     case Ui.PopupGravity:
                         ShowPopupGravityUi();
+                        break;
+                    case Ui.Permissions:
+                        ShowPermissionsUi();
                         break;
                     default:
                         // check for a status of interest, and if there
