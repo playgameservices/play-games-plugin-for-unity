@@ -1,0 +1,17 @@
+# Format: google3/devtools/metadata/metadata.proto (go/google3metadata)
+
+name: "Google Play Games plugin for Unity"
+description: "A plugin used by Unity developers to access Play Games Services APIs."
+
+third_party {
+  url {
+    type: GIT
+    value: "https://github.com/playgameservices/play-games-plugin-for-unity"
+  }
+  version: "a9a5be3de479fbcc8d8d356c0bbb6fedccf37018"
+  last_upgrade_date {
+    year: 2019
+    month: 12
+    day: 3
+  }
+}

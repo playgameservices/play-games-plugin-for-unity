@@ -1,0 +1,57 @@
+GOOGLE PLAY GAMES PLUGIN FOR UNITY
+
+    Copyright (C) 2014 Google Inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+
+[ SOURCE OR BINARY? ]
+
+    If you just want to *use* the plugin in your game (as opposed to modify it),
+    this directory is the wrong place to look. There is a pre-built and ready-to-use
+    version of the plugin in the "current-build" directory. Refer to the root
+    README.md file for more information.
+
+
+[ REPOSITORY CONTENTS ]
+
+    SupportLib/
+        Source code for the Java support lib (the JAR file)
+
+    PluginDev/
+        Unity project for developing and debugging the plugin
+
+    docgen/
+        Source code documentation generation config.
+
+
+[ HOW TO BUILD THE PLUGIN ]
+
+Gradle is used to coordinate the build process.
+
+1. Remove any old build directory.  It is named `./build`.
+2. Make sure you have the environment variables set correctly:
+   2.1 ANDROID_NDK_ROOT - points to the Android NDK
+   2.2 ANDROID_HOME - points to the Android SDK
+   2.3 UNITY_EXE - points to the unity executable.
+   2.4 GIT_EXE - points to the git executable.
+3. Run the gradle wrapper: `./gradlew`
+4. Get a cup of coffee, or tea, or learn a haiku while it builds.
+5. It will update the unitypackage in ../current-build and all the unitypackages
+    for the samples.
+
+[ KNOWN ISSUES]
+
+1. The plugin will not build on a case-sensitive drive.
+
+2. The plugin will not build if the directory structure contains spaces in any directory name.
