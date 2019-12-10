@@ -1,4 +1,5 @@
 #if UNITY_ANDROID
+#pragma warning disable 0642 // Possible mistaken empty statement
 
 namespace GooglePlayGames.Android
 {
