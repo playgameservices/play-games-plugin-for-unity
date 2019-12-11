@@ -49,3 +49,43 @@ presubmit: {
     required_for_cleanup: true
   }
 }
+
+# Copybara presubmit
+presubmit: {
+  path_expression: "//depot/google3/third_party/unity/play_games_services/project/..."
+  path_expression_exclusion: "//depot/.../METADATA"
+  path_expression_exclusion: "//depot/.../OWNERS"
+  # Add more path exclusions here...
+  check_presubmit_service: {
+    base: {
+      id: "Copybara-Review"
+      disable_tags: "GIT_ORIGIN_REV_ID"
+      disable_tags: "SKIP_COPYBARA"
+    }
+    action: REVIEW
+    streaming: true
+    timeout: 30
+    failure_status: WARNING
+    execution_mode: SECONDARY_EXECUTION
+    include_all_opened_files: true
+    include_deleted_files: true
+    address: "blade:copybara-streaming-presubmit-service-prod"
+    options: "depot_path=//depot/google3/third_party/unity/play_games_services/copybara/copy.bara.sky;workflow=presubmit_piper_to_gerrit;feedback=feedback_gerrit_to_critique;blocking=false"
+  }
+  check_presubmit_service: {
+    base: {
+      id: "Copybara-Submit"
+      disable_tags: "GIT_ORIGIN_REV_ID"
+      disable_tags: "SKIP_COPYBARA"
+    }
+    action: SUBMIT
+    streaming: true
+    timeout: 600
+    failure_status: ERROR
+    execution_mode: SECONDARY_EXECUTION
+    include_all_opened_files: true
+    include_deleted_files: true
+    address: "blade:copybara-streaming-presubmit-service-prod"
+    options: "depot_path=//depot/google3/third_party/unity/play_games_services/copybara/copy.bara.sky;workflow=presubmit_piper_to_gerrit;feedback=feedback_gerrit_to_critique;blocking=true"
+  }
+}
