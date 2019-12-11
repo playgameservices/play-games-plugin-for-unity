@@ -15,3 +15,37 @@ third_party {
     day: 3
   }
 }
+
+presubmit: {
+  path_expression: "//depot/google3/third_party/unity/play_games_services/project/..."
+  path_expression_exclusion: "//depot/.../METADATA"
+  path_expression_exclusion: "//depot/.../OWNERS"
+
+  # If the change propagates to github, a section of the change description
+  # needs to be marked as public.
+  check_description: {
+    base {
+      id: "CheckBeginEndPublic"
+    }
+    action: REVIEW
+    action: SUBMIT
+
+    failure_message:
+      "\n"
+      "CL descriptions for changes to //third_party/unity/play_games_services/project\n"
+      "must contain one or more sections delimited as follows:\n"
+      "\n"
+      "BEGIN_PUBLIC\n"
+      "...text exposed to open source public git repo...\n"
+      "END_PUBLIC\n"
+      "\n"
+
+    required_regexp:
+      "(^|\\n)\\s*BEGIN_PUBLIC\\s*?\\n"
+      "(.*\\n)*"
+      "\\s*\\S+.*(\\n.*)*\\n"
+      "\\s*END_PUBLIC\\s*?\\n"
+
+    required_for_cleanup: true
+  }
+}
