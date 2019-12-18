@@ -944,29 +944,20 @@ namespace SmokeTest
         private void ShowPermissionsUi()
         {
             DrawStatus();
-            DrawTitle("PopupGravity Ui");
+            DrawTitle("Permissions Ui");
 
-            if (GUI.Button(CalcGrid(0, 1), "Has Drive - AppData"))
+            if (GUI.Button(CalcGrid(0, 1), "Has Permission - Email"))
             {
-                Status = "Drive - AppData Permission " + PlayGamesPlatform.Instance.HasPermission(
-                             /* scope= */ "https://www.googleapis.com/auth/drive.appdata");
+                Status = "Email Permission " + PlayGamesPlatform.Instance.HasPermission("email");
             }
-            else if (GUI.Button(CalcGrid(1, 1), "Has Games Lite"))
+            else if (GUI.Button(CalcGrid(1, 1), "Request Permission- Email"))
             {
-                Status = "Games Lite Permission " + PlayGamesPlatform.Instance.HasPermission(
-                             /* scope= */ "https://www.googleapis.com/auth/games_lite");
+                Status = "Asking permission for email";
+                PlayGamesPlatform.Instance.RequestPermission(
+                    code => { Status = "Result code " + code; },
+                    "email");
             }
-            else if (GUI.Button(CalcGrid(0, 2), "Has User Info - Profile"))
-            {
-                Status = "User Info - Profile Permission " + PlayGamesPlatform.Instance.HasPermission(
-                             /* scope= */ "https://www.googleapis.com/auth/userinfo.profile");
-            }
-            else if (GUI.Button(CalcGrid(1, 2), "Has Play Games Activity"))
-            {
-                Status = "Play Games Activity Permission " + PlayGamesPlatform.Instance.HasPermission(
-                             /* scope= */ "https://www.googleapis.com/auth/games	");
-            }
-            else if (GUI.Button(CalcGrid(1, 4), "Back"))
+            else if (GUI.Button(CalcGrid(1, 6), "Back"))
             {
                 SetUI(Ui.Main);
                 ShowEffect(true);
