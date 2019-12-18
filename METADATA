@@ -8,11 +8,11 @@ third_party {
     type: GIT
     value: "https://github.com/playgameservices/play-games-plugin-for-unity"
   }
-  version: "a9a5be3de479fbcc8d8d356c0bbb6fedccf37018"
+  version: "03e4ab3164da319d3a7f52721bc5e815ac533878"
   last_upgrade_date {
     year: 2019
     month: 12
-    day: 3
+    day: 17
   }
 }
 
