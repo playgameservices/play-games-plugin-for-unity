@@ -1,4 +1,6 @@
 #if UNITY_ANDROID
+#pragma warning disable 0168 // The variable 'var' is declared but never used
+#pragma warning disable 0642 // Possible mistaken empty statement
 
 namespace GooglePlayGames.Android
 {
