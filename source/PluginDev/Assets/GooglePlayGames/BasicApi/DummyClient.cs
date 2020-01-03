@@ -373,6 +373,28 @@ namespace GooglePlayGames.BasicApi
             }
         }
 
+        /// <summary>Asks user to give permissions for the given scopes.</summary>
+        /// <param name="callback">Callback used to indicate the outcome of the operation.</param>
+        /// <param name="scopes">Scope to ask permission for</param>
+        public void RequestPermissions(Action<SignInStatus> callback, string[] scopes)
+        {
+            LogUsage();
+            if (callback != null)
+            {
+                callback.Invoke(SignInStatus.Failed);
+            }
+        }
+
+        /// <summary>Returns whether or not user has given permissions for given scopes.</summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.HasPermissions"/>
+        /// <param name="scopes">array of scopes</param>
+        /// <returns><c>true</c>, if given, <c>false</c> otherwise.</returns>
+        public bool HasPermissions(string[] scopes)
+        {
+            LogUsage();
+            return false;
+        }
+
         /// <summary>
         /// Returns a real-time multiplayer client.
         /// </summary>

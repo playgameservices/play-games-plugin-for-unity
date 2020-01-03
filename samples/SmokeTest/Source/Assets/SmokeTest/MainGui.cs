@@ -92,7 +92,8 @@ namespace SmokeTest
             Leaderboards,
             Video,
             UserInfo,
-            PopupGravity
+            PopupGravity,
+            Permissions
         }
 
         public void Start()
@@ -351,7 +352,11 @@ namespace SmokeTest
             {
                 SetUI(Ui.PopupGravity);
             }
-            else if (GUI.Button(this.CalcGrid(1, 5), "Sign Out"))
+            else if (GUI.Button(this.CalcGrid(1, 5), "Permissions"))
+            {
+                SetUI(Ui.Permissions);
+            }
+            else if (GUI.Button(this.CalcGrid(0, 6), "Sign Out"))
             {
                 this.DoSignOut();
             }
@@ -936,6 +941,29 @@ namespace SmokeTest
             }
         }
 
+        private void ShowPermissionsUi()
+        {
+            DrawStatus();
+            DrawTitle("Permissions Ui");
+
+            if (GUI.Button(CalcGrid(0, 1), "Has Permission - Email"))
+            {
+                Status = "Email Permission " + PlayGamesPlatform.Instance.HasPermission("email");
+            }
+            else if (GUI.Button(CalcGrid(1, 1), "Request Permission- Email"))
+            {
+                Status = "Asking permission for email";
+                PlayGamesPlatform.Instance.RequestPermission(
+                    code => { Status = "Result code " + code; },
+                    "email");
+            }
+            else if (GUI.Button(CalcGrid(1, 6), "Back"))
+            {
+                SetUI(Ui.Main);
+                ShowEffect(true);
+            }
+        }
+
         internal void ShowUserInfoUi()
         {
             GUI.Label(
@@ -1116,6 +1144,9 @@ namespace SmokeTest
                         break;
                     case Ui.PopupGravity:
                         ShowPopupGravityUi();
+                        break;
+                    case Ui.Permissions:
+                        ShowPermissionsUi();
                         break;
                     default:
                         // check for a status of interest, and if there

@@ -18,6 +18,7 @@
 namespace GooglePlayGames.Android
 {
     using System;
+    using System.Linq;
     using BasicApi;
     using OurUtils;
     using UnityEngine;
@@ -130,6 +131,91 @@ namespace GooglePlayGames.Android
         public void FetchTokens(bool silent, Action<int> callback)
         {
             PlayGamesHelperObject.RunOnGameThread(() => DoFetchToken(silent, callback));
+        }
+
+        public void RequestPermissions(Action<SignInStatus> callback, string[] scopes)
+        {
+            using (var bridgeClass = new AndroidJavaClass(HelperFragmentClass))
+            using (var currentActivity = AndroidHelperFragment.GetActivity())
+            using (var task =
+                bridgeClass.CallStatic<AndroidJavaObject>("showRequestPermissionsUi", currentActivity,
+                    oauthScopes.Union(scopes).ToArray()))
+            {
+                AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(task, /* disposeResult= */ false,
+                    accountWithNewScopes =>
+                    {
+                        if (accountWithNewScopes == null)
+                        {
+                            callback(SignInStatus.InternalError);
+                            return;
+                        }
+
+                        account = accountWithNewScopes;
+                        email = account.Call<string>("getEmail");
+                        idToken = account.Call<string>("getIdToken");
+                        authCode = account.Call<string>("getServerAuthCode");
+                        oauthScopes = oauthScopes.Union(scopes).ToList();
+                        callback(SignInStatus.Success);
+                    });
+
+                AndroidTaskUtils.AddOnFailureListener(task, e =>
+                {
+                    var failCode = ToSignInStatus(e.Call<int>("getStatusCode"));
+                    OurUtils.Logger.e("Exception requesting new permissions: " + failCode);
+                    callback(failCode);
+                });
+            }
+        }
+
+        private static SignInStatus ToSignInStatus(int code)
+        {
+            Dictionary<int, SignInStatus> dictionary = new Dictionary<int, SignInStatus>()
+            {
+                {
+                    /* CommonUIStatus.UI_BUSY */ -12, SignInStatus.AlreadyInProgress
+                },
+                {
+                    /* CommonStatusCodes.SUCCESS */ 0, SignInStatus.Success
+                },
+                {
+                    /* CommonStatusCodes.SIGN_IN_REQUIRED */ 4, SignInStatus.UiSignInRequired
+                },
+                {
+                    /* CommonStatusCodes.NETWORK_ERROR */ 7, SignInStatus.NetworkError
+                },
+                {
+                    /* CommonStatusCodes.INTERNAL_ERROR */ 8, SignInStatus.InternalError
+                },
+                {
+                    /* CommonStatusCodes.CANCELED */ 16, SignInStatus.Canceled
+                },
+                {
+                    /* CommonStatusCodes.API_NOT_CONNECTED */ 17, SignInStatus.Failed
+                },
+                {
+                    /* GoogleSignInStatusCodes.SIGN_IN_FAILED */ 12500, SignInStatus.Failed
+                },
+                {
+                    /* GoogleSignInStatusCodes.SIGN_IN_CANCELLED */ 12501, SignInStatus.Canceled
+                },
+                {
+                    /* GoogleSignInStatusCodes.SIGN_IN_CURRENTLY_IN_PROGRESS */ 12502, SignInStatus.AlreadyInProgress
+                },
+            };
+
+            return dictionary.ContainsKey(code) ? dictionary[code] : SignInStatus.Failed;
+        }
+
+        /// <summary>Returns whether or not user has given permissions for given scopes.</summary>
+        /// <param name="scopes">array of scopes</param>
+        /// <returns><c>true</c>, if given, <c>false</c> otherwise.</returns>
+        public bool HasPermissions(string[] scopes)
+        {
+            using (var bridgeClass = new AndroidJavaClass(HelperFragmentClass))
+            using (var currentActivity = AndroidHelperFragment.GetActivity())
+            {
+                return bridgeClass.CallStatic<bool>("hasPermissions", currentActivity, scopes);
+            }
         }
 
         private void DoFetchToken(bool silent, Action<int> callback)
