@@ -22,7 +22,7 @@ namespace GooglePlayGames
     using System.Collections;
     using GooglePlayGames.OurUtils;
     using UnityEngine;
-#if UNITY_2017_1_OR_NEWER
+#if UNITY_2017_2_OR_NEWER
     using UnityEngine.Networking;
 #endif
     using UnityEngine.SocialPlatforms;
@@ -120,7 +120,7 @@ namespace GooglePlayGames
             // avatar configured.
             if (!string.IsNullOrEmpty(AvatarURL))
             {
-#if UNITY_2017_1_OR_NEWER
+#if UNITY_2017_2_OR_NEWER
                 UnityWebRequest www = UnityWebRequestTexture.GetTexture(AvatarURL);
                 www.SendWebRequest();
 #else
@@ -133,7 +133,7 @@ namespace GooglePlayGames
 
                 if (www.error == null)
                 {
-#if UNITY_2017_1_OR_NEWER
+#if UNITY_2017_2_OR_NEWER
                     this.mImage = DownloadHandlerTexture.GetContent(www);
 #else
                     this.mImage = www.texture;
