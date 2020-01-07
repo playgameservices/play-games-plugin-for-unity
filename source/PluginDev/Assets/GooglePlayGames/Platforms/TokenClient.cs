@@ -17,6 +17,7 @@
 #if UNITY_ANDROID
 namespace GooglePlayGames
 {
+    using GooglePlayGames.BasicApi;
     using System;
 
     internal interface TokenClient
@@ -67,6 +68,10 @@ namespace GooglePlayGames
         void SetHidePopups(bool flag);
 
         void FetchTokens(bool silent, Action<int> callback);
+
+        void RequestPermissions(Action<SignInStatus> callback, string[] scopes);
+
+        bool HasPermissions(string[] scopes);
     }
 }
 #endif

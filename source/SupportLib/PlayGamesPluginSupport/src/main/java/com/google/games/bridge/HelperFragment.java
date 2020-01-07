@@ -26,16 +26,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.auth.api.signin.GoogleSignInStatusCodes;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Scope;
-import com.google.android.gms.common.api.Status;
-import com.google.android.gms.games.Games;
-import com.google.android.gms.games.GamesActivityResultCodes;
-import com.google.android.gms.games.multiplayer.Invitation;
 import com.google.android.gms.games.multiplayer.realtime.Room;
 import com.google.android.gms.tasks.Task;
 
@@ -56,6 +49,7 @@ public class HelperFragment extends Fragment
     static final int RC_INBOX_UI = 9007;
     static final int RC_SHOW_WAITING_ROOM_UI = 9008;
     static final int RC_SHOW_INVITATION_INBOX_UI = 9009;
+  static final int RC_SHOW_REQUEST_PERMISSIONS_UI = 9010;
 
     // Pending token request.  There can be only one outstanding request at a
     // time.
@@ -204,7 +198,7 @@ public class HelperFragment extends Fragment
         return request.getTask();
     }
 
-    public static Task<InboxUiRequest.Result> showInboxUi(Activity parentActivity){
+  public static Task<InboxUiRequest.Result> showInboxUi(Activity parentActivity) {
         InboxUiRequest request = new InboxUiRequest();
 
         if(!HelperFragment.startRequest(parentActivity, request)) {
@@ -213,6 +207,29 @@ public class HelperFragment extends Fragment
 
         return request.getTask();
     }
+
+  public static Task<GoogleSignInAccount> showRequestPermissionsUi(
+      Activity parentActivity, String[] scopes) {
+    RequestPermissionsRequest request = new RequestPermissionsRequest(toScopeList(scopes));
+
+    if (!HelperFragment.startRequest(parentActivity, request)) {
+      request.setFailure(CommonUIStatus.UI_BUSY);
+    }
+
+    return request.getTask();
+  }
+
+  public static boolean hasPermissions(Activity parentActivity, String[] scopes) {
+    return GoogleSignIn.hasPermissions(getAccount(parentActivity), toScopeList(scopes));
+  }
+
+  private static Scope[] toScopeList(String[] scopeUris) {
+    Scope[] scopes = new Scope[scopeUris.length];
+    for (int i = 0; i < scopeUris.length; i++) {
+      scopes[i] = new Scope(scopeUris[i]);
+    }
+    return scopes;
+  }
 
     public static void signOut(Activity activity) {
         GoogleSignInClient signInClient = GoogleSignIn.getClient(activity, GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);

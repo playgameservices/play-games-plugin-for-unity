@@ -1280,6 +1280,53 @@ namespace GooglePlayGames
                     (PlayGamesLeaderboard) board, scoreData, callback));
         }
 
+        /// <summary>Asks user to give permissions for the given scopes.</summary>
+        /// <param name="callback">Callback used to indicate the outcome of the operation.</param>
+        /// <param name="scopes">Scope to ask permission for</param>
+        public void RequestPermission(Action<SignInStatus> callback, string scope)
+        {
+            RequestPermissions(callback, new string[] {scope});
+        }
+
+        /// <summary>Asks user to give permissions for the given scopes.</summary>
+        /// <param name="callback">Callback used to indicate the outcome of the operation.</param>
+        /// <param name="scopes">List of scopes to ask permission for</param>
+        public void RequestPermissions(Action<SignInStatus> callback, string[] scopes)
+        {
+            if (!IsAuthenticated())
+            {
+                GooglePlayGames.OurUtils.Logger.e(
+                    "HasPermissions can only be called after authentication.");
+                callback(SignInStatus.NotAuthenticated);
+                return;
+            }
+
+            mClient.RequestPermissions(callback, scopes);
+        }
+
+        /// <summary>Returns whether or not user has given permissions for given scopes.</summary>
+        /// <param name="scope">scope</param>
+        /// <returns><c>true</c>, if given, <c>false</c> otherwise.</returns>
+        public bool HasPermission(string scope)
+        {
+            return HasPermissions(new string[] {scope});
+        }
+
+        /// <summary>Returns whether or not user has given permissions for given scopes.</summary>
+        /// <param name="scopes">array of scopes</param>
+        /// <returns><c>true</c>, if given, <c>false</c> otherwise.</returns>
+        public bool HasPermissions(string[] scopes)
+        {
+            if (!IsAuthenticated())
+            {
+                GooglePlayGames.OurUtils.Logger.e(
+                    "HasPermissions can only be called after authentication.");
+                return false;
+            }
+
+            return mClient.HasPermissions(scopes);
+        }
+
         /// <summary>
         /// Check if the leaderboard is currently loading.
         /// </summary>

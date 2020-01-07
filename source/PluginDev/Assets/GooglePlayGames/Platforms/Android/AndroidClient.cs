@@ -1020,6 +1020,37 @@ namespace GooglePlayGames.Android
             }
         }
 
+        public void RequestPermissions(Action<SignInStatus> callback, string[] scopes)
+        {
+            callback = AsOnGameThreadCallback(callback);
+            mTokenClient.RequestPermissions((code =>
+            {
+                UpdateClients();
+                callback(code);
+            }), scopes);
+        }
+
+        private void UpdateClients()
+        {
+            lock (GameServicesLock)
+            {
+                var account = mTokenClient.GetAccount();
+                mSavedGameClient = new AndroidSavedGameClient(account);
+                mEventsClient = new AndroidEventsClient(account);
+                mVideoClient = new AndroidVideoClient(mVideoClient.IsCaptureSupported(), account);
+                mRealTimeClient = new AndroidRealTimeMultiplayerClient(this, account);
+                mTurnBasedClient = new AndroidTurnBasedMultiplayerClient(this, account);
+                mTurnBasedClient.RegisterMatchDelegate(mConfiguration.MatchDelegate);
+            }
+        }
+
+        /// <summary>Returns whether or not user has given permissions for given scopes.</summary>
+        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.HasPermissions"/>
+        public bool HasPermissions(string[] scopes)
+        {
+            return mTokenClient.HasPermissions(scopes);
+        }
+
         ///<summary></summary>
         /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.GetRtmpClient"/>
         public IRealTimeMultiplayerClient GetRtmpClient()
