@@ -68,7 +68,7 @@ namespace GooglePlayGames.Android
 
         ///<summary></summary>
         /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.Authenticate"/>
-        public void Authenticate(Action<bool, string> callback, bool silent)
+        public void Authenticate(bool silent, Action<SignInStatus> callback)
         {
             lock (AuthStateLock)
             {
@@ -76,7 +76,8 @@ namespace GooglePlayGames.Android
                 // any additional work.
                 if (mAuthState == AuthState.Authenticated)
                 {
-                    InvokeCallbackOnGameThread(callback, true, null);
+                    Debug.Log("Already authenticated.");
+                    InvokeCallbackOnGameThread(callback, SignInStatus.Success);
                     return;
                 }
             }
@@ -162,7 +163,7 @@ namespace GooglePlayGames.Android
                                         }
 
                                         mAuthState = AuthState.Authenticated;
-                                        InvokeCallbackOnGameThread(callback, true, "Authentication succeeded");
+                                        callback(SignInStatus.Success);
                                         GooglePlayGames.OurUtils.Logger.d("Authentication succeeded");
                                         try
                                         {
@@ -221,8 +222,18 @@ namespace GooglePlayGames.Android
                                     else
                                     {
                                         SignOut();
-                                        InvokeCallbackOnGameThread(callback, false, "Authentication failed");
-                                        GooglePlayGames.OurUtils.Logger.d("Authentication failed");
+                                        if (completeTask.Call<bool>("isCanceled"))
+                                        {
+                                            InvokeCallbackOnGameThread(callback, SignInStatus.Canceled);
+                                            return;
+                                        }
+
+                                        using (var exception = completeTask.Call<AndroidJavaObject>("getException"))
+                                        {
+                                            GooglePlayGames.OurUtils.Logger.e(
+                                                "Authentication failed" + exception.Call<string>("toString"));
+                                            InvokeCallbackOnGameThread(callback, SignInStatus.InternalError);
+                                        }
                                     }
                                 }
                             );
@@ -233,21 +244,8 @@ namespace GooglePlayGames.Android
                 {
                     lock (AuthStateLock)
                     {
-                        if (result == 16 /* CommonStatusCodes.CANCELED */)
-                        {
-                            InvokeCallbackOnGameThread(callback, false, "Authentication canceled");
-                            GooglePlayGames.OurUtils.Logger.d("Authentication canceled");
-                        }
-                        else if (result == 8 /* CommonStatusCodes.DEVELOPER_ERROR */)
-                        {
-                            InvokeCallbackOnGameThread(callback, false, "Authentication failed - developer error");
-                            GooglePlayGames.OurUtils.Logger.d("Authentication failed - developer error");
-                        }
-                        else
-                        {
-                            InvokeCallbackOnGameThread(callback, false, "Authentication failed");
-                            GooglePlayGames.OurUtils.Logger.d("Authentication failed");
-                        }
+                        Debug.Log("Returning an error code.");
+                        InvokeCallbackOnGameThread(callback, SignInHelper.ToSignInStatus(result));
                     }
                 }
             });
@@ -480,6 +478,8 @@ namespace GooglePlayGames.Android
                     uiCallback();
                 }
             }
+
+            SignInHelper.SetPromptUiSignIn(true);
         }
 
         ///<summary></summary>

@@ -1,4 +1,4 @@
-﻿// <copyright file="MainGui.cs" company="Google Inc.">
+// <copyright file="MainGui.cs" company="Google Inc.">
 // Copyright (C) 2014 Google Inc.  All Rights Reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -304,7 +304,22 @@ namespace SmokeTest
                     .EnableSavedGames()
                     .Build());
             }
-            else if (GUI.Button(this.CalcGrid(0, 4), "Nearby Connections"))
+            else if (GUI.Button(this.CalcGrid(0, 4), "SignInInteractivity - NoPrompt"))
+            {
+                this.DoAuthenticate(SignInInteractivity.NoPrompt,
+                    new PlayGamesClientConfiguration.Builder().Build());
+            }
+            else if (GUI.Button(this.CalcGrid(1, 4), "SignInInteractivity - CanPromptOnce"))
+            {
+                this.DoAuthenticate(SignInInteractivity.CanPromptOnce,
+                    new PlayGamesClientConfiguration.Builder().Build());
+            }
+            else if (GUI.Button(this.CalcGrid(0, 5), "SignInInteractivity - CanPromptAlways"))
+            {
+                this.DoAuthenticate(SignInInteractivity.CanPromptAlways,
+                    new PlayGamesClientConfiguration.Builder().Build());
+            }
+            else if (GUI.Button(this.CalcGrid(1, 5), "Nearby Connections"))
             {
                 SetUI(Ui.NearbyConnections);
             }
@@ -1180,17 +1195,16 @@ namespace SmokeTest
             mStandby = false;
         }
 
-        internal void DoAuthenticate(PlayGamesClientConfiguration configuration)
+        internal void DoAuthenticate(SignInInteractivity interactivity, PlayGamesClientConfiguration configuration)
         {
             SetStandBy("Authenticating...");
-
             ClientConfiguration = configuration;
             PlayGamesPlatform.InitializeInstance(ClientConfiguration);
             PlayGamesPlatform.Activate();
-            Social.localUser.Authenticate((bool success) =>
+            PlayGamesPlatform.Instance.Authenticate(interactivity, (code) =>
             {
                 EndStandBy();
-                if (success)
+                if (code == SignInStatus.Success)
                 {
                     Status = "Authenticated. Hello, " + Social.localUser.userName + " (" +
                              Social.localUser.id + ")";
@@ -1205,11 +1219,16 @@ namespace SmokeTest
                 }
                 else
                 {
-                    Status = "*** Failed to authenticate.";
+                    Status = "*** Failed to authenticate with " + code;
                 }
 
-                ShowEffect(success);
+                ShowEffect(code == SignInStatus.Success);
             });
+        }
+
+        internal void DoAuthenticate(PlayGamesClientConfiguration configuration)
+        {
+            DoAuthenticate(SignInInteractivity.CanPromptAlways, configuration);
         }
 
         internal void DoSignOut()

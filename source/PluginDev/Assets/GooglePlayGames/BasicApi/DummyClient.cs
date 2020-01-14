@@ -43,12 +43,12 @@ namespace GooglePlayGames.BasicApi
         /// </remarks>
         /// <param name="callback">Callback when completed.</param>
         /// <param name="silent">If set to <c>true</c> silent.</param>
-        public void Authenticate(Action<bool, string> callback, bool silent)
+        public void Authenticate(bool silent, Action<SignInStatus> callback)
         {
             LogUsage();
             if (callback != null)
             {
-                callback(false, "Not implemented on this platform");
+                callback(SignInStatus.Failed);
             }
         }
 

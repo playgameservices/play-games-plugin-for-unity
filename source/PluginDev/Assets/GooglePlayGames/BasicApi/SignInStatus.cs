@@ -14,6 +14,12 @@ namespace GooglePlayGames.BasicApi
         /// </summary>
         UiSignInRequired,
 
+        /// <summary>
+        /// The application is misconfigured. This error is not recoverable and will be treated as fatal.
+        /// The developer should look at the logs after this to determine more actionable information.
+        /// </summary>
+        DeveloperError,
+
         /// <summary>A network error occurred. Retrying should resolve the problem.</summary>
         NetworkError,
 

@@ -370,6 +370,37 @@ namespace GooglePlayGames
         /// </param>
         public void Authenticate(Action<bool, string> callback, bool silent)
         {
+            Authenticate(silent ? SignInInteractivity.NoPrompt : SignInInteractivity.CanPromptAlways, status =>
+            {
+                if (status == SignInStatus.Success)
+                {
+                    callback(true, "Authentication succeeded");
+                }
+                else if (status == SignInStatus.Canceled)
+                {
+                    callback(false, "Authentication canceled");
+                    GooglePlayGames.OurUtils.Logger.d("Authentication canceled");
+                }
+                else if (status == SignInStatus.DeveloperError)
+                {
+                    callback(false, "Authentication failed - developer error");
+                    GooglePlayGames.OurUtils.Logger.d("Authentication failed - developer error");
+                }
+                else
+                {
+                    callback(false, "Authentication failed");
+                    GooglePlayGames.OurUtils.Logger.d("Authentication failed");
+                }
+            });
+        }
+
+        /// <summary>
+        /// Authenticate the local user with the Google Play Games service.
+        /// </summary>
+        /// <param name="callback">The callback to call when authentication finishes.</param>
+        /// <param name="signInInteractivity"><see cref="SignInInteractivity"/></param>
+        public void Authenticate(SignInInteractivity signInInteractivity, Action<SignInStatus> callback)
+        {
             // make a platform-specific Play Games client
             if (mClient == null)
             {
@@ -378,8 +409,94 @@ namespace GooglePlayGames
                 mClient = PlayGamesClientFactory.GetPlatformPlayGamesClient(mConfiguration);
             }
 
-            // authenticate!
-            mClient.Authenticate(callback, silent);
+            if (callback == null)
+            {
+                callback = status => { };
+            }
+
+            switch (signInInteractivity)
+            {
+                case SignInInteractivity.NoPrompt:
+                    mClient.Authenticate( /* silent= */ true, code =>
+                    {
+                        // SignInStatus.UiSignInRequired is returned when silent sign in fails or when there is no
+                        // internet connection.
+                        if (code == SignInStatus.UiSignInRequired &&
+                            Application.internetReachability == NetworkReachability.NotReachable)
+                        {
+                            callback(SignInStatus.NetworkError);
+                        }
+                        else
+                        {
+                            callback(code);
+                        }
+                    });
+                    break;
+
+                case SignInInteractivity.CanPromptAlways:
+                    mClient.Authenticate( /* silent= */ false, code =>
+                    {
+                        // SignInStatus.Canceled is returned when interactive sign in fails or when there is no internet connection.
+                        if (code == SignInStatus.Canceled &&
+                            Application.internetReachability == NetworkReachability.NotReachable)
+                        {
+                            callback(SignInStatus.NetworkError);
+                        }
+                        else
+                        {
+                            callback(code);
+                        }
+                    });
+                    break;
+
+                case SignInInteractivity.CanPromptOnce:
+
+                    // 1. Silent sign in first
+                    mClient.Authenticate( /* silent= */ true, silentSignInResultCode =>
+                    {
+                        if (silentSignInResultCode == SignInStatus.Success)
+                        {
+                            OurUtils.Logger.d("Successful, triggering callback");
+                            callback(silentSignInResultCode);
+                            return;
+                        }
+
+                        // 2. Check the shared pref and bail out if it's true.
+                        if (!SignInHelper.ShouldPromptUiSignIn())
+                        {
+                            OurUtils.Logger.d(
+                                "User cancelled sign in attempt in the previous attempt. Triggering callback with silentSignInResultCode");
+                            callback(silentSignInResultCode);
+                            return;
+                        }
+
+                        // 3. Check internet connection
+                        if (Application.internetReachability == NetworkReachability.NotReachable)
+                        {
+                            OurUtils.Logger.d("No internet connection");
+                            callback(SignInStatus.NetworkError);
+                            return;
+                        }
+
+                        // 4. Interactive sign in
+                        mClient.Authenticate( /* silent= */ false, interactiveSignInResultCode =>
+                        {
+                            // 5. Save that the user has cancelled the interactive sign in.
+                            if (interactiveSignInResultCode == SignInStatus.Canceled)
+                            {
+                                OurUtils.Logger.d("Cancelled, saving this to a shared pref");
+                                SignInHelper.SetPromptUiSignIn(false);
+                            }
+
+                            callback(interactiveSignInResultCode);
+                        });
+                    });
+                    break;
+
+                default:
+                    PlayGamesHelperObject.RunOnGameThread(() => callback(SignInStatus.Failed));
+                    break;
+            }
         }
 
         /// <summary>
@@ -520,18 +637,18 @@ namespace GooglePlayGames
             }
             else if (mClient != null && reAuthenticateIfNeeded)
             {
-                mClient.Authenticate((success, msg) =>
+                mClient.Authenticate(false, (status) =>
                 {
-                    if (success)
+                    if (status == SignInStatus.Success)
                     {
                         callback(mClient.GetServerAuthCode());
                     }
                     else
                     {
-                        OurUtils.Logger.e("Re-authentication failed: " + msg);
+                        OurUtils.Logger.e("Re-authentication failed: " + status);
                         callback(null);
                     }
-                }, false);
+                });
             }
             else
             {

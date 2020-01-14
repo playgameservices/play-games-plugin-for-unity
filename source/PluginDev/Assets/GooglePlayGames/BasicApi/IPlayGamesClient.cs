@@ -59,9 +59,9 @@ namespace GooglePlayGames.BasicApi
         /// Once the callback returns true, the user is considered to be authenticated
         /// forever after.
         /// </remarks>
-        /// <param name="callback">Callback.</param>
         /// <param name="silent">If set to <c>true</c> silent.</param>
-        void Authenticate(Action<bool, string> callback, bool silent);
+        /// <param name="callback">Callback</param>
+        void Authenticate(bool silent, Action<SignInStatus> callback);
 
         /// <summary>
         /// Returns whether or not user is authenticated.
@@ -312,7 +312,7 @@ namespace GooglePlayGames.BasicApi
         void RequestPermissions(Action<SignInStatus> callback, string[] scopes);
 
         /// <summary>
-        /// Returns whether or not user has given permissions for given scopes.
+        /// Returns whether or not user has given permissions for given scopes
         /// </summary>
         /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.HasPermissions"/>
         /// <param name="scopes">list of scopes</param>

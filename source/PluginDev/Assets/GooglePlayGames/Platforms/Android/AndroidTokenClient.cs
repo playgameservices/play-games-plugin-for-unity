@@ -1,4 +1,4 @@
-﻿// <copyright file="AndroidTokenClient.cs" company="Google Inc.">
+// <copyright file="AndroidTokenClient.cs" company="Google Inc.">
 // Copyright (C) 2015 Google Inc.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -160,50 +160,11 @@ namespace GooglePlayGames.Android
 
                 AndroidTaskUtils.AddOnFailureListener(task, e =>
                 {
-                    var failCode = ToSignInStatus(e.Call<int>("getStatusCode"));
+                    var failCode = SignInHelper.ToSignInStatus(e.Call<int>("getStatusCode"));
                     OurUtils.Logger.e("Exception requesting new permissions: " + failCode);
                     callback(failCode);
                 });
             }
-        }
-
-        private static SignInStatus ToSignInStatus(int code)
-        {
-            Dictionary<int, SignInStatus> dictionary = new Dictionary<int, SignInStatus>()
-            {
-                {
-                    /* CommonUIStatus.UI_BUSY */ -12, SignInStatus.AlreadyInProgress
-                },
-                {
-                    /* CommonStatusCodes.SUCCESS */ 0, SignInStatus.Success
-                },
-                {
-                    /* CommonStatusCodes.SIGN_IN_REQUIRED */ 4, SignInStatus.UiSignInRequired
-                },
-                {
-                    /* CommonStatusCodes.NETWORK_ERROR */ 7, SignInStatus.NetworkError
-                },
-                {
-                    /* CommonStatusCodes.INTERNAL_ERROR */ 8, SignInStatus.InternalError
-                },
-                {
-                    /* CommonStatusCodes.CANCELED */ 16, SignInStatus.Canceled
-                },
-                {
-                    /* CommonStatusCodes.API_NOT_CONNECTED */ 17, SignInStatus.Failed
-                },
-                {
-                    /* GoogleSignInStatusCodes.SIGN_IN_FAILED */ 12500, SignInStatus.Failed
-                },
-                {
-                    /* GoogleSignInStatusCodes.SIGN_IN_CANCELLED */ 12501, SignInStatus.Canceled
-                },
-                {
-                    /* GoogleSignInStatusCodes.SIGN_IN_CURRENTLY_IN_PROGRESS */ 12502, SignInStatus.AlreadyInProgress
-                },
-            };
-
-            return dictionary.ContainsKey(code) ? dictionary[code] : SignInStatus.Failed;
         }
 
         /// <summary>Returns whether or not user has given permissions for given scopes.</summary>
