@@ -1398,17 +1398,17 @@ namespace GooglePlayGames
         }
 
         /// <summary>Asks user to give permissions for the given scopes.</summary>
-        /// <param name="callback">Callback used to indicate the outcome of the operation.</param>
         /// <param name="scopes">Scope to ask permission for</param>
-        public void RequestPermission(Action<SignInStatus> callback, string scope)
+        /// <param name="callback">Callback used to indicate the outcome of the operation.</param>
+        public void RequestPermission(string scope, Action<SignInStatus> callback)
         {
-            RequestPermissions(callback, new string[] {scope});
+            RequestPermissions(new string[] {scope}, callback);
         }
 
         /// <summary>Asks user to give permissions for the given scopes.</summary>
-        /// <param name="callback">Callback used to indicate the outcome of the operation.</param>
         /// <param name="scopes">List of scopes to ask permission for</param>
-        public void RequestPermissions(Action<SignInStatus> callback, string[] scopes)
+        /// <param name="callback">Callback used to indicate the outcome of the operation.</param>
+        public void RequestPermissions(string[] scopes, Action<SignInStatus> callback)
         {
             if (!IsAuthenticated())
             {
@@ -1418,7 +1418,7 @@ namespace GooglePlayGames
                 return;
             }
 
-            mClient.RequestPermissions(callback, scopes);
+            mClient.RequestPermissions(scopes, callback);
         }
 
         /// <summary>Returns whether or not user has given permissions for given scopes.</summary>

@@ -133,7 +133,7 @@ namespace GooglePlayGames.Android
             PlayGamesHelperObject.RunOnGameThread(() => DoFetchToken(silent, callback));
         }
 
-        public void RequestPermissions(Action<SignInStatus> callback, string[] scopes)
+        public void RequestPermissions(string[] scopes, Action<SignInStatus> callback)
         {
             using (var bridgeClass = new AndroidJavaClass(HelperFragmentClass))
             using (var currentActivity = AndroidHelperFragment.GetActivity())

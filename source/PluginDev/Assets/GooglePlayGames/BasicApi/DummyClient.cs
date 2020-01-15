@@ -374,9 +374,9 @@ namespace GooglePlayGames.BasicApi
         }
 
         /// <summary>Asks user to give permissions for the given scopes.</summary>
-        /// <param name="callback">Callback used to indicate the outcome of the operation.</param>
         /// <param name="scopes">Scope to ask permission for</param>
-        public void RequestPermissions(Action<SignInStatus> callback, string[] scopes)
+        /// <param name="callback">Callback used to indicate the outcome of the operation.</param>
+        public void RequestPermissions(string[] scopes, Action<SignInStatus> callback)
         {
             LogUsage();
             if (callback != null)

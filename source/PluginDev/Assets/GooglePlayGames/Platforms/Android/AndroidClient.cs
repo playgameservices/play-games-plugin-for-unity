@@ -1020,14 +1020,14 @@ namespace GooglePlayGames.Android
             }
         }
 
-        public void RequestPermissions(Action<SignInStatus> callback, string[] scopes)
+        public void RequestPermissions(string[] scopes, Action<SignInStatus> callback)
         {
             callback = AsOnGameThreadCallback(callback);
-            mTokenClient.RequestPermissions((code =>
+            mTokenClient.RequestPermissions(scopes, code =>
             {
                 UpdateClients();
                 callback(code);
-            }), scopes);
+            });
         }
 
         private void UpdateClients()

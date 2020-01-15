@@ -968,9 +968,7 @@ namespace SmokeTest
             else if (GUI.Button(CalcGrid(1, 1), "Request Permission- Email"))
             {
                 Status = "Asking permission for email";
-                PlayGamesPlatform.Instance.RequestPermission(
-                    code => { Status = "Result code " + code; },
-                    "email");
+                PlayGamesPlatform.Instance.RequestPermission("email", code => { Status = "Result code " + code; });
             }
             else if (GUI.Button(CalcGrid(1, 6), "Back"))
             {

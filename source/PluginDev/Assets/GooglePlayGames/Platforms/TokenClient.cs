@@ -69,7 +69,7 @@ namespace GooglePlayGames
 
         void FetchTokens(bool silent, Action<int> callback);
 
-        void RequestPermissions(Action<SignInStatus> callback, string[] scopes);
+        void RequestPermissions(string[] scopes, Action<SignInStatus> callback);
 
         bool HasPermissions(string[] scopes);
     }
