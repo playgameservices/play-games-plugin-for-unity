@@ -76,6 +76,11 @@ namespace GooglePlayGames
             get { return mPlayerId; }
         }
 
+        public string gameId
+        {
+            get { return mPlayerId; }
+        }
+
         public bool isFriend
         {
             get { return true; }
