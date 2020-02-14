@@ -8,8 +8,7 @@ namespace GooglePlayGames.BasicApi
         /// <summary>
         /// This may show UIs, consent dialogs, etc.
         /// At the end of the process, callback will be invoked to notify of the result.
-        /// Once the callback returns true, the user is considered to be authenticated
-        /// forever after.
+        /// Once the callback returns true, the user is considered to be authenticated.
         /// </summary>
         CanPromptAlways,
 
@@ -19,7 +18,8 @@ namespace GooglePlayGames.BasicApi
         /// sign in if they have.
         /// 3. Check the internet connection and fail with NO_INTERNET_CONNECTION if there is no internet connection.
         /// 4. Prompt interactive sign in.
-        /// 5. If the interactive sign in is cancelled, then memorize this for the 2nd step of the next sign.
+        /// 5. If the interactive sign in is not successful (user declines or cancels), then
+        /// remember this for step 2 the next time the user opens the game and don’t ask for sign-in.
         /// </summary>
         CanPromptOnce
     }
