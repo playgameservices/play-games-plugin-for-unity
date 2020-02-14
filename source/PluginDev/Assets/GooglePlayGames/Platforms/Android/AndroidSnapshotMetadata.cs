@@ -73,7 +73,7 @@ namespace GooglePlayGames.Android
 
         public TimeSpan TotalTimePlayed
         {
-            get { return TimeSpan.FromTicks(mJavaMetadata.Call<long>("getPlayedTime")); }
+            get { return TimeSpan.FromMilliseconds(mJavaMetadata.Call<long>("getPlayedTime")); }
         }
 
         public DateTime LastModifiedTimestamp

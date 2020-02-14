@@ -474,7 +474,7 @@ namespace GooglePlayGames.Android
                 if (update.IsPlayedTimeUpdated)
                 {
                     using (builder.Call<AndroidJavaObject>("setPlayedTimeMillis",
-                        (long) update.UpdatedPlayedTime.Value.TotalMilliseconds)) ;
+                        Convert.ToInt64(update.UpdatedPlayedTime.Value.TotalMilliseconds))) ;
                 }
 
                 return builder.Call<AndroidJavaObject>("build");
