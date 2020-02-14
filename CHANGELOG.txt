@@ -1,8 +1,15 @@
+Version 0.10.07
+    New Features:
+    * Implementation of new authentication method and permission APIs.
+    Bug fixes:
+    * #2836 Fixed the wrong conversion of TotalTimePlayed.
+    * #2781 Disabled unnecessary warnings.
+    * #2791 Added gameId field to PlayGamesUserProfile for Unity 2020.1.
+
 Version 0.10.06
     Bug fixes:
     * #2776 Crashes due to uninstalled Play Games App.
     * #2766, #2772 Android SDK path detection in versions older than 2019.x.
-
 Version 0.10.05
     Bug fixes:
     * #2753 VersionHandlerImpl.UpdateVersionedAssets not found.
