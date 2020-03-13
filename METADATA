@@ -89,3 +89,20 @@ presubmit: {
     options: "depot_path=//depot/google3/third_party/unity/play_games_services/copybara/copy.bara.sky;workflow=presubmit_piper_to_gerrit;feedback=feedback_gerrit_to_critique;blocking=true"
   }
 }
+
+presubmit: {
+  path_expression: ".../gradle-wrapper.jar"
+  path_expression: ".../gradlew"
+  path_expression: ".../gradlew.bat"
+
+  check_file_operation: {
+    operation: ADD
+    failure_message:
+      "Gradle wrapper files should not be added to this project.\n"
+      "\tThese files are managed by //google3/third_party/gradle/ and added\n"
+      "\tto the build with Copybara.\n"
+      "\n"
+      "\tFiles:"
+    failure_status: ERROR
+  }
+}
