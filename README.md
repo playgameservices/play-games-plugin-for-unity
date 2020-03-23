@@ -376,7 +376,7 @@ The player stats are available after authenticating:
 ## Setting popup gravity
 
 You can set the gravity used by popups when showing game services elements
-such as achievement notificartions.  The default is TOP.  This can only
+such as achievement notifications.  The default is TOP.  This can only
 be set after authentication.  For example:
 
 ```csharp
