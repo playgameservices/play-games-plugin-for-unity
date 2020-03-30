@@ -163,7 +163,7 @@ namespace GooglePlayGames.Android
                                         }
 
                                         mAuthState = AuthState.Authenticated;
-                                        callback(SignInStatus.Success);
+                                        InvokeCallbackOnGameThread(callback, SignInStatus.Success);
                                         GooglePlayGames.OurUtils.Logger.d("Authentication succeeded");
                                         try
                                         {
