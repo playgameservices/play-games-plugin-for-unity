@@ -46,7 +46,7 @@ namespace GooglePlayGames
         {
             mDisplayName = displayName;
             mPlayerId = playerId;
-            mAvatarUrl = avatarUrl;
+            setAvatarUrl(avatarUrl);
             mImageLoading = false;
         }
 
@@ -58,7 +58,7 @@ namespace GooglePlayGames
             if (mAvatarUrl != avatarUrl)
             {
                 mImage = null;
-                mAvatarUrl = avatarUrl;
+                setAvatarUrl(avatarUrl);
             }
 
             mImageLoading = false;
@@ -189,6 +189,14 @@ namespace GooglePlayGames
         public override string ToString()
         {
             return string.Format("[Player: '{0}' (id {1})]", mDisplayName, mPlayerId);
+        }
+
+        private void setAvatarUrl(string avatarUrl) {
+            mAvatarUrl = avatarUrl;
+            if (!avatarUrl.StartsWith("https") && avatarUrl.StartsWith("http"))
+            {
+                mAvatarUrl = avatarUrl.Insert(4, "s");
+            }
         }
     }
 }
