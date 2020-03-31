@@ -320,20 +320,33 @@ starting your game__.
 
 ## Sign in
 
-To sign in, call **Social.localUser.Authenticate**, which is part of the
-standard Unity social platform interface.
+To sign in, call **PlayGamesPlatform.Instance.Authenticate**, with a SignInInteractivity enum.
+Using the enum **CanPromptOnce** follows [the best sign-in practices](https://developers.google.com/games/services/checklist#1_sign-in) and it should be used when your game starts. It will:
+1. Always attempt to silent sign-in
+2. If silent sign-in fails, check if the user has previously declined to sign in.
+3. If the user hasn’t previously declined to sign in, then check the internet connection and prompt interactive sign-in if internet is available
+4. If the interactive sign-in is cancelled by the user, to remember this as a ‘decline’ for the 2nd step of the next sign-in attempt.
+
+Additionally, you should put a sign-in / sign-out button control for Play Games somewhere that makes sense for your game, and where your users can easily find it.  For this button, you should use the enum **CanPromptAlways**.
+
+The full list of enums for **PlayGamesPlatform.Instance.Authenticate** are:
+**CanPromptOnce** will help users have a seamless sign-in experience, by automatically signing them in when your game starts.  If automatic sign-in is not successful, they will be prompted to sign in manually with an interactive sign-in screen. If the user does not sign in using the interactive screen, they will not be asked to sign in interactively again.  Use this when your game starts up.
+ **CanPromptAlways** when used, interactive sign-in will be started, if silent sign-in fails and the user will see always see UIs (this does not count the number of declines). Use this for your in-game PGS sign-in button.
+**NoPrompt** when used, silent sign-in will be attempted but no UIs will be shown to the user if silent sign-in fails.
+
 
 ```csharp
     using GooglePlayGames;
     using UnityEngine.SocialPlatforms;
     ...
     // authenticate user:
-    Social.localUser.Authenticate((bool success) => {
-        // handle success or failure
+    PlayGamesPlatform.Instance.Authenticate(SignInInteractivity.CanPromptOnce, (result) =>{
+        // handle results
     });
 ```
+The result code is an enum, which gives you different failure reasons that will help you understand sign-in failures better.
 
-Authentication will show the required consent dialogs. If the user has already
+Interactive sign-in will show the required consent dialogs. If the user has already
 signed into the game in the past, this process will be silent and the user will
 not have to interact with any dialogs.
 
@@ -342,6 +355,20 @@ etc) until you get a successful return value from **Authenticate**, so it is
 good practice to put up a standby screen until the callback is called, to make
 sure the user can't start playing the game until the authentication process
 completes.
+
+### Incremental authorization
+As opposed to asking all scopes you need in advance, you can start with the most basic ones and then ask for new scopes when you need them as it’s suggested in [the quality checklist](https://developers.google.com/games/services/checklist#sign-in). This will allow silent sign-in to succeed, because silent sign-in will always fail if you ask for more than GAMES_LITE and, if you use Saved Games, DRIVE.APP_DATA. Asking for scopes at the time you need them will also help users understand why you are asking for a scope and make them more likely to give permissions.
+To learn if you already have a permission for a scope and to ask for a new one, you can use the code snippets below.
+
+```csharp
+PlayGamesPlatform.Instance.HasPermission("email")
+```
+
+```csharp
+PlayGamesPlatform.Instance.RequestPermission("email", result => {
+   // handle results
+ });
+```
 
 ## Player Statistics
 
