@@ -19,8 +19,8 @@ namespace GooglePlayGames
     public class PluginVersion
     {
         // Current Version.
-        public const int VersionInt = 0x01007;
-        public const string VersionString = "0.10.07";
-        public const string VersionKey = "01007";
+        public const int VersionInt = 0x01008;
+        public const string VersionString = "0.10.08";
+        public const string VersionKey = "01008";
     }
 }

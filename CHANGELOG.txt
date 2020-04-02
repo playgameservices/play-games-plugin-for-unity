@@ -1,3 +1,8 @@
+Version 0.10.08
+    Bug fixes:
+    * #2853 Fixed the authentication callback not called on the main thread issue.
+    * Migrated old urls to start with https instead of http.
+
 Version 0.10.07
     New Features:
     * Implementation of new authentication method and permission APIs.
@@ -5,7 +10,6 @@ Version 0.10.07
     * #2836 Fixed the wrong conversion of TotalTimePlayed.
     * #2781 Disabled unnecessary warnings.
     * #2791 Added gameId field to PlayGamesUserProfile for Unity 2020.1.
-
 Version 0.10.06
     Bug fixes:
     * #2776 Crashes due to uninstalled Play Games App.
