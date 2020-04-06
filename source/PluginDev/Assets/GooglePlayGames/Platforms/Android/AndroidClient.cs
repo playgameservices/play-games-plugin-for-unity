@@ -231,7 +231,7 @@ namespace GooglePlayGames.Android
                                         using (var exception = completeTask.Call<AndroidJavaObject>("getException"))
                                         {
                                             GooglePlayGames.OurUtils.Logger.e(
-                                                "Authentication failed" + exception.Call<string>("toString"));
+                                                "Authentication failed - " + exception.Call<string>("toString"));
                                             InvokeCallbackOnGameThread(callback, SignInStatus.InternalError);
                                         }
                                     }
