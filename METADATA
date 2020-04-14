@@ -106,3 +106,16 @@ presubmit: {
     failure_status: ERROR
   }
 }
+
+# Validate JSON.
+presubmit: {
+  path_expression: "....asmdef"
+  path_expression: "....json"
+  check_presubmit_service: {
+    base: {
+      id: "CheckJson"
+    }
+    failure_status: ERROR
+    address: "blade:youtube-metadata-presubmit-youtube-check_json-prod"
+  }
+}
