@@ -83,7 +83,7 @@ namespace GooglePlayGames
         /// <param name="configuration">Configuration object to use.</param>
         private PlayGamesPlatform(PlayGamesClientConfiguration configuration)
         {
-            GooglePlayGames.OurUtils.Logger.w("Creating new PlayGamesPlatform");
+            GooglePlayGames.OurUtils.Logger.d("Creating new PlayGamesPlatform");
             this.mLocalUser = new PlayGamesLocalUser(this);
             this.mConfiguration = configuration;
         }
