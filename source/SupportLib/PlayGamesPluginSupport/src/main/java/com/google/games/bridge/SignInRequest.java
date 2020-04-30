@@ -10,15 +10,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.auth.api.signin.GoogleSignInStatusCodes;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.games.Games;
-import com.google.android.gms.games.GamesActivityResultCodes;
-import com.google.android.gms.games.GamesClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -102,80 +99,96 @@ class SignInRequest implements HelperFragment.Request {
 
         final GoogleSignInClient signInClient = buildClient();
 
-        if (signInClient != null) {
-            Activity activity = helperFragment.getActivity();
-            if (canReuseAccount()) {
-                final GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(activity);
-                if (GoogleSignIn.hasPermissions(account, scopes)) {
-                    Log.d(TAG, "Checking the last signed-in account if it can be used.");
-                    Games.getGamesClient(activity, account).getAppId()
-                        .addOnCompleteListener(new OnCompleteListener<String>() {
-                            @Override
-                            public void onComplete(/* @NonNull */ Task<String> task) {
-                                if (task.isSuccessful()) {
-                                    Log.d(TAG, "Signed-in with the last signed-in account.");
-                                    setSuccess(account);
-                                } else {
-                                    signInClient.signOut().addOnCompleteListener(
-                                        new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(/* @NonNull */ Task<Void> task) {
-                                                if (task.isSuccessful()) {
-                                                    Log.d(TAG, "Can't reuse the last signed-in account. Second attempt after sign out.");
-                                                    // Last signed account should be null now
-                                                    signIn();
-                                                } else {
-                                                    Log.e(TAG, "Can't reuse the last signed-in account and sign out failed.");
-                                                    setFailure(CommonStatusCodes.SIGN_IN_REQUIRED);
-                                                }
-                                            }
-                                        });
-                                }
-                            }
-                        });
-                    return;
-                }
-            }
+    if (signInClient == null) {
+      return;
+    }
 
-            Log.d(TAG, "signInClient.silentSignIn");
-            signInClient.silentSignIn()
-                .addOnSuccessListener(
-                    activity,
-                    new OnSuccessListener<GoogleSignInAccount>() {
-                        @Override
-                        public void onSuccess(GoogleSignInAccount result) {
-                            Log.d(TAG, "silentSignIn.onSuccess");
-                            setSuccess(result);
-                        }
-                    })
-                .addOnFailureListener(
-                    activity,
-                    new OnFailureListener() {
-                        @Override
-                        public void onFailure(Exception exception) {
-                            Log.d(TAG, "silentSignIn.onFailure");
-                            int statusCode = CommonStatusCodes.INTERNAL_ERROR;
-                            if (exception instanceof ApiException) {
-                                statusCode = ((ApiException) exception).getStatusCode();
-                            }
-                            // INTERNAL_ERROR will be returned if the user has the outdated PlayServices
-                            if (statusCode == CommonStatusCodes.SIGN_IN_REQUIRED
-                                    || statusCode == CommonStatusCodes.INTERNAL_ERROR
-                                    || statusCode == CommonStatusCodes.RESOLUTION_REQUIRED) {
-                                if (!silent) {
-                                    Intent signInIntent = signInClient.getSignInIntent();
-                                    helperFragment.startActivityForResult(signInIntent, HelperFragment.RC_SIGN_IN);
-                                } else {
-                                    Log.i(TAG, "Sign-in failed. Run in silent mode and UI sign-in required.");
+    Activity activity = helperFragment.getActivity();
+    Log.d(TAG, "canReuseAccount: " + canReuseAccount());
+    if (canReuseAccount()) {
+      final GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(activity);
+      Log.d(TAG, "lastSignedInAccount is " + (account != null ? "not null" : "null"));
+      if (GoogleSignIn.hasPermissions(account, scopes)) {
+        Log.d(TAG, "Checking the last signed-in account if it can be used.");
+        Games.getGamesClient(activity, account)
+            .getAppId()
+            .addOnCompleteListener(
+                new OnCompleteListener<String>() {
+                  @Override
+                  public void onComplete(/* @NonNull */ Task<String> task) {
+                    if (task.isSuccessful()) {
+                      Log.d(TAG, "Signed-in with the last signed-in account.");
+                      setSuccess(account);
+                    } else {
+                      Log.d(TAG, "getAppId task is not successful." + "Trying to sign out.");
+                      signInClient
+                          .signOut()
+                          .addOnCompleteListener(
+                              new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(/* @NonNull */ Task<Void> task) {
+                                  if (task.isSuccessful()) {
+                                    Log.d(
+                                        TAG,
+                                        "Can't reuse the last signed-in account. Second attempt"
+                                            + " after sign out.");
+                                    // Last signed account should be null now
+                                    signIn();
+                                  } else {
+                                    Log.e(
+                                        TAG,
+                                        "Can't reuse the last signed-in account and sign out"
+                                            + " failed.");
                                     setFailure(CommonStatusCodes.SIGN_IN_REQUIRED);
+                                  }
                                 }
-                            } else {
-                                Log.e(TAG, "Sign-in failed with status code: " + statusCode);
-                                setFailure(statusCode);
-                            }
-                        }
-                    });
-        }
+                              });
+                    }
+                  }
+                });
+        return;
+      }
+    }
+
+    Log.d(TAG, "signInClient.silentSignIn");
+    signInClient
+        .silentSignIn()
+        .addOnSuccessListener(
+            activity,
+            new OnSuccessListener<GoogleSignInAccount>() {
+              @Override
+              public void onSuccess(GoogleSignInAccount result) {
+                Log.d(TAG, "silentSignIn.onSuccess");
+                setSuccess(result);
+              }
+            })
+        .addOnFailureListener(
+            activity,
+            new OnFailureListener() {
+              @Override
+              public void onFailure(Exception exception) {
+                Log.d(TAG, "silentSignIn.onFailure");
+                int statusCode = CommonStatusCodes.INTERNAL_ERROR;
+                if (exception instanceof ApiException) {
+                  statusCode = ((ApiException) exception).getStatusCode();
+                }
+                // INTERNAL_ERROR will be returned if the user has the outdated PlayServices
+                if (statusCode == CommonStatusCodes.SIGN_IN_REQUIRED
+                    || statusCode == CommonStatusCodes.INTERNAL_ERROR
+                    || statusCode == CommonStatusCodes.RESOLUTION_REQUIRED) {
+                  if (!silent) {
+                    Intent signInIntent = signInClient.getSignInIntent();
+                    helperFragment.startActivityForResult(signInIntent, HelperFragment.RC_SIGN_IN);
+                  } else {
+                    Log.i(TAG, "Sign-in failed. Run in silent mode and UI sign-in required.");
+                    setFailure(CommonStatusCodes.SIGN_IN_REQUIRED);
+                  }
+                } else {
+                  Log.e(TAG, "Sign-in failed with status code: " + statusCode);
+                  setFailure(statusCode);
+                }
+              }
+            });
     }
 
     private GoogleSignInClient buildClient() {

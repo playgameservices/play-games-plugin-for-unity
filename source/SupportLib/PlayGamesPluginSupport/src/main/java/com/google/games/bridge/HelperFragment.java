@@ -30,6 +30,8 @@ import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.games.multiplayer.realtime.Room;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
 /**
@@ -232,8 +234,26 @@ public class HelperFragment extends Fragment
   }
 
     public static void signOut(Activity activity) {
-        GoogleSignInClient signInClient = GoogleSignIn.getClient(activity, GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
-        signInClient.signOut();
+    GoogleSignInClient signInClient =
+        GoogleSignIn.getClient(activity, GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN);
+    signInClient
+        .signOut()
+        .addOnSuccessListener(
+            activity,
+            new OnSuccessListener<Void>() {
+              @Override
+              public void onSuccess(Void v) {
+                Log.d(TAG, "signOut.onSuccess");
+              }
+            })
+        .addOnFailureListener(
+            activity,
+            new OnFailureListener() {
+              @Override
+              public void onFailure(Exception exception) {
+                Log.d(TAG, "signOut.onFailure with " + exception.toString());
+              }
+            });
         synchronized (lock) {
             pendingRequest = null;
             runningRequest = null;

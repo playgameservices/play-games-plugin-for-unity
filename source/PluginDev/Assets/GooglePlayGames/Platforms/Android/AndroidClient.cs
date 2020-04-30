@@ -270,7 +270,6 @@ namespace GooglePlayGames.Android
 
             PlayGamesHelperObject.RunOnGameThread(() =>
             {
-                GooglePlayGames.OurUtils.Logger.d("Invoking user callback on game thread");
                 callback(data);
             });
         }
@@ -299,7 +298,6 @@ namespace GooglePlayGames.Android
 
             PlayGamesHelperObject.RunOnGameThread(() =>
             {
-                OurUtils.Logger.d("Invoking user callback on game thread");
                 callback(t1, t2);
             });
         }
