@@ -1,4 +1,4 @@
-﻿// <copyright file="NativeClient.cs" company="Google Inc.">
+// <copyright file="NativeClient.cs" company="Google Inc.">
 // Copyright (C) 2014 Google Inc.  All Rights Reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -147,7 +147,7 @@ namespace GooglePlayGames.Android
                                         var account = mTokenClient.GetAccount();
                                         lock (GameServicesLock)
                                         {
-                                            mSavedGameClient = new AndroidSavedGameClient(account);
+                                            mSavedGameClient = new AndroidSavedGameClient(this, account);
                                             mEventsClient = new AndroidEventsClient(account);
                                             bool isCaptureSupported;
                                             using (var resultObject =
@@ -569,12 +569,14 @@ namespace GooglePlayGames.Android
                         }
                     });
 
-                AndroidTaskUtils.AddOnFailureListener(
+                AddOnFailureListenerWithSignOut(
                     task,
                     e =>
                     {
-                        Debug.Log("GetPlayerStats failed");
-                        InvokeCallbackOnGameThread(callback, CommonStatusCodes.InternalError, new PlayerStats());
+                        Debug.Log("GetPlayerStats failed: " + e.Call<string>("toString"));
+                        var statusCode = IsAuthenticated() ?
+                            CommonStatusCodes.InternalError : CommonStatusCodes.SignInRequired;
+                        InvokeCallbackOnGameThread(callback, statusCode, new PlayerStats());
                     });
             }
         }
@@ -626,11 +628,11 @@ namespace GooglePlayGames.Android
                                 }
                             });
 
-                        AndroidTaskUtils.AddOnFailureListener(
+                        AddOnFailureListenerWithSignOut(
                             task,
                             exception =>
                             {
-                                Debug.Log("LoadUsers failed for index " + i);
+                                Debug.Log("LoadUsers failed for index " + i + " with: " + exception.Call<string>("toString"));
                                 lock (countLock)
                                 {
                                     ++resultCount;
@@ -696,11 +698,11 @@ namespace GooglePlayGames.Android
                         }
                     });
 
-                AndroidTaskUtils.AddOnFailureListener(
+                AddOnFailureListenerWithSignOut(
                     task,
                     exception =>
                     {
-                        Debug.Log("LoadAchievements failed");
+                        Debug.Log("LoadAchievements failed: " + exception.Call<string>("toString"));
                         InvokeCallbackOnGameThread(callback, new Achievement[0]);
                     });
             }
@@ -815,6 +817,22 @@ namespace GooglePlayGames.Android
             }
         }
 
+        private void AddOnFailureListenerWithSignOut(AndroidJavaObject task, Action<AndroidJavaObject> callback)
+        {
+            AndroidTaskUtils.AddOnFailureListener(
+                task,
+                exception =>
+                {
+                    var statusCode = exception.Call<int>("getStatusCode");
+                    if (statusCode == /* CommonStatusCodes.SignInRequired */ 4 ||
+                        statusCode == /* GamesClientStatusCodes.CLIENT_RECONNECT_REQUIRED */ 26502)
+                    {
+                        SignOut();
+                    }
+                    callback(exception);
+                });
+        }
+
         private Action<UIStatus> GetUiSignOutCallbackOnGameThread(Action<UIStatus> callback)
         {
             Action<UIStatus> uiCallback = (status) =>
@@ -877,11 +895,11 @@ namespace GooglePlayGames.Android
                             }
                         });
 
-                    AndroidTaskUtils.AddOnFailureListener(
+                    AddOnFailureListenerWithSignOut(
                         task,
                         exception =>
                         {
-                            Debug.Log("LoadScores failed");
+                            Debug.Log("LoadScores failed: " + exception.Call<string>("toString"));
                             InvokeCallbackOnGameThread(callback,
                                 new LeaderboardScoreData(leaderboardId, ResponseStatus.InternalError));
                         });
@@ -916,11 +934,11 @@ namespace GooglePlayGames.Android
                         }
                     });
 
-                AndroidTaskUtils.AddOnFailureListener(
+                AddOnFailureListenerWithSignOut(
                     task,
                     exception =>
                     {
-                        Debug.Log("LoadMoreScores failed");
+                        Debug.Log("LoadMoreScores failed: " + exception.Call<string>("toString"));
                         InvokeCallbackOnGameThread(callback,
                             new LeaderboardScoreData(token.LeaderboardId, ResponseStatus.InternalError));
                     });
@@ -1033,7 +1051,7 @@ namespace GooglePlayGames.Android
             lock (GameServicesLock)
             {
                 var account = mTokenClient.GetAccount();
-                mSavedGameClient = new AndroidSavedGameClient(account);
+                mSavedGameClient = new AndroidSavedGameClient(this, account);
                 mEventsClient = new AndroidEventsClient(account);
                 mVideoClient = new AndroidVideoClient(mVideoClient.IsCaptureSupported(), account);
                 mRealTimeClient = new AndroidRealTimeMultiplayerClient(this, account);

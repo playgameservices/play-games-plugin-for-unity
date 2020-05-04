@@ -21,9 +21,11 @@ namespace GooglePlayGames.Android
         private static readonly Regex ValidFilenameRegex = new Regex(@"\A[a-zA-Z0-9-._~]{1,100}\Z");
 
         private volatile AndroidJavaObject mSnapshotsClient;
+        private volatile AndroidClient mAndroidClient;
 
-        public AndroidSavedGameClient(AndroidJavaObject account)
+        public AndroidSavedGameClient(AndroidClient androidClient, AndroidJavaObject account)
         {
+            mAndroidClient = androidClient;
             using (var gamesClass = new AndroidJavaClass("com.google.android.gms.games.Games"))
             {
                 mSnapshotsClient = gamesClass.CallStatic<AndroidJavaObject>("getSnapshotsClient",
@@ -154,6 +156,7 @@ namespace GooglePlayGames.Android
                             // result in this method being re-executed. This recursion will continue until
                             // all conflicts are resolved or an error occurs.
                             AndroidConflictResolver resolver = new AndroidConflictResolver(
+                                this,
                                 mSnapshotsClient,
                                 conflict,
                                 original,
@@ -178,9 +181,16 @@ namespace GooglePlayGames.Android
                         }
                     });
 
-                AndroidTaskUtils.AddOnFailureListener(
+                AddOnFailureListenerWithSignOut(
                     task,
-                    exception => completedCallback(SavedGameRequestStatus.InternalError, null));
+                    exception => {
+                        OurUtils.Logger.d("InternalOpen has failed: " + exception.Call<string>("toString"));
+                        var status = mAndroidClient.IsAuthenticated() ?
+                            SavedGameRequestStatus.InternalError :
+                            SavedGameRequestStatus.AuthenticationError;
+                        completedCallback(status, null);
+                    }
+                );
             }
         }
 
@@ -282,12 +292,15 @@ namespace GooglePlayGames.Android
                             new AndroidSnapshotMetadata(snapshotMetadata, /* contents= */null));
                     });
 
-                AndroidTaskUtils.AddOnFailureListener(
+                AddOnFailureListenerWithSignOut(
                     task,
                     exception =>
                     {
-                        Debug.Log("commitAndClose.failed");
-                        callback(SavedGameRequestStatus.InternalError, null);
+                        Debug.Log("commitAndClose.failed: " + exception.Call<string>("toString"));
+                        var status = mAndroidClient.IsAuthenticated() ?
+                            SavedGameRequestStatus.InternalError :
+                            SavedGameRequestStatus.AuthenticationError;
+                        callback(status, null);
                     });
             }
         }
@@ -325,10 +338,16 @@ namespace GooglePlayGames.Android
                         }
                     });
 
-                AndroidTaskUtils.AddOnFailureListener(
+                AddOnFailureListenerWithSignOut(
                     task,
-                    exception =>
-                        callback(SavedGameRequestStatus.InternalError, new List<ISavedGameMetadata>()));
+                    exception => {
+                        OurUtils.Logger.d("FetchAllSavedGames failed: " + exception.Call<string>("toString"));
+                        var status = mAndroidClient.IsAuthenticated() ?
+                            SavedGameRequestStatus.InternalError :
+                            SavedGameRequestStatus.AuthenticationError;
+                        callback(status, new List<ISavedGameMetadata>());
+                    }
+                );
             }
         }
 
@@ -337,6 +356,22 @@ namespace GooglePlayGames.Android
             AndroidSnapshotMetadata androidMetadata = metadata as AndroidSnapshotMetadata;
             Misc.CheckNotNull(androidMetadata);
             using (mSnapshotsClient.Call<AndroidJavaObject>("delete", androidMetadata.JavaMetadata)) ;
+        }
+
+        private void AddOnFailureListenerWithSignOut(AndroidJavaObject task, Action<AndroidJavaObject> callback)
+        {
+            AndroidTaskUtils.AddOnFailureListener(
+                task,
+                exception =>
+                {
+                    var statusCode = exception.Call<int>("getStatusCode");
+                    if (statusCode == /* CommonStatusCodes.SignInRequired */ 4 ||
+                        statusCode == /* GamesClientStatusCodes.CLIENT_RECONNECT_REQUIRED */ 26502)
+                    {
+                        mAndroidClient.SignOut();
+                    }
+                    callback(exception);
+                });
         }
 
         private ConflictCallback ToOnGameThread(ConflictCallback conflictCallback)
@@ -363,10 +398,13 @@ namespace GooglePlayGames.Android
             private readonly Action<SavedGameRequestStatus, ISavedGameMetadata> mCompleteCallback;
             private readonly Action mRetryFileOpen;
 
-            internal AndroidConflictResolver(AndroidJavaObject snapshotClient, AndroidJavaObject conflict,
+            private readonly AndroidSavedGameClient mAndroidSavedGameClient;
+
+            internal AndroidConflictResolver(AndroidSavedGameClient androidSavedGameClient, AndroidJavaObject snapshotClient, AndroidJavaObject conflict,
                 AndroidSnapshotMetadata original, AndroidSnapshotMetadata unmerged,
                 Action<SavedGameRequestStatus, ISavedGameMetadata> completeCallback, Action retryOpen)
             {
+                this.mAndroidSavedGameClient = androidSavedGameClient;
                 this.mSnapshotsClient = Misc.CheckNotNull(snapshotClient);
                 this.mConflict = Misc.CheckNotNull(conflict);
                 this.mOriginal = Misc.CheckNotNull(original);
@@ -408,9 +446,16 @@ namespace GooglePlayGames.Android
                             task,
                             dataOrConflict => mRetryFileOpen());
 
-                        AndroidTaskUtils.AddOnFailureListener(
+                        mAndroidSavedGameClient.AddOnFailureListenerWithSignOut(
                             task,
-                            exception => mCompleteCallback(SavedGameRequestStatus.InternalError, null));
+                            exception => {
+                                OurUtils.Logger.d("ResolveConflict failed: " + exception.Call<string>("toString"));
+                                var status = mAndroidSavedGameClient.mAndroidClient.IsAuthenticated() ?
+                                    SavedGameRequestStatus.InternalError :
+                                    SavedGameRequestStatus.AuthenticationError;
+                                mCompleteCallback(status, null);
+                            }
+                        );
                     }
                 }
             }
@@ -434,9 +479,16 @@ namespace GooglePlayGames.Android
                         task,
                         dataOrConflict => mRetryFileOpen());
 
-                    AndroidTaskUtils.AddOnFailureListener(
+                    mAndroidSavedGameClient.AddOnFailureListenerWithSignOut(
                         task,
-                        exception => mCompleteCallback(SavedGameRequestStatus.InternalError, null));
+                        exception => {
+                            OurUtils.Logger.d("ChooseMetadata failed: " + exception.Call<string>("toString"));
+                            var status = mAndroidSavedGameClient.mAndroidClient.IsAuthenticated() ?
+                                SavedGameRequestStatus.InternalError :
+                                SavedGameRequestStatus.AuthenticationError;
+                            mCompleteCallback(status, null);
+                        }
+                    );
                 }
             }
         }
