@@ -1,8 +1,13 @@
+Version 0.10.09
+    Bug fixes:
+    * Fixed the issue of having an invalidated account in cache.
+    * Added more logs to sign-in and sign-out, removed unnecessary logs, formatted code.
+    * Moved AndroidClient.SignOut method callback onto the main thread.
+
 Version 0.10.08
     Bug fixes:
     * #2853 Fixed the authentication callback not called on the main thread issue.
     * Migrated old urls to start with https instead of http.
-
 Version 0.10.07
     New Features:
     * Implementation of new authentication method and permission APIs.
