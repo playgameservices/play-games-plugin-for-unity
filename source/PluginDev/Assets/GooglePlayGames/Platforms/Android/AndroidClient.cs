@@ -261,6 +261,19 @@ namespace GooglePlayGames.Android
             return result => InvokeCallbackOnGameThread(callback, result);
         }
 
+        private static void InvokeCallbackOnGameThread(Action callback)
+        {
+            if (callback == null)
+            {
+                return;
+            }
+
+            PlayGamesHelperObject.RunOnGameThread(() =>
+            {
+                callback();
+            });
+        }
+
         private static void InvokeCallbackOnGameThread<T>(Action<T> callback, T data)
         {
             if (callback == null)
@@ -444,6 +457,7 @@ namespace GooglePlayGames.Android
         {
             if (mTokenClient == null)
             {
+                InvokeCallbackOnGameThread(uiCallback);
                 return;
             }
 
@@ -462,7 +476,7 @@ namespace GooglePlayGames.Android
                             mAuthState = AuthState.Unauthenticated;
                             if (uiCallback != null)
                             {
-                                uiCallback();
+                                InvokeCallbackOnGameThread(uiCallback);
                             }
                         });
                 }
@@ -473,11 +487,11 @@ namespace GooglePlayGames.Android
                 mAuthState = AuthState.Unauthenticated;
                 if (uiCallback != null)
                 {
-                    uiCallback();
+                    InvokeCallbackOnGameThread(uiCallback);
                 }
             }
 
-            SignInHelper.SetPromptUiSignIn(true);
+            PlayGamesHelperObject.RunOnGameThread(() => SignInHelper.SetPromptUiSignIn(true));
         }
 
         ///<summary></summary>
