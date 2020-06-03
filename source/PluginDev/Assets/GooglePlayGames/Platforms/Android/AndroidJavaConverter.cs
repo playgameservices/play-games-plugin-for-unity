@@ -30,8 +30,7 @@ namespace GooglePlayGames.Android
         internal static System.DateTime ToDateTime(long milliseconds)
         {
             System.DateTime result = new System.DateTime(1970, 1, 1, 0, 0, 0, 0);
-            result.AddMilliseconds(milliseconds);
-            return result;
+            return result.AddMilliseconds(milliseconds);
         }
 
         // Convert to LeaderboardVariant.java#TimeSpan
