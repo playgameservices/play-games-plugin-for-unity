@@ -5,7 +5,7 @@ if ! [ -f README.md ]; then
     exit 2
 fi
 
-for d in samples/CubicPilot samples/Minimal samples/QuizRacer samples/TicTacToe; do
+for d in samples/CubicPilot samples/Minimal; do
     rm -rvf $d/Assets/Editor $d/Assets/Editor.meta
     rm -rvf $d/Assets/GooglePlayGames $d/Assets/GooglePlayGames.meta
     rm -rvf $d/Assets/Plugins $d/Assets/Plugins.meta

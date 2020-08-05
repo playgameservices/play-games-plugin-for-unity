@@ -16,7 +16,6 @@ available.
  5. Create a new game on the Play Game Console.
    * Enable Saved Games.
  6. Add the linked application for the platform(s) you want to build.
-   * Enable Turn-based and Real-time multiplayer for each app.
  7. Add the following resources
    1. AchievementToReveal - this is a hidden achievement
    2. AchievementToUnlock - this is a visible achievement

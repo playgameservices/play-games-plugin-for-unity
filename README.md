@@ -25,9 +25,6 @@ following features of the Google Play Games API:<br/>
 * events
 * video recording of gameplay
 * [nearby connections](NEARBY.md)
-* [turn-based multiplayer](TBMP.md)
-* [real-time multiplayer](RTMP.md)
-
 
 __NOTICE__: This version of the plugin no longer supports iOS.  Google Play games services for iOS is deprecated,
 and is not likely to function as expected. Do not use Google Play games
@@ -62,10 +59,6 @@ Google Play Developer Console. Follow the instructions on creating a client ID.
 Be particularly careful when entering your package name and your
 certificate fingerprints, since mistakes on those screens can be difficult to
 recover from.
-
-If you intend to use real-time or turn-based multiplayer in your game, remember
-to activate those features in the Google Play Developer Console when creating
-your application instances.
 
 ### Copy the game resources from the console
 
@@ -265,13 +258,10 @@ please refer to [nearby connections](NEARBY.md).
 
 ## Configuration & Initialization Play Game Services
 
-In order to save game progress, handle multiplayer invitations and
-turn notifications, or require access to a player's Google+ social graph,
-the default configuration needs to be replaced with a custom configuration.
-To do this use the **PlayGamesClientConfiguration**.  If your game does not
-use these features, then there is no need to
-initialize the platform configuration.  Once the instance is initialized,
-make it your default social platform by calling **PlayGamesPlatform.Activate**:
+In order to save game progress or require access to a player's Google+ social
+graph, the default configuration needs to be replaced with a custom
+configuration. To do this use the **PlayGamesClientConfiguration**.
+If your game does not use these features, then there is no need to
 
 ```csharp
     using GooglePlayGames;
@@ -897,13 +887,6 @@ Social.localUser.LoadFriends((ok) =>  {
 ```
 
 
-## Multiplayer
-
-If you wish to integrate **turn-based multiplayer** in your game, refer to the
-[Getting Started with Turn-Based Multiplayer](TBMP.md).
-
-If you wish to integrate **real-time multiplayer** in your game, refer to the
-[Getting Started with Real-Time Multiplayer](RTMP.md).
 
 ## Video Recording
 

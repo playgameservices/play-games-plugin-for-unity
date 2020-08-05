@@ -12,10 +12,6 @@ achievements, leaderboards and cloud save.  It also supports gamepad controllers
 
 **SmokeTest** is a "kitchen sink" sample - with buttons for each API call.
 
-**Tic Tac Toe** is a complete game that demonstrates how to use the plugin to implement turn-based multiplayer.
-
-**Quiz Racer** is a complete game that demonstrates how to use the plugin to implement real-time multiplayer.
-
 **Nearby Droids** is a game demonstrating the nearby connection API.  This sample requires android play services sdk 23 or higher.
 The nearby connections API is only available on Android.  The UI in this game uses the 'new' Unity UI system, 
 so Unity 5.0 or higher is recommended.  For more details and how to build and configure the sample, 
@@ -139,28 +135,8 @@ and disable `Portrait` and `Portrait Upside Down` rotations by unchecking them.
 > should be dragged into the Android Build Settings
 > (`File &gt; Build Settings &gt; Android`).
 
-## Configuration for QuizRacer
-This is a real-time multi-player game.  Create the achievements:
-
-Make sure real-time multiplayer is enabled.
-
-1. Name: "Play"<br/>
-    Description:  "Play Quiz Racer"
-2. Name: "Score"<br/>
-    Description: "Score at least 1 point"
-3. Name: "Win"<br/>
-    Description: "Win a match"
-4. Name: "Lose"<br/>
-    Description: "Lose a match"
-5. Name: "Don't play"<br/>
-    Description: "Don't play a match"
-
-Use `QuizRacer.GPGSIds` for the constants class when setting up the game.
-
 ## Configuration for SmokeTest
 This is a sample demonstrating each function.
-
-Make sure Save Games, Real-time and Turn-based multiplayer are enabled.
 
 Events:
 
@@ -191,14 +167,6 @@ Leaderboards:
 
 
 Use `SmokeTest.GPGSIds` for the constants class when setting up the game.
-
-## Configuration for TicTacToe
-This is a turn-based game.
-
-Events:
-    1. Name: "Play"
-
-Use `TicTacToe.GPGSIds` for the constants class when setting up the game.
 
 ## Configuration for TrivalQuest
 This is a sample for Events and Quests.  The Quest definition configuration

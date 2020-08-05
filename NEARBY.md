@@ -276,28 +276,6 @@ Build and run the sample - using two devices.
 Menu Items that are displayed:
 
   * Single player - Plays the game standalone.
-  * Start Multiplayer - Starts a multiplayer game as the host (advertising)
-  * Join Multiplayer - Starts a multiple player game as a guest (discovery)
-
-When Starting a Multiplayer game there are some settings to fill out:
-
-  * Room name - this is the room name shown to players when joining.
-  * Enable auto-connect - this allows players to connect automatically.
-  * Allow joining during game play - this allows players to join the game in
-progress.
-  * Player Name - this is your player's name
-  * Select Character - this is your player's avatar in the game.
-  * Press start to start.
-
-If you unchecked the "enable auto-connect", there is a lobby page where you can
-select which players to allow to join the game.
-
-When Joining a Multiplayer game:
-
-  * Player Name - this is your player's name
-  * Select Character - this is your player's avatar in the game.
-  * Press start to start looking for games to join.  On the lobby screen, select
-the game to join and then press start.
 
   1. Game play is to move (players move towards the tap) in the x and y directions
 (no diagonal movement).

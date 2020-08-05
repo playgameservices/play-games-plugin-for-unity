@@ -77,7 +77,6 @@ project.ext {
     pluginRepoDir = "${pluginProj}/${editorDir}/m2repository"
 
     sampleList = ['CubicPilot', 'Minimal',
-         'QuizRacer',  'TicTacToe',
          'NearbyDroids', 'SmokeTest']
 
 
