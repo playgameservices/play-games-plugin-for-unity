@@ -20,7 +20,6 @@
 namespace GooglePlayGames.Android
 {
     using GooglePlayGames.BasicApi;
-    using GooglePlayGames.BasicApi.Multiplayer;
     using GooglePlayGames.BasicApi.SavedGame;
     using GooglePlayGames.OurUtils;
     using System;
@@ -42,20 +41,15 @@ namespace GooglePlayGames.Android
         private readonly object AuthStateLock = new object();
 
         private readonly PlayGamesClientConfiguration mConfiguration;
-        private volatile AndroidTurnBasedMultiplayerClient mTurnBasedClient;
-        private volatile IRealTimeMultiplayerClient mRealTimeClient;
         private volatile ISavedGameClient mSavedGameClient;
         private volatile IEventsClient mEventsClient;
         private volatile IVideoClient mVideoClient;
         private volatile AndroidTokenClient mTokenClient;
-        private volatile Action<Invitation, bool> mInvitationDelegate;
         private volatile Player mUser = null;
         private volatile AuthState mAuthState = AuthState.Unauthenticated;
 
         AndroidJavaClass mGamesClass = new AndroidJavaClass("com.google.android.gms.games.Games");
         private static string TasksClassName = "com.google.android.gms.tasks.Tasks";
-
-        private AndroidJavaObject mInvitationCallback = null;
 
         private readonly int mLeaderboardMaxResults = 25; // can be from 1 to 25
 
@@ -63,7 +57,6 @@ namespace GooglePlayGames.Android
         {
             PlayGamesHelperObject.CreateObject();
             this.mConfiguration = Misc.CheckNotNull(configuration);
-            RegisterInvitationDelegate(configuration.InvitationDelegate);
         }
 
         ///<summary></summary>
@@ -93,20 +86,6 @@ namespace GooglePlayGames.Android
                 {
                     using (var signInTasks = new AndroidJavaObject("java.util.ArrayList"))
                     {
-                        if (mInvitationDelegate != null)
-                        {
-                            mInvitationCallback = new AndroidJavaObject(
-                                "com.google.games.bridge.InvitationCallbackProxy",
-                                new InvitationCallbackProxy(mInvitationDelegate));
-                            using (var invitationsClient = getInvitationsClient())
-                            using (var taskRegisterCallback =
-                                invitationsClient.Call<AndroidJavaObject>("registerInvitationCallback",
-                                    mInvitationCallback))
-                            {
-                                signInTasks.Call<bool>("add", taskRegisterCallback);
-                            }
-                        }
-
                         AndroidJavaObject taskGetPlayer =
                             getPlayersClient().Call<AndroidJavaObject>("getCurrentPlayer");
                         AndroidJavaObject taskGetActivationHint =
@@ -157,66 +136,11 @@ namespace GooglePlayGames.Android
                                             }
 
                                             mVideoClient = new AndroidVideoClient(isCaptureSupported, account);
-                                            mRealTimeClient = new AndroidRealTimeMultiplayerClient(this, account);
-                                            mTurnBasedClient = new AndroidTurnBasedMultiplayerClient(this, account);
-                                            mTurnBasedClient.RegisterMatchDelegate(mConfiguration.MatchDelegate);
                                         }
 
                                         mAuthState = AuthState.Authenticated;
                                         InvokeCallbackOnGameThread(callback, SignInStatus.Success);
                                         GooglePlayGames.OurUtils.Logger.d("Authentication succeeded");
-                                        try
-                                        {
-                                            using (var activationHint =
-                                                taskGetActivationHint.Call<AndroidJavaObject>("getResult"))
-                                            {
-                                                if (mInvitationDelegate != null)
-                                                {
-                                                    try
-                                                    {
-                                                        using (var invitationObject =
-                                                            activationHint.Call<AndroidJavaObject>("getParcelable",
-                                                                "invitation" /* Multiplayer.EXTRA_INVITATION */))
-                                                        {
-                                                            Invitation invitation =
-                                                                AndroidJavaConverter.ToInvitation(invitationObject);
-                                                            mInvitationDelegate(invitation, /* shouldAutoAccept= */
-                                                                true);
-                                                        }
-                                                    }
-                                                    catch (Exception)
-                                                    {
-                                                        // handle null return
-                                                    }
-                                                }
-
-
-                                                if (mTurnBasedClient.MatchDelegate != null)
-                                                {
-                                                    try
-                                                    {
-                                                        using (var matchObject =
-                                                            activationHint.Call<AndroidJavaObject>("getParcelable",
-                                                                "turn_based_match" /* Multiplayer#EXTRA_TURN_BASED_MATCH */)
-                                                        )
-                                                        {
-                                                            TurnBasedMatch turnBasedMatch =
-                                                                AndroidJavaConverter.ToTurnBasedMatch(matchObject);
-                                                            mTurnBasedClient.MatchDelegate(
-                                                                turnBasedMatch, /* shouldAutoLaunch= */ true);
-                                                        }
-                                                    }
-                                                    catch (Exception)
-                                                    {
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        catch (Exception)
-                                        {
-                                            // handle null return
-                                        }
-
                                         LoadAchievements(ignore => { });
                                     }
                                     else
@@ -461,34 +385,11 @@ namespace GooglePlayGames.Android
                 return;
             }
 
-            if (mInvitationCallback != null)
+            mTokenClient.Signout();
+            mAuthState = AuthState.Unauthenticated;
+            if (uiCallback != null)
             {
-                using (var invitationsClient = getInvitationsClient())
-                using (var task = invitationsClient.Call<AndroidJavaObject>(
-                    "unregisterInvitationCallback", mInvitationCallback))
-                {
-                    AndroidTaskUtils.AddOnCompleteListener<AndroidJavaObject>(
-                        task,
-                        completedTask =>
-                        {
-                            mInvitationCallback = null;
-                            mTokenClient.Signout();
-                            mAuthState = AuthState.Unauthenticated;
-                            if (uiCallback != null)
-                            {
-                                InvokeCallbackOnGameThread(uiCallback);
-                            }
-                        });
-                }
-            }
-            else
-            {
-                mTokenClient.Signout();
-                mAuthState = AuthState.Unauthenticated;
-                if (uiCallback != null)
-                {
-                    InvokeCallbackOnGameThread(uiCallback);
-                }
+                InvokeCallbackOnGameThread(uiCallback);
             }
 
             PlayGamesHelperObject.RunOnGameThread(() => SignInHelper.SetPromptUiSignIn(true));
@@ -1068,9 +969,6 @@ namespace GooglePlayGames.Android
                 mSavedGameClient = new AndroidSavedGameClient(this, account);
                 mEventsClient = new AndroidEventsClient(account);
                 mVideoClient = new AndroidVideoClient(mVideoClient.IsCaptureSupported(), account);
-                mRealTimeClient = new AndroidRealTimeMultiplayerClient(this, account);
-                mTurnBasedClient = new AndroidTurnBasedMultiplayerClient(this, account);
-                mTurnBasedClient.RegisterMatchDelegate(mConfiguration.MatchDelegate);
             }
         }
 
@@ -1079,31 +977,6 @@ namespace GooglePlayGames.Android
         public bool HasPermissions(string[] scopes)
         {
             return mTokenClient.HasPermissions(scopes);
-        }
-
-        ///<summary></summary>
-        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.GetRtmpClient"/>
-        public IRealTimeMultiplayerClient GetRtmpClient()
-        {
-            if (!IsAuthenticated())
-            {
-                return null;
-            }
-
-            lock (GameServicesLock)
-            {
-                return mRealTimeClient;
-            }
-        }
-
-        ///<summary></summary>
-        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.GetTbmpClient"/>
-        public ITurnBasedMultiplayerClient GetTbmpClient()
-        {
-            lock (GameServicesLock)
-            {
-                return mTurnBasedClient;
-            }
         }
 
         ///<summary></summary>
@@ -1136,42 +1009,6 @@ namespace GooglePlayGames.Android
             }
         }
 
-        ///<summary></summary>
-        /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.RegisterInvitationDelegate"/>
-        public void RegisterInvitationDelegate(InvitationReceivedDelegate invitationDelegate)
-        {
-            if (invitationDelegate == null)
-            {
-                mInvitationDelegate = null;
-            }
-            else
-            {
-                mInvitationDelegate = AsOnGameThreadCallback<Invitation, bool>(
-                    (invitation, autoAccept) => invitationDelegate(invitation, autoAccept));
-            }
-        }
-
-        private class InvitationCallbackProxy : AndroidJavaProxy
-        {
-            private Action<Invitation, bool> mInvitationDelegate;
-
-            public InvitationCallbackProxy(Action<Invitation, bool> invitationDelegate)
-                : base("com/google/games/bridge/InvitationCallbackProxy$Callback")
-            {
-                mInvitationDelegate = invitationDelegate;
-            }
-
-            public void onInvitationReceived(AndroidJavaObject invitation)
-            {
-                mInvitationDelegate.Invoke(AndroidJavaConverter.ToInvitation(invitation), /* shouldAutoAccept= */
-                    false);
-            }
-
-            public void onInvitationRemoved(string invitationId)
-            {
-            }
-        }
-
         private AndroidJavaObject getAchievementsClient()
         {
             return mGamesClass.CallStatic<AndroidJavaObject>("getAchievementsClient",
@@ -1182,12 +1019,6 @@ namespace GooglePlayGames.Android
         {
             return mGamesClass.CallStatic<AndroidJavaObject>("getGamesClient", AndroidHelperFragment.GetActivity(),
                 mTokenClient.GetAccount());
-        }
-
-        private AndroidJavaObject getInvitationsClient()
-        {
-            return mGamesClass.CallStatic<AndroidJavaObject>("getInvitationsClient",
-                AndroidHelperFragment.GetActivity(), mTokenClient.GetAccount());
         }
 
         private AndroidJavaObject getPlayersClient()

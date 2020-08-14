@@ -18,7 +18,6 @@
 
 namespace GooglePlayGames.BasicApi
 {
-    using GooglePlayGames.BasicApi.Multiplayer;
     using GooglePlayGames.OurUtils;
     using System.Collections.Generic;
     using System.Linq;
@@ -79,24 +78,12 @@ namespace GooglePlayGames.BasicApi
         private readonly string mAccountName;
 
         /// <summary>
-        /// The invitation delegate.
-        /// </summary>
-        private readonly InvitationReceivedDelegate mInvitationDelegate;
-
-        /// <summary>
-        /// The match delegate.
-        /// </summary>
-        private readonly MatchDelegate mMatchDelegate;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="GooglePlayGames.BasicApi.PlayGamesClientConfiguration"/> struct.
         /// </summary>
         /// <param name="builder">Builder for this configuration.</param>
         private PlayGamesClientConfiguration(Builder builder)
         {
             this.mEnableSavedGames = builder.HasEnableSaveGames();
-            this.mInvitationDelegate = builder.GetInvitationDelegate();
-            this.mMatchDelegate = builder.GetMatchDelegate();
             this.mScopes = builder.getScopes();
             this.mHidePopups = builder.IsHidingPopups();
             this.mRequestAuthCode = builder.IsRequestingAuthCode();
@@ -177,24 +164,6 @@ namespace GooglePlayGames.BasicApi
         }
 
         /// <summary>
-        /// Gets the invitation delegate.
-        /// </summary>
-        /// <value>The invitation delegate.</value>
-        public InvitationReceivedDelegate InvitationDelegate
-        {
-            get { return mInvitationDelegate; }
-        }
-
-        /// <summary>
-        /// Gets the match delegate.
-        /// </summary>
-        /// <value>The match delegate.</value>
-        public MatchDelegate MatchDelegate
-        {
-            get { return mMatchDelegate; }
-        }
-
-        /// <summary>
         /// Builder class for the configuration.
         /// </summary>
         public class Builder
@@ -241,16 +210,6 @@ namespace GooglePlayGames.BasicApi
             /// This is only used when requesting auth code or id token.
             /// </remarks>
             private string mAccountName = null;
-
-            /// <summary>
-            /// The invitation delegate.  Default is a no-op;
-            /// </summary>
-            private InvitationReceivedDelegate mInvitationDelegate = delegate { };
-
-            /// <summary>
-            /// The match delegate.  Default is a no-op.
-            /// </summary>
-            private MatchDelegate mMatchDelegate = delegate { };
 
             /// <summary>
             /// Enables the saved games.
@@ -316,30 +275,6 @@ namespace GooglePlayGames.BasicApi
             }
 
             /// <summary>
-            /// Adds the invitation delegate.  This is called when an invitation
-            /// is received.
-            /// </summary>
-            /// <returns>The builder</returns>
-            /// <param name="invitationDelegate">Invitation delegate.</param>
-            public Builder WithInvitationDelegate(InvitationReceivedDelegate invitationDelegate)
-            {
-                this.mInvitationDelegate = Misc.CheckNotNull(invitationDelegate);
-                return this;
-            }
-
-            /// <summary>
-            /// Adds the match delegate.  This is called when a match notification
-            /// is received.
-            /// </summary>
-            /// <returns>The builder.</returns>
-            /// <param name="matchDelegate">Match delegate.</param>
-            public Builder WithMatchDelegate(MatchDelegate matchDelegate)
-            {
-                this.mMatchDelegate = Misc.CheckNotNull(matchDelegate);
-                return this;
-            }
-
-            /// <summary>
             /// Build this instance.
             /// </summary>
             /// <returns>the client configuration instance</returns>
@@ -395,24 +330,6 @@ namespace GooglePlayGames.BasicApi
             {
                 return mScopes == null ? new string[0] : mScopes.ToArray();
             }
-
-            /// <summary>
-            /// Gets the match delegate.
-            /// </summary>
-            /// <returns>The match delegate.</returns>
-            internal MatchDelegate GetMatchDelegate()
-            {
-                return mMatchDelegate;
-            }
-
-            /// <summary>
-            /// Gets the invitation delegate.
-            /// </summary>
-            /// <returns>The invitation delegate.</returns>
-            internal InvitationReceivedDelegate GetInvitationDelegate()
-            {
-                return mInvitationDelegate;
-            }
         }
 
         public override int GetHashCode()
@@ -427,8 +344,6 @@ namespace GooglePlayGames.BasicApi
                 hash = hash * 31 + IsRequestingAuthCode.GetHashCode();
                 hash = hash * 31 + Scopes.GetHashCode();
                 hash = hash * 31 + AccountName.GetHashCode();
-                hash = hash * 31 + InvitationDelegate.GetHashCode();
-                hash = hash * 31 + MatchDelegate.GetHashCode();
                 return hash;
             }
         }

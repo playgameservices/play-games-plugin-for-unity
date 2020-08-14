@@ -92,9 +92,6 @@ namespace GooglePlayGames.BasicApi
         /// <summary>UI closed by user.</summary>
         UserClosedUI = -6,
         UiBusy = -12,
-
-        /// <summary>The player left the multiplayer room.</summary>
-        LeftRoom = -18,
     }
 
     /// <summary>Values specifying the start location for fetching scores.</summary>

@@ -22,7 +22,6 @@ namespace GooglePlayGames
     using System.Collections.Generic;
     using GooglePlayGames.BasicApi;
     using GooglePlayGames.BasicApi.Events;
-    using GooglePlayGames.BasicApi.Multiplayer;
     using GooglePlayGames.BasicApi.Nearby;
     using GooglePlayGames.BasicApi.SavedGame;
     using GooglePlayGames.BasicApi.Video;
@@ -141,18 +140,6 @@ namespace GooglePlayGames
 
                 return sNearbyConnectionClient;
             }
-        }
-
-        /// <summary> Gets the real time multiplayer API object</summary>
-        public IRealTimeMultiplayerClient RealTime
-        {
-            get { return mClient.GetRtmpClient(); }
-        }
-
-        /// <summary> Gets the turn based multiplayer API object</summary>
-        public ITurnBasedMultiplayerClient TurnBased
-        {
-            get { return mClient.GetTbmpClient(); }
         }
 
         /// <summary>Gets the saved game client object.</summary>
@@ -1452,16 +1439,6 @@ namespace GooglePlayGames
         public bool GetLoading(ILeaderboard board)
         {
             return board != null && board.loading;
-        }
-
-        /// <summary>
-        /// Register an invitation delegate to be
-        /// notified when a multiplayer invitation arrives
-        /// </summary>
-        /// <param name="deleg">The delegate to register</param>
-        public void RegisterInvitationDelegate(InvitationReceivedDelegate deleg)
-        {
-            mClient.RegisterInvitationDelegate(deleg);
         }
 
         /// <summary>

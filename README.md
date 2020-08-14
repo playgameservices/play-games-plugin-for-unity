@@ -271,11 +271,6 @@ If your game does not use these features, then there is no need to
     PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder()
         // enables saving game progress.
         .EnableSavedGames()
-        // registers a callback to handle game invitations received while the game is not running.
-        .WithInvitationDelegate(<callback method>)
-        // registers a callback for turn based match notifications received while the
-        // game is not running.
-        .WithMatchDelegate(<callback method>)
         // requests the email address of the player be available.
         // Will bring up a prompt for consent.
         .RequestEmail()

@@ -16,7 +16,6 @@
 using System;
 using NUnit.Framework;
 using GooglePlayGames.BasicApi;
-using GooglePlayGames.BasicApi.Multiplayer;
 using GooglePlayGames.OurUtils;
 
 namespace GooglePlayGames.UnitTests {

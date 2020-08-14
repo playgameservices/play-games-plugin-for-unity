@@ -17,7 +17,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections;
 using GooglePlayGames.BasicApi;
-using GooglePlayGames.BasicApi.Multiplayer;
 using GooglePlayGames.BasicApi.SavedGame;
 
 namespace GooglePlayGames.UnitTests {
@@ -90,27 +89,7 @@ class BaseMockPlayGamesClient : IPlayGamesClient {
         throw new NotSupportedException("unsupported");
     }
 
-    public BasicApi.Multiplayer.IRealTimeMultiplayerClient GetRtmpClient() {
-        throw new NotSupportedException("unsupported");
-    }
-
-    public BasicApi.Multiplayer.ITurnBasedMultiplayerClient GetTbmpClient() {
-        throw new NotSupportedException("unsupported");
-    }
-
     public BasicApi.SavedGame.ISavedGameClient GetSavedGameClient() {
-        throw new NotSupportedException("unsupported");
-    }
-
-    public void RegisterInvitationDelegate(InvitationReceivedDelegate deleg) {
-        throw new NotSupportedException("unsupported");
-    }
-
-    public Invitation GetInvitationFromNotification() {
-        throw new NotSupportedException("unsupported");
-    }
-
-    public bool HasInvitationFromNotification() {
         throw new NotSupportedException("unsupported");
     }
 

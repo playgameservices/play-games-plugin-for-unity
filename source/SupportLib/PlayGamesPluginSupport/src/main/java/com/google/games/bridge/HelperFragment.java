@@ -29,7 +29,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Scope;
-import com.google.android.gms.games.multiplayer.realtime.Room;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -48,10 +47,7 @@ public class HelperFragment extends Fragment
     static final int RC_SELECT_SNAPSHOT_UI = 9004;
     static final int RC_CAPTURE_OVERLAY_UI = 9005;
     static final int RC_SELECT_OPPONENTS_UI = 9006;
-    static final int RC_INBOX_UI = 9007;
-    static final int RC_SHOW_WAITING_ROOM_UI = 9008;
-    static final int RC_SHOW_INVITATION_INBOX_UI = 9009;
-  static final int RC_SHOW_REQUEST_PERMISSIONS_UI = 9010;
+    static final int RC_SHOW_REQUEST_PERMISSIONS_UI = 9010;
 
     // Pending token request.  There can be only one outstanding request at a
     // time.
@@ -155,56 +151,6 @@ public class HelperFragment extends Fragment
 
         if(!HelperFragment.startRequest(parentActivity, request)) {
             request.setResult(SelectSnapshotUiRequest.SELECT_UI_STATUS_UI_BUSY);
-        }
-
-        return request.getTask();
-    }
-
-    public static Task<BaseSelectOpponentsUiRequest.Result> showRtmpSelectOpponentsUi(Activity parentActivity, int minOpponents, int maxOpponents) {
-        RtmpSelectOpponentsUiRequest request = new RtmpSelectOpponentsUiRequest(minOpponents, maxOpponents);
-
-        if(!HelperFragment.startRequest(parentActivity, request)) {
-            request.setResult(CommonUIStatus.UI_BUSY);
-        }
-
-        return request.getTask();
-    }
-
-    public static Task<BaseSelectOpponentsUiRequest.Result> showTbmpSelectOpponentsUi(Activity parentActivity, int minOpponents, int maxOpponents) {
-        TbmpSelectOpponentsUiRequest request = new TbmpSelectOpponentsUiRequest(minOpponents, maxOpponents);
-
-        if(!HelperFragment.startRequest(parentActivity, request)) {
-            request.setResult(CommonUIStatus.UI_BUSY);
-        }
-
-        return request.getTask();
-    }
-
-    public static Task<ShowWaitingRoomUiRequest.Result> showWaitingRoomUI(Activity parentActivity, Room room, int minParticipantsToStart) {
-        ShowWaitingRoomUiRequest request = new ShowWaitingRoomUiRequest(room, minParticipantsToStart);
-
-        if(!HelperFragment.startRequest(parentActivity, request)) {
-            request.setResult(ShowWaitingRoomUiRequest.UI_STATUS_BUSY, null);
-        }
-
-        return request.getTask();
-    }
-
-    public static Task<ShowInvitationInboxUIRequest.Result> showInvitationInboxUI(Activity parentActivity) {
-        ShowInvitationInboxUIRequest request = new ShowInvitationInboxUIRequest();
-
-        if(!HelperFragment.startRequest(parentActivity, request)) {
-            request.setResult(CommonUIStatus.UI_BUSY);
-        }
-
-        return request.getTask();
-    }
-
-  public static Task<InboxUiRequest.Result> showInboxUi(Activity parentActivity) {
-        InboxUiRequest request = new InboxUiRequest();
-
-        if(!HelperFragment.startRequest(parentActivity, request)) {
-            request.setResult(CommonUIStatus.UI_BUSY);
         }
 
         return request.getTask();

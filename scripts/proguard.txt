@@ -1,4 +1,3 @@
--keep class com.google.android.gms.games.multiplayer.** { *; }
 -keep class com.google.android.gms.games.leaderboard.** { *; }
 -keep class com.google.android.gms.games.snapshot.** { *; }
 -keep class com.google.android.gms.games.achievement.** { *; }
