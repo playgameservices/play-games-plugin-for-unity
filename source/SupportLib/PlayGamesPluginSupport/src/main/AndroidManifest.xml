@@ -2,7 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.google.games.bridge"
     android:versionCode="1" >
-
-    <application/>
+    <application>
+        <activity
+                android:name=".GenericResolutionActivity"
+                android:label="GenericResolutionActivity"
+                android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"
+                android:exported="false">
+            <meta-data android:name="instantapps.clients.allowed" android:value="true"/>
+        </activity>
+    </application>
 
 </manifest>

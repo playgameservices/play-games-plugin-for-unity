@@ -1,4 +1,4 @@
-﻿// <copyright file="AndroidTokenClient.cs" company="Google Inc.">
+// <copyright file="AndroidTokenClient.cs" company="Google Inc.">
 // Copyright (C) 2015 Google Inc.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -124,6 +124,64 @@ namespace GooglePlayGames.Android
                         Debug.Log("ShowLeaderboardUI failed with exception");
                         cb.Invoke(UIStatus.InternalError);
                     });
+            }
+        }
+
+        public static void ShowCompareProfileWithAlternativeNameHintsUI(
+            string playerId, string otherPlayerInGameName, string currentPlayerInGameName,
+            Action<UIStatus> cb)
+        {
+            using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
+            using (
+                var task = helperFragment.CallStatic<AndroidJavaObject>(
+                    "showCompareProfileWithAlternativeNameHintsUI",
+                    AndroidHelperFragment.GetActivity(), playerId, otherPlayerInGameName,
+                    currentPlayerInGameName))
+            {
+                AndroidTaskUtils.AddOnSuccessListener<int>(task, uiCode =>
+                {
+                    Debug.Log("ShowCompareProfileWithAlternativeNameHintsUI result " + uiCode);
+                    cb.Invoke((UIStatus) uiCode);
+                });
+                AndroidTaskUtils.AddOnFailureListener(task, exception =>
+                {
+                    Debug.Log("ShowCompareProfileWithAlternativeNameHintsUI failed with exception");
+                    cb.Invoke(UIStatus.InternalError);
+                });
+            }
+        }
+
+        public static void IsResolutionRequired(
+            AndroidJavaObject friendsSharingConsentException, Action<bool> cb)
+        {
+            using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
+            {
+                var isResolutionRequired = helperFragment.CallStatic<bool>(
+                    "isResolutionRequired", friendsSharingConsentException);
+                cb.Invoke(isResolutionRequired);
+            }
+        }
+
+        public static void AskForLoadFriendsResolution(
+            AndroidJavaObject friendsSharingConsentException, Action<UIStatus> cb)
+        {
+            using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
+            using (
+                var task = helperFragment.CallStatic<AndroidJavaObject>(
+                    "askForLoadFriendsResolution", AndroidHelperFragment.GetActivity(),
+                    friendsSharingConsentException))
+            {
+                AndroidTaskUtils.AddOnSuccessListener<int>(task, uiCode =>
+                {
+                    Debug.Log("AskForLoadFriendsResolution result " + uiCode);
+                    cb.Invoke((UIStatus) uiCode);
+                });
+
+                AndroidTaskUtils.AddOnFailureListener(task, exception =>
+                {
+                    Debug.Log("AskForLoadFriendsResolution failed with exception");
+                    cb.Invoke(UIStatus.InternalError);
+                });
             }
         }
 

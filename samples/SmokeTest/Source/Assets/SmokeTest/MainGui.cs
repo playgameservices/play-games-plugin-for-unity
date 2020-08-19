@@ -59,30 +59,30 @@ namespace SmokeTest
 
         private string idToken = "";
         private string authCode = "";
-        private bool loadedFriends = false;
         private string statsMessage = string.Empty;
 
         private NearbyGUI mNearbyGui;
         private AchievementGUI mAchievementGui;
         private LeaderboardGUI mLeaderboardGui;
         private VideoGUI mVideoGui;
+        private FriendsGUI mFriendsGui;
 
         // which UI are we showing?
-        public enum Ui
-        {
-            Main,
-            SavedGame,
-            EditSavedGameName,
-            WriteSavedGame,
-            ResolveSaveConflict,
-            Events,
-            NearbyConnections,
-            Achievements,
-            Leaderboards,
-            Video,
-            UserInfo,
-            PopupGravity,
-            Permissions
+        public enum Ui {
+          Main,
+          SavedGame,
+          EditSavedGameName,
+          WriteSavedGame,
+          ResolveSaveConflict,
+          Events,
+          NearbyConnections,
+          Achievements,
+          Leaderboards,
+          Video,
+          UserInfo,
+          PopupGravity,
+          Permissions,
+          Friends
         }
 
         public void Start()
@@ -94,8 +94,7 @@ namespace SmokeTest
             this.mAchievementGui = new AchievementGUI(this);
             this.mLeaderboardGui = new LeaderboardGUI(this);
             this.mVideoGui = new VideoGUI(this);
-
-            loadedFriends = false;
+            this.mFriendsGui = new FriendsGUI(this);
         }
 
         public void SetUI(Ui page)
@@ -251,28 +250,25 @@ namespace SmokeTest
             else if (GUI.Button(CalcGrid(1, 2), "User Info"))
             {
                 SetUI(Ui.UserInfo);
-            }
-            else if (GUI.Button(this.CalcGrid(1, 3), "Saved Game"))
+            } else if (GUI.Button(this.CalcGrid(0, 3), "Friends"))
+            {
+                SetUI(Ui.Friends);
+            } else if (GUI.Button(this.CalcGrid(1, 3), "Saved Game"))
             {
                 SetUI(Ui.SavedGame);
-            }
-            else if (GUI.Button(this.CalcGrid(0, 4), "Video"))
+            } else if (GUI.Button(this.CalcGrid(0, 4), "Video"))
             {
                 SetUI(Ui.Video);
-            }
-            else if (GUI.Button(this.CalcGrid(1, 4), "Nearby Connections"))
+            } else if (GUI.Button(this.CalcGrid(1, 4), "Nearby Connections"))
             {
                 SetUI(Ui.NearbyConnections);
-            }
-            else if (GUI.Button(this.CalcGrid(0, 5), "Popup Gravity"))
+            } else if (GUI.Button(this.CalcGrid(0, 5), "Popup Gravity"))
             {
                 SetUI(Ui.PopupGravity);
-            }
-            else if (GUI.Button(this.CalcGrid(1, 5), "Permissions"))
+            } else if (GUI.Button(this.CalcGrid(1, 5), "Permissions"))
             {
                 SetUI(Ui.Permissions);
-            }
-            else if (GUI.Button(this.CalcGrid(0, 6), "Sign Out"))
+            } else if (GUI.Button(this.CalcGrid(0, 6), "Sign Out"))
             {
                 this.DoSignOut();
             }
@@ -698,26 +694,6 @@ namespace SmokeTest
             );
 
             string friendString = "";
-            if (Social.localUser.friends.Any() || loadedFriends)
-            {
-                foreach (IUserProfile p in Social.localUser.friends)
-                {
-                    friendString += p.userName + "\n";
-                }
-
-                if (friendString == "")
-                {
-                    friendString = "No Friends found!";
-                }
-            }
-            else
-            {
-                Social.localUser.LoadFriends((ok) =>
-                {
-                    loadedFriends = ok;
-                    Debug.Log("Friends loaded OK: " + ok);
-                });
-            }
 
             GUI.Label(
                 CalcGrid(0, 5, 2, 2),
@@ -807,6 +783,9 @@ namespace SmokeTest
                         break;
                     case Ui.EditSavedGameName:
                         ShowEditSavedGameName();
+                        break;
+                    case Ui.Friends:
+                        mFriendsGui.OnGUI();
                         break;
                     case Ui.WriteSavedGame:
                         ShowWriteSavedGame();

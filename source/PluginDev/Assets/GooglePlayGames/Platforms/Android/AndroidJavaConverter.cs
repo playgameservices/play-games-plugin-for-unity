@@ -1,4 +1,4 @@
-﻿// <copyright file="AndroidTokenClient.cs" company="Google Inc.">
+// <copyright file="AndroidTokenClient.cs" company="Google Inc.">
 // Copyright (C) 2015 Google Inc.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +21,7 @@ namespace GooglePlayGames.Android
     using GooglePlayGames.BasicApi.SavedGame;
     using OurUtils;
     using UnityEngine;
+    using UnityEngine.SocialPlatforms;
     using System;
     using System.Collections.Generic;
 
@@ -53,7 +54,7 @@ namespace GooglePlayGames.Android
             switch (collection)
             {
                 case LeaderboardCollection.Social:
-                    return 1 /* COLLECTION_SOCIAL */;
+                  return 3 /* COLLECTION_FRIENDS */;
                 case LeaderboardCollection.Public:
                 default:
                     return 0 /* COLLECTION_PUBLIC */;
@@ -87,6 +88,20 @@ namespace GooglePlayGames.Android
             return new Player(displayName, playerId, avatarUrl);
         }
 
+        internal static PlayerProfile ToPlayerProfile(AndroidJavaObject player) {
+          if (player == null) {
+            return null;
+          }
+
+          string displayName = player.Call<String>("getDisplayName");
+          string playerId = player.Call<String>("getPlayerId");
+          string avatarUrl = player.Call<String>("getIconImageUrl");
+          bool isFriend =
+              player.Call<AndroidJavaObject>("getRelationshipInfo").Call<int>("getFriendStatus") ==
+              4 /* PlayerFriendStatus.Friend*/;
+          return new PlayerProfile(displayName, playerId, avatarUrl, isFriend);
+        }
+
         internal static List<string> ToStringList(AndroidJavaObject stringList)
         {
             if (stringList == null)
@@ -115,6 +130,35 @@ namespace GooglePlayGames.Android
             }
 
             return converted;
+        }
+
+        internal static FriendsListVisibilityStatus ToFriendsListVisibilityStatus(int playerListVisibility) {
+            switch (playerListVisibility)
+            {
+                case /* FriendsListVisibilityStatus.UNKNOWN */ 0:
+                    return FriendsListVisibilityStatus.Unknown;
+                case /* FriendsListVisibilityStatus.VISIBLE */ 1:
+                    return FriendsListVisibilityStatus.Visible;
+                case /* FriendsListVisibilityStatus.REQUEST_REQUIRED */ 2:
+                    return FriendsListVisibilityStatus.ResolutionRequired;
+                case /* FriendsListVisibilityStatus.FEATURE_UNAVAILABLE */ 3:
+                    return FriendsListVisibilityStatus.Unavailable;
+                default:
+                    return FriendsListVisibilityStatus.Unknown;
+            }
+        }
+
+        internal static IUserProfile[] playersBufferToArray(AndroidJavaObject playersBuffer) {
+          int count = playersBuffer.Call<int>("getCount");
+          IUserProfile[] users = new IUserProfile[count];
+          for (int i = 0; i < count; ++i) {
+            using (var player = playersBuffer.Call<AndroidJavaObject>("get", i)) {
+              users[i] = AndroidJavaConverter.ToPlayerProfile(player);
+            }
+          }
+
+          playersBuffer.Call("release");
+          return users;
         }
     }
 }

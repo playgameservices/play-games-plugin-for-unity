@@ -1119,7 +1119,9 @@ namespace GooglePlayGames
         }
 
         /// <summary>
-        /// Loads the scores using the provided parameters.
+        /// Loads the scores using the provided parameters. This call may fail when trying to load friends with
+        /// ResponseCode.ResolutionRequired if the user has not share the friends list with the game. In this case, use
+        /// AskForLoadFriendsResolution to request access.
         /// </summary>
         /// <param name="leaderboardId">Leaderboard identifier.</param>
         /// <param name="start">Start either top scores, or player centered.</param>
@@ -1154,7 +1156,9 @@ namespace GooglePlayGames
         }
 
         /// <summary>
-        /// Loads more scores.
+        /// Loads more scores. This call may fail when trying to load friends with
+        /// ResponseCode.ResolutionRequired if the user has not share the friends list with the game. In this case, use
+        /// AskForLoadFriendsResolution to request access.
         /// </summary>
         /// <remarks>This is used to load the next "page" of scores. </remarks>
         /// <param name="token">Token used to recording the loading.</param>
@@ -1442,6 +1446,144 @@ namespace GooglePlayGames
         }
 
         /// <summary>
+        /// Shows the Player Profile UI for the given user identifier.
+        /// </summary>
+        /// <param name="userId">User Identifier.</param>
+        /// <param name="otherPlayerInGameName">
+        /// The game's own display name of the player referred to by userId.
+        /// </param>
+        /// <param name="currentPlayerInGameName">
+        /// The game's own display name of the current player.
+        /// </param>
+        /// <param name="callback">Callback invoked upon completion.</param>
+        public void ShowCompareProfileWithAlternativeNameHintsUI(string userId,
+            string otherPlayerInGameName,
+            string currentPlayerInGameName,
+            Action<UIStatus> callback)
+        {
+            if (!IsAuthenticated())
+            {
+                GooglePlayGames.OurUtils.Logger.e(
+                    "ShowCompareProfileWithAlternativeNameHintsUI can only be called after authentication.");
+                InvokeCallbackOnGameThread(callback, UIStatus.NotAuthorized);
+
+                return;
+            }
+
+            GooglePlayGames.OurUtils.Logger.d(
+                "ShowCompareProfileWithAlternativeNameHintsUI, userId=" + userId + " callback is " +
+                callback);
+            mClient.ShowCompareProfileWithAlternativeNameHintsUI(userId, otherPlayerInGameName,
+                currentPlayerInGameName, callback);
+        }
+
+        /// <summary>
+        /// Returns if the user has allowed permission for the game to access the friends list.
+        /// </summary>
+        /// <param name="forceReload">If true, this call will clear any locally cached data and
+        /// attempt to fetch the latest data from the server. Normally, this should be set to {@code
+        /// false} to gain advantages of data caching.</param>
+        /// <param name="callback">Callback invoked upon completion.</param>
+        public void GetFriendsListVisibility(bool forceReload,
+            Action<FriendsListVisibilityStatus> callback)
+        {
+            if (!IsAuthenticated())
+            {
+                GooglePlayGames.OurUtils.Logger.e(
+                    "GetFriendsListVisibility can only be called after authentication.");
+                InvokeCallbackOnGameThread(callback, FriendsListVisibilityStatus.NotAuthorized);
+                return;
+            }
+
+            GooglePlayGames.OurUtils.Logger.d("GetFriendsListVisibility, callback is " + callback);
+            mClient.GetFriendsListVisibility(forceReload, callback);
+        }
+
+        /// <summary>
+        /// Shows the appropriate platform-specific friends sharing UI.
+        /// <param name="callback">The callback to invoke when complete. If null,
+        /// no callback is called. </param>
+        /// </summary>
+        public void AskForLoadFriendsResolution(Action<UIStatus> callback)
+        {
+            if (!IsAuthenticated())
+            {
+                GooglePlayGames.OurUtils.Logger.e(
+                    "AskForLoadFriendsResolution can only be called after authentication.");
+                InvokeCallbackOnGameThread(callback, UIStatus.NotAuthorized);
+                return;
+            }
+
+            GooglePlayGames.OurUtils.Logger.d("AskForLoadFriendsResolution callback is " + callback);
+            mClient.AskForLoadFriendsResolution(callback);
+        }
+
+        /// <summary>
+        /// Gets status of the last call to load friends.
+        /// </summary>
+        public LoadFriendsStatus GetLastLoadFriendsStatus()
+        {
+            if (!IsAuthenticated())
+            {
+                GooglePlayGames.OurUtils.Logger.e(
+                    "GetLastLoadFriendsStatus can only be called after authentication.");
+                return LoadFriendsStatus.NotAuthorized;
+            }
+
+            return mClient.GetLastLoadFriendsStatus();
+        }
+
+        /// <summary>
+        /// Loads the first page of the user's friends
+        /// </summary>
+        /// <param name="pageSize">
+        /// The number of entries to request for this initial page. Note that if cached
+        /// data already exists, the returned buffer may contain more than this size, but it is
+        /// guaranteed to contain at least this many if the collection contains enough records.
+        /// </param>
+        /// <param name="forceReload">
+        /// If true, this call will clear any locally cached data and attempt to
+        /// fetch the latest data from the server. This would commonly be used for something like a
+        /// user-initiated refresh. Normally, this should be set to {@code false} to gain advantages
+        /// of data caching.</param> <param name="callback">Callback invoked upon
+        /// completion.</param>
+        public void LoadFriends(int pageSize, bool forceReload,
+            Action<LoadFriendsStatus> callback)
+        {
+            if (!IsAuthenticated())
+            {
+                GooglePlayGames.OurUtils.Logger.e(
+                    "LoadFriends can only be called after authentication.");
+                InvokeCallbackOnGameThread(callback, LoadFriendsStatus.NotAuthorized);
+                return;
+            }
+
+            mClient.LoadFriends(pageSize, forceReload, callback);
+        }
+
+        /// <summary>
+        /// Loads the friends list page
+        /// </summary>
+        /// <param name="pageSize">
+        /// The number of entries to request for this initial page. Note that if cached
+        /// data already exists, the returned buffer may contain more than this size, but it is
+        /// guaranteed to contain at least this many if the collection contains enough records.
+        /// </param>
+        /// <param name="callback"></param>
+        public void LoadMoreFriends(int pageSize, Action<LoadFriendsStatus> callback)
+        {
+            if (!IsAuthenticated())
+            {
+                GooglePlayGames.OurUtils.Logger.e(
+                    "LoadMoreFriends can only be called after authentication.");
+                InvokeCallbackOnGameThread(callback, LoadFriendsStatus.NotAuthorized);
+                return;
+            }
+
+            mClient.LoadMoreFriends(pageSize, callback);
+        }
+
+        /// <summary>
         /// Handles the processing of scores during loading.
         /// </summary>
         /// <param name="board">leaderboard being loaded</param>
@@ -1509,6 +1651,16 @@ namespace GooglePlayGames
             }
 
             return id;
+        }
+
+        private static void InvokeCallbackOnGameThread<T>(Action<T> callback, T data)
+        {
+            if (callback == null)
+            {
+                return;
+            }
+
+            PlayGamesHelperObject.RunOnGameThread(() => { callback(data); });
         }
 
         private static Action<T> ToOnGameThread<T>(Action<T> toConvert)

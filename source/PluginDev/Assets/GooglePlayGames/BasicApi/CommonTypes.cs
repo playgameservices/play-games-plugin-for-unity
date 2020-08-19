@@ -1,4 +1,4 @@
-﻿// <copyright file="CommonTypes.cs" company="Google Inc.">
+// <copyright file="CommonTypes.cs" company="Google Inc.">
 // Copyright (C) 2014 Google Inc.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -67,6 +67,12 @@ namespace GooglePlayGames.BasicApi
 
         /// <summary>Timed out while awaiting the result.</summary>
         Timeout = -5,
+
+        ///< summary>
+        /// Constant indicating that the developer does not have access to the friends list, but can
+        /// call the AskForLoadFriendsResolution API to show a consent dialog.
+        ///</summary>
+        ResolutionRequired = -6,
     }
 
     /// <summary> Native response status codes for UI operations.</summary>
@@ -92,6 +98,9 @@ namespace GooglePlayGames.BasicApi
         /// <summary>UI closed by user.</summary>
         UserClosedUI = -6,
         UiBusy = -12,
+
+        /// <summary>An network error occurred.</summary>
+        NetworkError = -20,
     }
 
     /// <summary>Values specifying the start location for fetching scores.</summary>
@@ -125,6 +134,65 @@ namespace GooglePlayGames.BasicApi
 
         /// <summary>Social leaderboards contain the scores of players in the viewing player's circles.</summary>
         Social = 2,
+    }
+
+    public enum FriendsListVisibilityStatus
+    {
+        ///< summary>
+        /// Constant indicating that currently it's unknown if the friends list is visible to the
+        /// game, game can ask for permission from user.
+        ///</summary>
+        Unknown = 0,
+
+        /// Constant indicating that the friends list is currently visible to the game.
+        Visible = 1,
+
+        ///< summary>
+        /// Constant indicating that the developer does not have access to the friends list, but can
+        /// call the AskForLoadFriendsResolution API to show a consent dialog.
+        ///</summary>
+        ResolutionRequired = 2,
+
+        ///< summary>
+        /// Constant indicating that the friends list is currently unavailable for this user, and it
+        /// is not possible to request access at this time, either because the user has permanently
+        /// declined or the friends feature is not available to them. In this state, any attempts to
+        /// request
+        /// access to the friends list will be unsuccessful.
+        ///</summary>
+        Unavailable = 3,
+
+        /// <summary>An network error occurred.</summary>
+        NetworkError = -4,
+
+        /// <summary>The player is not authorized to perform the operation.</summary>
+        NotAuthorized = -5,
+    }
+
+    public enum LoadFriendsStatus
+    {
+        /// <summary>An unknown value to return when loadFriends is not available.</summary>
+        Unknown = 0,
+
+        /// <summary>All the friends have been loaded.</summary>
+        Completed = 1,
+
+        /// <summary>There are more friends to load.</summary>
+        LoadMore = 2,
+
+        /// <summary>
+        /// The game doesn't have permission to access the player's friends list. No friends loaded.
+        /// </summary>
+        ResolutionRequired = -3,
+
+        /// <summary>An internal error occurred.</summary>
+        InternalError = -4,
+
+        /// <summary>The player is not authorized to perform the operation.</summary>
+        NotAuthorized = -5,
+
+        /// <summary>An network error occurred.</summary>
+        NetworkError = -6,
     }
 
     public enum VideoCaptureMode

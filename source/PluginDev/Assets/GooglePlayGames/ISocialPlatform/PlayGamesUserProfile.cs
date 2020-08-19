@@ -37,6 +37,7 @@ namespace GooglePlayGames
         private string mDisplayName;
         private string mPlayerId;
         private string mAvatarUrl;
+        private bool mIsFriend;
 
         private volatile bool mImageLoading = false;
         private Texture2D mImage;
@@ -48,6 +49,17 @@ namespace GooglePlayGames
             mPlayerId = playerId;
             setAvatarUrl(avatarUrl);
             mImageLoading = false;
+            mIsFriend = false;
+        }
+
+        internal PlayGamesUserProfile(string displayName, string playerId, string avatarUrl,
+            bool isFriend)
+        {
+            mDisplayName = displayName;
+            mPlayerId = playerId;
+            mAvatarUrl = avatarUrl;
+            mImageLoading = false;
+            mIsFriend = isFriend;
         }
 
         protected void ResetIdentity(string displayName, string playerId,
@@ -55,6 +67,7 @@ namespace GooglePlayGames
         {
             mDisplayName = displayName;
             mPlayerId = playerId;
+            mIsFriend = false;
             if (mAvatarUrl != avatarUrl)
             {
                 mImage = null;
@@ -83,7 +96,7 @@ namespace GooglePlayGames
 
         public bool isFriend
         {
-            get { return true; }
+            get { return mIsFriend; }
         }
 
         public UserState state
@@ -191,7 +204,8 @@ namespace GooglePlayGames
             return string.Format("[Player: '{0}' (id {1})]", mDisplayName, mPlayerId);
         }
 
-        private void setAvatarUrl(string avatarUrl) {
+        private void setAvatarUrl(string avatarUrl)
+        {
             mAvatarUrl = avatarUrl;
             if (!avatarUrl.StartsWith("https") && avatarUrl.StartsWith("http"))
             {

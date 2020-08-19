@@ -47,11 +47,17 @@ namespace GooglePlayGames.Android
         private volatile AndroidTokenClient mTokenClient;
         private volatile Player mUser = null;
         private volatile AuthState mAuthState = AuthState.Unauthenticated;
+        private IUserProfile[] mFriends = new IUserProfile[0];
+        private LoadFriendsStatus mLastLoadFriendsStatus = LoadFriendsStatus.Unknown;
 
         AndroidJavaClass mGamesClass = new AndroidJavaClass("com.google.android.gms.games.Games");
         private static string TasksClassName = "com.google.android.gms.tasks.Tasks";
 
+        private AndroidJavaObject mFriendsResolutionException = null;
+
         private readonly int mLeaderboardMaxResults = 25; // can be from 1 to 25
+
+        private readonly int mFriendsMaxResults = 200; // the maximum load friends page size
 
         internal AndroidClient(PlayGamesClientConfiguration configuration)
         {
@@ -192,10 +198,7 @@ namespace GooglePlayGames.Android
                 return;
             }
 
-            PlayGamesHelperObject.RunOnGameThread(() =>
-            {
-                callback();
-            });
+            PlayGamesHelperObject.RunOnGameThread(() => { callback(); });
         }
 
         private static void InvokeCallbackOnGameThread<T>(Action<T> callback, T data)
@@ -205,10 +208,7 @@ namespace GooglePlayGames.Android
                 return;
             }
 
-            PlayGamesHelperObject.RunOnGameThread(() =>
-            {
-                callback(data);
-            });
+            PlayGamesHelperObject.RunOnGameThread(() => { callback(data); });
         }
 
 
@@ -233,10 +233,7 @@ namespace GooglePlayGames.Android
                 return;
             }
 
-            PlayGamesHelperObject.RunOnGameThread(() =>
-            {
-                callback(t1, t2);
-            });
+            PlayGamesHelperObject.RunOnGameThread(() => { callback(t1, t2); });
         }
 
         private void InitializeGameServices()
@@ -354,19 +351,201 @@ namespace GooglePlayGames.Android
 
         public void LoadFriends(Action<bool> callback)
         {
-            if (!IsAuthenticated())
-            {
-                GooglePlayGames.OurUtils.Logger.d("Cannot loadFriends when not authenticated");
-                InvokeCallbackOnGameThread(callback, false);
-                return;
-            }
+            LoadAllFriends(mFriendsMaxResults, /* forceReload= */ false, /* loadMore= */ false, callback);
+        }
 
-            InvokeCallbackOnGameThread(callback, true);
+        private void LoadAllFriends(int pageSize, bool forceReload, bool loadMore,
+            Action<bool> callback)
+        {
+            LoadFriendsPaginated(pageSize, loadMore, forceReload, result =>
+            {
+                mLastLoadFriendsStatus = result;
+                switch (result)
+                {
+                    case LoadFriendsStatus.Completed:
+                        InvokeCallbackOnGameThread(callback, true);
+                        break;
+                    case LoadFriendsStatus.LoadMore:
+                        // There are more friends to load.
+                        LoadAllFriends(pageSize, /* forceReload= */ false, /* loadMore= */ true, callback);
+                        break;
+                    case LoadFriendsStatus.ResolutionRequired:
+                    case LoadFriendsStatus.InternalError:
+                    case LoadFriendsStatus.NotAuthorized:
+                        InvokeCallbackOnGameThread(callback, false);
+                        break;
+                    default:
+                        GooglePlayGames.OurUtils.Logger.d("There was an error when loading friends." + result);
+                        InvokeCallbackOnGameThread(callback, false);
+                        break;
+                }
+            });
+        }
+
+        public void LoadFriends(int pageSize, bool forceReload,
+            Action<LoadFriendsStatus> callback)
+        {
+            LoadFriendsPaginated(pageSize, /* isLoadMore= */ false, /* forceReload= */ forceReload,
+                callback);
+        }
+
+        public void LoadMoreFriends(int pageSize, Action<LoadFriendsStatus> callback)
+        {
+            LoadFriendsPaginated(pageSize, /* isLoadMore= */ true, /* forceReload= */ false,
+                callback);
+        }
+
+        private void LoadFriendsPaginated(int pageSize, bool isLoadMore, bool forceReload,
+            Action<LoadFriendsStatus> callback)
+        {
+            mFriendsResolutionException = null;
+            using (var playersClient = getPlayersClient())
+            using (var task = isLoadMore
+                ? playersClient.Call<AndroidJavaObject>("loadMoreFriends", pageSize)
+                : playersClient.Call<AndroidJavaObject>("loadFriends", pageSize,
+                    forceReload))
+            {
+                AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
+                    task, annotatedData =>
+                    {
+                        using (var playersBuffer = annotatedData.Call<AndroidJavaObject>("get"))
+                        {
+                            AndroidJavaObject metadata = playersBuffer.Call<AndroidJavaObject>("getMetadata");
+                            var areMoreFriendsToLoad = metadata != null &&
+                                                       metadata.Call<AndroidJavaObject>("getString",
+                                                           "next_page_token") != null;
+                            mFriends = AndroidJavaConverter.playersBufferToArray(playersBuffer);
+                            mLastLoadFriendsStatus = areMoreFriendsToLoad
+                                ? LoadFriendsStatus.LoadMore
+                                : LoadFriendsStatus.Completed;
+                            InvokeCallbackOnGameThread(callback, mLastLoadFriendsStatus);
+                        }
+                    });
+                AndroidTaskUtils.AddOnFailureListener(task, exception =>
+                {
+                    AndroidHelperFragment.IsResolutionRequired(exception, resolutionRequired =>
+                    {
+                        if (resolutionRequired)
+                        {
+                            mFriendsResolutionException =
+                                exception.Call<AndroidJavaObject>("getResolution");
+                            mLastLoadFriendsStatus = LoadFriendsStatus.ResolutionRequired;
+                            mFriends = new IUserProfile[0];
+                            InvokeCallbackOnGameThread(callback, LoadFriendsStatus.ResolutionRequired);
+                        }
+                        else
+                        {
+                            mFriendsResolutionException = null;
+                            var statusCode = exception.Call<int>("getStatusCode");
+                            if (statusCode == /* GamesClientStatusCodes.NETWORK_ERROR_NO_DATA */ 26504)
+                            {
+                                mLastLoadFriendsStatus = LoadFriendsStatus.NetworkError;
+                                InvokeCallbackOnGameThread(callback, LoadFriendsStatus.NetworkError);
+                                return;
+                            }
+
+                            mLastLoadFriendsStatus = LoadFriendsStatus.InternalError;
+                            Debug.Log("LoadFriends failed with status code: " + statusCode);
+                            InvokeCallbackOnGameThread(callback, LoadFriendsStatus.InternalError);
+                        }
+                    });
+                    return;
+                });
+            }
+        }
+
+        public LoadFriendsStatus GetLastLoadFriendsStatus()
+        {
+            return mLastLoadFriendsStatus;
+        }
+
+        public void AskForLoadFriendsResolution(Action<UIStatus> callback)
+        {
+            if (mFriendsResolutionException == null)
+            {
+                GooglePlayGames.OurUtils.Logger.d("The developer asked for access to the friends " +
+                                                  "list but there is no intent to trigger the UI. This may be because the user " +
+                                                  "has granted access already or the game has not called loadFriends() before.");
+                using (var playersClient = getPlayersClient())
+                using (
+                    var task = playersClient.Call<AndroidJavaObject>("loadFriends", /* pageSize= */ 1,
+                        /* forceReload= */ false))
+                {
+                    AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
+                        task, annotatedData => { InvokeCallbackOnGameThread(callback, UIStatus.Valid); });
+                    AndroidTaskUtils.AddOnFailureListener(task, exception =>
+                    {
+                        AndroidHelperFragment.IsResolutionRequired(exception, resolutionRequired =>
+                        {
+                            if (resolutionRequired)
+                            {
+                                mFriendsResolutionException =
+                                    exception.Call<AndroidJavaObject>("getResolution");
+                                AndroidHelperFragment.AskForLoadFriendsResolution(
+                                    mFriendsResolutionException, AsOnGameThreadCallback(callback));
+                            }
+                            else
+                            {
+                                var statusCode = exception.Call<int>("getStatusCode");
+                                if (statusCode == /* GamesClientStatusCodes.NETWORK_ERROR_NO_DATA */ 26504)
+                                {
+                                    InvokeCallbackOnGameThread(callback, UIStatus.NetworkError);
+                                    return;
+                                }
+
+                                Debug.Log("LoadFriends failed with status code: " + statusCode);
+                                InvokeCallbackOnGameThread(callback, UIStatus.InternalError);
+                            }
+                        });
+                        return;
+                    });
+                }
+            }
+            else
+            {
+                AndroidHelperFragment.AskForLoadFriendsResolution(mFriendsResolutionException,
+                    AsOnGameThreadCallback(callback));
+            }
+        }
+
+        public void ShowCompareProfileWithAlternativeNameHintsUI(string playerId,
+            string otherPlayerInGameName,
+            string currentPlayerInGameName,
+            Action<UIStatus> callback)
+        {
+            AndroidHelperFragment.ShowCompareProfileWithAlternativeNameHintsUI(
+                playerId, otherPlayerInGameName, currentPlayerInGameName,
+                GetUiSignOutCallbackOnGameThread(callback));
+        }
+
+        public void GetFriendsListVisibility(bool forceReload,
+            Action<FriendsListVisibilityStatus> callback)
+        {
+            using (var playersClient = getPlayersClient())
+            using (
+                var task = playersClient.Call<AndroidJavaObject>("getCurrentPlayer", forceReload))
+            {
+                AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(task, annotatedData =>
+                {
+                    AndroidJavaObject currentPlayerInfo =
+                        annotatedData.Call<AndroidJavaObject>("get").Call<AndroidJavaObject>(
+                            "getCurrentPlayerInfo");
+                    int playerListVisibility =
+                        currentPlayerInfo.Call<int>("getFriendsListVisibilityStatus");
+                    InvokeCallbackOnGameThread(callback,
+                        AndroidJavaConverter.ToFriendsListVisibilityStatus(playerListVisibility));
+                });
+                AndroidTaskUtils.AddOnFailureListener(task, exception =>
+                {
+                    InvokeCallbackOnGameThread(callback, FriendsListVisibilityStatus.NetworkError);
+                    return;
+                });
+            }
         }
 
         public IUserProfile[] GetFriends()
         {
-            return new IUserProfile[0];
+            return mFriends;
         }
 
         ///<summary></summary>
@@ -489,8 +668,9 @@ namespace GooglePlayGames.Android
                     e =>
                     {
                         Debug.Log("GetPlayerStats failed: " + e.Call<string>("toString"));
-                        var statusCode = IsAuthenticated() ?
-                            CommonStatusCodes.InternalError : CommonStatusCodes.SignInRequired;
+                        var statusCode = IsAuthenticated()
+                            ? CommonStatusCodes.InternalError
+                            : CommonStatusCodes.SignInRequired;
                         InvokeCallbackOnGameThread(callback, statusCode, new PlayerStats());
                     });
             }
@@ -543,20 +723,19 @@ namespace GooglePlayGames.Android
                                 }
                             });
 
-                        AddOnFailureListenerWithSignOut(
-                            task,
-                            exception =>
+                        AddOnFailureListenerWithSignOut(task, exception =>
+                        {
+                            Debug.Log("LoadUsers failed for index " + i +
+                                      " with: " + exception.Call<string>("toString"));
+                            lock (countLock)
                             {
-                                Debug.Log("LoadUsers failed for index " + i + " with: " + exception.Call<string>("toString"));
-                                lock (countLock)
+                                ++resultCount;
+                                if (resultCount == count)
                                 {
-                                    ++resultCount;
-                                    if (resultCount == count)
-                                    {
-                                        InvokeCallbackOnGameThread(callback, users);
-                                    }
+                                    InvokeCallbackOnGameThread(callback, users);
                                 }
-                            });
+                            }
+                        });
                     }
                 }
             }
@@ -744,6 +923,7 @@ namespace GooglePlayGames.Android
                     {
                         SignOut();
                     }
+
                     callback(exception);
                 });
         }
@@ -810,14 +990,29 @@ namespace GooglePlayGames.Android
                             }
                         });
 
-                    AddOnFailureListenerWithSignOut(
-                        task,
-                        exception =>
-                        {
-                            Debug.Log("LoadScores failed: " + exception.Call<string>("toString"));
-                            InvokeCallbackOnGameThread(callback,
-                                new LeaderboardScoreData(leaderboardId, ResponseStatus.InternalError));
-                        });
+                    AddOnFailureListenerWithSignOut(task, exception =>
+                    {
+                        AndroidHelperFragment.IsResolutionRequired(
+                            exception, resolutionRequired =>
+                            {
+                                if (resolutionRequired)
+                                {
+                                    mFriendsResolutionException = exception.Call<AndroidJavaObject>(
+                                        "getResolution");
+                                    InvokeCallbackOnGameThread(
+                                        callback, new LeaderboardScoreData(leaderboardId,
+                                            ResponseStatus.ResolutionRequired));
+                                }
+                                else
+                                {
+                                    mFriendsResolutionException = null;
+                                }
+                            });
+                        Debug.Log("LoadScores failed: " + exception.Call<string>("toString"));
+                        InvokeCallbackOnGameThread(
+                            callback, new LeaderboardScoreData(leaderboardId,
+                                ResponseStatus.InternalError));
+                    });
                 }
             }
         }
@@ -849,14 +1044,28 @@ namespace GooglePlayGames.Android
                         }
                     });
 
-                AddOnFailureListenerWithSignOut(
-                    task,
-                    exception =>
+                AddOnFailureListenerWithSignOut(task, exception =>
+                {
+                    AndroidHelperFragment.IsResolutionRequired(exception, resolutionRequired =>
                     {
-                        Debug.Log("LoadMoreScores failed: " + exception.Call<string>("toString"));
-                        InvokeCallbackOnGameThread(callback,
-                            new LeaderboardScoreData(token.LeaderboardId, ResponseStatus.InternalError));
+                        if (resolutionRequired)
+                        {
+                            mFriendsResolutionException =
+                                exception.Call<AndroidJavaObject>("getResolution");
+                            InvokeCallbackOnGameThread(
+                                callback, new LeaderboardScoreData(token.LeaderboardId,
+                                    ResponseStatus.ResolutionRequired));
+                        }
+                        else
+                        {
+                            mFriendsResolutionException = null;
+                        }
                     });
+                    Debug.Log("LoadMoreScores failed: " + exception.Call<string>("toString"));
+                    InvokeCallbackOnGameThread(
+                        callback, new LeaderboardScoreData(token.LeaderboardId,
+                            ResponseStatus.InternalError));
+                });
             }
         }
 

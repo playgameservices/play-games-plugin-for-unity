@@ -258,6 +258,51 @@ namespace GooglePlayGames.BasicApi
             }
         }
 
+        public void AskForLoadFriendsResolution(Action<UIStatus> callback) {
+          LogUsage();
+          if (callback != null) {
+            callback.Invoke(UIStatus.VersionUpdateRequired);
+          }
+        }
+
+        public LoadFriendsStatus GetLastLoadFriendsStatus() {
+          LogUsage();
+          return LoadFriendsStatus.Unknown;
+        }
+
+        public void LoadFriends(int pageSize, bool forceReload,
+                                Action<LoadFriendsStatus> callback) {
+          LogUsage();
+          if (callback != null) {
+            callback.Invoke(LoadFriendsStatus.Unknown);
+          }
+        }
+
+        public void LoadMoreFriends(int pageSize, Action<LoadFriendsStatus> callback) {
+          LogUsage();
+          if (callback != null) {
+            callback.Invoke(LoadFriendsStatus.Unknown);
+          }
+        }
+
+        public void ShowCompareProfileWithAlternativeNameHintsUI(string userId,
+                                                                 string otherPlayerInGameName,
+                                                                 string currentPlayerInGameName,
+                                                                 Action<UIStatus> callback) {
+          LogUsage();
+          if (callback != null) {
+            callback.Invoke(UIStatus.VersionUpdateRequired);
+          }
+        }
+
+        public void GetFriendsListVisibility(bool forceReload,
+                                            Action<FriendsListVisibilityStatus> callback) {
+          LogUsage();
+          if (callback != null) {
+            callback.Invoke(FriendsListVisibilityStatus.Unknown);
+          }
+        }
+
         /// <summary>
         /// Shows the leaderboard UI
         /// </summary>
