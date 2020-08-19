@@ -1,3 +1,9 @@
+Version 0.10.10
+    New Features:
+    * Added Friends APIs: Play Games now has a cross-game Friends list. Request access to your players cross-game PGS friends list and integrate it with your in-game system to help players play with a set of high-quality gaming friends, and help people find their friends within your game. Learn more about Play Games Services .
+    Bug fixes:
+    * Removed Multiplayer code.
+
 Version 0.10.09
     Bug fixes:
     * Fixed the issue of having an invalidated account in cache.
