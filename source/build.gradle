@@ -68,7 +68,7 @@ project.ext {
     samplesBuildSrc = file('build/sampleSrc').absolutePath
     exportPath = file('build/plugin.unitypackage').absolutePath
     currentPluginPath = file('../current-build').absolutePath
-    currentPluginVersion = "0.10.10"
+    currentPluginVersion = "0.10.11"
     currentPluginBasename = 'GooglePlayGamesPlugin'
     currentPluginName = "${currentPluginBasename}-${currentPluginVersion}.unitypackage"
     resolverDir = new File('build/jarresolver').absolutePath
