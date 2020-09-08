@@ -21,9 +21,27 @@
 /// Resources.
 ///
 
+using System.Collections.Generic;
+
 __NameSpaceStart__
 public static class __Class__
 {
 __Constant_Properties__
+
+__DictionaryIds__
+
+        /// <summary>
+        /// Return the leaderboard id by the leaderboard name or null if the leaderboard name does not exist.
+        /// </summary>
+        /// <returns>Leaderboard id or null.</returns>
+        /// <param name="leaderboardName">Leaderboard id or null in case the leaderboard name has not been found.</param>
+        public static string GetLeaderboardId(string leaderboardName)
+        {
+            if (Dictionary.ContainsKey(leaderboardName)) {
+                return Dictionary[leaderboardName];
+            }
+
+            return null;
+        }
 }
 __NameSpaceEnd__

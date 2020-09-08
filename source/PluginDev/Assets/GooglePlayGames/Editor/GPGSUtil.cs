@@ -18,6 +18,7 @@
 namespace GooglePlayGames.Editor
 {
     using System;
+    using System.Text;
     using System.Collections;
     using System.Collections.Generic;
     using System.IO;
@@ -96,6 +97,9 @@ namespace GooglePlayGames.Editor
 
         /// <summary>Constant for token replacement</summary>
         private const string CONSTANTSPLACEHOLDER = "__Constant_Properties__";
+
+        /// <summary>Constant for token replacement</summary>
+        private const string DICTIONARYPLACEHOLDER = "__DictionaryIds__";
 
         /// <summary>
         /// The game info file path, relative to the plugin root directory.  This is a generated file.
@@ -566,6 +570,9 @@ namespace GooglePlayGames.Editor
         public static void WriteResourceIds(string classDirectory, string className, Hashtable resourceKeys)
         {
             string constantsValues = string.Empty;
+            StringBuilder disctionaryValuesStringBuilder = new StringBuilder()
+                .AppendLine("        public static readonly Dictionary<string, string> Dictionary = new Dictionary<string, string>{");
+
             string[] parts = className.Split('.');
             string dirName = classDirectory;
             if (string.IsNullOrEmpty(dirName))
@@ -591,7 +598,9 @@ namespace GooglePlayGames.Editor
                 string key = MakeIdentifier((string) ent.Key);
                 constantsValues += "        public const string " +
                                    key + " = \"" + ent.Value + "\"; // <GPGSID>\n";
+                disctionaryValuesStringBuilder.AppendLine($"            {{\"{key}\", \"{ent.Value}\"}},");
             }
+            disctionaryValuesStringBuilder.AppendLine("        };");
 
             string fileBody = GPGSUtil.ReadEditorTemplate("template-Constants");
             if (nameSpace != string.Empty)
@@ -607,6 +616,7 @@ namespace GooglePlayGames.Editor
 
             fileBody = fileBody.Replace(CLASSNAMEPLACEHOLDER, parts[parts.Length - 1]);
             fileBody = fileBody.Replace(CONSTANTSPLACEHOLDER, constantsValues);
+            fileBody = fileBody.Replace(DICTIONARYPLACEHOLDER, disctionaryValuesStringBuilder.ToString());
             if (nameSpace != string.Empty)
             {
                 fileBody = fileBody.Replace(
