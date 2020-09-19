@@ -243,7 +243,6 @@ namespace GooglePlayGames.Android
             private Action<ConnectionResponse> mResponseCallback;
             private IMessageListener mListener;
             private AndroidJavaObject mClient;
-            private string mLocalEndpointName;
 
             public DiscoveringConnectionLifecycleCallback(Action<ConnectionResponse> responseCallback,
                 IMessageListener listener, AndroidJavaObject client) : base(

@@ -40,7 +40,7 @@ namespace GooglePlayGames.UnitTests {
             public Action<bool> UnlockedCallback { get; set; }
 
             public string IncrementedId { get; set; }
-            public int? IncrementedSteps { get; set; }
+            public int? NewSteps { get; set; }
             public Action<bool> IncrementedCallback { get; set; }
 
             public Achievement CurrentAchievement { get; set; }
@@ -57,14 +57,26 @@ namespace GooglePlayGames.UnitTests {
                 UnlockedCallback = callback;
             }
 
-            public override void IncrementAchievement(string achId, int steps, Action<bool> callback) {
+            public override void SetStepsAtLeast(string achId, int steps, Action<bool> callback) {
                 IncrementedId = achId;
-                IncrementedSteps = steps;
+                NewSteps = steps;
                 IncrementedCallback = callback;
             }
 
-            public override void ShowAchievementsUI() {
+            public override void ShowAchievementsUI(Action<UIStatus> callback) {
                 ShownUiCount++;
+            }
+
+            public override void LoadAchievements(Action<Achievement[]> callback) {
+                Achievement[] achievements;
+                if (CurrentAchievement == null) {
+                    achievements = new Achievement[0];
+                } else {
+                    achievements = new Achievement[1];
+                    achievements[0] = CurrentAchievement;
+                }
+
+                callback.Invoke(achievements);
             }
         }
 
@@ -95,6 +107,9 @@ namespace GooglePlayGames.UnitTests {
             var mockClient = new AchievementClient();
             var platform = new PlayGamesPlatform(mockClient);
             platform.AddIdMapping("mappedId", "realId");
+            Achievement achievemnt = new Achievement();
+            achievemnt.Id = "realId";
+            mockClient.CurrentAchievement = achievemnt;
 
             platform.ReportProgress("mappedId", 0.00000001, SentinelCallback);
 
@@ -107,6 +122,7 @@ namespace GooglePlayGames.UnitTests {
             var platform = new PlayGamesPlatform(mockClient);
 
             Achievement nonIncremental = new Achievement();
+            nonIncremental.Id = "nonIncremental";
             mockClient.CurrentAchievement = nonIncremental;
 
             platform.ReportProgress("nonIncremental", 50, SentinelCallback);
@@ -134,7 +150,7 @@ namespace GooglePlayGames.UnitTests {
             IncrementViaReportProgress(mockClient, platform, 0, 100, 100);
 
             Assert.AreEqual("incremental", mockClient.IncrementedId);
-            Assert.AreEqual(100, mockClient.IncrementedSteps.Value);
+            Assert.AreEqual(100, mockClient.NewSteps.Value);
         }
 
         [Test]
@@ -145,7 +161,7 @@ namespace GooglePlayGames.UnitTests {
             IncrementViaReportProgress(mockClient, platform, 0, 100, 25);
 
             Assert.AreEqual("incremental", mockClient.IncrementedId);
-            Assert.AreEqual(25, mockClient.IncrementedSteps.Value);
+            Assert.AreEqual(25, mockClient.NewSteps.Value);
         }
 
         [Test]
@@ -156,30 +172,7 @@ namespace GooglePlayGames.UnitTests {
             IncrementViaReportProgress(mockClient, platform, 25, 100, 60);
 
             Assert.AreEqual("incremental", mockClient.IncrementedId);
-            // Our target is 50 steps, initial value is 25 - delta of 25.
-            Assert.AreEqual(35, mockClient.IncrementedSteps.Value);
-        }
-
-        [Test]
-        public void AchievementReportProgressIncrementalIgnoresProgressDecrease() {
-            var mockClient = new AchievementClient();
-            var platform = new PlayGamesPlatform(mockClient);
-
-            IncrementViaReportProgress(mockClient, platform, 25, 100, 10);
-
-            Assert.IsNull(mockClient.IncrementedId);
-            Assert.IsNull(mockClient.IncrementedSteps);
-        }
-
-        [Test]
-        public void AchievementReportProgressIncrementalIgnoresZeroIncrement() {
-            var mockClient = new AchievementClient();
-            var platform = new PlayGamesPlatform(mockClient);
-
-            IncrementViaReportProgress(mockClient, platform, 25, 100, 25);
-
-            Assert.IsNull(mockClient.IncrementedId);
-            Assert.IsNull(mockClient.IncrementedSteps);
+            Assert.AreEqual(60, mockClient.NewSteps.Value);
         }
 
         [Test]
@@ -190,7 +183,7 @@ namespace GooglePlayGames.UnitTests {
             IncrementViaReportProgress(mockClient, platform, 0, 100, 200);
 
             Assert.AreEqual("incremental", mockClient.IncrementedId);
-            Assert.AreEqual(200, mockClient.IncrementedSteps.Value);
+            Assert.AreEqual(200, mockClient.NewSteps.Value);
         }
 
         [Test]
@@ -211,10 +204,10 @@ namespace GooglePlayGames.UnitTests {
             var mockClient = new AchievementClient();
             var platform = new PlayGamesPlatform(mockClient);
 
-            platform.IncrementAchievement("unmapped", 20, SentinelCallback);
+            platform.SetStepsAtLeast("unmapped", 20, SentinelCallback);
 
             Assert.AreEqual("unmapped", mockClient.IncrementedId);
-            Assert.AreEqual(20, mockClient.IncrementedSteps);
+            Assert.AreEqual(20, mockClient.NewSteps);
             Assert.AreSame(SentinelCallback, mockClient.IncrementedCallback);
         }
 
@@ -224,10 +217,10 @@ namespace GooglePlayGames.UnitTests {
             var platform = new PlayGamesPlatform(mockClient);
             platform.AddIdMapping("unmapped", "mapped");
 
-            platform.IncrementAchievement("unmapped", 30, SentinelCallback);
+            platform.SetStepsAtLeast("unmapped", 30, SentinelCallback);
 
             Assert.AreEqual("mapped", mockClient.IncrementedId);
-            Assert.AreEqual(30, mockClient.IncrementedSteps);
+            Assert.AreEqual(30, mockClient.NewSteps);
             Assert.AreSame(SentinelCallback, mockClient.IncrementedCallback);
         }
 
@@ -256,6 +249,7 @@ namespace GooglePlayGames.UnitTests {
         static void IncrementViaReportProgress(AchievementClient mockClient, PlayGamesPlatform platform,
                                        int current, int total, double progress) {
             Achievement incremental = new Achievement();
+            incremental.Id = "incremental";
             incremental.IsIncremental = true;
             incremental.CurrentSteps = current;
             incremental.TotalSteps = total;
@@ -278,7 +272,9 @@ namespace GooglePlayGames.UnitTests {
                 SubmitCallback = callback;
             }
 
-            public override void ShowLeaderboardUI(string leaderboardId) {
+            public override void ShowLeaderboardUI(string leaderboardId,
+                LeaderboardTimeSpan span,
+                Action<UIStatus> callback) {
                 UIShown = true;
                 ShownId = leaderboardId;
             }
@@ -408,14 +404,14 @@ namespace GooglePlayGames.UnitTests {
         // Authentication tests
         class LoginClient : BaseMockPlayGamesClient {
             public bool? AuthenticatedSilently { get; set; }
-            public Action<bool> AuthenticationCallback { get; set; }
+            public Action<SignInStatus> AuthenticationCallback { get; set; }
 
             public String UserId { get; set; }
             public String UserDisplayName { get; set; }
 
             public int SignOutCount { get; set; }
 
-            public override void Authenticate(Action<bool> callback, bool silent) {
+            public override void Authenticate(bool silent, Action<SignInStatus> callback) {
                 AuthenticatedSilently = silent;
                 AuthenticationCallback = callback;
             }
@@ -440,7 +436,6 @@ namespace GooglePlayGames.UnitTests {
 
             platform.Authenticate(SentinelCallback);
 
-            Assert.AreSame(SentinelCallback, mockClient.AuthenticationCallback);
             Assert.IsFalse(mockClient.AuthenticatedSilently.Value);
         }
 
@@ -451,7 +446,6 @@ namespace GooglePlayGames.UnitTests {
 
             platform.Authenticate(SentinelCallback, true);
 
-            Assert.AreSame(SentinelCallback, mockClient.AuthenticationCallback);
             Assert.IsTrue(mockClient.AuthenticatedSilently.Value);
         }
 
@@ -462,7 +456,6 @@ namespace GooglePlayGames.UnitTests {
 
             platform.Authenticate(SentinelCallback, false);
 
-            Assert.AreSame(SentinelCallback, mockClient.AuthenticationCallback);
             Assert.IsFalse(mockClient.AuthenticatedSilently.Value);
         }
 
@@ -495,103 +488,9 @@ namespace GooglePlayGames.UnitTests {
 
             Assert.AreEqual(1, mockClient.SignOutCount);
         }
-
-        // CloudSave tests
-        class CloudSaveClient : BaseMockPlayGamesClient {
-            public int? Slot { get; set; }
-            public OnStateLoadedListener Listener { get; set; }
-            public byte[] Data { get; set; }
-
-            public override void LoadState(int slot, OnStateLoadedListener listener) {
-                Slot = slot;
-                Listener = listener;
-            }
-
-            public override void UpdateState(int slot, byte[] data, OnStateLoadedListener listener) {
-                Slot = slot;
-                Data = data;
-                Listener = listener;
-            }
-        }
-
-        class CapturingStateListener : OnStateLoadedListener {
-            public bool? LastOperationSucceeded { get; private set; }
-            public int? SlotForLastOperation { get; private set; }
-            public byte[] DataForLastOperation { get; private set; }
-
-            public void OnStateLoaded(bool success, int slot, byte[] data) {
-                LastOperationSucceeded = success;
-                SlotForLastOperation = slot;
-                DataForLastOperation = data;
-            }
-
-            public byte[] OnStateConflict(int slot, byte[] localData, byte[] serverData) {
-                return null;
-            }
-
-            public void OnStateSaved(bool success, int slot) {
-                LastOperationSucceeded = success;
-                SlotForLastOperation = slot;
-            }
-        }
-
-        [Test]
-        public void LoadStateFailsWhenNotLoggedIn() {
-            var mockClient = new CloudSaveClient();
-            var platform = new PlayGamesPlatform(mockClient);
-            var listener = new CapturingStateListener();
-
-            mockClient.Authenticated = false;
-
-            platform.LoadState(3, listener);
-
-            Assert.AreEqual(3, listener.SlotForLastOperation);
-            Assert.IsNull(listener.DataForLastOperation);
-            Assert.IsFalse(listener.LastOperationSucceeded.Value);
-        }
-
-        [Test]
-        public void LoadStateSucceedsWhenLoggedIn() {
-            var mockClient = new CloudSaveClient();
-            var platform = new PlayGamesPlatform(mockClient);
-            var listener = new CapturingStateListener();
-
-            platform.LoadState(3, listener);
-
-            Assert.AreEqual(3, mockClient.Slot);
-            Assert.AreSame(listener, mockClient.Listener);
-        }
-
-        [Test]
-        public void UpdateStateFailsWhenNotLoggedIn() {
-            var mockClient = new CloudSaveClient();
-            var platform = new PlayGamesPlatform(mockClient);
-            var listener = new CapturingStateListener();
-
-            mockClient.Authenticated = false;
-
-            platform.UpdateState(2, new byte[] {0, 1}, listener);
-
-            Assert.AreEqual(2, listener.SlotForLastOperation);
-            Assert.IsFalse(listener.LastOperationSucceeded.Value);
-        }
-
-        [Test]
-        public void UpdateStateSucceedsWhenLoggedIn() {
-            var mockClient = new CloudSaveClient();
-            var platform = new PlayGamesPlatform(mockClient);
-            var listener = new CapturingStateListener();
-            var data = new byte[] {0, 1};
-
-            platform.UpdateState(2, data, listener);
-
-            Assert.AreEqual(2, mockClient.Slot);
-            Assert.AreEqual(data, mockClient.Data);
-            Assert.AreSame(listener, mockClient.Listener);
-        }
     }
 
-    class CapturingAction<T> {
+     class CapturingAction<T> {
         internal bool Invoked { get; private set; }
 
         private T captured;
@@ -614,4 +513,3 @@ namespace GooglePlayGames.UnitTests {
         }
     }
 }
-

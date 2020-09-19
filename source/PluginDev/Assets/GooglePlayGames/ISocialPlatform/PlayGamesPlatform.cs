@@ -1249,7 +1249,7 @@ namespace GooglePlayGames
                 leaderboardId = MapId(leaderboardId);
             }
 
-            mClient.ShowLeaderboardUI(leaderboardId, LeaderboardTimeSpan.AllTime, null);
+            ShowLeaderboardUI(leaderboardId, LeaderboardTimeSpan.AllTime, null);
         }
 
         /// <summary>
