@@ -61,23 +61,42 @@ project.ext {
         git_exe = 'git'
     }
 
+    pluginVersion = "0.10.11"
+
+    // String for specifying the build mode.
+    // If 'eap', will include all files from the 'Protected' folder.
+    // If build mode is anything other than 'eap', assumes a regular public
+    // build.
+    //   -PbuildMode=eap
+    if (!project.hasProperty('buildMode') || buildMode != 'eap') {
+        buildMode = 'public'
+    }
+
+    if (buildMode == 'eap') {
+        buildPath = file('build-eap').absolutePath
+        currentPluginPath = buildPath
+        currentPluginVersion = "${pluginVersion}-eap"
+    } else {
+        buildPath = file('build').absolutePath
+        currentPluginPath = file('../current-build').absolutePath
+        currentPluginVersion = "${pluginVersion}"
+    }
     pluginSrc = file('PluginDev').absolutePath
-    pluginBuildSrc = file('build/PluginSrc').absolutePath
-    pluginProj = file('build/PluginProject').absolutePath
+    protectedPluginSrc = file('../Protected/PluginDev').absolutePath
+    pluginBuildSrc = file("${buildPath}/PluginSrc").absolutePath
+    pluginProj = file("${buildPath}/PluginProject").absolutePath
     samplesPath = file('../samples').absolutePath
-    samplesBuildSrc = file('build/sampleSrc').absolutePath
-    exportPath = file('build/plugin.unitypackage').absolutePath
-    currentPluginPath = file('../current-build').absolutePath
-    currentPluginVersion = "0.10.11"
+    protectedSamplesPath = file('../Protected/samples').absolutePath
+    samplesBuildSrc = file("${buildPath}/sampleSrc").absolutePath
+    exportPath = file("${buildPath}/plugin.unitypackage").absolutePath
     currentPluginBasename = 'GooglePlayGamesPlugin'
     currentPluginName = "${currentPluginBasename}-${currentPluginVersion}.unitypackage"
-    resolverDir = new File('build/jarresolver').absolutePath
+    resolverDir = new File("${buildPath}/jarresolver").absolutePath
 
     editorDir = "Assets/GooglePlayGames/Editor"
     pluginRepoDir = "${pluginProj}/${editorDir}/m2repository"
 
-    sampleList = ['CubicPilot', 'Minimal',
-         'NearbyDroids', 'SmokeTest']
+    sampleList = ['CubicPilot', 'Minimal', 'NearbyDroids', 'SmokeTest']
 
 
     jarresolver_uri = System.getProperty("RESOLVER_PACKAGE_URI")
@@ -146,18 +165,19 @@ sampleList.each { sampleName ->
     // this is the path to the source code
     def sampleSrcDir = samplesPath + '/' + sampleName + '/Source/Assets/' + sampleName
 
+    // this is the path to the source code for eap code
+    def protectedSampleSrcDir = protectedSamplesPath + '/' + sampleName + '/Source/Assets/' + sampleName
+
     // this is the path to the source code in the build dir
     def sampleBuildSrcDir = samplesBuildSrc + '/' + sampleName + '/Source/Assets/' + sampleName
 
-    def buildPath = file('build').absolutePath
-
     // this is the path to build the sample package
-    def sampleDestSrcDir = file("${buildPath}/Samples/${sampleName}/Assets/${sampleName}").absolutePath
+    def sampleDestSrcDir = file("${project.ext.buildPath}/Samples/${sampleName}/Assets/${sampleName}").absolutePath
 
     // the relative path to the sample assets within the project.
     def sampleAssets = "Assets/${sampleName}"
 
-    def sampleDir = file("${buildPath}/Samples")
+    def sampleDir = file("${project.ext.buildPath}/Samples")
     if (!sampleDir.exists()) {
         sampleDir.mkdirs()
     }
@@ -168,14 +188,14 @@ sampleList.each { sampleName ->
     createTask.description = "Create the ${sampleName} package"
     createTask.dependsOn 'export_package'
     createTask.doFirst {
-        delete "${buildPath}/Samples/${sampleName}"
+        delete "${project.ext.buildPath}/Samples/${sampleName}"
 
-        def logFilename = "${buildPath}/CreateSample${sampleName}.log"
+        def logFilename = "${project.ext.buildPath}/CreateSample${sampleName}.log"
         def argv = [
           "-gvh_disable",
           "-g.building",
           "-batchmode",
-          "-createProject", "${buildPath}/Samples/${sampleName}",
+          "-createProject", "${project.ext.buildPath}/Samples/${sampleName}",
           "-importPackage", "${exportPath}",
           "-logFile", logFilename,
           "-quit"
@@ -195,6 +215,12 @@ sampleList.each { sampleName ->
             copy {
                 from sampleSrcDir
                 into sampleBuildSrcDir
+            }
+            if (buildMode == 'eap') {
+                copy {
+                    from protectedSampleSrcDir
+                    into sampleBuildSrcDir
+                }
             }
     }
     copyBuildSrcTask.doLast {
@@ -230,16 +256,16 @@ sampleList.each { sampleName ->
         packageTask.dependsOn createTask, copySrcTask
 
         packageTask.doLast {
-            def logFilename = "${buildPath}/ExportSample${sampleName}.log"
+            def logFilename = "${project.ext.buildPath}/ExportSample${sampleName}.log"
             def argv = [
               "-gvh_disable",
               "-g.building",
               "-batchmode",
-              "-projectPath", "${buildPath}/Samples/${sampleName}",
+              "-projectPath", "${project.ext.buildPath}/Samples/${sampleName}",
               "-buildTarget", "android",
               "-logFile", logFilename,
               "-exportPackage", "${sampleAssets}",
-                    "${buildPath}/Samples/${sampleName}.unitypackage",
+                    "${project.ext.buildPath}/Samples/${sampleName}.unitypackage",
               "-quit"
               ]
             runUnity(argv, logFilename)
@@ -252,9 +278,16 @@ sampleList.each { sampleName ->
         def copySamplePackageTask = project.tasks.create('CopySamplePackage' + sampleName)
         copySamplePackageTask.description = "Copy unity package for " + sampleName + " back to src dir"
         copySamplePackageTask.doLast {
-            copy {
-                from file("${buildPath}/Samples/${sampleName}.unitypackage")
-                into file("../samples/${sampleName}")
+            if (buildMode == 'eap') {
+                copy {
+                    from file("${project.ext.buildPath}/Samples/${sampleName}.unitypackage")
+                    into file("${project.ext.protectedSamplesPath}/${sampleName}")
+                }
+            } else {
+                copy {
+                    from file("${project.ext.buildPath}/Samples/${sampleName}.unitypackage")
+                    into file("${project.ext.samplesPath}/${sampleName}")
+                }
             }
         }
 
@@ -276,7 +309,7 @@ task import_jarresolver() {
             }
         def jarresolver_package = tree.getSingleFile()
 
-        def logFilename = "${buildDir}/import_resolver_unity.log"
+        def logFilename = "${project.ext.buildPath}/import_resolver_unity.log"
         def argv = [
             "-gvh_disable",
             "-g.building",
@@ -306,7 +339,7 @@ task copy_pluginProjSrc () {
     }
     doLast {
       copy {
-        from {"${buildDir}/m2repository"}
+        from {"${project.ext.buildPath}/m2repository"}
         includes ["**/*"]
         duplicatesStrategy DuplicatesStrategy.INCLUDE
         into {"${pluginRepoDir}"}
@@ -415,7 +448,7 @@ task export_package () {
     }
 
     doLast {
-        def logFilename = "${buildDir}/unity.log"
+        def logFilename = "${project.ext.buildPath}/unity.log"
         def argv = [
                 "-g.building",
                 // This prevents the VersionHandler to preserve the plugin layout
@@ -470,6 +503,14 @@ task copy_plugin_source {
         from {"${pluginSrc}"}
         into {"${pluginBuildSrc}"}
     }
+    if (buildMode == 'eap') {
+      copy {
+          from("${protectedPluginSrc}") {
+              exclude 'README'
+          }
+          into {"${pluginBuildSrc}"}
+      }
+    }
   }
 }
 
@@ -521,7 +562,7 @@ task build_java_support_lib(type: GradleBuild) {
     description = "Builds the client libraries for Android"
     buildFile = 'SupportLib/build.gradle'
     startParameter.projectProperties.put('projVersion',currentPluginVersion)
-    startParameter.projectProperties.put('uploadDir', "${buildDir}/m2repository")
+    startParameter.projectProperties.put('uploadDir', "${project.ext.buildPath}/m2repository")
 
     tasks = ['build', 'uploadArchives']
 }
