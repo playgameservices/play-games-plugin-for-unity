@@ -96,8 +96,20 @@ project.ext {
     editorDir = "Assets/GooglePlayGames/Editor"
     pluginRepoDir = "${pluginProj}/${editorDir}/m2repository"
 
-    sampleList = ['CubicPilot', 'Minimal', 'NearbyDroids', 'SmokeTest']
+    // String for specifying if samples are built.
+    // If 'off', only the plugin will be built.
+    // If sampleBuild mode is anything other than 'off', assume samples are
+    // built.
+    //   -PsampleBuild=off
+    if (!project.hasProperty('sampleBuild') || sampleBuild != 'off') {
+        sampleBuild = 'on'
+    }
 
+    if (sampleBuild == 'on') {
+        sampleList = ['CubicPilot', 'Minimal', 'NearbyDroids', 'SmokeTest']
+    } else {
+        sampleList = []
+    }
 
     jarresolver_uri = System.getProperty("RESOLVER_PACKAGE_URI")
     jarresolver_repos = [
