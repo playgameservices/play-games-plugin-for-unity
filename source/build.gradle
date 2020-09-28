@@ -506,7 +506,7 @@ task copy_plugin_source {
     if (buildMode == 'eap') {
       copy {
           from("${protectedPluginSrc}") {
-              exclude 'README'
+              exclude 'README.md'
           }
           into {"${pluginBuildSrc}"}
       }
