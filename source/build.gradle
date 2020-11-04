@@ -76,13 +76,19 @@ project.ext {
         buildPath = file('build-eap').absolutePath
         currentPluginPath = buildPath
         currentPluginVersion = "${pluginVersion}-eap"
+        supportLibProj = file("${buildPath}/SupportLibProject").absolutePath
+        supportLibGradle = "${buildPath}/SupportLibProject/build.gradle"
     } else {
         buildPath = file('build').absolutePath
         currentPluginPath = file('../current-build').absolutePath
         currentPluginVersion = "${pluginVersion}"
+        supportLibProj = file('SupportLib').absolutePath
+        supportLibGradle = 'SupportLib/build.gradle'
     }
     pluginSrc = file('PluginDev').absolutePath
     protectedPluginSrc = file('../Protected/PluginDev').absolutePath
+    supportLib = file('SupportLib').absolutePath
+    protectedSupportLib = file('../Protected/SupportLib').absolutePath
     pluginBuildSrc = file("${buildPath}/PluginSrc").absolutePath
     pluginProj = file("${buildPath}/PluginProject").absolutePath
     samplesPath = file('../samples').absolutePath
@@ -526,6 +532,24 @@ task copy_plugin_source {
   }
 }
 
+task copy_supportlib_source {
+  description = "Copies support lib source into build directory for EAPs only"
+  ext.remoteTaskPhase = 'prebuild'
+
+  if (buildMode == 'eap') {
+    copy {
+        from("${supportLib}")
+        into {"${supportLibProj}"}
+    }
+    copy {
+        from("${protectedSupportLib}") {
+            exclude 'README.md'
+        }
+        into {"${supportLibProj}"}
+    }
+  }
+}
+
 task copy_jarresolver() {
     description = "Clones the jar resolver project and copied into the build."
     ext.remoteTaskPhase = "prebuild"
@@ -572,7 +596,8 @@ task copy_jarresolver() {
 
 task build_java_support_lib(type: GradleBuild) {
     description = "Builds the client libraries for Android"
-    buildFile = 'SupportLib/build.gradle'
+    buildFile = supportLibGradle
+    dependsOn copy_supportlib_source
     startParameter.projectProperties.put('projVersion',currentPluginVersion)
     startParameter.projectProperties.put('uploadDir', "${project.ext.buildPath}/m2repository")
 
@@ -582,7 +607,7 @@ build_java_support_lib.ext.remoteTaskPhase = 'prebuild'
 
 task clean_support_lib(type: GradleBuild) {
     description = "cleans the client libraries for Android"
-    buildFile = 'SupportLib/build.gradle'
+    buildFile = supportLibGradle
     tasks = ['clean']
 }
 task clean() {
