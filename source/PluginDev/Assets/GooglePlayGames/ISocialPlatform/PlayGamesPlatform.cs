@@ -1380,7 +1380,8 @@ namespace GooglePlayGames
                                               " callback is " + callback);
             mClient.LoadScores(
                 board.id,
-                LeaderboardStart.PlayerCentered,
+                // Corrected: If the from parameter is non-positive, then the results returned are player-centered, meaning the scores around the current player's score are returned.
+                board.range.from <= 0 ? LeaderboardStart.PlayerCentered: LeaderboardStart.TopScores,
                 board.range.count > 0 ? board.range.count : mClient.LeaderboardMaxResults(),
                 board.userScope == UserScope.FriendsOnly ? LeaderboardCollection.Social : LeaderboardCollection.Public,
                 timeSpan,
