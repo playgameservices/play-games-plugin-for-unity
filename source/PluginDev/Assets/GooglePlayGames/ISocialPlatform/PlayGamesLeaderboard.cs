@@ -115,7 +115,7 @@ namespace GooglePlayGames
         {
             if (data.Valid)
             {
-                Debug.Log("Setting leaderboard from: " + data);
+                OurUtils.Logger.d("Setting leaderboard from: " + data);
                 SetMaxRange(data.ApproximateCount);
                 SetTitle(data.Title);
                 SetLocalUserScore((PlayGamesScore) data.PlayerScore);

@@ -147,7 +147,7 @@ namespace GooglePlayGames.OurUtils
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError("Exception in OnApplicationFocus:" +
+                    Logger.e("Exception in OnApplicationFocus:" +
                                    e.Message + "\n" + e.StackTrace);
                 }
             }
@@ -163,7 +163,7 @@ namespace GooglePlayGames.OurUtils
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError("Exception in OnApplicationPause:" +
+                    Logger.e("Exception in OnApplicationPause:" +
                                    e.Message + "\n" + e.StackTrace);
                 }
             }
