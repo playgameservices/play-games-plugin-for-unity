@@ -93,6 +93,35 @@ namespace GooglePlayGames.UnitTests {
         }
 
         [Test]
+        public void ProgressToSteps() {
+            var testCases = new[] {
+                new {progress =  0.00f, totalSteps = 3, expectedResult = 0},
+                new {progress = 33.33f, totalSteps = 3, expectedResult = 0},
+                new {progress = 33.34f, totalSteps = 3, expectedResult = 1},
+                new {progress = 49.99f, totalSteps = 3, expectedResult = 1},
+                new {progress = 50.00f, totalSteps = 3, expectedResult = 1},
+                new {progress = 83.33f, totalSteps = 3, expectedResult = 2},
+                new {progress = 83.34f, totalSteps = 3, expectedResult = 2},
+                new {progress = 100.0f, totalSteps = 3, expectedResult = 3},
+
+                new {progress = 0f, totalSteps = 10, expectedResult = 0},
+                new {progress = 10f, totalSteps = 10, expectedResult = 1},
+                new {progress = 50f, totalSteps = 10, expectedResult = 5},
+                new {progress = 89.9f, totalSteps = 10, expectedResult = 8},
+                new {progress = 90f, totalSteps = 10, expectedResult = 9},
+                new {progress = 99.99f, totalSteps = 10, expectedResult = 9},
+                new {progress = 100f, totalSteps = 10, expectedResult = 10}
+            };
+            foreach (var testCase in testCases) {
+                Assert.AreEqual(
+                    testCase.expectedResult,
+                    PlayGamesPlatform.progressToSteps(testCase.progress, testCase.totalSteps),
+                    "For progress = {0:f} and totalSteps = {1:d}", testCase.progress, testCase.totalSteps
+                 );
+            }
+        }
+
+        [Test]
         public void AchievementReportProgressIsRevealNoMapping() {
             var mockClient = new AchievementClient();
             var platform = new PlayGamesPlatform(mockClient);
@@ -180,10 +209,10 @@ namespace GooglePlayGames.UnitTests {
             var mockClient = new AchievementClient();
             var platform = new PlayGamesPlatform(mockClient);
 
-            IncrementViaReportProgress(mockClient, platform, 0, 100, 200);
+            IncrementViaReportProgress(mockClient, platform, 0, 120, 110.0);
 
             Assert.AreEqual("incremental", mockClient.IncrementedId);
-            Assert.AreEqual(200, mockClient.NewSteps.Value);
+            Assert.AreEqual(120, mockClient.NewSteps.Value);
         }
 
         [Test]
