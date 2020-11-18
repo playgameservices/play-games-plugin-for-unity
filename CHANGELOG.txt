@@ -1,3 +1,14 @@
+Version 0.10.12
+    New Features:
+    * Updated play-services-games version to 21.0.0
+    * Updated play-services-auth version to 19.0.0
+    * Updated GradleDependency to 4.0.2
+    * Fixed issue where Google Play Games SDK path not found for Unity_2020.
+    * Fixed rounding issue with incremental achievements.
+    * Replace Debug.Log with OurUtils.Logger
+    * Build configuration updates.
+    * Unit test fixes.
+
 Version 0.10.10
     New Features:
     * Added Friends APIs: Play Games now has a cross-game Friends list. Request access to your players cross-game PGS friends list and integrate it with your in-game system to help players play with a set of high-quality gaming friends, and help people find their friends within your game. Learn more about Play Games Services .
