@@ -3,10 +3,12 @@ Version 0.10.12
     * Updated play-services-games version to 21.0.0
     * Updated play-services-auth version to 19.0.0
     * Updated GradleDependency to 4.0.2
-    * Fixed issue where Google Play Games SDK path not found for Unity_2020.
-    * Fixed rounding issue with incremental achievements.
     * Replace Debug.Log with OurUtils.Logger
     * Build configuration updates.
+    Bug fixes:
+    * #2967 Fixed the GUID not found error.
+    * Fixed issue where Google Play Games SDK path not found for Unity_2020.
+    * Fixed rounding issue with incremental achievements.
     * Unit test fixes.
 
 Version 0.10.10
