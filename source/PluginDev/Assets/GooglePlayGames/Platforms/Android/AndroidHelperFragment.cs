@@ -55,7 +55,7 @@ namespace GooglePlayGames.Android
                     task,
                     uiCode =>
                     {
-                        Debug.Log("ShowAchievementsUI result " + uiCode);
+                        OurUtils.Logger.d("ShowAchievementsUI result " + uiCode);
                         cb.Invoke((UIStatus) uiCode);
                     });
 
@@ -63,7 +63,7 @@ namespace GooglePlayGames.Android
                     task,
                     exception =>
                     {
-                        Debug.Log("ShowAchievementsUI failed with exception");
+                        OurUtils.Logger.e("ShowAchievementsUI failed with exception");
                         cb.Invoke(UIStatus.InternalError);
                     });
             }
@@ -88,7 +88,7 @@ namespace GooglePlayGames.Android
                     task,
                     uiCode =>
                     {
-                        Debug.Log("ShowAllLeaderboardsUI result " + uiCode);
+                        OurUtils.Logger.d("ShowAllLeaderboardsUI result " + uiCode);
                         cb.Invoke((UIStatus) uiCode);
                     });
 
@@ -96,7 +96,7 @@ namespace GooglePlayGames.Android
                     task,
                     exception =>
                     {
-                        Debug.Log("ShowAllLeaderboardsUI failed with exception");
+                        OurUtils.Logger.e("ShowAllLeaderboardsUI failed with exception");
                         cb.Invoke(UIStatus.InternalError);
                     });
             }
@@ -113,7 +113,7 @@ namespace GooglePlayGames.Android
                     task,
                     uiCode =>
                     {
-                        Debug.Log("ShowLeaderboardUI result " + uiCode);
+                        OurUtils.Logger.d("ShowLeaderboardUI result " + uiCode);
                         cb.Invoke((UIStatus) uiCode);
                     });
 
@@ -121,7 +121,7 @@ namespace GooglePlayGames.Android
                     task,
                     exception =>
                     {
-                        Debug.Log("ShowLeaderboardUI failed with exception");
+                        OurUtils.Logger.e("ShowLeaderboardUI failed with exception");
                         cb.Invoke(UIStatus.InternalError);
                     });
             }
@@ -140,12 +140,12 @@ namespace GooglePlayGames.Android
             {
                 AndroidTaskUtils.AddOnSuccessListener<int>(task, uiCode =>
                 {
-                    Debug.Log("ShowCompareProfileWithAlternativeNameHintsUI result " + uiCode);
+                    OurUtils.Logger.d("ShowCompareProfileWithAlternativeNameHintsUI result " + uiCode);
                     cb.Invoke((UIStatus) uiCode);
                 });
                 AndroidTaskUtils.AddOnFailureListener(task, exception =>
                 {
-                    Debug.Log("ShowCompareProfileWithAlternativeNameHintsUI failed with exception");
+                    OurUtils.Logger.e("ShowCompareProfileWithAlternativeNameHintsUI failed with exception");
                     cb.Invoke(UIStatus.InternalError);
                 });
             }
@@ -173,13 +173,13 @@ namespace GooglePlayGames.Android
             {
                 AndroidTaskUtils.AddOnSuccessListener<int>(task, uiCode =>
                 {
-                    Debug.Log("AskForLoadFriendsResolution result " + uiCode);
+                    OurUtils.Logger.d("AskForLoadFriendsResolution result " + uiCode);
                     cb.Invoke((UIStatus) uiCode);
                 });
 
                 AndroidTaskUtils.AddOnFailureListener(task, exception =>
                 {
-                    Debug.Log("AskForLoadFriendsResolution failed with exception");
+                    OurUtils.Logger.e("AskForLoadFriendsResolution failed with exception");
                     cb.Invoke(UIStatus.InternalError);
                 });
             }
@@ -198,7 +198,7 @@ namespace GooglePlayGames.Android
                     result =>
                     {
                         SelectUIStatus status = (SelectUIStatus) result.Get<int>("status");
-                        Debug.Log("ShowSelectSnapshotUI result " + status);
+                        OurUtils.Logger.d("ShowSelectSnapshotUI result " + status);
 
                         AndroidJavaObject javaMetadata = result.Get<AndroidJavaObject>("metadata");
                         AndroidSnapshotMetadata metadata =
@@ -213,7 +213,7 @@ namespace GooglePlayGames.Android
                     task,
                     exception =>
                     {
-                        Debug.Log("ShowSelectSnapshotUI failed with exception");
+                        OurUtils.Logger.e("ShowSelectSnapshotUI failed with exception");
                         cb.Invoke(SelectUIStatus.InternalError, null);
                     });
             }
