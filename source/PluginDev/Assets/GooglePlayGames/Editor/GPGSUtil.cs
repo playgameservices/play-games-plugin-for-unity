@@ -121,35 +121,22 @@ namespace GooglePlayGames.Editor
             {
                 if (string.IsNullOrEmpty(mRootPath))
                 {
-                    string[] dirs = Directory.GetDirectories("Assets", RootFolderName, SearchOption.AllDirectories);
-                    switch (dirs.Length)
+                    var projectPath = Directory.GetParent(Application.dataPath);
+                    var res = System.IO.Directory.GetFiles (projectPath.FullName, "GPGSUtil.cs", SearchOption.AllDirectories);
+
+                    switch (res.Length)
                     {
                         case 0:
-                            Alert("Plugin error: GooglePlayGames folder was renamed");
-                            throw new Exception("GooglePlayGames folder was renamed");
+                            Alert("Plugin error: GPGSUtil.cs not found");
+                            throw new Exception("Plugin error: GPGSUtil.cs not found");
 
                         case 1:
-                            mRootPath = SlashesToPlatformSeparator(dirs[0]);
+                            mRootPath = res [0].Replace ("Editor/GPGSUtil.cs", "").Replace ("\\", "/");
                             break;
 
                         default:
-                            for (int i = 0; i < dirs.Length; i++)
-                            {
-                                if (File.Exists(SlashesToPlatformSeparator(Path.Combine(dirs[i], GameInfoRelativePath)))
-                                )
-                                {
-                                    mRootPath = SlashesToPlatformSeparator(dirs[i]);
-                                    break;
-                                }
-                            }
-
-                            if (string.IsNullOrEmpty(mRootPath))
-                            {
-                                Alert("Plugin error: GooglePlayGames folder was renamed");
-                                throw new Exception("GooglePlayGames folder was renamed");
-                            }
-
-                            break;
+                            Alert("Plugin error: Multiple occurrences of GPGSUtil.cs");
+                            throw new Exception("Plugin error: Multiple occurrences of GPGSUtil.cs");
                     }
                 }
 
