@@ -135,8 +135,9 @@ namespace GooglePlayGames
                 {
 #if UNITY_2017_1_OR_NEWER
                     mImageFetcher = UnityWebRequestTexture.GetTexture(url);
+					mImageFetcher.SendWebRequest();
 #else
-                    mImageFetcher = new WWW(url);
+					mImageFetcher = new WWW(url);
 #endif
                     mImage = null;
                 }
