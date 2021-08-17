@@ -81,7 +81,7 @@ if [ "$?" = "0" ]; then
     exit 1
 fi
 
-echo "Checking for Library directories..."
+echo "Checking for Library directories..." 
 git ls-files | grep /Library/
 if [ "$?" = "0" ]; then
     echo "*** Error: can't commit Library directories of Unity projects."
@@ -92,5 +92,5 @@ if [ "$?" = "0" ]; then
 fi
 
 
-echo "All presubmit test passed."
+echo "All presubmit test passed." 
 
