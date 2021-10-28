@@ -39,7 +39,7 @@ Features:
 
 System requirements:
 
-* Unity&reg; 5 or above.
+* Unity&reg; 2017.4 or above.
 
 * To deploy on Android:
     * Android SDK

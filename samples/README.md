@@ -14,7 +14,7 @@ achievements, leaderboards and cloud save.  It also supports gamepad controllers
 
 **Nearby Droids** is a game demonstrating the nearby connection API.  This sample requires android play services sdk 23 or higher.
 The nearby connections API is only available on Android.  The UI in this game uses the 'new' Unity UI system, 
-so Unity 5.0 or higher is recommended.  For more details and how to build and configure the sample, 
+so Unity 2017.4 or higher is recommended.  For more details and how to build and configure the sample, 
 see [Nearby Connections documentation](https://github.com/playgameservices/play-games-plugin-for-unity/blob/master/NEARBY.md).
 
 > **Note:**

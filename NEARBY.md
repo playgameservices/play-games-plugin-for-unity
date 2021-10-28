@@ -243,7 +243,7 @@ complete 2D game that demonstrates how to advertise and discover players,
 establish the connections and maintain the gamestate across multiple levels.
 
 <strong><u>Note</u></strong>: This sample requires additional tags, layers and sorting layers to be
-defined.  If you are running Unity 5 or greater, this script will run
+defined.  If you are running Unity 2017.4 or greater, this script will run
 automatically and add the required elements.  If you are running an older
 version of Unity, please refer to the script in
 Assets/NearbyDroids/Editor/InitializeTagsAndLayers.cs  for the names of the
