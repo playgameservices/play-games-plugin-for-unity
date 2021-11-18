@@ -421,6 +421,7 @@ namespace GooglePlayGames.Android
                             InvokeCallbackOnGameThread(callback, mLastLoadFriendsStatus);
                         }
                     });
+
                 AndroidTaskUtils.AddOnFailureListener(task, exception =>
                 {
                     AndroidHelperFragment.IsResolutionRequired(exception, resolutionRequired =>
@@ -436,16 +437,21 @@ namespace GooglePlayGames.Android
                         else
                         {
                             mFriendsResolutionException = null;
-                            var statusCode = exception.Call<int>("getStatusCode");
-                            if (statusCode == /* GamesClientStatusCodes.NETWORK_ERROR_NO_DATA */ 26504)
+
+                            if (Misc.IsApiException(exception))
                             {
-                                mLastLoadFriendsStatus = LoadFriendsStatus.NetworkError;
-                                InvokeCallbackOnGameThread(callback, LoadFriendsStatus.NetworkError);
-                                return;
+                                var statusCode = exception.Call<int>("getStatusCode");
+                                if (statusCode == /* GamesClientStatusCodes.NETWORK_ERROR_NO_DATA */ 26504)
+                                {
+                                    mLastLoadFriendsStatus = LoadFriendsStatus.NetworkError;
+                                    InvokeCallbackOnGameThread(callback, LoadFriendsStatus.NetworkError);
+                                    return;
+                                }
                             }
 
                             mLastLoadFriendsStatus = LoadFriendsStatus.InternalError;
-                            Debug.Log("LoadFriends failed with status code: " + statusCode);
+                            OurUtils.Logger.e("LoadFriends failed: " +
+                                exception.Call<string>("toString"));
                             InvokeCallbackOnGameThread(callback, LoadFriendsStatus.InternalError);
                         }
                     });

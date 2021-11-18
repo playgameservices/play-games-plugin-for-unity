@@ -160,6 +160,12 @@ namespace GooglePlayGames.Android
 
                 AndroidTaskUtils.AddOnFailureListener(task, e =>
                 {
+                    if (!Misc.IsApiException(e)) {
+                        OurUtils.Logger.e("Exception requesting new permissions" +
+                            e.Call<string>("toString"));
+                        return;
+                    }
+
                     var failCode = SignInHelper.ToSignInStatus(e.Call<int>("getStatusCode"));
                     OurUtils.Logger.e("Exception requesting new permissions: " + failCode);
                     callback(failCode);

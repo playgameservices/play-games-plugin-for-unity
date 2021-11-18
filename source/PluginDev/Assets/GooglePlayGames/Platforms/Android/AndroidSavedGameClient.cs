@@ -364,11 +364,14 @@ namespace GooglePlayGames.Android
                 task,
                 exception =>
                 {
-                    var statusCode = exception.Call<int>("getStatusCode");
-                    if (statusCode == /* CommonStatusCodes.SignInRequired */ 4 ||
-                        statusCode == /* GamesClientStatusCodes.CLIENT_RECONNECT_REQUIRED */ 26502)
+                    if (Misc.IsApiException(exception))
                     {
-                        mAndroidClient.SignOut();
+                      var statusCode = exception.Call<int>("getStatusCode");
+                      if (statusCode == /* CommonStatusCodes.SignInRequired */ 4 ||
+                          statusCode == /* GamesClientStatusCodes.CLIENT_RECONNECT_REQUIRED */ 26502)
+                      {
+                          mAndroidClient.SignOut();
+                      }
                     }
                     callback(exception);
                 });
