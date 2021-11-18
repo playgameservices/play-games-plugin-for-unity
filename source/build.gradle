@@ -481,7 +481,7 @@ task export_package () {
                 "-logFile", logFilename,
                 "-exportPackage",
                     "Assets/GooglePlayGames",
-                    "Assets/GooglePlayGames/Plugins/Android/GooglePlayGamesManifest.plugin",
+                    "Assets/GooglePlayGames/Plugins/Android/GooglePlayGamesManifest.androidlib",
                     "Assets/ExternalDependencyManager",
                 "${exportPath}",
                 "-quit"

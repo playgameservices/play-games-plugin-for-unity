@@ -45,7 +45,7 @@ PluginImporter:
           CPU: ARMv7
     data:
       first:
-        Any: 
+        Any:
       second:
         enabled: 1
         settings: {}
@@ -136,8 +136,8 @@ PluginImporter:
       second:
         enabled: 1
         settings:
-          CompileFlags: 
-          FrameworkDependencies: 
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
+          CompileFlags:
+          FrameworkDependencies:
+  userData:
+  assetBundleName:
+  assetBundleVariant:
