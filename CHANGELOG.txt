@@ -1,3 +1,11 @@
+Version 0.10.13
+    Bug fixes:
+    * Fixed the `Ambiguous match found` error, resolving the dependencies.
+    * #3088 Fixed `GooglePlayGames.plugin` not found error on Unity 2021.2.
+    * #2876 Fixed `When using LoadScores with SetUserFilter the Scores
+    list returns empty`.
+    * Removed obsolete code from GPGSUpgrader.
+
 Version 0.10.12
     New Features:
     * Updated play-services-games version to 21.0.0
