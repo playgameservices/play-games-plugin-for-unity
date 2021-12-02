@@ -1,3 +1,8 @@
+Version 0.10.14
+    Bug fixes:
+    * #3091 Fixed the issue of unity <=2019 not detecting GooglePlayGames as an
+    android library.
+
 Version 0.10.13
     Bug fixes:
     * Fixed the `Ambiguous match found` error, resolving the dependencies.
