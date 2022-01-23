@@ -263,7 +263,7 @@ namespace GooglePlayGames.Android
                     /* accountName= */ ""))
                 {
                     pendingResult.Call("setResultCallback", new ResultCallbackProxy(
-                        tokenResult => { callback(tokenResult.Call<string>("getAuthCode")); }));
+                        tokenResult => { callback(authCode = tokenResult.Call<string>("getAuthCode")); }));
                 }
             }
             catch (Exception e)
