@@ -65,6 +65,18 @@ namespace GooglePlayGames.Android
             this.mConfiguration = Misc.CheckNotNull(configuration);
         }
 
+        ///<summary>
+        ///Refresh id token in session
+        ///</summary>
+        /// <param name="callback"> callback with result value.</param>
+        public void TokenRefresh(Action<int> callback)
+        {
+            if(mTokenClient != null)
+            {
+                mTokenClient.FetchTokens(true, callback);
+            }
+        }
+
         ///<summary></summary>
         /// <seealso cref="GooglePlayGames.BasicApi.IPlayGamesClient.Authenticate"/>
         public void Authenticate(bool silent, Action<SignInStatus> callback)
@@ -76,7 +88,14 @@ namespace GooglePlayGames.Android
                 if (mAuthState == AuthState.Authenticated)
                 {
                     Debug.Log("Already authenticated.");
-                    InvokeCallbackOnGameThread(callback, SignInStatus.Success);
+                    
+                    if(mTokenClient == null) return;
+                    
+                    TokenRefresh((result)=>{
+                        bool succeed = result == 0 /* CommonStatusCodes.SUCCEED */;
+                        if(succeed) InvokeCallbackOnGameThread(callback, SignInStatus.Success);
+                        else InvokeCallbackOnGameThread(callback, SignInStatus.Failed);
+                    });
                     return;
                 }
             }
