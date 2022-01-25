@@ -92,9 +92,7 @@ namespace GooglePlayGames.Android
                     if(mTokenClient == null) return;
                     
                     TokenRefresh((result)=>{
-                        bool succeed = result == 0 /* CommonStatusCodes.SUCCEED */;
-                        if(succeed) InvokeCallbackOnGameThread(callback, SignInStatus.Success);
-                        else InvokeCallbackOnGameThread(callback, SignInStatus.Failed);
+                        InvokeCallbackOnGameThread(callback, (SignInStatus)result);
                     });
                     return;
                 }
