@@ -155,7 +155,8 @@ class BaseMockPlayGamesClient : IPlayGamesClient {
     public virtual void LoadScores(string leaderboardId, LeaderboardStart start,
             int rowCount, LeaderboardCollection collection,
             LeaderboardTimeSpan timeSpan,
-            Action<LeaderboardScoreData> callback) {
+            Action<LeaderboardScoreData> callback,
+            bool forceReload = false) {
         throw new NotSupportedException("unsupported");
     }
 

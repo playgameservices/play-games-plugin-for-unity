@@ -339,13 +339,15 @@ namespace GooglePlayGames.BasicApi
         /// <param name="collection">Collection to display.</param>
         /// <param name="timeSpan">Time span.</param>
         /// <param name="callback">Callback to invoke when complete.</param>
+        /// <param name="forceReload">if true, this will delete local data and fetch it again from the server.</param>
         public void LoadScores(
             string leaderboardId,
             LeaderboardStart start,
             int rowCount,
             LeaderboardCollection collection,
             LeaderboardTimeSpan timeSpan,
-            Action<LeaderboardScoreData> callback)
+            Action<LeaderboardScoreData> callback,
+            bool forceReload = false)
         {
             LogUsage();
             if (callback != null)

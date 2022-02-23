@@ -319,10 +319,12 @@ namespace GooglePlayGames.BasicApi
         /// <param name="timeSpan">leaderboard timespan</param>
         /// <param name="callback">callback with the scores, and a page token.
         ///   The token can be used to load next/prev pages.</param>
+        /// <param name="forceReload">if true, this will delete local data and fetch it again from the server.</param>
         void LoadScores(string leaderboardId, LeaderboardStart start,
             int rowCount, LeaderboardCollection collection,
             LeaderboardTimeSpan timeSpan,
-            Action<LeaderboardScoreData> callback);
+            Action<LeaderboardScoreData> callback,
+            bool forceReload = false);
 
         /// <summary>
         /// Loads the more scores for the leaderboard.
