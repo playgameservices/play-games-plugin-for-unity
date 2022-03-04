@@ -38,7 +38,7 @@ namespace GooglePlayGames
             ulong rank, string playerId, ulong value, string metadata)
         {
             this.mDate = date;
-            mLbId = leaderboardID;
+            mLbId = leaderboardId;
             this.mRank = rank;
             this.mPlayerId = playerId;
             this.mValue = (long) value;
