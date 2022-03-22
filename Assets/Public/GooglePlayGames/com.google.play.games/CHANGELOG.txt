@@ -1,0 +1,546 @@
+Version 0.11.01
+    New Features:
+    * The plugin now uses Play Games Services v2 SDK. See [Sign-in for Android Games](https://developers.google.com/games/services/android/signin)
+
+Version 0.10.14
+    Bug fixes:
+    * #3091 Fixed the issue of unity <=2019 not detecting GooglePlayGames as an
+    android library.
+
+Version 0.10.13
+    Bug fixes:
+    * Fixed the `Ambiguous match found` error, resolving the dependencies.
+    * #3088 Fixed `GooglePlayGames.plugin` not found error on Unity 2021.2.
+    * #2876 Fixed `When using LoadScores with SetUserFilter the Scores
+    list returns empty`.
+    * Removed obsolete code from GPGSUpgrader.
+
+Version 0.10.12
+    New Features:
+    * Updated play-services-games version to 21.0.0
+    * Updated play-services-auth version to 19.0.0
+    * Updated GradleDependency to 4.0.2
+    * Replace Debug.Log with OurUtils.Logger
+    * Build configuration updates.
+    Bug fixes:
+    * #2967 Fixed the GUID not found error.
+    * Fixed issue where Google Play Games SDK path not found for Unity_2020.
+    * Fixed rounding issue with incremental achievements.
+    * Unit test fixes.
+
+Version 0.10.10
+    New Features:
+    * Added Friends APIs: Play Games now has a cross-game Friends list. Request access to your players cross-game PGS friends list and integrate it with your in-game system to help players play with a set of high-quality gaming friends, and help people find their friends within your game. Learn more about Play Games Services .
+    Bug fixes:
+    * Removed Multiplayer code.
+
+Version 0.10.09
+    Bug fixes:
+    * Fixed the issue of having an invalidated account in cache.
+    * Added more logs to sign-in and sign-out, removed unnecessary logs, formatted code.
+    * Moved AndroidClient.SignOut method callback onto the main thread.
+
+Version 0.10.08
+    Bug fixes:
+    * #2853 Fixed the authentication callback not called on the main thread issue.
+    * Migrated old urls to start with https instead of http.
+Version 0.10.07
+    New Features:
+    * Implementation of new authentication method and permission APIs.
+    Bug fixes:
+    * #2836 Fixed the wrong conversion of TotalTimePlayed.
+    * #2781 Disabled unnecessary warnings.
+    * #2791 Added gameId field to PlayGamesUserProfile for Unity 2020.1.
+Version 0.10.06
+    Bug fixes:
+    * #2776 Crashes due to uninstalled Play Games App.
+    * #2766, #2772 Android SDK path detection in versions older than 2019.x.
+Version 0.10.05
+    Bug fixes:
+    * #2753 VersionHandlerImpl.UpdateVersionedAssets not found.
+    * Fixed the issues caused by Nearby and RTMP callbacks not being on the main thread.
+    * Fixed detecting AndroidSdkRoot when unity embedded is used.
+Version 0.10.04
+    Bug fixes:
+    * Updated the way of handling requests to prevent them being processed twice.
+    * Fixed the callback not being triggered in CommitUpdate issue.
+    * RealTimeMultiplayerListener runs on the game thread.
+Version 0.10.03
+    Bug fixes:
+    * Fixed the exception caused by ui callbacks.
+Version 0.10.02
+    Bug Fixes:
+    * Fixed LoadMoreScores.
+    * Fixed sign out issues when signed out from ui.
+    * GetAnotherServerAuthCode uses the same scopes used in sign in.
+    * Local user id is returned instead of "me" in LoadScores.
+    * Removed AndroidX dependency.
+Version 0.10.01
+    Other:
+      * Reimplementation of the plugin without using C++ SDK
+    New Features:
+      * Updated play-services-games version to 18.0.1
+      * Migrated java code to AndroidX
+Version 0.9.64
+    New Features:
+      * Updated gradle version to 5.4.1 and tools to 3.4.0
+    Bug Fixes:
+      * #2553 NullReferenceException with new v0.9.63 Achievements system
+      * #2545 Soft crash when opening achievements
+      * #2549 PlayerStats.AvgSessonLength is a typo
+Version 0.9.63
+    New Features:
+      * Updated gradle version to 3.3.2
+      * Updated play-services-games version to 17.0
+      * [TBMP] Added GetMatch method
+      * [TBMP] Added Dismiss method
+      * [TBMP] Expose creation and update timestamps of match
+      * [TBMP] Expose creation time of invitation
+    Bug Fixes:
+      * Improved sign-in time.
+      * Refactored achievements implementation. Now it uses less server calls and massive achievement increement will not block Achievement UI.
+      * Log DateTime guard
+      * Fix DirectoryNotFoundException in GPGSUtil.GenerateAndroidManifest
+      * Fixed readme
+      * #2482 Warning in AndroidTokenClient when building for device
+      * #2486 CanRematch in TBM always false
+    Other:
+      * Removed GetAchievement method. Use LoadAchievements instead.
+Version 0.9.62
+    Bug Fixes:
+      * #2475 ANRs 0.9.61 TokenFragment
+      * #2473 GetAnotherServerAuthCode email scope not granted
+      * #2465 Crash during sign-in failure at TokenFragment
+      * Additional check if Play Games is installed.
+Version 0.9.61
+    Bug Fixes:
+      * #2442 GetAnotherServerAuthCode doesn't honor OAuth scope
+      * #2444 Crash during sign-in failure at TokenFragment line 258
+Version 0.9.60
+    Bug Fixes:
+      * #2439 UnityWebRequestTexture class is not contained at unity 5.6
+Version 0.9.59
+    Bug Fixes:
+      * #2430 Fixed sign-in issues with Android version 7 and less
+      * #2417 Windows. System.UnauthorizedAccessException: Access to the path is denied
+      * Replaces WWW with UnityWebRequest
+    New Features:
+      * Updated PlayServicesResolver to 1.2.100.0
+Version 0.9.58
+    Bug Fixes:
+      * #2409 GetAnotherServerAuthCode always requests email permission
+      * #2406 IL2CPP managed stripping level
+      * #2401 Fix for missing TokenFragment class
+      * #2400 Many crash in Unity 2018.3.0f2
+      * #2395 Not working with Unity 2018.3.0f2
+    New Features:
+      * Updated PlayServicesResolver to 1.2.98.0
+      * Updated gradle version to 3.3.0
+Version 0.9.57
+    Bug Fixes:
+      * Fixed issue with unable to sign-in if Google Play Services or Google Play Games need to be updated.
+      * #2388 IVideoClient not in package
+Version 0.9.56
+    Bug Fixes:
+      * #2387 ISavedGameClient null if Authentication Failed.
+      * Non silent Authenticate in some cases failed silently.
+Version 0.9.55
+    Bug Fixes:
+      * #2371 Authenticate callback is not called if sign-in was canceled.
+      * #1983, #2078, #2167 Android 8+ sign in fails when using EnableHidePopups.
+Version 0.9.54
+    Bug Fixes:
+      * #2361 Failing to silently login - auth fails on request - initialisation order problem?
+      * #2350 Remove unused import that breaks iOS builds
+      * #2339 GetAnotherServerAuthCode Nothing Happens
+Version 0.9.53
+    Bug Fixes:
+      * #2348 pragma UNITY_2017 should be UNITY_2017_1_OR_NEWER.
+      * #1581 Solve namespace error when importing to Unity project with existing Result class.
+      * Annotations fixes.
+Version 0.9.52
+    Bug Fixes:
+      * #2319 Not Working with Unity 2018.2
+Version 0.9.51
+    Bug Fixes:
+      * #2324 Please update the plugin to support new version of gms！！！please！！！！
+      * #2325 Google play services sdk and facebook sdk creating build issues
+      * #2327 Libgpg not included with arm64
+      * #2330 Play-games-plugin-for-unity vs google-play-services.jar
+      * #2334 Forced Resolution Failed for plugin 0.9.50
+    New Features:
+      * Using GPGS C++ SDK 3.0.1.
+      * Using play-services 15.01+.
+      * Added arm64-v8a support.
+Version 0.9.50
+    Bug Fixes:
+      * Non-Fat APK including all native ABI libraries.
+      * Nearby connections advertising JNI error.
+      * #2067 iOS Cocoapods added during iOS build.
+    New Features:
+      * Using GPGS C++ SDK 3.0
+      * Removed iOS menu items.
+      * Adopted JarResolver version handler logic for plugin upgrades.
+      * Removed the Quests API.
+      * Added Support for SaveGames conflict resolution with updated
+          data and metadata changes.  This matches the changes in the
+          C++ API.
+Version 0.9.42
+    Bug Fixes:
+       * #1909 Account Picker displayed after backgrounding/foregrounding app.
+       * #1922 Cannot build with Gradle: missing google_play_services_version.
+       * #1940 Leaderboard and other activities do not work.
+       * #1971 Cannot have separate builds for x86, arm7v.
+Version 0.9.41
+    Bug Fixes:
+        * #1785 - Cleaned up files in Plugins/Android.
+        * #1833 - Added RevealAchievement method to PlayGamesPlatform
+        * #1867 - Added connection failure handling for auth failure edge cases.
+    New Features:
+        * Updated Play Services jar resolver uses xml file configuration.
+        * Added method GetAnotherServerAuthCode() to get additional server auth
+            codes without signing out.
+Version 0.9.40
+    Bug Fixes:
+        * #1610 - Show menu items even if not on Android/iOS.
+        * #1764 - Jar Resolver conflicts with Firebase
+        * #1794 - Reduced warning spam about deprecations
+        * #1791 - Fixed typos in README.MD
+                - Added Jar resolver call when building just a nearby connections app.
+Version 0.9.39a
+    Bug Fixes:
+        * #1778 - Requesting Id Token error.
+Version 0.9.39
+    Bug Fixes:
+        * #1712 - Signing in/out multiple accounts does not work.
+        * #1756 - After signout, email, token are empty when reconnected.
+        * #1761 - Google.IOSResolver.Enabled is read-only.
+        * #1766 - Error executing VideoManager@IsCaptureAvailableCallback
+    New Features:
+        * #1743 - Ability to set the gravity of Achievement popups.
+Version 0.9.38a
+    Bug Fixes:
+        * #1729 - Strings marshaled incorrectly.
+Version 0.9.38
+    Bug Fixes:
+        * #1711 - iOSClient Error does not implement interface member
+        * #1712 - Signing in/out multiple google accounts
+        * #1699 - GetServerAuthCode causes "invalid_grant: Code was already redeemed
+        * #1692 - See semi-transparent black screen during login.
+        * #1675 - Calling Signout causes crash.
+Version 0.9.37
+    Bug Fixes:
+        * #1604 - Incompatible class error with play-services 10.1.
+        * #370 - Fixed freeze/crash when calling Application.Quit().
+    New Features:
+        * #35 - Added a method to inhibit achievment popups.
+        * Google SignIn support for Auth Code, Id Token and email.
+        * Updated to use GPGS C++ SDK version 2.3.
+        * Added the Video Capture API.
+    Deprecated Features:
+        * iOS Support will be winding down, ending iOS services in March 2018.
+            See https://android-developers.googleblog.com/2017/04/focusing-our-google-play-games-services.html
+
+        ** IMPORTANT **
+        This is the last version with iOS support for GPGS.  Plan accordingly.
+        ** IMPORTANT **
+
+        * Quests are deprecated.
+
+Version 0.9.36
+    Bug Fixes:
+        * #1432 - Updating Authenticate to match Unity 5.5 interface.
+        * #1496 - Fixing NO_GPGS not being honored.
+        * Disabled JarResolver for iOS, added instructions for CocoaPods.
+    New Features:
+        * #1346 - Check if Play Games is installed.
+Version 0.9.35
+    Bug Fixes:
+        * #1194 - OnPostprocessAllAssets called before Resolver is registered.
+        * #1209 - Stuck incremental achievements due to lost precision (via PR #1258).
+        * #1313 - NSInvalidArgumentException in iOS didRegisterForRemoteNotificationsWithDeviceToken.
+        * #1360 - Fixed Object not set to instance in PlayServicesResolver.
+        * #1361 - Removed multiple Resolver version log messages.
+        * #1371 - Removed warning about unreachable code in GPGSUpgrader.
+        * #1396 - Logging calls on non-game thread crash in IL2CPP for Android.
+        Updated CubicPilot to use SceneManager in Unity 5.3+
+    New Features:
+        * #1134 - No API for setting OAuth scopes (via PR #1296)
+        * Added HighSpenderProbability, TotalSpendNext28Days to PlayerStats for Android.
+        * Improved Jar Resolver - see README.
+Version 0.9.34
+    Bug Fixes:
+        * #1162 - Cannot build from source
+        * #1179 - Interfaces should not be under `#if`
+        * #1175 - Play-services version needs to be updated to 9.0.0
+        * #1180 - PlayGamesUserProfile.Equals(object obj)` implemented incorrectly
+    New Features:
+        * #1085 - Add SpendProbability player stat.
+Version 0.9.33
+    Bug Fixes:
+        * #1032 - Not able to get user's email.
+        * #1040 - Cannot parse PBX project for iOS
+        * #1068 - CreateWithInvitationScreen callback called twice on cancel.
+        * #1082 - Changed postbuild order to avoid Invalid PBX project.
+        * #1088 - Disable BITCODE for iOS build
+        * #1105 - GetServerAuthCode callback should be on game thread.
+                    (also moved other callbacks to be on game thread).
+        * Improved jar resolver logic during setup.
+    New Features:
+        * #990 - Support callback for getting email address.
+        * Removed dependency on Google+.
+Version 0.9.32
+    Bug Fixes:
+        * #989 - Fixed misleading messages about RTMP when authenticating.
+        * #999 - Fixed BuildTarget.iOS reference when using Unity 4.x.
+        * #1004 - Upgrading from older version of plugin did not remove unused files.
+        * #1010 - Updated documentation about which Android SDK components
+            are needed.
+        * Updated dependency pattern for android-support-v4 to be 23.1+.
+    New Features:
+        * Play-services-jar resolver update to 1.1.1.
+            See https://github.com/googlesamples/unity-jar-resolver/blob/master/CHANGELOG.md
+            for details on the changes.
+        * Added plugin version to manifest.
+Version 0.9.31a
+    Bug Fixes:
+        * #977 - IsConnectedToRoom always returned false, causing local player
+                to be removed from real time multiplayer room.
+        * #971 - NO_GPGS did not remove the Cocoapod dependencies corrrectly.
+Version 0.9.31
+    New Features:
+        * PlayGamesAchievement (the object returned by
+            PlayGamesPlatform.LoadAchievements) now includes the current number
+            of steps and the total number of steps for the corresponding
+            achievement.
+        * Play-services-jar-resolver updated to 1.1.  This fixes the
+            problem of include play-services-measurement which has a variable
+            in the AndroidManifest.xml file.
+    Bug Fixes:
+        * #935 include IFDEF to allow editing in unsupported platforms.
+Version 0.9.30
+    ** BREAKING CHANGES **
+        * `PlayerStats` is now a standalone class,
+            rather than a subclass of `PlayGamesLocalUser`.
+            All existing references to `PlayGamesLocalUser.PlayerStats`
+            should now directly refer to `PlayerStats`.
+        * The `NumOfSessions` property in `PlayerStats` has been renamed
+            `NumberOfSessions` to be consistent with other properties.
+    New Features:
+        * Rebase PlayerStats API to use the Play Games C++ SDK.
+        * PlayerStats API now supported on iOS.
+        * Added an option to PlayGamesClientConfiguration to require Google+.
+        * Updated to use GPGS C++ SDK version 2.1.
+        * Deprecated GetIdToken and GetAccessToken.  Applications should use
+            `PlayGamesPlatform.GetServerAuthCode()` to use the player's identity
+            on the server side.
+        * Updated configuration dialogs exposing the **Require Google Plus** property.
+            This property should be false if possible, reducing the number of
+            scopes and permissions the player has to allow.  Game developers should
+            use PlayGamesPlatform.GetServerAuthCode() to pass the player's OAuth
+            credentials to the server, and use Player.Id when possible for a persistent,
+            unique identifier for the player rather than email address.
+    Bug Fixes:
+        * #917 iOS 9, game freeze after closing authentication window.
+        * #919 Resolves Android jars even when target is not Android.
+        * #868 Avoid memory allocations in the PlayGamesHelperObject.
+        * #865 GetIdToken needs to be asynchronous.
+Version 0.9.28
+        ** BREAKING CHANGES **
+
+        The jar resolution process for importing Play Services has been
+        standardized with the other Google plugins.  If you are upgrading
+        from 0.9.27, you will need to delete the Assets/GooglePlayGames/Editor
+        directory and restart Unity, then re-import version 0.9.28.
+
+    New Features:
+        * Integrated Play-services-jar resolver plugin for improved compatibility.
+Version 0.9.27a
+    Bug Fixes:
+        * #809 Unity 5.3 namespace conflict
+Version 0.9.27
+    New Features:
+        * Updating Android email and token access for new permissions model.
+        * Specify directory for generated game resource constants.
+        * Improved plugin initialization and setup.
+        * Added getChurnProbability() to PlayerStats.
+    Bug Fixes:
+        * #750 AndroidJavaProxy not found when building for iOS.
+        * #757 Can only start coroutine from main thread.
+        * #771 Documentation update: what are "Android Resources"
+        * #772 Disable bitcode in podfile
+        * #777 Can not get the list of friend images.
+        * #785 Regression on reportProgress for incremental achievement.
+        * #610 Stripped version of Play Services client library.
+        * #565 Minimize client library to avoid 65k dex limit.
+        * #323 Support for split client aars.
+Version 0.9.26
+    New Features:
+        * #666 Expose invitation property for Real time game.
+        * Implement PlayerStats API for the local user.
+        * Requires version 8.1.5 of play services SDK
+    Bug Fixes:
+        * #696 Validate constants classname during setup.
+        * #709 ShowWaitingRoom cancels match.
+        * #712 Waiting room does not appear
+        * #719 Extra web client label in ios Setup dialog
+        * #726 inviter profile image not loading
+        * #722 Social.localUser.id throws NullPointerException
+Version 0.9.25 (codename: frengle)
+    11 Sept 2015
+    ** BREAKING CHANGES **
+       * Cloud Save service (AppState) has been removed.
+       * The setup dialog now requires the generated resource data from
+            Google Play Developer Console.  This reduces the number of
+            copy & pastes needed and makes it harder to make a mistake with the
+            client id.
+    New Features:
+       * Updated Configuration setup using Resource data from Play Console.
+       * Added support for exclusiveBitmask in Turnbased quickmatches.
+       * Implementing Google Auth 2.0 for iOS authentication
+       * #120 implement setStepsAtLeast for achievements
+       * #274 Added the score reception functionality - method LoadCurrentScore
+       * #256 Get all turn-based invitations
+       * #259 implement LoadAchievements
+       * #186 Return Leaderboard Rank?
+       * #380 Callback on CreateWithInvitationScreen
+       * #480 Get score rank after submitting
+       * #503 LoadScores not implemented
+       * #546 Loading friends of logged in user. (Thanks @ashkan-saeedi-mazdeh
+                for the initial implementation).
+       * #617 Get all turn-based matches
+    Bug Fixes:
+       * #182 Response to Submit Score or Load Scores
+       * #387 OnLeftRoom not called when application is paused
+       * #445 Variant error in turn based match
+       * #563 Custom UI for invitation UI.
+       * #614 OnRoomConnected() getting called twice after implementing ShowWaitingRoomUI
+       * #619 NO_GPGS does not work with Symlink Unity libraries
+       * #655 Authenticate fails at first, then succeeds second time
+Version 0.9.21
+  **BREAKING CHANGES**
+       * #382 Callback for declined invitation when creating RTMP room
+    This change adds the method `OnParticipantLeft` to the
+ `RealTimeMultiplayerListener` interface.  Existing games that use this interface
+need to add an implementation of this method.
+  New Features:
+       * #136 Callback for ShowLeaderboardUI()
+       * #392 Support for Default waiting room for RTMP
+       * #498 Bitmask filter in CreateQuickGame
+       * #537 Exposing Saved Games Delete API
+       * iOS builds will use Cocoapods if installed to build xcode project.
+  Bug Fixes
+       * #440 No callback from ReportProgress
+       * #444 Can Rematch always returns false
+       * #483 IncrementAchievement does not update Achievement data cache
+       * #488 Peers disconnected right after OnRoomConnected
+       * #568 Exception with null or empty image URL
+       * Fixed Setup dialogs not laidout correctly.
+2015-05-01 Version 0.9.20 (codename: ewokian)
+   New Features:
+       * Support for Events and Quests
+       * Support for Nearby Connections
+   Bug Fixes:
+       * #275 Plugin crashes when sending invite for iOS RTMP
+       * #326 Not always receiving invitations in iOS
+       * #363 Save Games not working on iOS
+       * #375 Authentication Return calls before initialization done
+       * #379 OnPeersDisconnected(string[] participantIds) is never called
+       * #443 ERROR_NOT_AUTHORIZED on re-login
+       * #453 NO_GPGS causes unreachable code warnings
+       * #454 Error building Player: IOException: android-support-v4.jar already exists
+Version 0.9.15 (codename: auto-dogey5)
+    New Features:
+        * #276 Added support for excluding Google Play Game Services for iOS build (NO_GPGS)
+    Bug Fixes:
+        * #376 Moved Editor scripts into GooglePlayGames/Editor to reduce script sprawl.
+        * #331 Corrected Download menu item text.
+        * #331 Added support for new android-support jar location.
+        * #331 Removed Google play services version check when building.
+        * #361 Fixed player image not refreshed when changing players.
+        * #318 Removed armeabi libraries which broke Unity 5 building.
+        * #371 Unable to reshow Achievement or Leaderboard UI after Home button is pressed
+Version 0.9.12 (codename: auto-dogey)
+    New features:
+        * Refactored AndroidSetup script to facilitate automated builds.
+        * Refactored Samples to be packaged as custom packaged Assets vs. projects.
+Version 0.9.11 (codename: extra-dogey)
+    New features:
+        * Image property of IUserProfile implemented
+        * An implementation of Saved Games is now available. This obviates the old
+          cloud save feature, which is deprecated and will be removed. See
+          ISavedGameClient.cs for more details.
+    API Changes:
+        * RTMP Clients will no longer automatically call LeaveRoom when
+          they are removed from the connected set. Also, the local player
+          will never appear as a participant in
+          OnPeersConnected/OnPeersDisconnected.
+        * The PlayGamesPlatform must be configured before it can be used.
+          See PlayGamesClientConfiguration, PlayGamesPlatform.InitializeInstance,
+          and PlayGamesClientFactory.GetPlatformPlayGamesClient.
+    Bug Fixes:
+        * #309 - LeaderboardManager calls ShowAllUI when using leaderboard id
+
+
+2014-11-14 Version 0.9.10 (codename: doge)
+    This release is a major rearchitecting of the plugin to use
+    the Play Games C++ SDK. This allows us to re-use the same code on
+    all supported platforms, reducing codesize and decreasing the
+    work required to add new features. This release makes few
+    developer-facing API changes, apart from those required for
+    correctness reasons.
+
+    New features:
+        * Post-process build is handled by pure C# code rather than
+          bash / shell scripts.
+        * Implemented on top of the cross platform C++ Play Games SDK
+    API Changes:
+        * Conversions from int to uint where applicable:
+            - TurnBasedMatch.AvailableAutomatchSlots
+            - TurnBasedMatch.Variant
+            - IPlayGamesClient.IncrementAchievement
+            - IRealTimeMultiplayerClient.CreateQuickGame
+            - IRealTimeMultiplayerClient.CreateWithInvitationScreen
+            - ITurnBasedMultiplayerClient.CreateQuickGame
+            - ITurnBasedMultiplayerClient.CreateWithInvitationScreen
+        * Removes support for cloud state on iOS (a crossplatform
+          alternative is coming soon).
+        * Removes cloud state encrypter (only used by iOS).
+        * Real Time multiplayer calls will fail immediately when the
+          current match is being left or is shutdown.
+        * Turn-based multiplayer APIs now take instances of TurnBasedMatch
+          rather than just match ID. This is required for correctness
+          (the previous API allowed silently overwriting updated matches).
+
+
+2014-03-17 Version 0.9.00 (codename: cuiaba)
+
+    New features:
+        * Turn-based multiplayer (iOS, Android)
+        * Real-time multiplayer (iOS, Android)
+    Bug fixes:
+        * #49 - double cancellation necessary
+        * #40 - add account crashes app
+        * #25 - Action Scheduled for Later
+        * properly close Achievement buffer
+        * fix memory management on iOS
+        * minor fixes
+
+2014-02-04 Version 0.8.01 (codename: brasilia)
+
+    Updates all plug in code to use new Google Play Services
+    programming pattern (GoogleApiClient) and provides a few
+    bug fixes.
+
+    * References to GamesClient and AppStateClient updated to use GoogleApiClient
+    * Bug fix: GetUserId() occasionally causing crashes on IOS
+    * Bug fix: IsAuthenticated() returning true immediatly after SignOut()
+    * Bug fix: GPGSAppController.m missing call to super
+    * Bug fix: Error dialogs pop up briefly when no network available
+    * Bug fix: PostProcessBuildPlayer not friendly with other plugins
+    * Bug fix: Missing AddressBook.framework in iOS build instructions
+
+2013-12-10 Version 0.8.00 (codename: altamira)
+
+    Initial launch.
+

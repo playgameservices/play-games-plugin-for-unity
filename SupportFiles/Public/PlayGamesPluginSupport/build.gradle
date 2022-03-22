@@ -1,0 +1,101 @@
+buildscript {
+    repositories {
+        google()
+        jcenter()
+        maven { url '/tmp/games_m2/repository' }
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.1.2'
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
+}
+
+apply plugin: 'maven'
+apply plugin: 'com.android.library'
+
+group 'com.google.games'
+project.ext.baseName = "gpgs-plugin-support"
+
+if (project.hasProperty("projVersion")) {
+    project.version = project.projVersion
+} else {
+    project.version '0-SNAPSHOT'
+}
+
+if (project.hasProperty("uploadDir")) {
+    project.ext.uploadDir = project.uploadDir
+} else {
+    project.ext.uploadDir = "${buildDir}/m2repository"
+}
+
+android {
+    lintOptions {
+        abortOnError true
+        warningsAsErrors true
+    }
+    defaultConfig {
+        versionName  project.version
+        archivesBaseName = project.ext.baseName
+        minSdkVersion 16
+
+    }
+    compileSdkVersion 28
+}
+
+// Rename the .aar file to be .srcaar to work around
+// // having the local repo in a subdirectory in a Unity project.
+// // The jar resolver plugin handles the changing back from .srcaar
+// // to .aar
+// //
+// // This is done in 2 parts, first declare the .srcaar as an
+// // artifact, the second is a task to rename the aar -> srcaar.
+//
+artifacts {
+    archives file("build/${baseName}-${version}.srcaar")
+}
+
+
+task renameLibrary() {
+  doFirst {
+    copy {
+      from "${buildDir}/outputs/aar/${baseName}-release.aar"
+     into "${buildDir}"
+      rename {
+        String fn ->
+          return fn.replace("release.aar", "${version}.srcaar")
+      }
+    }
+  }
+
+
+  doLast {
+    configurations.archives.with   {
+         artifacts.remove artifacts.find { it.extension == "aar"}
+      }
+  }
+}
+
+tasks.whenTaskAdded { task ->
+  if (task.name == 'assembleRelease')
+    renameLibrary.dependsOn task
+}
+
+uploadArchives {
+  dependsOn renameLibrary
+  repositories {
+    mavenDeployer {
+      repository(url: uri(project.ext.uploadDir))
+    }
+  }
+}
+
+dependencies {
+    implementation 'com.google.android.gms:play-services-games-v2:17.0.0'
+    implementation 'com.google.android.gms:play-services-nearby:18.0.2'
+}
