@@ -92,8 +92,8 @@ project.ext {
     pluginBuildSrc = file("${buildPath}/PluginSrc/Assets/GooglePlayGames").absolutePath
     manifestBuildSrc = file("${buildPath}/PluginSrc/Assets/Plugins").absolutePath
     pluginProj = file("${buildPath}/PluginProject").absolutePath
-    samplesPath = file('Assets/Public/GooglePlayGames/com.google.play.games/Samples').absolutePath
-    protectedSamplesPath = file('Assets/Protected/GooglePlayGames/com.google.play.games/Samples').absolutePath
+    samplesPath = file('Samples').absolutePath
+    protectedSamplesPath = file('Samples').absolutePath
     samplesBuildSrc = file("${buildPath}/sampleSrc").absolutePath
     exportPath = file("${buildPath}/plugin.unitypackage").absolutePath
     currentPluginBasename = 'GooglePlayGamesPlugin'
