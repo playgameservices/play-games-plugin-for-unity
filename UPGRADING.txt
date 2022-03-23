@@ -1,0 +1,20 @@
+NOTES ON UPGRADING
+
+Note for 0.11.1
+
+The new SDK contains four major changes to increase sign-in success which you
+should be aware of:
+
+1. Sign-in is triggered automatically when your game is launched. Creating a
+PlayGamesClientConfiguration instance, the initialization and activation of
+PlayGamesPlatform are not needed. Just calling
+`PlayGamesPlatform.Instance.Authenticate()` will fetch the result of automatic
+sign-in.
+2. Authentication tokens are now provided using
+`PlayGamesPlatform.Instance.requestServerSideAccess()`.
+3. Sign-out method is removed, and we will no longer require an in-game button
+to sign-in or sign-out of Play Games Services.
+4. Extra scopes cannot be requested.
+
+Before importing the unity package for v0.11.1, delete everything under
+`Assets/GooglePlayGames`. You can then follow the regular integration process.
