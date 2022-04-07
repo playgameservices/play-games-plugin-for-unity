@@ -16,5 +16,7 @@ sign-in.
 to sign-in or sign-out of Play Games Services.
 4. Extra scopes cannot be requested.
 
-Before importing the unity package for v0.11.1, delete everything under
-`Assets/GooglePlayGames`. You can then follow the regular integration process.
+Before importing the unity package for v0.11.1, delete
+`Assets/Plugins/Android/com.google.android.gms.play-services-games-<version_number>.aar`
+and everything under `Assets/GooglePlayGames`. You can then follow the regular
+integration process.
