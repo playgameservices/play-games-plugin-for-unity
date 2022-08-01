@@ -1,0 +1,9 @@
+{
+    "name": "Google.Play.Games.Editor",
+    "references": [
+        "Google.Play.Games"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ]
+}

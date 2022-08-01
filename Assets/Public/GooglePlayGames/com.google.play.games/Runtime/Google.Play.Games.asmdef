@@ -1,0 +1,7 @@
+{
+    "name": "Google.Play.Games",
+    "includePlatforms": [
+        "Android",
+        "Editor"
+    ]
+}

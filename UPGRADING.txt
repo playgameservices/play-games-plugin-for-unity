@@ -1,19 +1,22 @@
 NOTES ON UPGRADING
 
-Note for 0.9.35
+Note for 0.11.1
 
-The Play Services Jar Resolver has changed to be a DLL, in order to import this
-correctly, you need to delete the Assets/PlayServicesResolver folder in your
-project *BEFORE* importing this plugin.  You may also need to restart Unity
-to correctly initialize the DLLs in the editor.
+The new SDK contains four major changes to increase sign-in success which you
+should be aware of:
 
-IF YOU STILL HAVE PROBLEMS:
+1. Sign-in is triggered automatically when your game is launched. Creating a
+PlayGamesClientConfiguration instance, the initialization and activation of
+PlayGamesPlatform are not needed. Just calling
+`PlayGamesPlatform.Instance.Authenticate()` will fetch the result of automatic
+sign-in.
+2. Authentication tokens are now provided using
+`PlayGamesPlatform.Instance.requestServerSideAccess()`.
+3. Sign-out method is removed, and we will no longer require an in-game button
+to sign-in or sign-out of Play Games Services.
+4. Extra scopes cannot be requested.
 
-If you have already integrated the plugin and want to upgrade it to a newer version,
-you must delete the Assets/GooglePlayGames folder, then import the new package.
-
-
-After upgrading, redo setup (click "Google Play Games | Android Setup" and/or
-"Google Play Games | iOS Setup" on the menu). Do this even if you had already done
-this before on this project.
-
+Before importing the unity package for v0.11.1, delete
+`Assets/Plugins/Android/com.google.android.gms.play-services-games-<version_number>.aar`
+and everything under `Assets/GooglePlayGames`. You can then follow the regular
+integration process.

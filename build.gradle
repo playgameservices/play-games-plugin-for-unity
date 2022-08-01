@@ -1,0 +1,754 @@
+/*
+*   Gradle file to build the Unity plugin for Google Play Game Services.
+*/
+
+buildscript {
+    repositories {
+        google()
+        jcenter()
+        mavenLocal()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.5.0'
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
+}
+
+/*
+    Project level variables
+*/
+project.ext {
+    os_name = System.getProperty("os.name").toLowerCase();
+    os_osx = os_name.contains("mac os x");
+    os_windows = os_name.contains("windows");
+    os_linux = os_name.contains("linux");
+
+    ndk_root = System.getProperty("ANDROID_NDK_ROOT")
+    if (ndk_root == null || ndk_root.isEmpty()) {
+        ndk_root = System.getenv("ANDROID_NDK_ROOT")
+    }
+    sdk_root = System.getProperty("ANDROID_HOME")
+    if (sdk_root == null || sdk_root.isEmpty()) {
+        sdk_root = System.getenv("ANDROID_HOME")
+    }
+    unity_exe = System.getProperty("UNITY_EXE")
+    if (unity_exe == null || unity_exe.isEmpty()) {
+        unity_exe = System.getenv("UNITY_EXE")
+    }
+
+    // Take a guess at where Unity is located as a last resort.
+    if (unity_exe == null || unity_exe.isEmpty()) {
+      if (os_osx) {
+        unity_exe ='/Applications/Unity/Unity.app/Contents/MacOS/Unity'
+      } else if (os_windows) {
+        unity_exe ='c:\\program files\\unity\\editor\\unity.exe'
+      } else {
+        unity_exe = 'Unity'
+      }
+    }
+
+    git_exe = System.getProperty("GIT_EXE")
+    if (git_exe == null || git_exe.isEmpty()) {
+        git_exe = System.getenv("GIT_EXE")
+    }
+    if (git_exe == null || git_exe.isEmpty()) {
+        git_exe = 'git'
+    }
+
+    // Also update in com.google.play.games/package.json
+    pluginVersion = "0.11.01"
+
+    // String for specifying the build mode.
+    // If 'eap', will include all files from the 'Protected' folder.
+    // If build mode is anything other than 'eap', assumes a regular public
+    // build.
+    //   -PbuildMode=eap
+    if (!project.hasProperty('buildMode') || buildMode != 'eap') {
+        buildMode = 'public'
+    }
+
+    if (buildMode == 'eap') {
+        buildPath = file('build-eap').absolutePath
+        currentPluginPath = buildPath
+        currentPluginVersion = "${pluginVersion}-eap"
+    } else {
+        buildPath = file('build').absolutePath
+        currentPluginPath = buildPath
+        currentPluginVersion = "${pluginVersion}"
+    }
+    pluginSrc = file('Assets/Public/GooglePlayGames').absolutePath
+    manifestSrc = file('Assets/Plugins').absolutePath
+    protectedPluginSrc = file('Assets/Protected/GooglePlayGames').absolutePath
+    supportLib = file('SupportFiles/Public').absolutePath
+    protectedSupportLib = file('SupportFiles/Protected').absolutePath
+    supportLibProj = file("${buildPath}/SupportLibProject").absolutePath
+    supportLibGradle = "${buildPath}/SupportLibProject/build.gradle"
+    pluginBuildSrc = file("${buildPath}/PluginSrc/Assets/GooglePlayGames").absolutePath
+    manifestBuildSrc = file("${buildPath}/PluginSrc/Assets/Plugins").absolutePath
+    pluginProj = file("${buildPath}/PluginProject").absolutePath
+    samplesPath = file('Samples').absolutePath
+    protectedSamplesPath = file('Samples').absolutePath
+    samplesBuildSrc = file("${buildPath}/sampleSrc").absolutePath
+    exportPath = file("${buildPath}/plugin.unitypackage").absolutePath
+    currentPluginBasename = 'GooglePlayGamesPlugin'
+    currentPluginName = "${currentPluginBasename}-${currentPluginVersion}.unitypackage"
+    resolverDir = new File("${buildPath}/jarresolver").absolutePath
+
+    editorDir = "Assets/GooglePlayGames/com.google.play.games/Editor"
+    pluginRepoDir = "${pluginProj}/${editorDir}/m2repository"
+
+   // Determine where we are relative to the Assets directory.
+    def currentDirectory = file('.')
+    if (file('PluginDev/Assets').isDirectory()) {
+        assetsPath = file('PluginDev/Assets')
+    } else if (file('Assets').isDirectory()) {
+        assetsPath = file('Assets')
+    } else if (currentDirectory.getName() == 'Assets') {
+        assetsPath = currentDirectory
+    } else if (currentDirectory.getParentFile().getName() == 'Assets') {
+        assetsPath = currentDirectory.getParentFile()
+    } else {
+        throw new GradleException("Unable to locate Assets directory in path: $currentDirectory")
+    }
+
+    // String for specifying if samples are built.
+    // If 'off', only the plugin will be built.
+    // If sampleBuild mode is anything other than 'off', assume samples are
+    // built.
+    //   -PsampleBuild=off
+    if (!project.hasProperty('sampleBuild') || sampleBuild != 'off') {
+        sampleBuild = 'on'
+    }
+
+    if (sampleBuild == 'on') {
+        sampleList = ['SmokeTest']
+    } else {
+        sampleList = []
+    }
+
+    jarresolver_uri = System.getProperty("RESOLVER_PACKAGE_URI")
+    jarresolver_repos = [
+      'https://github.com/googlesamples/unity-jar-resolver.git'
+    ]
+    jarresolver_tag = null;
+}
+
+if (!tasks.findByName('prebuild')) {
+    task prebuild() {
+        println('Local prebuild')
+    }
+    prebuild.dependsOn {
+        project.tasks.findAll { task -> task.ext.has('remoteTaskPhase') && task.ext.remoteTaskPhase == 'prebuild' }
+    }
+}
+if (!tasks.findByName('build')) {
+    task build() {
+        println('Local build')
+    }
+    build.dependsOn {
+        project.tasks.findAll { task -> task.ext.has('remoteTaskPhase') && task.ext.remoteTaskPhase == 'build' }
+    }
+}
+if (!tasks.findByName('postbuild')) {
+    task postbuild() {
+        println('Local postbuild')
+    }
+    postbuild.dependsOn {
+        project.tasks.findAll { task -> task.ext.has('remoteTaskPhase') && task.ext.remoteTaskPhase == 'postbuild' }
+    }
+}
+
+project.defaultTasks = ['prebuild', 'build', 'postbuild']
+
+
+/**
+    Final task of building all the unity packages.
+**/
+task unity_package(dependsOn:'export_legacy_package') {
+
+    description = "Top level task for building the unity packages"
+
+    doLast {
+        println "Packaging Complete!"
+    }
+
+    // Mark this a build phase task for remoteTask support.
+    ext.remoteTaskPhase = 'build'
+
+    // Depends on packaging all the samples
+    dependsOn {
+        tasks.findAll { task -> task.name.startsWith('PackageSample') }
+    }
+}
+
+/**
+    Generate tasks for the samples.  There are several tasks for each sample.
+**/
+sampleList.each { sampleName ->
+    def createTask   = project.tasks.create('CreateSample' + sampleName)
+    def copySrcTask   = project.tasks.create('CopySrcSample' + sampleName)
+    def copyBuildSrcTask   = project.tasks.create('CopyBuildSrcSample' + sampleName)
+    def copyPluginSrcTask   = project.tasks.create('CopyPluginSrcSample' + sampleName)
+
+    // this is the path to the source code
+    def sampleSrcDir = samplesPath + '/' + sampleName
+
+    // this is the path to the source code for eap code
+    def protectedSampleSrcDir = protectedSamplesPath + '/' + sampleName
+
+    // this is the path to the source code in the build dir
+    def sampleBuildSrcDir = samplesBuildSrc + '/' + sampleName
+
+    // this is the path to build the sample package
+    def sampleDestSrcDir = file("${pluginProj}/Samples/${sampleName}/Assets/${sampleName}").absolutePath
+
+    // this is the path for the plugin assets for the sample package
+    def samplePluginSrcDir = file("${pluginProj}/Samples/${sampleName}/Assets").absolutePath
+
+    // the relative path to the sample assets within the project.
+    def sampleAssets = "Assets/${sampleName}"
+
+    // the path to the plugin code that will be copied into the sample package
+    def pluginDir = file("${pluginProj}/Assets")
+
+    def sampleDir = file("${pluginProj}/Samples/${sampleName}/Assets/${sampleName}")
+    if (!sampleDir.exists()) {
+        sampleDir.mkdirs()
+    }
+
+    /*
+        Create the sample in the build directory
+    */
+    createTask.description = "Create the ${sampleName} package"
+    createTask.dependsOn 'export_legacy_package'
+    createTask.doFirst {
+        delete "${pluginProj}/Samples/${sampleName}/Assets/${sampleName}"
+
+        def logFilename = "${pluginProj}/Samples/${sampleName}/CreateSample${sampleName}.log"
+        def argv = [
+          "-gvh_disable",
+          "-g.building",
+          "-batchmode",
+          "-createProject", "${pluginProj}/Samples/${sampleName}",
+          "-logFile", logFilename,
+          "-quit"
+        ]
+        runUnity(argv, logFilename)
+
+    }
+    // This is a build task
+    createTask.ext.remoteTaskPhase = 'build'
+
+    /*
+        Copy the source of the sample into build dir.
+        This is done so it can be remoted and assembled as a part of a RemoteTask.
+    */
+    copyBuildSrcTask.description = "Copies sample ${sampleName} source code to build area"
+    copyBuildSrcTask.doFirst {
+            copy {
+                from sampleSrcDir
+                into sampleBuildSrcDir
+            }
+            if (buildMode == 'eap') {
+                copy {
+                    from protectedSampleSrcDir
+                    into sampleBuildSrcDir
+                }
+            }
+    }
+    copyBuildSrcTask.doLast {
+            println 'copied ' + sampleSrcDir + ' to ' + sampleBuildSrcDir
+    }
+
+    copyBuildSrcTask.ext.remoteTaskPhase = 'prebuild'
+
+    /*
+        Copy the source of the sample into build target.  Don't import the
+        sample package, since we want the latest source code.
+    */
+    copySrcTask.description = "Copies sample ${sampleName} source code to sample project build area"
+    copySrcTask.dependsOn createTask, copyBuildSrcTask
+    copySrcTask.doFirst {
+            copy {
+                from sampleBuildSrcDir
+                into sampleDestSrcDir
+            }
+    }
+    copySrcTask.doLast {
+            println 'copied ' + sampleBuildSrcDir + ' to ' + sampleDestSrcDir
+    }
+
+    copySrcTask.ext.remoteTaskPhase = 'build'
+
+    /*
+        Copy the source of the plugin and jar resolver into build dir.
+        This is done so it can be remoted and assembled as a part of a RemoteTask.
+    */
+    copyPluginSrcTask.description = "Copies plugin into sample ${sampleName} build area"
+    copyPluginSrcTask.dependsOn createTask, copySrcTask, 'export_legacy_package'
+
+    copyPluginSrcTask.doFirst {
+            copy {
+                from pluginDir
+                into samplePluginSrcDir
+            }
+    }
+    copyPluginSrcTask.doLast {
+            println 'copied ' + pluginDir + ' to ' + samplePluginSrcDir
+    }
+
+    copyPluginSrcTask.ext.remoteTaskPhase = 'build'
+
+    /*
+        Create the exported package
+    */
+    def packageTask   = project.tasks.create('PackageSample' + sampleName)
+
+        packageTask.description = "Package ${sampleName} sample"
+
+        packageTask.dependsOn createTask, copySrcTask, copyPluginSrcTask
+
+        packageTask.doLast {
+            def pluginAssets = file("${pluginProj}/Samples/${sampleName}/Assets/GooglePlayGames/com.google.play.games")
+            if (!pluginAssets.exists()) {
+                println 'Could not find ' + pluginAssets
+            }
+            def logFilename = "${pluginProj}/Samples/${sampleName}/ExportSample${sampleName}.log"
+            def argv = [
+              "-gvh_disable",
+              "-g.building",
+              "-batchmode",
+              "-projectPath", "${pluginProj}/Samples/${sampleName}",
+              "-buildTarget", "android",
+              "-logFile", logFilename,
+              "-exportPackage",
+                     "${sampleAssets}",
+                     "Assets/GooglePlayGames/com.google.play.games",
+                     "Assets/Plugins/Android/GooglePlayGamesManifest.androidlib",
+              "${pluginProj}/Samples/${sampleName}.unitypackage",
+              "-quit"
+              ]
+            runUnity(argv, logFilename)
+        }
+        packageTask.ext.remoteTaskPhase = 'build'
+
+        /*
+            Finally, copy the package to the source sample dir.
+        */
+        def copySamplePackageTask = project.tasks.create('CopySamplePackage' + sampleName)
+        copySamplePackageTask.description = "Copy unity package for " + sampleName + " back to src dir"
+        copySamplePackageTask.doLast {
+            if (buildMode == 'eap') {
+                copy {
+                    from file("${pluginProj}/Samples/${sampleName}.unitypackage")
+                    into file("${protectedSamplesPath}/${sampleName}")
+                }
+            } else {
+                copy {
+                    from file("${pluginProj}/Samples/${sampleName}.unitypackage")
+                    into file("${samplesPath}/${sampleName}")
+                }
+            }
+        }
+
+        copySamplePackageTask.ext.remoteTaskPhase = 'postbuild'
+}
+
+task import_jarresolver() {
+    description = "Imports the jar resolver package into the plugin"
+    ext.remoteTaskPhase = 'build'
+    doFirst {
+        if (file(pluginProj).exists()) {
+            delete pluginProj
+        }
+    }
+    doLast {
+        def tree = fileTree("${resolverDir}")
+            {
+                include 'external-dependency-manager-latest.unitypackage'
+            }
+        def jarresolver_package = tree.getSingleFile()
+
+        def logFilename = "${pluginProj}/import_resolver_unity.log"
+        def argv = [
+            "-gvh_disable",
+            "-g.building",
+            "-batchmode",
+            "-createProject", "${pluginProj}",
+            "-logFile", logFilename,
+            "-importPackage", "${jarresolver_package}",
+            "-quit"
+            ]
+        runUnity(argv, logFilename)
+    }
+
+}
+// don't explicitly depend on copy_jarresolver here since it is run
+// as a prebuild step, and import_jarresolver is a build step which can happen
+// on a machine with limited network connectivity.
+// import_jarresolver.dependsOn "copy_jarresolver"
+
+task copy_pluginProjSrc () {
+    doFirst {
+      copy {
+        from {"${pluginBuildSrc}"}
+        includes ["**/*"]
+        duplicatesStrategy DuplicatesStrategy.INCLUDE
+        into {"${pluginProj}/Assets/GooglePlayGames"}
+      }
+      copy {
+        from {"${manifestBuildSrc}"}
+        includes ["**/*"]
+        duplicatesStrategy DuplicatesStrategy.INCLUDE
+        into {"${pluginProj}/Assets/Plugins"}
+      }
+    }
+    doLast {
+      copy {
+        from {"${project.ext.buildPath}/m2repository"}
+        includes ["**/*"]
+        duplicatesStrategy DuplicatesStrategy.INCLUDE
+        into {"${pluginRepoDir}"}
+      }
+    }
+}
+copy_pluginProjSrc.dependsOn import_jarresolver
+copy_pluginProjSrc.ext.remoteTaskPhase = 'build'
+
+
+
+task generate_dependency_xml() {
+  description "Generate the JarResolver dependency file for the support library"
+  dependsOn copy_pluginProjSrc
+  doFirst {
+    def xmlFile = file("${pluginProj}/${editorDir}/${currentPluginBasename}Dependencies.xml")
+    xmlFile << '<?xml version="1.0" encoding="UTF-8" ?>\n'
+    xmlFile << '<dependencies>\n'
+    xmlFile << '<!-- Internal library dependency generated at build time. \n'
+    xmlFile << '    It also defines the transitive dependencies on play-services\n'
+    xmlFile << '-->\n'
+    xmlFile << '  <androidPackages>\n'
+    xmlFile << '    <androidPackage spec="com.google.games:gpgs-plugin-support:'
+    xmlFile << "${currentPluginVersion}\">\n"
+    xmlFile << '      <repositories>\n'
+    xmlFile << '        <repository>Packages/com.google.play.games/Editor/m2repository</repository>\n'
+    xmlFile << '      </repositories>\n'
+    xmlFile << '    </androidPackage>\n'
+    xmlFile << '  </androidPackages>\n'
+    xmlFile << '</dependencies>\n'
+  }
+}
+
+
+task inject_versionIntoMetaFiles() {
+  description 'Inject the version number into the plugin\'s meta files.'
+  dependsOn copy_pluginProjSrc, generate_dependency_xml, import_jarresolver
+  doLast {
+    def currentManifestFile = versionedAssetName("${currentPluginBasename}.txt", "${currentPluginVersion}")
+    for (fileobj in fileTree("${pluginProj}")) {
+      if (fileobj.path.endsWith('.meta')) {
+        // Skip the manifest files for any previous versions
+        // Skip any files in 'PackageCache' subdirectory
+        if (fileobj.path.contains("Editor/${currentPluginBasename}") &&
+            !fileobj.path.contains(currentManifestFile) ||
+                fileobj.path.contains("PackageCache")) {
+          continue
+        }
+        def lines = fileobj.text.split('\n')
+        def outputLines = []
+        def added = false
+        for (line in lines) {
+          outputLines.add(line)
+          if (line.contains('labels:')) {
+            outputLines.add("- gvh_v${currentPluginVersion}")
+            added = true
+          } else if (line.contains('folderAsset:') && line.contains('yes')) {
+            added = true
+          }
+        }
+        if (!added) {
+          outputLines.add("labels:\n- gvh_v${currentPluginVersion}")
+        }
+        fileobj.write(outputLines.join('\n') + '\n')
+      }
+    }
+  }
+}
+
+task generate_manifest(dependsOn: [ 'inject_versionIntoMetaFiles']) {
+  description 'Generate a manifest for the files in the plug-in.'
+  doLast {
+    def dir = file("${pluginProj}/Assets")
+    def list = []
+    dir.eachFileRecurse(groovy.io.FileType.FILES) { filename ->
+        def path = filename.path
+        if (!path.toLowerCase().endsWith('.meta')) {
+          list << filename.path.replace("${pluginProj}/", '')
+        }
+    }
+    def manifest = file("${pluginProj}/${editorDir}/" +
+          versionedAssetName(currentPluginBasename + '.txt', "${currentPluginVersion}"))
+    manifest.write(list.join('\n') + '\n')
+  }
+}
+
+
+task copy_manifestMetadata(dependsOn: generate_manifest, type: Copy) {
+  def manifestBasename = versionedAssetName(currentPluginBasename + '.txt',
+        null) + '.meta'
+  description 'Copy .meta file for the plugin manifest.'
+  from file("${pluginProj}/${editorDir}/" + manifestBasename)
+  into file("${pluginProj}/${editorDir}/")
+  rename {
+    String fn ->
+      return fn.replace(manifestBasename,
+          versionedAssetName(currentPluginBasename + '.txt',
+          "${currentPluginVersion}") + '.meta')
+  }
+}
+task export_legacy_package () {
+    description = "Creates and exports the Plugin unity package"
+    doFirst {
+        ext.path = "${pluginProj}/${editorDir}/projsettings.txt"
+        delete '${ext.path}'
+    }
+
+    doLast {
+        def logFilename = "${pluginProj}/unity.log"
+        def argv = [
+                "-g.building",
+                // This prevents the VersionHandler to preserve the plugin layout
+                "-gvh_disable",
+                // NOTE: This doesn't target Android since we don't want to have
+                // dependencies on the Jar Resolver as they require the plugin to
+                // be enabled during the build process which would break the
+                // versioning process.  Compilation is verified when exporting
+                // the sample projects.
+                "-batchmode",
+                "-projectPath", "${pluginProj}",
+                "-logFile", logFilename,
+                "-exportPackage",
+                    "Assets/GooglePlayGames/com.google.play.games",
+                    "Assets/Plugins/Android/GooglePlayGamesManifest.androidlib",
+                    "Assets/ExternalDependencyManager",
+                "${exportPath}",
+                "-quit"
+        ]
+        runUnity(argv, logFilename)
+    }
+}
+export_legacy_package.dependsOn generate_manifest, import_jarresolver, copy_manifestMetadata
+export_legacy_package.dependsOn copy_pluginProjSrc
+export_legacy_package.ext.remoteTaskPhase = 'build'
+
+task export_plugin_tgz_setup() {
+    description 'Creates a gradle task for each UPM .tgz that we need to generate'
+    fileTree(assetsPath).matching {
+        include '**/package.json'
+    }.each {
+        def packageJsonFile ->
+            println 'Package.json file found at ' + packageJsonFile
+            def packageJson = new groovy.json.JsonSlurper().parse(packageJsonFile)
+            def packageName = packageJson.name
+            def packageVersion = packageJson.version
+            // Create a Tar task for each package.
+            def task = tasks.create(name: "upmTar-${packageName}", type: Tar) {
+                compression = Compression.GZIP
+                archiveFileName = "${packageName}-${packageVersion}.tgz"
+                destinationDirectory = file("${project.ext.buildPath}")
+                into('package') {
+                    from file("${pluginProj}/Assets/GooglePlayGames/${packageName}")
+                }
+            }
+            task.dependsOn generate_manifest, import_jarresolver, copy_manifestMetadata
+            task.dependsOn copy_pluginProjSrc
+    }
+}
+export_plugin_tgz_setup.ext.remoteTaskPhase = 'build'
+
+task export_plugin_tgz(dependsOn: export_plugin_tgz_setup) {
+    description 'Creates a Unity Package Manager .tgz file for every package in the project'
+    doFirst {
+        println "Creating .tgz packages."
+    }
+    // Lazily add a dependency on each of the package creation tasks.
+    dependsOn {
+        tasks.findAll { task -> task.name.startsWith('upmTar') }
+    }
+}
+export_plugin_tgz.ext.remoteTaskPhase = 'build'
+
+/*
+    Copy the plugin to the current-build directory
+*/
+task copy_plugin() {
+    description = 'Copy plugin to the current-build directory'
+    doFirst {
+            copy {
+                from file(exportPath)
+                into file(currentPluginPath)
+                rename ('plugin.unitypackage', currentPluginName)
+            }
+        }
+
+    doLast {
+        println "Copied  ${exportPath}  to   ${currentPluginPath}"
+    }
+
+    ext.remoteTaskPhase = 'postbuild'
+}
+
+task copy_plugin_source {
+  description = "Copies plugin source into build directory"
+  ext.remoteTaskPhase = 'prebuild'
+
+  doFirst {
+    copy {
+        from("${pluginSrc}") {
+            exclude '**/Samples', '**/Samples.meta'
+        }
+        into {"${pluginBuildSrc}"}
+    }
+    copy {
+        from("${manifestSrc}")
+        into {"${manifestBuildSrc}"}
+    }
+    println "Copied  ${manifestSrc}  to   ${manifestBuildSrc}"
+    if (buildMode == 'eap') {
+      copy {
+          from("${protectedPluginSrc}") {
+              exclude 'README.md', '**/Samples', '**/Samples.meta'
+          }
+          into {"${pluginBuildSrc}"}
+      }
+    }
+  }
+}
+
+task copy_supportlib_source {
+  description = "Copies support lib source into build directory for EAPs only"
+  ext.remoteTaskPhase = 'prebuild'
+
+  copy {
+      from("${supportLib}")
+      into {"${supportLibProj}"}
+  }
+  if (buildMode == 'eap') {
+    copy {
+        from("${protectedSupportLib}") {
+            exclude 'README.md'
+        }
+        into {"${supportLibProj}"}
+    }
+  }
+}
+
+task copy_jarresolver() {
+    description = "Clones the jar resolver project and copied into the build."
+    ext.remoteTaskPhase = "prebuild"
+    dependsOn copy_plugin_source
+
+    doFirst {
+        if (file(resolverDir).exists()) {
+            delete resolverDir
+        }
+    }
+
+    doLast {
+        if (jarresolver_uri != null) {
+            mkdir("${resolverDir}")
+            def resolver = new File("${resolverDir}/resolver.unitypackage")
+            new URL("${jarresolver_uri}").withInputStream {
+                inputStream -> resolver.withOutputStream { it << inputStream }
+            }
+            return
+        }
+
+        for (repo in jarresolver_repos) {
+            println 'clone ' + repo
+            def result = exec {
+                executable "${git_exe}"
+                args "clone", repo, "${resolverDir}"
+                ignoreExitValue true
+            }
+            if (result.exitValue == 0 && jarresolver_tag != null) {
+                result = exec {
+                    executable "${git_exe}"
+                    args "checkout", "-b", "buildver", "${jarresolver_tag}"
+                    workingDir "${resolverDir}"
+                }
+            }
+
+            if (result.exitValue == 0) {
+                println "Downloaded resolver from " + repo
+                return
+            }
+        }
+    }
+}
+
+task build_java_support_lib(type: GradleBuild) {
+    description = "Builds the client libraries for Android"
+    buildFile = supportLibGradle
+    dependsOn copy_supportlib_source
+    startParameter.projectProperties.put('projVersion',currentPluginVersion)
+    startParameter.projectProperties.put('uploadDir', "${project.ext.buildPath}/m2repository")
+
+    tasks = ['build', 'uploadArchives']
+}
+
+build_java_support_lib.ext.remoteTaskPhase = 'prebuild'
+
+task clean_support_lib(type: GradleBuild) {
+    description = "cleans the client libraries for Android"
+    buildFile = supportLibGradle
+    tasks = ['clean']
+}
+task clean() {
+    doFirst {
+        delete 'build'
+        }
+    dependsOn clean_support_lib
+}
+
+tasks.findAll { task -> task.ext.has('remoteTaskPhase') && task.ext.remoteTaskPhase == 'build' }*.dependsOn('prebuild')
+tasks.findAll { task -> task.ext.has('remoteTaskPhase') && task.ext.remoteTaskPhase == 'postbuild' }*.dependsOn('build')
+
+// Construct the name of a versioned asset from the source filename and version
+// // string.
+// // The encoded string takes the form...
+// // ${filename}_v${version}_.${extension}
+// // where extension is derived from the specified filename.
+def versionedAssetName(filename, version) {
+  def extensionIndex = filename.lastIndexOf('.')
+  def basename = filename.substring(0, extensionIndex)
+  def extension = filename.substring(extensionIndex)
+  // Encode the DLL version and target names into the DLL in the form...
+  // ${dllname}_t${hypen_separated_target_names}_v${version}.dll
+  def targetName = basename
+  if (version != null && !version.isEmpty()) {
+    targetName += '_v' + version
+  }
+  return targetName + extension
+}
+
+def runUnity(argv, logFilename) {
+  def result = exec {
+    executable "${project.ext.unity_exe}"
+    args argv
+    ignoreExitValue true
+  }
+
+  if (result.exitValue != 0) {
+    println "***Error Running Unity: ${result}"
+    def src = file(logFilename).text
+    print src
+    throw new GradleException('error exporting sample')
+  }
+}

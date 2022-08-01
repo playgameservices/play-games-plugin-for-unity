@@ -1,3 +1,20 @@
+Version 0.11.01
+    New Features:
+    * The plugin now uses Play Games Services v2 SDK. See [Sign-in for Android Games](https://developers.google.com/games/services/android/signin)
+
+Version 0.10.14
+    Bug fixes:
+    * #3091 Fixed the issue of unity <=2019 not detecting GooglePlayGames as an
+    android library.
+
+Version 0.10.13
+    Bug fixes:
+    * Fixed the `Ambiguous match found` error, resolving the dependencies.
+    * #3088 Fixed `GooglePlayGames.plugin` not found error on Unity 2021.2.
+    * #2876 Fixed `When using LoadScores with SetUserFilter the Scores
+    list returns empty`.
+    * Removed obsolete code from GPGSUpgrader.
+
 Version 0.10.12
     New Features:
     * Updated play-services-games version to 21.0.0

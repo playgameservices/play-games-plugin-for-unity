@@ -24,7 +24,6 @@ following features of the Google Play Games API:<br/>
 * cloud save read/write
 * show built-in achievement/leaderboards UI
 * events
-* video recording of gameplay
 * [nearby connections](NEARBY.md)
 
 __NOTICE__: This version of the plugin no longer supports iOS.  Google Play games services for iOS is deprecated,
@@ -39,7 +38,7 @@ Features:
 
 System requirements:
 
-* Unity&reg; 5 or above.
+* Unity&reg; 2017.4 or above.
 
 * To deploy on Android:
     * Android SDK
@@ -68,11 +67,11 @@ copy the resource configuration from the Google Play Developer Console, and past
 into the setup configuration in Unity.  To get the resources go to the Achievements
 tab, then click on "Get resources" on the bottom of the list.
 
-![click Get Resources](source/docgen/resourcesLink.png "Show the resources data")
+![click Get Resources](docgen/resourcesLink.png "Show the resources data")
 
 Then click the "Android section".
 
-![Android Resources](source/docgen/resources.png "Android resource data")
+![Android Resources](docgen/resources.png "Android resource data")
 
 Select all the contents of the resources window, and copy them to the clipboard.
 
@@ -82,7 +81,7 @@ Back in Unity, open the setup dialog **Window > Google Play Games > Setup... > A
 
 (Notice that you will have to switch to Android platform in Build Settings in order to see the *Android Setup* option enabled).
 
-![Android Setup](source/docgen/AndroidSetup.png "Android setup")
+![Android Setup](docgen/AndroidSetup.png "Android setup")
 
  * **Enter the directory to save constants** - Enter the folder for the constants file.
  * **Constants class name** - this is the name of the C# class to create, including namespace.
@@ -221,9 +220,9 @@ For more information, consult the documentation for your version of Windows.
 
 ## Run the Project
 
-If you are working with the **Minimal** sample, you should be able to build
-and run the project at this point. You will see a screen with an **Authenticate** button,
-and you should be able to sign in when you click it.
+If you are working with the **Smoketest** sample, you should be able to build
+and run the project at this point. You will see the automatic sign-in attempt,
+when **Smoketest** starts.
 
 To build and run on Android, click
 **File > Build Settings**, select the **Android** platform, then
@@ -259,104 +258,59 @@ and no Google Play Developer Console configuration is needed.
 For detailed information on nearby connection usage,
 please refer to [nearby connections](NEARBY.md).
 
-## Configuration & Initialization Play Game Services
-
-In order to save game progress or require access to a player's Google+ social
-graph, the default configuration needs to be replaced with a custom
-configuration. To do this use the **PlayGamesClientConfiguration**.
-If your game does not use these features, then there is no need to
-
-```csharp
-    using GooglePlayGames;
-    using GooglePlayGames.BasicApi;
-    using UnityEngine.SocialPlatforms;
-
-    PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder()
-        // enables saving game progress.
-        .EnableSavedGames()
-        // requests the email address of the player be available.
-        // Will bring up a prompt for consent.
-        .RequestEmail()
-        // requests a server auth code be generated so it can be passed to an
-        //  associated back end server application and exchanged for an OAuth token.
-        .RequestServerAuthCode(false)
-        // requests an ID token be generated.  This OAuth token can be used to
-        //  identify the player to other services such as Firebase.
-        .RequestIdToken()
-        .Build();
-
-    PlayGamesPlatform.InitializeInstance(config);
-    // recommended for debugging:
-    PlayGamesPlatform.DebugLogEnabled = true;
-    // Activate the Google Play Games platform
-    PlayGamesPlatform.Activate();
-```
-
-After activated, you can access the Play Games platform through
-**Social.Active**. You should only call **PlayGamesPlatform.Activate** once in
-your application. Making this call will not display anything on the screen and
-will not interact with the user in any way.
-
-
-## Adding additional Scopes
-
-You can add additional scopes to the authentication process by calling
-`PlayGamesClientConfiguration.Builder().AddOauthScope(scope)`.
-
-  __Note: adding additional scopes with most likely require user consent when
-starting your game__.
-
 ## Sign in
 
-To sign in, call **PlayGamesPlatform.Instance.Authenticate**, with a SignInInteractivity enum.
-Using the enum **CanPromptOnce** follows [the best sign-in practices](https://developers.google.com/games/services/checklist#1_sign-in) and it should be used when your game starts. It will:
-1. Always attempt to silent sign-in
-2. If silent sign-in fails, check if the user has previously declined to sign in.
-3. If the user hasn’t previously declined to sign in, then check the internet connection and prompt interactive sign-in if internet is available
-4. If the interactive sign-in is cancelled by the user, to remember this as a ‘decline’ for the 2nd step of the next sign-in attempt.
+A connection to Game services will be automatically formed when your game is opened.
+Once the connection is successful the player will be welcomed with a pop-up and
+your game is ready to begin using the Games Unity Plugin.
 
-Additionally, you should put a sign-in / sign-out button control for Play Games somewhere that makes sense for your game, and where your users can easily find it.  For this button, you should use the enum **CanPromptAlways**.
+Note: If a user has never used Google Play Games on this device, they will be
+automatically taken through one-time setup operations such as creating a profile
+with the Play Games app.
 
-The full list of enums for **PlayGamesPlatform.Instance.Authenticate** are:
-**CanPromptOnce** will help users have a seamless sign-in experience, by automatically signing them in when your game starts.  If automatic sign-in is not successful, they will be prompted to sign in manually with an interactive sign-in screen. If the user does not sign in using the interactive screen, they will not be asked to sign in interactively again.  Use this when your game starts up.
- **CanPromptAlways** when used, interactive sign-in will be started, if silent sign-in fails and the user will see always see UIs (this does not count the number of declines). Use this for your in-game PGS sign-in button.
-**NoPrompt** when used, silent sign-in will be attempted but no UIs will be shown to the user if silent sign-in fails.
-
+In the Start method of your script, listen to the result of the automatic sign-in
+attempt, fetch the authentication status and disable Play Games Services features
+if the user is not signed in.
 
 ```csharp
     using GooglePlayGames;
-    using UnityEngine.SocialPlatforms;
-    ...
-    // authenticate user:
-    PlayGamesPlatform.Instance.Authenticate(SignInInteractivity.CanPromptOnce, (result) =>{
-        // handle results
-    });
-```
-The result code is an enum, which gives you different failure reasons that will help you understand sign-in failures better.
 
-Interactive sign-in will show the required consent dialogs. If the user has already
-signed into the game in the past, this process will be silent and the user will
-not have to interact with any dialogs.
+    public void Start() {
+      PlayGamesPlatform.Instance.Authenticate(ProcessAuthentication);
+    }
+
+    internal void ProcessAuthentication(SignInStatus status) {
+      if (status == SignInStatus.Success) {
+        // Continue with Play Games Services
+      } else {
+        // Disable your integration with Play Games Services or show a login button
+        // to ask users to sign-in. Clicking it should call
+        // PlayGamesPlatform.Instance.ManuallyAuthenticate(ProcessAuthentication).
+      }
+    }
+}
+```
+
+The result code is an enum, which gives you different failure reasons that will
+help you understand sign-in failures better.
+
+If you prefer using Unity’s Social platform, then you can alternatively use the
+code block below.
+
+```csharp
+  using GooglePlayGames;
+
+  public void Start() {
+    PlayGamesPlatform.Activate();
+    Social.localUser.Authenticate(ProcessAuthentication);
+  }
+```
 
 Note that you cannot make any games API calls (unlock achievements, post scores,
 etc) until you get a successful return value from **Authenticate**, so it is
 good practice to put up a standby screen until the callback is called, to make
 sure the user can't start playing the game until the authentication process
 completes.
-
-### Incremental authorization
-As opposed to asking all scopes you need in advance, you can start with the most basic ones and then ask for new scopes when you need them as it’s suggested in [the quality checklist](https://developers.google.com/games/services/checklist#sign-in). This will allow silent sign-in to succeed, because silent sign-in will always fail if you ask for more than GAMES_LITE and, if you use Saved Games, DRIVE.APP_DATA. Asking for scopes at the time you need them will also help users understand why you are asking for a scope and make them more likely to give permissions.
-To learn if you already have a permission for a scope and to ask for a new one, you can use the code snippets below.
-
-```csharp
-PlayGamesPlatform.Instance.HasPermission("email")
-```
-
-```csharp
-PlayGamesPlatform.Instance.RequestPermission("email", result => {
-   // handle results
- });
-```
 
 ## Friends
 
@@ -482,24 +436,6 @@ The player stats are available after authenticating:
             }
         });
 ```
-
-## Setting popup gravity
-
-You can set the gravity used by popups when showing game services elements
-such as achievement notifications.  The default is TOP.  This can only
-be set after authentication.  For example:
-
-```csharp
-    Social.localUser.Authenticate((bool success) =>
-                {
-                    if (success)
-                    {
-                        ((GooglePlayGames.PlayGamesPlatform)Social.Active).SetGravityForPopups(Gravity.BOTTOM);
-                    }
-                });
-```
-
-
 
 ## Revealing/Unlocking an Achievement
 
@@ -750,18 +686,6 @@ This call is "fire and forget", it will handle batching and execution for you in
 
 For details on saved games concepts and APIs please refer to the  [documentation](https://developers.google.com/games/services/common/concepts/savedgames).
 
-
-To enable support for saved games, the plugin must be initialized with saved games enabled by calling
-**PlayGamesPlatform.InitializeInstance**:
-
-```csharp
-    PlayGamesClientConfiguration config = new PlayGamesClientConfiguration.Builder()
-        // enables saving game progress.
-        .EnableSavedGames()
-        .Build();
-    PlayGamesPlatform.InitializeInstance(config);
-```
-
 ### Displaying saved games UI ###
 
 The standard UI for selecting or creating a saved game entry is displayed by calling:
@@ -919,165 +843,20 @@ pass this to your web server application.  This code can then be exchanged for
 an access token to make calls to the various APIs.
 For more details on this flow see: [Google Sign-In for Websites](https://developers.google.com/identity/sign-in/web/server-side-flow).
 
-To get the Server Auth code:
-1. Configure the web client Id of the web application linked to your game in the
+To get the server side access code:
+1. Configure the web client id of the web application linked to your game in the
 Play Game Console.
-2. Call `PlayGamesClientConfiguration.Builder.RequestServerAuthCode(false)` when
-    creating the configuration.
-3. Call `PlayGamesPlatform.Instance.GetServerAuthCode()` once the player is authenticated.
-4. Pass this code to your server application.
-
-### Getting another server auth code after exchanging the first code
-If your back end server interactions requires you to send a server auth code
-more than once per authenticated session, you can call
-    `PlayGamesPlatform.Instance.GetAnotherServerAuthCode(Action<string> callback)`
-This method requires the player to be aready authenticated and correctly configured to
-request server auth codes on this client.  This method is implemented by calling
-Google Sign-in silently which returns a new server auth code when already signed in.
-
-
-## Retrieving player's email
-In order to access the player's email address:
-1. Call `PlayGamesClientConfiguration.Builder.RequestEmail()` when creating
-    the configuration.
-2. Access the email property `((PlayGamesLocalUser) Social.localUser).Email`
-    after the player is authenticated.
-
-__Note:__
-If all that is needed is a persistent unique identifier for the player, then you
-should use the player's id.  This is a unique ID specific to that player and
-is the same value all the time.
-
+2. Call `PlayGamesPlatform.Instance.RequestServerSideAccess` once the player is
+  authenticated to get the server side access code.
+3. Pass this code to your server application.
 
 ```csharp
-    // call this from Update()
-    Debug.Log("Local user's email is " +
-        ((PlayGamesLocalUser)Social.localUser).Email);
-```
-
-## Retrieving player's ID Token
-To get the player's OAuth ID token:
-1. Call `PlayGamesClientConfiguration.Builder.RequestIdToken()` when creating
-    the configuration.
-2. Access the idtoken property `((PlayGamesLocalUser) Social.localUser).GetIdToken()`
-    after the player is authenticated.
-
-__Note:__
-The ID Token can be used to identify the real player identity.  As a result
-requesting the ID Token will cause a consent screen to be presented to the user
-during login.
-
-
-## Video Recording
-
-If you wish to integrate the Play Games video capture functionality into your game,
-you can use the following features.
-
-### Get Video Capture Capabilities ###
-
-You can access the video capture capabilities of a device, including if the camera, mic,
-or write storage can be used, as well as the capture modes (save as a file or live stream)
-and quality levels (SD, HD, etc.).
-
-```csharp
-PlayGamesPlatform.Instance.Video.GetCaptureCapabilities(
-  (status, capabilities) => {
-    bool isSuccess = CommonTypesUtil.StatusIsSuccess(status);
-    if (isSuccess) {
-      if (capabilities.IsCameraSupported && capabilities.IsMicSupported &&
-          capabilities.IsWriteStorageSupported &&
-          capabilities.SupportsCaptureMode(VideoCaptureMode.File) &&
-          capabilities.SupportsQualityLevel(VideoQualityLevel.SD)) {
-        Debug.Log("All requested capabilities are present.");
-      } else {
-        Debug.Log("Not all requested capabilities are present!");
-      }
-    } else {
-      Debug.Log("Error: " + status.ToString());
-    }
-  });
-```
-
-### Launch the Video Capture Overlay ###
-
-Before activating the video capture overlay, be sure to check that it can be launched with
-**IsCaptureSupported** and **IsCaptureAvailable**.
-
-```csharp
-if (PlayGamesPlatform.Instance.Video.IsCaptureSupported()) {
-  PlayGamesPlatform.Instance.Video.IsCaptureAvailable(VideoCaptureMode.File,
-    (status, isAvailable) => {
-      bool isSuccess = CommonTypesUtil.StatusIsSuccess(status);
-      if (isSuccess) {
-        if (isAvailable) {
-          PlayGamesPlatform.Instance.Video.ShowCaptureOverlay();
-        } else {
-          Debug.Log("Video capture is unavailable. Is the overlay already open?");
-        }
-      } else {
-        Debug.Log("Error: " + status.ToString());
-      }
+  PlayGamesPlatform.Instance.RequestServerSideAccess(
+    /* forceRefreshToken= */ false,
+    code -> {
+      // send code to server
     });
-}
 ```
-
-### Get the Current Video Capture State ###
-
-When required, you can access the current state of the video capture overlay,
-including whether or not it is recording, and what mode and resolution it is recording in.
-
-```csharp
-PlayGamesPlatform.Instance.Video.GetCaptureState(
-  (status, state) => {
-    bool isSuccess = CommonTypesUtil.StatusIsSuccess(status);
-    if (isSuccess) {
-      if (state.IsCapturing) {
-        Debug.Log("Currently capturing to " + state.CaptureMode.ToString() + " in " +
-                  state.QualityLevel.ToString());
-      } else {
-        Debug.Log("Not currently capturing.");
-      }
-    } else {
-      Debug.Log("Error: " + status.ToString());
-    }
-  });
-```
-
-### Setup a Listener for Live Updates to the Capture State ###
-
-To receive an update whenever the status of the video capture overlay changes,
-use **RegisterCaptureOverlayStateChangedListener**.
-Only one listener can be registered at a time, subsequent calls will replace the previous listener.
-The listener can be unregistered with **UnregisterCaptureOverlayStateChangedListener**.
-
-```csharp
-PlayGamesPlatform.Instance.Video.RegisterCaptureOverlayStateChangedListener(this);
-```
-
-The object passed to **RegisterCaptureOverlayStateChangedListener** must implement
-**CaptureOverlayStateListener** from **GooglePlayGames.BasicApi.Video**.
-The **OnCaptureOverlayStateChanged** in that object will be called when the state changes.
-
-```csharp
-public void OnCaptureOverlayStateChanged(VideoCaptureOverlayState overlayState)
-{
-  Debug.Log("Overlay State is now " + overlayState.ToString());
-}
-```
-
-## Sign out
-
-To sign the user out, use the **PlayGamesPlatform.SignOut** method.
-
-```csharp
-    using GooglePlayGames;
-    using UnityEngine.SocialPlatforms;
-
-    // sign out
-    PlayGamesPlatform.Instance.SignOut();
-```
-
-After signing out, no further API calls can be made until the user authenticates again.
 
 ## Decreasing apk size
 
