@@ -5,7 +5,7 @@ buildscript {
         maven { url '/tmp/games_m2/repository' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.1.3'
+        classpath 'com.android.tools.build:gradle:7.2.2'
     }
 }
 
@@ -97,5 +97,5 @@ uploadArchives {
 
 dependencies {
     implementation 'com.google.android.gms:play-services-games-v2:17.0.0'
-    implementation 'com.google.android.gms:play-services-nearby:18.0.2'
+    implementation 'com.google.android.gms:play-services-nearby:18.3.0'
 }
