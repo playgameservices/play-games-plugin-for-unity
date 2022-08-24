@@ -5,7 +5,7 @@ buildscript {
         mavenLocal()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.2.1'
+        classpath 'com.android.tools.build:gradle:7.2.2'
     }
 }
 
@@ -97,6 +97,6 @@ uploadArchives {
 
 dependencies {
     implementation 'com.google.android.gms:play-services-games:22.0.1'
-    implementation 'com.google.android.gms:play-services-auth:20.1.0'
-    implementation 'com.google.android.gms:play-services-nearby:18.2.0'
+    implementation 'com.google.android.gms:play-services-auth:20.2.0'
+    implementation 'com.google.android.gms:play-services-nearby:18.3.0'
 }
