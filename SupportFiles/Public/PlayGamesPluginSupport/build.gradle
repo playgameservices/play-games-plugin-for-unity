@@ -5,7 +5,7 @@ buildscript {
         maven { url '/tmp/games_m2/repository' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.3.1'
+        classpath 'com.android.tools.build:gradle:7.4.0'
     }
 }
 
