@@ -37,6 +37,11 @@ project.ext {
     if (sdk_root == null || sdk_root.isEmpty()) {
         sdk_root = System.getenv("ANDROID_HOME")
     }
+
+    if (sdk_root == null || sdk_root.isEmpty()) {
+      println("ANDROID_HOME is not set properly. This may cause a build failure.")
+    }
+
     unity_exe = System.getProperty("UNITY_EXE")
     if (unity_exe == null || unity_exe.isEmpty()) {
         unity_exe = System.getenv("UNITY_EXE")
@@ -51,6 +56,10 @@ project.ext {
       } else {
         unity_exe = 'Unity'
       }
+    }
+
+    if (unity_exe == null || unity_exe.isEmpty()) {
+      println("UNITY_EXE is not set properly. This may cause a build failure.")
     }
 
     git_exe = System.getProperty("GIT_EXE")
