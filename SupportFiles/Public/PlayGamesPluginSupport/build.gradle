@@ -2,7 +2,6 @@ buildscript {
     repositories {
         google()
         jcenter()
-        maven { url '/tmp/games_m2/repository' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.4.2'
@@ -13,6 +12,7 @@ allprojects {
     repositories {
         google()
         jcenter()
+        maven { url '/tmp/games_m2/repository' }
     }
 }
 
