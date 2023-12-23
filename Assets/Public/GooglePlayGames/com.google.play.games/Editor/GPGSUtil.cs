@@ -22,6 +22,7 @@ namespace GooglePlayGames.Editor
     using System.Collections.Generic;
     using System.IO;
     using System.Xml;
+    using System.Linq;
     using UnityEditor;
     using UnityEngine;
 
@@ -112,6 +113,44 @@ namespace GooglePlayGames.Editor
 
         private const string RootFolderName = "com.google.play.games";
 
+        static string localResolvedPath = "Packages";
+
+        public static void InitResolverPath(Action<bool> onFinished)
+        {
+            var listRequest = UnityEditor.PackageManager.Client.List(true,true);
+
+            EditorApplication.update += Progress;
+
+            void Progress()
+            {
+                if(listRequest.Status == UnityEditor.PackageManager.StatusCode.InProgress)
+                    return;
+
+                EditorApplication.update -= Progress;
+
+                if(listRequest.Status == UnityEditor.PackageManager.StatusCode.Failure)
+                {
+                    Alert(listRequest.Error.errorCode.ToString(),listRequest.Error.message);
+                    onFinished?.Invoke(false);
+                    return;
+                }
+
+                var packageInfo = listRequest.Result.FirstOrDefault((info) => info.packageId.StartsWith(RootFolderName + "@"));
+                if(packageInfo == null)
+                {
+                    Alert(RootFolderName,"Not installed");
+                    onFinished?.Invoke(false);
+                    return;
+                }
+
+                if(packageInfo.source == UnityEditor.PackageManager.PackageSource.Local)
+                    localResolvedPath = Path.GetDirectoryName(packageInfo.resolvedPath);
+
+                Debug.Log(localResolvedPath);
+                onFinished?.Invoke(true);
+            }
+        }
+
         /// <summary>
         /// The root path of the Google Play Games plugin
         /// </summary>
@@ -119,18 +158,21 @@ namespace GooglePlayGames.Editor
         {
             get
             {
-                if (string.IsNullOrEmpty(mRootPath))
+                if (string.IsNullOrEmpty(mRootPath) || !Directory.Exists(mRootPath))
                 {
+                    string[] dirs = new[] {
 #if UNITY_2018_4_OR_NEWER
-                    // Search for root path in plugin locations for both Asset packages and UPM packages
-                    string[] dirs = Directory.GetDirectories("Packages", RootFolderName, SearchOption.AllDirectories);
-                    string[] dir1 = Directory.GetDirectories("Assets", RootFolderName, SearchOption.AllDirectories);
-                    int dirsLength = dirs.Length;
-                    Array.Resize<string>(ref dirs, dirsLength + dir1.Length);
-                    Array.Copy(dir1, 0, dirs, dirsLength, dir1.Length);
-#else
-                    string[] dirs = Directory.GetDirectories("Assets", RootFolderName, SearchOption.AllDirectories);
+                        // search for remote UPM installation
+                        Path.Join("Library","PackageCache"),
+                        localResolvedPath,
+                        "Packages",
 #endif
+                        "Assets"
+                    }.Distinct().SelectMany((path) => {
+                        return Directory.GetDirectories(path, RootFolderName + "*", SearchOption.AllDirectories);
+                    }).Distinct().ToArray();
+
+
                     switch (dirs.Length)
                     {
                         case 0:
@@ -144,8 +186,7 @@ namespace GooglePlayGames.Editor
                         default:
                             for (int i = 0; i < dirs.Length; i++)
                             {
-                                if (File.Exists(SlashesToPlatformSeparator(Path.Combine(dirs[i], GameInfoRelativePath)))
-                                )
+                                if (File.Exists(SlashesToPlatformSeparator(Path.Combine(dirs[i], GameInfoRelativePath))))
                                 {
                                     mRootPath = SlashesToPlatformSeparator(dirs[i]);
                                     break;
@@ -251,8 +292,7 @@ namespace GooglePlayGames.Editor
         /// <param name="name">Name of the template in the editor directory.</param>
         public static string ReadEditorTemplate(string name)
         {
-            return ReadFile(
-                Path.Combine(RootPath, string.Format("Editor{0}{1}.txt", Path.DirectorySeparatorChar, name)));
+            return ReadFile(Path.Combine(RootPath,"Editor",string.Format("{0}.txt", name)));
         }
 
         /// <summary>
@@ -662,9 +702,7 @@ namespace GooglePlayGames.Editor
         /// </summary>
         public static void CheckAndFixDependencies()
         {
-            string depPath =
-                SlashesToPlatformSeparator(Path.Combine(GPGSUtil.RootPath,
-                    "Editor/GooglePlayGamesPluginDependencies.xml"));
+            string depPath = SlashesToPlatformSeparator(Path.Combine("Assets","Editor","GooglePlayGamesPluginDependencies.xml"));
 
             XmlDocument doc = new XmlDocument();
             doc.Load(depPath);
@@ -694,8 +732,12 @@ namespace GooglePlayGames.Editor
         /// </summary>
         public static void CheckAndFixVersionedAssestsPaths()
         {
-            string[] foundPaths =
-                Directory.GetFiles(RootPath, "GooglePlayGamesPlugin_v*.txt", SearchOption.AllDirectories);
+            string[] rootPaths = new string[] { "Assets",RootPath };
+            string[] foundPaths = rootPaths.Select((rootPath) => {
+                return Directory.GetFiles(Path.Combine(rootPath,"Editor"), "GooglePlayGamesPlugin_v*.txt", SearchOption.AllDirectories);
+            }).FirstOrDefault((txtFiles) => {
+                return txtFiles.Length > 0 && File.Exists(txtFiles[0]);
+            });
 
             if (foundPaths.Length == 1)
             {
@@ -710,8 +752,7 @@ namespace GooglePlayGames.Editor
                         int pos = assetPath.IndexOf(RootFolderName);
                         if (pos != -1)
                         {
-                            assetPath = Path.Combine(RootPath, assetPath.Substring(pos + RootFolderName.Length + 1))
-                                .Replace("\\", "/");
+                            assetPath = Path.Combine(RootPath, assetPath.Substring(pos + RootFolderName.Length + 1)).Replace("\\", "/");
                         }
 
                         writer.WriteLine(assetPath);

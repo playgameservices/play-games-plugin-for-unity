@@ -62,7 +62,7 @@ project.ext {
     }
 
     // Also update in com.google.play.games/package.json
-    pluginVersion = "0.11.01"
+    pluginVersion = "0.11.1"
 
     // String for specifying the build mode.
     // If 'eap', will include all files from the 'Protected' folder.
