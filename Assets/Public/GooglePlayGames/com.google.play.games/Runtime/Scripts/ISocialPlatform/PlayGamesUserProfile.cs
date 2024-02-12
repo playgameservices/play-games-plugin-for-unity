@@ -207,7 +207,7 @@ namespace GooglePlayGames
         private void setAvatarUrl(string avatarUrl)
         {
             mAvatarUrl = avatarUrl;
-            if (!avatarUrl.StartsWith("https") && avatarUrl.StartsWith("http"))
+            if (avatarUrl != null && !avatarUrl.StartsWith("https") && avatarUrl.StartsWith("http"))
             {
                 mAvatarUrl = avatarUrl.Insert(4, "s");
             }
