@@ -96,8 +96,21 @@ namespace GooglePlayGames.BasicApi
       void RequestServerSideAccess(bool forceRefreshToken, Action<string> callback);
 
       /// <summary>
+      /// Requests Recall Access to Player Games Services for the currently signed in account
+      /// </summary>
+      /// When requested a session id is returned that can be used by your game-server to
+      /// use Recall Access APIs like LinkPerson , UnlinkPersona and get Details about Recall Tokens
+      /// and corresponding personas. See https://developer.android.com/games/pgs/recall?hl=en.
+      ///
+      /// <remarks>
+      ///
+      /// </remarks>
+      /// <param name="callback"></param>
+      void RequestRecallAccessToken(Action<RecallAccess> callback);
+
+      /// <summary>
       /// Returns the authenticated user's ID. Note that this value may change if a user signs
-      /// on and signs in with a different account.
+      /// out and signs in with a different account.
       /// </summary>
       /// <returns>The user's ID, <code>null</code> if the user is not logged in.</returns>
       string GetUserId();

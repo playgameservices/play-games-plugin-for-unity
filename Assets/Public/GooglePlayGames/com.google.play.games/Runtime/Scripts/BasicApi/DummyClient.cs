@@ -63,6 +63,15 @@ namespace GooglePlayGames.BasicApi
             }
         }
 
+        public void RequestRecallAccessToken(Action<RecallAccess> callback)
+        {
+            LogUsage();
+            if (callback != null)
+            {
+                callback(null);
+            }
+        }
+
         public string GetUserId()
         {
             LogUsage();

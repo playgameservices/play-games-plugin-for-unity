@@ -207,6 +207,29 @@ namespace GooglePlayGames.Android
             }
         }
 
+        public void RequestRecallAccessToken(Action<RecallAccess> callback)
+        {
+            callback = AsOnGameThreadCallback(callback);
+            using (var client = getRecallClient())
+            using (var task = client.Call<AndroidJavaObject>("requestRecallAccess"))
+            {
+                AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
+                    task,
+                    recallAccess => {
+                        var sessionId = recallAccess.Call<string>("getSessionId");
+                        callback(new RecallAccess(sessionId));
+                    }
+                );
+
+                AndroidTaskUtils.AddOnFailureListener(task, exception =>
+                {
+                    OurUtils.Logger.e("Requesting Recall access task failed - " +
+                                      exception.Call<string>("toString"));
+                    callback(null);
+                });
+            }
+        }
+
         private static Action<T> AsOnGameThreadCallback<T>(Action<T> callback)
         {
             if (callback == null)
@@ -1017,6 +1040,12 @@ namespace GooglePlayGames.Android
         private AndroidJavaObject getGamesSignInClient()
         {
             return mGamesClass.CallStatic<AndroidJavaObject>("getGamesSignInClient",
+                AndroidHelperFragment.GetActivity());
+        }
+
+        private AndroidJavaObject getRecallClient()
+        {
+            return mGamesClass.CallStatic<AndroidJavaObject>("getRecallClient",
                 AndroidHelperFragment.GetActivity());
         }
     }
