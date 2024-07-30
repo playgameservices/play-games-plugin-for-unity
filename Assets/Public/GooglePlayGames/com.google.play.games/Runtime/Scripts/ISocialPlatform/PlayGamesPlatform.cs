@@ -210,6 +210,7 @@ namespace GooglePlayGames
         /// example, <c>Social.Active.Authenticate()</c>.
         /// </summary>
         /// <returns>The singleton <see cref="PlayGamesPlatform" /> instance.</returns>
+    	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
         public static PlayGamesPlatform Activate()
         {
             GooglePlayGames.OurUtils.Logger.d("Activating PlayGamesPlatform.");
