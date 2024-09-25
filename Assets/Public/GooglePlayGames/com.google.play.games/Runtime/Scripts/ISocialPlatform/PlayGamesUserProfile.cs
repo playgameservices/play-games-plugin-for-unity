@@ -19,9 +19,11 @@
 namespace GooglePlayGames
 {
     using System;
-    using System.Threading.Tasks;
 
     using UnityEngine;
+
+    using GooglePlayGames.OurUtils;
+
 #if UNITY_2017_2_OR_NEWER
     using UnityEngine.Networking;
 #endif
@@ -107,48 +109,37 @@ namespace GooglePlayGames
 
                     mImage = new Texture2D(96,96);
 
-                    var scheduler = TaskScheduler.FromCurrentSynchronizationContext();
-
                     using(var currentActivity = Android.AndroidHelperFragment.GetActivity())
                     {
                         currentActivity.Call("runOnUiThread", new AndroidJavaRunnable(() => {
-                            var listener = new OnLoadImageListener();
-
                             using(var currentActivity = Android.AndroidHelperFragment.GetActivity())
                             using(var ImageManager = new AndroidJavaClass("com.google.android.gms.common.images.ImageManager"))
                             using(var imageManager = ImageManager.CallStatic<AndroidJavaObject>("create",currentActivity))
                             using(var Uri = new AndroidJavaClass("android.net.Uri"))
                             using(var uri = Uri.CallStatic<AndroidJavaObject>("parse",AvatarURL))
                             {
-                                imageManager.Call("loadImage",listener,uri);
+                                imageManager.Call("loadImage",new OnLoadImageListener((result) => {
+                                    PlayGamesHelperObject.RunOnGameThread(() => {
+                                        var (uri,drawable,isRequestedDrawable) = result;
+
+                                        using(var CompressFormat = new AndroidJavaClass("android.graphics.Bitmap$CompressFormat"))
+                                        using(var format = CompressFormat.GetStatic<AndroidJavaObject>("PNG"))
+                                        using(var outputStream = new AndroidJavaObject("java.io.ByteArrayOutputStream"))
+                                        using(var bitmap = drawable.Call<AndroidJavaObject>("getBitmap"))
+                                        {
+                                            mImage.Reinitialize(bitmap.Call<int>("getWidth"),bitmap.Call<int>("getHeight"));
+
+                                            bitmap.Call<bool>("compress",format,100,outputStream);
+                                            var data = outputStream.Call<sbyte[]>("toByteArray");
+
+                                            mImage.LoadImage(System.Runtime.InteropServices.MemoryMarshal.Cast<sbyte,byte>(data).ToArray());
+                                        }
+
+                                        drawable?.Dispose();
+                                        uri?.Dispose();
+                                    });
+                                }),uri);
                             }
-
-                            listener.AsTask.ContinueWith((task) => {
-                                Debug.LogFormat("task : {0}",task);
-                                if(!task.IsCompletedSuccessfully)
-                                {
-                                    Debug.LogException(task.Exception);
-                                    return;
-                                }
-
-                                var (uri,drawable,_) = task.Result;
-
-                                using(var CompressFormat = new AndroidJavaClass("android.graphics.Bitmap$CompressFormat"))
-                                using(var format = CompressFormat.GetStatic<AndroidJavaObject>("PNG"))
-                                using(var outputStream = new AndroidJavaObject("java.io.ByteArrayOutputStream"))
-                                using(var bitmap = drawable.Call<AndroidJavaObject>("getBitmap"))
-                                {
-                                    mImage.Reinitialize(bitmap.Call<int>("getWidth"),bitmap.Call<int>("getHeight"));
-
-                                    bitmap.Call<bool>("compress",format,100,outputStream);
-                                    var data = outputStream.Call<sbyte[]>("toByteArray");
-
-                                    mImage.LoadImage(System.Runtime.InteropServices.MemoryMarshal.Cast<sbyte,byte>(data).ToArray());
-                                }
-
-                                drawable?.Dispose();
-                                uri?.Dispose();
-                            },scheduler);
                         }));
                     }
                 }
@@ -166,16 +157,15 @@ namespace GooglePlayGames
 
         class OnLoadImageListener : AndroidJavaProxy
         {
-            public Task<(AndroidJavaObject uri,AndroidJavaObject drawable,bool isRequestedDrawable)> AsTask => source.Task;
-            TaskCompletionSource<(AndroidJavaObject uri,AndroidJavaObject drawable,bool isRequestedDrawable)> source = new TaskCompletionSource<(AndroidJavaObject uri, AndroidJavaObject drawable, bool isRequestedDrawable)>();
-
-            public OnLoadImageListener() : base("com.google.android.gms.common.images.ImageManager$OnImageLoadedListener") { }
+            private Action<(AndroidJavaObject uri, AndroidJavaObject drawable, bool isRequestedDrawable)> mAction;
+            public OnLoadImageListener(Action<(AndroidJavaObject uri, AndroidJavaObject drawable, bool isRequestedDrawable)> action) : base("com.google.android.gms.common.images.ImageManager$OnImageLoadedListener")
+            {
+                mAction = action;
+            }
 
             public void onImageLoaded(AndroidJavaObject uri, AndroidJavaObject drawable, bool isRequestedDrawable)
             {
-                Debug.Log((uri,drawable,isRequestedDrawable));
-                Debug.Log(source);
-                source.TrySetResult((uri,drawable,isRequestedDrawable));
+                mAction((uri,drawable,isRequestedDrawable));
             }
         }
 

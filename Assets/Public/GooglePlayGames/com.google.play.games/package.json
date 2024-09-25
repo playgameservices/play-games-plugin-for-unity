@@ -9,5 +9,12 @@
     },
     "dependencies": {
         "com.google.external-dependency-manager": "1.2.170"
-    }
+    },
+    "samples": [
+        {
+            "displayName": "SmokeTest",
+            "description": "Google Play Games Service Samples",
+            "path": "Samples~/SmokeTest"
+        }
+    ]
 }
