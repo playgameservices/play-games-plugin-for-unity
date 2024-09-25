@@ -2,9 +2,15 @@
 
 ```json
 {
-    "com.google.play.games": "https://github.com/Thaina/play-games-plugin-for-unity.git?path=/Assets/Public/GooglePlayGames/com.google.play.games"
+  "dependencies": {
+    "com.google.external-dependency-manager": "https://github.com/googlesamples/unity-jar-resolver.git?path=upm",
+    "com.google.play.games": "https://github.com/Thaina/play-games-plugin-for-unity.git?path=/Assets/Public/GooglePlayGames/com.google.play.games",
+    ...
+  }
 }
 ```
+
+`external-dependency-manager` is required dependencies to imported with UPM. But can be tgz or OpenUPM
 
 This fork now use gradle post build event to patch androidmanifest
 

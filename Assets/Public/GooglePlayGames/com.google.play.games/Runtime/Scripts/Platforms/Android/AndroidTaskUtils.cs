@@ -6,32 +6,37 @@ namespace GooglePlayGames.Android
     using UnityEngine;
     using System;
 
-    class AndroidTaskUtils
+    static class AndroidTaskUtils
     {
-        private AndroidTaskUtils()
+        /** <returns> self </returns> */
+        public static AndroidJavaObject AddOnCanceledListener(this AndroidJavaObject task, Action callback)
         {
+            using (task.Call<AndroidJavaObject>("addOnCanceledListener",new TaskOnCanceledProxy(callback))) ;
+            return task;
         }
 
-        public static void AddOnSuccessListener<T>(AndroidJavaObject task, Action<T> callback)
+        /** <returns> self </returns> */
+        public static AndroidJavaObject AddOnSuccessListener<T>(this AndroidJavaObject task, Action<T> callback) => task.AddOnSuccessListener(true,callback);
+
+        /** <returns> self </returns> */
+        public static AndroidJavaObject AddOnSuccessListener<T>(this AndroidJavaObject task, bool disposeResult, Action<T> callback)
         {
-            using (task.Call<AndroidJavaObject>("addOnSuccessListener",
-                new TaskOnSuccessProxy<T>(callback, /* disposeResult= */ true))) ;
+            using (task.Call<AndroidJavaObject>("addOnSuccessListener",new TaskOnSuccessProxy<T>(callback, disposeResult))) ;
+            return task;
         }
 
-        public static void AddOnSuccessListener<T>(AndroidJavaObject task, bool disposeResult, Action<T> callback)
-        {
-            using (task.Call<AndroidJavaObject>("addOnSuccessListener",
-                new TaskOnSuccessProxy<T>(callback, disposeResult))) ;
-        }
-
-        public static void AddOnFailureListener(AndroidJavaObject task, Action<AndroidJavaObject> callback)
+        /** <returns> self </returns> */
+        public static AndroidJavaObject AddOnFailureListener(this AndroidJavaObject task, Action<AndroidJavaObject> callback)
         {
             using (task.Call<AndroidJavaObject>("addOnFailureListener", new TaskOnFailedProxy(callback))) ;
+            return task;
         }
 
-        public static void AddOnCompleteListener<T>(AndroidJavaObject task, Action<T> callback)
+        /** <returns> self </returns> */
+        public static AndroidJavaObject AddOnCompleteListener<T>(this AndroidJavaObject task, Action<T> callback)
         {
             using (task.Call<AndroidJavaObject>("addOnCompleteListener", new TaskOnCompleteProxy<T>(callback))) ;
+            return task;
         }
 
         private class TaskOnCompleteProxy<T> : AndroidJavaProxy
@@ -65,8 +70,7 @@ namespace GooglePlayGames.Android
             private Action<T> mCallback;
             private bool mDisposeResult;
 
-            public TaskOnSuccessProxy(Action<T> callback, bool disposeResult)
-                : base("com/google/android/gms/tasks/OnSuccessListener")
+            public TaskOnSuccessProxy(Action<T> callback, bool disposeResult) : base("com/google/android/gms/tasks/OnSuccessListener")
             {
                 mCallback = callback;
                 mDisposeResult = disposeResult;
@@ -92,8 +96,7 @@ namespace GooglePlayGames.Android
         {
             private Action<AndroidJavaObject> mCallback;
 
-            public TaskOnFailedProxy(Action<AndroidJavaObject> callback)
-                : base("com/google/android/gms/tasks/OnFailureListener")
+            public TaskOnFailedProxy(Action<AndroidJavaObject> callback) : base("com/google/android/gms/tasks/OnFailureListener")
             {
                 mCallback = callback;
             }
@@ -104,6 +107,21 @@ namespace GooglePlayGames.Android
                 {
                     mCallback(exception);
                 }
+            }
+        }
+
+        private class TaskOnCanceledProxy : AndroidJavaProxy
+        {
+            private Action mCallback;
+
+            public TaskOnCanceledProxy(Action callback) : base("com/google/android/gms/tasks/OnCanceledListener")
+            {
+                mCallback = callback;
+            }
+
+            public void onCanceled()
+            {
+                mCallback();
             }
         }
     }
