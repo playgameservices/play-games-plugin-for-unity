@@ -37,12 +37,11 @@ namespace GooglePlayGames.Android
 
         private readonly object GameServicesLock = new object();
         private readonly object AuthStateLock = new object();
-        private readonly static String PlayGamesSdkClassName =
-          "com.google.android.gms.games.PlayGamesSdk";
+        private const string PlayGamesSdkClassName = "com.google.android.gms.games.PlayGamesSdk";
 
         private volatile ISavedGameClient mSavedGameClient;
         private volatile IEventsClient mEventsClient;
-        private volatile Player mUser = null;
+        private volatile PlayGamesUserProfile mUser = null;
         private volatile AuthState mAuthState = AuthState.Unauthenticated;
         private IUserProfile[] mFriends = new IUserProfile[0];
         private LoadFriendsStatus mLastLoadFriendsStatus = LoadFriendsStatus.Unknown;
@@ -97,8 +96,7 @@ namespace GooglePlayGames.Android
 
             OurUtils.Logger.d("Starting Auth using the method " + methodName);
             using (var client = getGamesSignInClient())
-            using (
-                var task = client.Call<AndroidJavaObject>(methodName))
+            using (var task = client.Call<AndroidJavaObject>(methodName))
             {
                 AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(task, authenticationResult =>
                 {
@@ -179,19 +177,39 @@ namespace GooglePlayGames.Android
             }
         }
 
+        static string appID = null;
+        public static string AppId
+        {
+            get
+            {
+                if(appID == null)
+                    appID = AndroidHelperFragment.CallPackageMetaData<string>("GET_META_DATA","getString","com.google.android.gms.games.APP_ID") ?? "";
+
+                return appID;
+            }
+        }
+
+        static string webClientId = null;
+        public static string WebClientId
+        {
+            get
+            {
+                if(webClientId == null)
+                    webClientId = AndroidHelperFragment.CallPackageMetaData<string>("GET_META_DATA","getString","com.google.android.gms.games.WEB_CLIENT_ID") ?? "";
+
+                return webClientId;
+            }
+        }
+
         public void RequestServerSideAccess(bool forceRefreshToken, Action<string> callback)
         {
             callback = AsOnGameThreadCallback(callback);
 
-            if (!GameInfo.WebClientIdInitialized())
-            {
-                throw new InvalidOperationException("Requesting server side access requires web " +
-                                                    "client id to be configured.");
-            }
+            if (string.IsNullOrEmpty(WebClientId) || !WebClientId.StartsWith(AppId) || !WebClientId.EndsWith(".googleusercontent.com"))
+                throw new InvalidOperationException("Requesting server side access requires web client id to be configured.");
 
             using (var client = getGamesSignInClient())
-            using (var task = client.Call<AndroidJavaObject>("requestServerSideAccess",
-                GameInfo.WebClientId, forceRefreshToken))
+            using (var task = client.Call<AndroidJavaObject>("requestServerSideAccess", WebClientId, forceRefreshToken))
             {
                 AndroidTaskUtils.AddOnSuccessListener<string>(
                     task,
@@ -298,11 +316,9 @@ namespace GooglePlayGames.Android
             LoadAllFriends(mFriendsMaxResults, /* forceReload= */ false, /* loadMore= */ false, callback);
         }
 
-        private void LoadAllFriends(int pageSize, bool forceReload, bool loadMore,
-            Action<bool> callback)
+        private void LoadAllFriends(int pageSize, bool forceReload, bool loadMore, Action<bool> callback)
         {
-            LoadFriendsPaginated(pageSize, loadMore, forceReload, result =>
-            {
+            LoadFriendsPaginated(pageSize, loadMore, forceReload, result => {
                 mLastLoadFriendsStatus = result;
                 switch (result)
                 {
@@ -326,8 +342,7 @@ namespace GooglePlayGames.Android
             });
         }
 
-        public void LoadFriends(int pageSize, bool forceReload,
-            Action<LoadFriendsStatus> callback)
+        public void LoadFriends(int pageSize, bool forceReload, Action<LoadFriendsStatus> callback)
         {
             LoadFriendsPaginated(pageSize, /* isLoadMore= */ false, /* forceReload= */ forceReload,
                 callback);
@@ -339,8 +354,7 @@ namespace GooglePlayGames.Android
                 callback);
         }
 
-        private void LoadFriendsPaginated(int pageSize, bool isLoadMore, bool forceReload,
-            Action<LoadFriendsStatus> callback)
+        private void LoadFriendsPaginated(int pageSize, bool isLoadMore, bool forceReload, Action<LoadFriendsStatus> callback)
         {
             mFriendsResolutionException = null;
             using (var playersClient = getPlayersClient())
@@ -393,8 +407,7 @@ namespace GooglePlayGames.Android
                             }
 
                             mLastLoadFriendsStatus = LoadFriendsStatus.InternalError;
-                            OurUtils.Logger.e("LoadFriends failed: " +
-                                exception.Call<string>("toString"));
+                            OurUtils.Logger.e("LoadFriends failed: " + exception.Call<string>("toString"));
                             InvokeCallbackOnGameThread(callback, LoadFriendsStatus.InternalError);
                         }
                     });
@@ -422,9 +435,7 @@ namespace GooglePlayGames.Android
                                                   "list but there is no intent to trigger the UI. This may be because the user " +
                                                   "has granted access already or the game has not called loadFriends() before.");
                 using (var playersClient = getPlayersClient())
-                using (
-                    var task = playersClient.Call<AndroidJavaObject>("loadFriends", /* pageSize= */ 1,
-                        /* forceReload= */ false))
+                using (var task = playersClient.Call<AndroidJavaObject>("loadFriends", /* pageSize= */ 1, /* forceReload= */ false))
                 {
                     AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
                         task, annotatedData => { InvokeCallbackOnGameThread(callback, UIStatus.Valid); });
@@ -452,8 +463,7 @@ namespace GooglePlayGames.Android
                                 }
                             }
 
-                            OurUtils.Logger.e("LoadFriends failed: " +
-                                exception.Call<string>("toString"));
+                            OurUtils.Logger.e("LoadFriends failed: " + exception.Call<string>("toString"));
                             InvokeCallbackOnGameThread(callback, UIStatus.InternalError);
                         });
                     });
@@ -461,8 +471,7 @@ namespace GooglePlayGames.Android
             }
             else
             {
-                AndroidHelperFragment.AskForLoadFriendsResolution(mFriendsResolutionException,
-                    AsOnGameThreadCallback(callback));
+                AndroidHelperFragment.AskForLoadFriendsResolution(mFriendsResolutionException,AsOnGameThreadCallback(callback));
             }
         }
 
@@ -476,12 +485,10 @@ namespace GooglePlayGames.Android
                 AsOnGameThreadCallback(callback));
         }
 
-        public void GetFriendsListVisibility(bool forceReload,
-            Action<FriendsListVisibilityStatus> callback)
+        public void GetFriendsListVisibility(bool forceReload, Action<FriendsListVisibilityStatus> callback)
         {
             using (var playersClient = getPlayersClient())
-            using (
-                var task = playersClient.Call<AndroidJavaObject>("getCurrentPlayer", forceReload))
+            using (var task = playersClient.Call<AndroidJavaObject>("getCurrentPlayer", forceReload))
             {
                 AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(task, annotatedData =>
                 {
@@ -861,8 +868,7 @@ namespace GooglePlayGames.Android
             }
         }
 
-        public void LoadMoreScores(ScorePageToken token, int rowCount,
-            Action<LeaderboardScoreData> callback)
+        public void LoadMoreScores(ScorePageToken token, int rowCount, Action<LeaderboardScoreData> callback)
         {
             using (var client = getLeaderboardsClient())
             using (var task = client.Call<AndroidJavaObject>("loadMoreScores",
@@ -983,8 +989,7 @@ namespace GooglePlayGames.Android
             }
         }
 
-        public void SubmitScore(string leaderboardId, long score, string metadata,
-            Action<bool> callback)
+        public void SubmitScore(string leaderboardId, long score, string metadata, Action<bool> callback)
         {
             if (!IsAuthenticated())
             {
