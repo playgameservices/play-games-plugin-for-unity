@@ -41,8 +41,7 @@ namespace GooglePlayGames.OurUtils
                 //if the app is installed, no errors. Else, doesn't get past next line
                 try
                 {
-                    launchIntent =
- packageManager.Call<AndroidJavaObject>("getLaunchIntentForPackage", "com.google.android.play.games");
+                    launchIntent = packageManager.Call<AndroidJavaObject>("getLaunchIntentForPackage", "com.google.android.play.games");
                 }
                 catch (Exception)
                 {
