@@ -1,3 +1,23 @@
+## Fork for upgrade package and making UPM compatiable
+
+```json
+{
+  "dependencies": {
+    "com.google.external-dependency-manager": "https://github.com/googlesamples/unity-jar-resolver.git?path=upm",
+    "com.google.play.games": "https://github.com/Thaina/play-games-plugin-for-unity.git?path=/Assets/Public/GooglePlayGames/com.google.play.games",
+    ...
+  }
+}
+```
+
+`external-dependency-manager` is required dependencies to imported with UPM. But can be tgz or OpenUPM
+
+This fork now use gradle post build event to patch androidmanifest
+
+Also fix the image loader from play service
+
+Tested and worked in Unity 6. Should be compatible with lower version but not fully tested yet
+
 # Google Play Games plugin for Unity
 _Copyright (c) 2014 Google Inc. All rights reserved._
 
