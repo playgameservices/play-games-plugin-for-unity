@@ -21,29 +21,26 @@ namespace GooglePlayGames.Editor
 
     public class GPGSDocsUI
     {
-        [MenuItem("Window/Google Play Games/Documentation/Plugin Getting Started Guide...", false, 100)]
+        [MenuItem("Google/Play Games/Documentation/Plugin Getting Started Guide...", false, 100)]
         public static void MenuItemGettingStartedGuide()
         {
             Application.OpenURL(GPGSStrings.ExternalLinks.GettingStartedGuideURL);
         }
 
-        [MenuItem("Window/Google Play Games/Documentation/Google Play Games API...", false, 101)]
+        [MenuItem("Google/Play Games/Documentation/Google Play Games API...", false, 101)]
         public static void MenuItemPlayGamesServicesAPI()
         {
             Application.OpenURL(GPGSStrings.ExternalLinks.PlayGamesServicesApiURL);
         }
 
-        [MenuItem("Window/Google Play Games/About/About the Plugin...", false, 300)]
+        [MenuItem("Google/Play Games/About/About the Plugin...", false, 300)]
         public static void MenuItemAbout()
         {
-            string msg = GPGSStrings.AboutText +
-                         PluginVersion.VersionString + " (" +
-                         string.Format("0x{0:X8}", GooglePlayGames.PluginVersion.VersionInt) + ")";
-            EditorUtility.DisplayDialog(GPGSStrings.AboutTitle, msg,
-                GPGSStrings.Ok);
+            string msg = GPGSStrings.AboutText + PluginVersion.VersionString + " (" + string.Format("0x{0:X8}", GooglePlayGames.PluginVersion.VersionInt) + ")";
+            EditorUtility.DisplayDialog(GPGSStrings.AboutTitle, msg, GPGSStrings.Ok);
         }
 
-        [MenuItem("Window/Google Play Games/About/License...", false, 301)]
+        [MenuItem("Google/Play Games/About/License...", false, 301)]
         public static void MenuItemLicense()
         {
             EditorUtility.DisplayDialog(GPGSStrings.LicenseTitle, GPGSStrings.LicenseText,

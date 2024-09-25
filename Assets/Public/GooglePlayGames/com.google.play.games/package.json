@@ -7,5 +7,7 @@
     "author": {
         "name": "Google LLC"
     },
-    "dependencies": {}
+    "dependencies": {
+        "com.google.external-dependency-manager": "1.2.170"
+    }
 }
