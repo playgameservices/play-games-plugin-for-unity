@@ -130,7 +130,7 @@ project.ext {
     jarresolver_repos = [
       'https://github.com/googlesamples/unity-jar-resolver.git'
     ]
-    jarresolver_tag = null;
+    jarresolver_tag = 'v1.2.182';
 }
 
 if (!tasks.findByName('prebuild')) {
