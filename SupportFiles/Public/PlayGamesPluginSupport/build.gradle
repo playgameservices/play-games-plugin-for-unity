@@ -1,7 +1,7 @@
 buildscript {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:8.0.1'
@@ -11,7 +11,8 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
+        // The following line is needed when building the plugin with an unreleased SDK.
         maven { url '/tmp/games_m2/repository' }
     }
 }
