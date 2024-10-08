@@ -700,7 +700,7 @@ task build_java_support_lib(type: GradleBuild) {
     startParameter.projectProperties.put('projVersion',currentPluginVersion)
     startParameter.projectProperties.put('uploadDir', "${project.ext.buildPath}/m2repository")
 
-    tasks = ['build', 'uploadArchives']
+    tasks = ['build', 'publish']
 }
 
 build_java_support_lib.ext.remoteTaskPhase = 'prebuild'
