@@ -36,17 +36,19 @@ if (project.hasProperty("uploadDir")) {
 }
 
 android {
+    namespace 'com.google.games.bridge'
+
     lintOptions {
         abortOnError true
         warningsAsErrors true
 
         // Don't fail when new versions of dependencies are available. Allows reproducible builds
-        disable("NewerVersionAvailable", "GradleDependency")
+        disable("AndroidGradlePluginVersion", "GradleDependency", "NewerVersionAvailable", "UnusedResources")
     }
     defaultConfig {
         versionName  project.version
         archivesBaseName = project.ext.baseName
-        minSdkVersion 16
+        minSdkVersion 19
 
     }
     compileSdkVersion 28
