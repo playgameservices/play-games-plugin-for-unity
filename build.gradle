@@ -437,7 +437,7 @@ task generate_dependency_xml() {
     xmlFile << '    <androidPackage spec="com.google.games:gpgs-plugin-support:'
     xmlFile << "${currentPluginVersion}\">\n"
     xmlFile << '      <repositories>\n'
-    xmlFile << '        <repository>Packages/com.google.play.games/Editor/m2repository</repository>\n'
+    xmlFile << '        <repository>Assets/GooglePlayGames/com.google.play.games/Editor/m2repository</repository>\n'
     xmlFile << '      </repositories>\n'
     xmlFile << '    </androidPackage>\n'
     xmlFile << '  </androidPackages>\n'
