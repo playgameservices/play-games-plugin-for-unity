@@ -17,14 +17,14 @@
 #if UNITY_ANDROID
 namespace GooglePlayGames.Android
 {
+    using System;
+
+    using UnityEngine;
+
     using GooglePlayGames.BasicApi;
     using GooglePlayGames.BasicApi.SavedGame;
-    using OurUtils;
-    using UnityEngine;
-    using System;
-    using System.Collections.Generic;
 
-    internal class AndroidHelperFragment
+    internal static class AndroidHelperFragment
     {
         private const string HelperFragmentClass = "com.google.games.bridge.HelperFragment";
 
@@ -34,6 +34,26 @@ namespace GooglePlayGames.Android
             {
                 return jc.GetStatic<AndroidJavaObject>("currentActivity");
             }
+        }
+
+        public static int PackageManagerFlag(string flagName)
+        {
+            using(var PackageManager = new AndroidJavaClass("android.content.pm.PackageManager"))
+                return PackageManager.GetStatic<int>(flagName);
+        }
+
+        public static T CallPackageMetaData<T>(string flagName,string methodName, params object[] args)
+        {
+            return CallPackageMetaData<T>(PackageManagerFlag(flagName),methodName,args);
+        }
+
+        public static T CallPackageMetaData<T>(int applicationInfoFlags,string methodName, params object[] args)
+        {
+            using (var activity = GetActivity())
+            using (var pm = activity.Call<AndroidJavaObject>("getPackageManager"))
+            using (var appInfo = pm.Call<AndroidJavaObject>("getApplicationInfo", activity.Call<string>("getPackageName"), applicationInfoFlags))
+            using (var bundle = appInfo.Get<AndroidJavaObject>("metaData"))
+                return bundle.Call<T>(methodName,args);
         }
 
         public static AndroidJavaObject GetDefaultPopupView()
