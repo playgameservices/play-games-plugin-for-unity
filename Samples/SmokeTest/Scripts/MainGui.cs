@@ -59,6 +59,7 @@ namespace SmokeTest
         private AchievementGUI mAchievementGui;
         private LeaderboardGUI mLeaderboardGui;
         private FriendsGUI mFriendsGui;
+        private RecallGUI mRecallGui;
 
         // which UI are we showing?
         public enum Ui {
@@ -72,7 +73,8 @@ namespace SmokeTest
           Achievements,
           Leaderboards,
           UserInfo,
-          Friends
+          Friends,
+          Recall
         }
 
         public void Start()
@@ -86,6 +88,7 @@ namespace SmokeTest
             this.mAchievementGui = new AchievementGUI(this);
             this.mLeaderboardGui = new LeaderboardGUI(this);
             this.mFriendsGui = new FriendsGUI(this);
+            this.mRecallGui = new RecallGUI(this);
         }
 
         public void SetUI(Ui page)
@@ -195,6 +198,10 @@ namespace SmokeTest
             } else if (GUI.Button(this.CalcGrid(0, 4), "Events"))
             {
                 SetUI(Ui.Events);
+            }
+            else if (GUI.Button(this.CalcGrid(1, 4), "Recall"))
+            {
+                SetUI(Ui.Recall);
             }
         }
 
@@ -659,6 +666,9 @@ namespace SmokeTest
                         break;
                     case Ui.UserInfo:
                         ShowUserInfoUi();
+                        break;
+                    case Ui.Recall:
+                        mRecallGui.OnGUI();
                         break;
                     default:
                         // check for a status of interest, and if there
