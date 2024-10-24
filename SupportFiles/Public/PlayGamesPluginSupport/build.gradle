@@ -79,15 +79,34 @@ publishing {
             version = project.version
 
             artifact("${buildDir}/${baseName}-${version}.srcaar" as File)
+
+            // Add the required dependencies to the generated `pom.xml` file.
+            pom.withXml {
+                final dependenciesNode = asNode().appendNode('dependencies')
+                configurations.implementation.allDependencies.each {
+                    // Exclude filetree dependencies.
+                    if (it.name != 'unspecified') {
+                        println("Adding dependency: " + it.group + ":" + it.name + ":" + it.version)
+
+                        final dependencyNode = dependenciesNode.appendNode('dependency')
+                        dependencyNode.appendNode('groupId', it.group)
+                        dependencyNode.appendNode('artifactId', it.name)
+                        dependencyNode.appendNode('version', it.version)
+                        if (it.artifacts.size() > 0) {
+                            dependencyNode.appendNode('type', it.artifacts[0].type)
+                        }
+                    }
+                }
+            }
         }
     }
-
     repositories {
         maven {
             url uri(project.ext.uploadDir)
         }
     }
 }
+
 
 tasks.withType(PublishToMavenRepository) { it.dependsOn renameLibrary }
 
