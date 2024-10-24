@@ -48,7 +48,7 @@ android {
     defaultConfig {
         versionName  project.version
         archivesBaseName = project.ext.baseName
-        minSdkVersion 19
+        minSdkVersion 21
 
     }
     compileSdkVersion 28
@@ -111,6 +111,6 @@ publishing {
 tasks.withType(PublishToMavenRepository) { it.dependsOn renameLibrary }
 
 dependencies {
-    implementation 'com.google.android.gms:play-services-games-v2:17.0.0'
+    implementation 'com.google.android.gms:play-services-games-v2:20.1.2'
     implementation 'com.google.android.gms:play-services-nearby:18.5.0'
 }
