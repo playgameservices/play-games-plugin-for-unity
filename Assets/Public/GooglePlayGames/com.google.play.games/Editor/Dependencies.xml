@@ -1,6 +1,6 @@
 <dependencies>
     <androidPackages>
-        <androidPackage spec="com.google.android.gms:play-services-games-v2:20.1.0"/>
+        <androidPackage spec="com.google.android.gms:play-services-games-v2:20.1.2"/>
         <androidPackage spec="com.google.android.gms:play-services-nearby:19.3.0"/>
     </androidPackages>
 </dependencies>
