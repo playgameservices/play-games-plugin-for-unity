@@ -79,6 +79,8 @@ Select all the contents of the resources window, and copy them to the clipboard.
 
 Back in Unity, open the setup dialog **Window > Google Play Games > Setup... > Android Setup**
 
+(Notice that you will have to switch to Android platform in Build Settings in order to see the *Android Setup* option enabled).
+
 ![Android Setup](docgen/AndroidSetup.png "Android setup")
 
  * **Enter the directory to save constants** - Enter the folder for the constants file.
