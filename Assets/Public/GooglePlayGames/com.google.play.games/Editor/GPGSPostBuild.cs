@@ -17,13 +17,16 @@
 #if UNITY_ANDROID
 namespace GooglePlayGames.Editor
 {
-    using System.Collections.Generic;
     using System.IO;
-    using UnityEditor.Callbacks;
-    using UnityEditor;
-    using UnityEngine;
+    using System.Xml;
+    using System.Linq;
+    using System.Collections.Generic;
 
-    public static class GPGSPostBuild
+    using UnityEditor;
+    using UnityEditor.Android;
+    using UnityEditor.Callbacks;
+
+    public class GPGSPostBuild : IPostGenerateGradleAndroidProject
     {
         [PostProcessBuild(99999)]
         public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
@@ -36,6 +39,96 @@ namespace GooglePlayGames.Editor
             }
 
             return;
+        }
+
+        public int callbackOrder => 999;
+
+        const string androidNamespaceURL = "http://schemas.android.com/apk/res/android";
+        public void OnPostGenerateGradleAndroidProject(string path)
+        {
+            var manifestPath = Path.Combine(path,"src","main","AndroidManifest.xml");
+            if(!File.Exists(manifestPath))
+            {
+                EditorUtility.DisplayDialog("Google Play Games Error","Cannot find AndroidManifest.xml to modified","OK");
+                return;
+            }
+
+            var xmlDoc = new XmlDocument();
+            xmlDoc.Load(manifestPath);
+
+            var nsmgr = new XmlNamespaceManager(xmlDoc.NameTable);
+            nsmgr.AddNamespace("android",androidNamespaceURL);
+
+            var appID = FindOrCreate(xmlDoc,nsmgr,androidNamespaceURL,"manifest/application/meta-data","android:name","com.google.android.gms.games.APP_ID");
+            SetAttributeNS(xmlDoc,appID,androidNamespaceURL,"android:value","\\u003" + GPGSProjectSettings.Instance.Get(GPGSUtil.APPIDKEY));
+
+            var webClientID = FindOrCreate(xmlDoc,nsmgr,androidNamespaceURL,"manifest/application/meta-data","android:name","com.google.android.gms.games.WEB_CLIENT_ID");
+            SetAttributeNS(xmlDoc,webClientID,androidNamespaceURL,"android:value",GPGSProjectSettings.Instance.Get(GPGSUtil.WEBCLIENTIDKEY));
+
+            var version = FindOrCreate(xmlDoc,nsmgr,androidNamespaceURL,"manifest/application/meta-data","android:name","com.google.android.gms.games.unityVersion");
+            SetAttributeNS(xmlDoc,version,androidNamespaceURL,"android:value","\\u003" + PluginVersion.VersionString);
+
+            string serviceID = GPGSProjectSettings.Instance.Get(GPGSUtil.SERVICEIDKEY);
+            if (!string.IsNullOrEmpty(serviceID))
+            {
+                foreach(var permission in new[]{ "BLUETOOTH","BLUETOOTH_ADMIN","ACCESS_WIFI_STATE","CHANGE_WIFI_STATE","ACCESS_COARSE_LOCATION" })
+                    FindOrCreate(xmlDoc,nsmgr,androidNamespaceURL,"manifest/uses-permission","android:name","android.permission." + permission);
+
+                var service = FindOrCreate(xmlDoc,nsmgr,androidNamespaceURL,"manifest/application/meta-data","android:name","com.google.android.gms.nearby.connection.SERVICE_ID");
+                SetAttributeNS(xmlDoc,service,androidNamespaceURL,"android:value",serviceID);
+            }
+
+            xmlDoc.Save(manifestPath);
+        }
+
+        static void SetAttributeNS(XmlDocument xmlDoc,XmlElement element,string namespaceURL,string attributeName,string attributeValue)
+        {
+            var attr = xmlDoc.CreateAttribute(attributeName,namespaceURL);
+            attr.Value = attributeValue;
+            element.SetAttributeNode(attr);
+        }
+
+        static XmlElement FindOrCreate(XmlDocument xmlDoc,XmlNamespaceManager nsmgr,string attributeNamespace,string path,string attributeName,string attributeValue)
+        {
+            var nodes = xmlDoc.SelectNodes($"{path}[@{attributeName}='{attributeValue}']",nsmgr);
+            if(nodes.Count > 0)
+            {
+                int i = 0;
+                while(i < nodes.Count)
+                {
+                    if(nodes[i] is XmlElement element)
+                        break;
+
+                    i++;
+                }
+
+                foreach(var node in nodes.OfType<XmlNode>().Where((node,n) => i != n))
+                    node.ParentNode.RemoveChild(node);
+
+                return nodes[i] as XmlElement;
+            }
+            else
+            {
+                var element = xmlDoc.DocumentElement;
+                var stack = new Stack<string>();
+                while(path.LastIndexOf('/') is int i && i > 0)
+                {
+                    stack.Push(path.Substring(i + 1));
+                    path = path.Remove(i);
+                    element = xmlDoc.SelectNodes(path,nsmgr)?.OfType<XmlElement>().FirstOrDefault();
+                    if(element != null)
+                        break;
+                }
+
+                while(stack.TryPop(out string name))
+                {
+                    element = element.AppendChild(xmlDoc.CreateElement(name)) as XmlElement;
+                }
+
+                SetAttributeNS(xmlDoc,element,attributeNamespace,attributeName,attributeValue);
+
+                return element;
+            }
         }
     }
 }
