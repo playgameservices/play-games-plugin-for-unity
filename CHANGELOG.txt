@@ -1,3 +1,11 @@
+Version 2.0.0
+    New Features:
+    * Recall feature implementation. See [Recall for unity](https://developer.android.com/games/pgs/recall)
+    * Smoketest app is updated. 
+    * Update Android Gradle Plugin and Gradle to 7.5.1.
+    * Upgraded maven to maven-publish
+    * Pin unity-jar-resolver version to 1.2.182.
+
 Version 0.11.01
     New Features:
     * The plugin now uses Play Games Services v2 SDK. See [Sign-in for Android Games](https://developers.google.com/games/services/android/signin)
