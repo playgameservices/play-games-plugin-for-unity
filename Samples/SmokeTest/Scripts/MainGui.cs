@@ -60,6 +60,7 @@ namespace SmokeTest
         private LeaderboardGUI mLeaderboardGui;
         private FriendsGUI mFriendsGui;
         private RecallGUI mRecallGui;
+        private EventsGUI mEventsGui;
 
         // which UI are we showing?
         public enum Ui {
@@ -89,6 +90,7 @@ namespace SmokeTest
             this.mLeaderboardGui = new LeaderboardGUI(this);
             this.mFriendsGui = new FriendsGUI(this);
             this.mRecallGui = new RecallGUI(this);
+            this.mEventsGui = new EventsGUI(this);
         }
 
         public void SetUI(Ui page)
@@ -499,56 +501,6 @@ namespace SmokeTest
             }
         }
 
-        internal void ShowEventsUi()
-        {
-            DrawStatus();
-            DrawTitle("Events");
-            if (GUI.Button(CalcGrid(0, 1), "Fetch All Events"))
-            {
-                SetStandBy("Fetching All Events");
-                PlayGamesPlatform.Instance.Events.FetchAllEvents(
-                    DataSource.ReadNetworkOnly,
-                    (status, events) =>
-                    {
-                        Status = "Fetch All Status: " + status + "\n";
-                        Status += "Events: [" +
-                                  string.Join(",", events.Select(g => g.Id).ToArray()) + "]";
-                        events.ForEach(e =>
-                            GooglePlayGames.OurUtils.Logger.d("Retrieved event: " + e));
-                        EndStandBy();
-                    });
-            }
-            else if (GUI.Button(CalcGrid(1, 1), "Fetch Event"))
-            {
-                SetStandBy("Fetching Event");
-                PlayGamesPlatform.Instance.Events.FetchEvent(
-                    DataSource.ReadNetworkOnly,
-                    GPGSIds.event_smokingevent,
-                    (status, fetchedEvent) =>
-                    {
-                        Status = "Fetch Status: " + status + "\n";
-                        if (fetchedEvent != null)
-                        {
-                            Status += "Event: [" + fetchedEvent.Id + ", " + fetchedEvent.Description + "]: " +
-                                      fetchedEvent.CurrentCount;
-                            GooglePlayGames.OurUtils.Logger.d("Fetched event: " + fetchedEvent);
-                        }
-
-                        EndStandBy();
-                    });
-            }
-            else if (GUI.Button(CalcGrid(0, 2), "Increment Event"))
-            {
-                PlayGamesPlatform.Instance.Events.IncrementEvent(
-                    GPGSIds.event_smokingevent, 10);
-            }
-
-            if (GUI.Button(CalcGrid(1, 6), "Back"))
-            {
-                SetUI(Ui.Main);
-            }
-        }
-
         internal void ShowUserInfoUi()
         {
             GUI.Label(
@@ -659,7 +611,7 @@ namespace SmokeTest
                         ShowResolveConflict();
                         break;
                     case Ui.Events:
-                        ShowEventsUi();
+                        mEventsGui.OnGUI();
                         break;
                     case Ui.NearbyConnections:
                         mNearbyGui.OnGUI();
