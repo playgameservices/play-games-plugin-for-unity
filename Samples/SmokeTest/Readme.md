@@ -19,11 +19,11 @@ Next steps are to create achievements, leaderboards and events.
 *   Create three achievements in play console with exact given name:
 
     *   `achievementtoincrement` - Check
-        [this](https://screenshot.googleplex.com/ByodrtbvY2UQxwK) box to make it
+        [this](https://services.google.com/fh/gumdrop/preview/misc/increment_console.png) box to make it
         incremental
     *   `achievementtounlock` - Revealed and non - incremental achievement
     *   `achievementtoreveal` -
-        [Hidden](https://screenshot.googleplex.com/3mqFEJUUaQXEQHB) Achievement,
+        [Hidden](https://services.google.com/fh/gumdrop/preview/misc/hidden_console.png) Achievement,
         non incremental
     *   `achievement_hidden_incremental` - Hidden and Incremental Achievement
 
@@ -58,7 +58,7 @@ Open Build Settings ( File > Build Settings )
         at your custom keystore and use the required key.
     *   Copy the SHA1 use have set in your Unity Hub and paste it into the
         `Credentials` section in Google cloud console -
-        [here](https://screenshot.googleplex.com/BDu49YLzLjxJotB)
+        [here](https://services.google.com/fh/gumdrop/preview/misc/sha_creds_update.png)
 
 ### Configuring Google Play Games in Unity Hub
 
