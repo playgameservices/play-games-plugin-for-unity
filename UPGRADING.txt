@@ -1,22 +1,18 @@
 NOTES ON UPGRADING
 
-Note for 0.11.1
+Note for 2.0.0
 
-The new SDK contains four major changes to increase sign-in success which you
-should be aware of:
+The new SDK contains six changes which you should be aware of:
+1. Recall feature implementation. See [Recall for unity](https://developer.android.com/games/pgs/recall)
+2. Smoketest app is updated. 
+3. Update Android Gradle Plugin and Gradle to 7.5.1.
+4. Upgraded maven to maven-publish
+5. Pin unity-jar-resolver version to 1.2.182.
+6. Removal of PGA dependency
 
-1. Sign-in is triggered automatically when your game is launched. Creating a
-PlayGamesClientConfiguration instance, the initialization and activation of
-PlayGamesPlatform are not needed. Just calling
-`PlayGamesPlatform.Instance.Authenticate()` will fetch the result of automatic
-sign-in.
-2. Authentication tokens are now provided using
-`PlayGamesPlatform.Instance.requestServerSideAccess()`.
-3. Sign-out method is removed, and we will no longer require an in-game button
-to sign-in or sign-out of Play Games Services.
-4. Extra scopes cannot be requested.
+There are no major changes related to sign-in flow.
 
-Before importing the unity package for v0.11.1, delete
+Before importing the unity package for v2.0.0, delete
 `Assets/Plugins/Android/com.google.android.gms.play-services-games-<version_number>.aar`
 and everything under `Assets/GooglePlayGames`. You can then follow the regular
 integration process.
