@@ -6,6 +6,7 @@ Version 2.0.0
     * Upgraded maven to maven-publish
     * Pin unity-jar-resolver version to 1.2.182.
     * Removal of PGA dependency
+    * Updated documentation. See [Set up Google Play Games for Unity and sign-in](https://developer.android.com/games/pgs/unity/unity-start)
 
 Version 0.11.01
     New Features:
