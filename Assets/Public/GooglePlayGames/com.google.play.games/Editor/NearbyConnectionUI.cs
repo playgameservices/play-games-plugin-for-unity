@@ -25,7 +25,7 @@ namespace GooglePlayGames.Editor
     {
         private string mNearbyServiceId = string.Empty;
 
-        [MenuItem("Window/Google Play Games/Setup/Nearby Connections setup...", false, 3)]
+        [MenuItem("Google/Play Games/Setup/Nearby Connections setup...", false, 3)]
         public static void MenuItemNearbySetup()
         {
             EditorWindow window = EditorWindow.GetWindow(
@@ -33,7 +33,7 @@ namespace GooglePlayGames.Editor
             window.minSize = new Vector2(400, 200);
         }
 
-        [MenuItem("Window/Google Play Games/Setup/Nearby Connections setup...", true)]
+        [MenuItem("Google/Play Games/Setup/Nearby Connections setup...", true)]
         public static bool EnableNearbyMenuItem()
         {
 #if UNITY_ANDROID
@@ -128,7 +128,7 @@ namespace GooglePlayGames.Editor
                 GPGSUtil.EnsureDirExists("Assets/Plugins/Android");
 
                 // Generate AndroidManifest.xml
-                GPGSUtil.GenerateAndroidManifest();
+                GPGSUtil.UpdateGameInfo();
 
                 GPGSProjectSettings.Instance.Set(GPGSUtil.NEARBYSETUPDONEKEY, true);
                 GPGSProjectSettings.Instance.Save();

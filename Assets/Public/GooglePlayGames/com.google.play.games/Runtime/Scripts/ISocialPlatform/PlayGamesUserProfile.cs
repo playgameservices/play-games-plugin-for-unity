@@ -19,9 +19,11 @@
 namespace GooglePlayGames
 {
     using System;
-    using System.Collections;
-    using GooglePlayGames.OurUtils;
+
     using UnityEngine;
+
+    using GooglePlayGames.OurUtils;
+
 #if UNITY_2017_2_OR_NEWER
     using UnityEngine.Networking;
 #endif
@@ -42,18 +44,11 @@ namespace GooglePlayGames
         private volatile bool mImageLoading = false;
         private Texture2D mImage;
 
-        internal PlayGamesUserProfile(string displayName, string playerId,
-            string avatarUrl)
+        internal PlayGamesUserProfile(string displayName, string playerId,string avatarUrl) : this(displayName,playerId,avatarUrl,false)
         {
-            mDisplayName = displayName;
-            mPlayerId = playerId;
-            setAvatarUrl(avatarUrl);
-            mImageLoading = false;
-            mIsFriend = false;
         }
 
-        internal PlayGamesUserProfile(string displayName, string playerId, string avatarUrl,
-            bool isFriend)
+        internal PlayGamesUserProfile(string displayName, string playerId, string avatarUrl,bool isFriend)
         {
             mDisplayName = displayName;
             mPlayerId = playerId;
@@ -62,8 +57,7 @@ namespace GooglePlayGames
             mIsFriend = isFriend;
         }
 
-        protected void ResetIdentity(string displayName, string playerId,
-            string avatarUrl)
+        protected void ResetIdentity(string displayName, string playerId,string avatarUrl)
         {
             mDisplayName = displayName;
             mPlayerId = playerId;
@@ -112,7 +106,42 @@ namespace GooglePlayGames
                 {
                     OurUtils.Logger.d("Starting to load image: " + AvatarURL);
                     mImageLoading = true;
-                    PlayGamesHelperObject.RunCoroutine(LoadImage());
+
+                    mImage = new Texture2D(96,96);
+
+                    using(var currentActivity = Android.AndroidHelperFragment.GetActivity())
+                    {
+                        currentActivity.Call("runOnUiThread", new AndroidJavaRunnable(() => {
+                            using(var currentActivity = Android.AndroidHelperFragment.GetActivity())
+                            using(var ImageManager = new AndroidJavaClass("com.google.android.gms.common.images.ImageManager"))
+                            using(var imageManager = ImageManager.CallStatic<AndroidJavaObject>("create",currentActivity))
+                            using(var Uri = new AndroidJavaClass("android.net.Uri"))
+                            using(var uri = Uri.CallStatic<AndroidJavaObject>("parse",AvatarURL))
+                            {
+                                imageManager.Call("loadImage",new OnLoadImageListener((result) => {
+                                    PlayGamesHelperObject.RunOnGameThread(() => {
+                                        var (uri,drawable,isRequestedDrawable) = result;
+
+                                        using(var CompressFormat = new AndroidJavaClass("android.graphics.Bitmap$CompressFormat"))
+                                        using(var format = CompressFormat.GetStatic<AndroidJavaObject>("PNG"))
+                                        using(var outputStream = new AndroidJavaObject("java.io.ByteArrayOutputStream"))
+                                        using(var bitmap = drawable.Call<AndroidJavaObject>("getBitmap"))
+                                        {
+                                            mImage.Reinitialize(bitmap.Call<int>("getWidth"),bitmap.Call<int>("getHeight"));
+
+                                            bitmap.Call<bool>("compress",format,100,outputStream);
+                                            var data = outputStream.Call<sbyte[]>("toByteArray");
+
+                                            mImage.LoadImage(System.Runtime.InteropServices.MemoryMarshal.Cast<sbyte,byte>(data).ToArray());
+                                        }
+
+                                        drawable?.Dispose();
+                                        uri?.Dispose();
+                                    });
+                                }),uri);
+                            }
+                        }));
+                    }
                 }
 
                 return mImage;
@@ -126,50 +155,17 @@ namespace GooglePlayGames
             get { return mAvatarUrl; }
         }
 
-        /// <summary>
-        /// Loads the local user's image from the url.  Loading urls
-        /// is asynchronous so the return from this call is fast,
-        /// the image is returned once it is loaded.  null is returned
-        /// up to that point.
-        /// </summary>
-        internal IEnumerator LoadImage()
+        class OnLoadImageListener : AndroidJavaProxy
         {
-            // the url can be null if the user does not have an
-            // avatar configured.
-            if (!string.IsNullOrEmpty(AvatarURL))
+            private Action<(AndroidJavaObject uri, AndroidJavaObject drawable, bool isRequestedDrawable)> mAction;
+            public OnLoadImageListener(Action<(AndroidJavaObject uri, AndroidJavaObject drawable, bool isRequestedDrawable)> action) : base("com.google.android.gms.common.images.ImageManager$OnImageLoadedListener")
             {
-#if UNITY_2017_2_OR_NEWER
-                UnityWebRequest www = UnityWebRequestTexture.GetTexture(AvatarURL);
-                www.SendWebRequest();
-#else
-                WWW www = new WWW(AvatarURL);
-#endif
-                while (!www.isDone)
-                {
-                    yield return null;
-                }
-
-                if (www.error == null)
-                {
-#if UNITY_2017_2_OR_NEWER
-                    this.mImage = DownloadHandlerTexture.GetContent(www);
-#else
-                    this.mImage = www.texture;
-#endif
-                }
-                else
-                {
-                    mImage = Texture2D.blackTexture;
-                    OurUtils.Logger.e("Error downloading image: " + www.error);
-                }
-
-                mImageLoading = false;
+                mAction = action;
             }
-            else
+
+            public void onImageLoaded(AndroidJavaObject uri, AndroidJavaObject drawable, bool isRequestedDrawable)
             {
-                OurUtils.Logger.e("No URL found.");
-                mImage = Texture2D.blackTexture;
-                mImageLoading = false;
+                mAction((uri,drawable,isRequestedDrawable));
             }
         }
 
