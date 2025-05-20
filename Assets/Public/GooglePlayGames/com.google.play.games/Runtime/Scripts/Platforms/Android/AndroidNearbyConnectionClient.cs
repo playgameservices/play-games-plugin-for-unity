@@ -24,8 +24,7 @@ namespace GooglePlayGames.Android
             NearbyHelperObject.CreateObject(this);
             using (var nearbyClass = new AndroidJavaClass("com.google.android.gms.nearby.Nearby"))
             {
-                mClient = nearbyClass.CallStatic<AndroidJavaObject>("getConnectionsClient",
-                    AndroidHelperFragment.GetActivity());
+                mClient = nearbyClass.CallStatic<AndroidJavaObject>("getConnectionsClient",AndroidHelperFragment.GetActivity());
             }
         }
 
@@ -292,12 +291,10 @@ namespace GooglePlayGames.Android
 
         private AndroidJavaObject CreateDiscoveryOptions()
         {
-            using (var strategy =
-                new AndroidJavaClass("com.google.android.gms.nearby.connection.Strategy").GetStatic<AndroidJavaObject>(
-                    "P2P_CLUSTER"))
-            using (var builder =
-                new AndroidJavaObject("com.google.android.gms.nearby.connection.DiscoveryOptions$Builder"))
-            using (builder.Call<AndroidJavaObject>("setStrategy", strategy))
+            using (var builder = new AndroidJavaObject("com.google.android.gms.nearby.connection.DiscoveryOptions$Builder"))
+            using (var strategy = new AndroidJavaClass("com.google.android.gms.nearby.connection.Strategy"))
+            using (var flag = strategy.GetStatic<AndroidJavaObject>("P2P_CLUSTER"))
+            using (builder.Call<AndroidJavaObject>("setStrategy", flag))
             {
                 return builder.Call<AndroidJavaObject>("build");
             }
@@ -413,20 +410,9 @@ namespace GooglePlayGames.Android
 
         private static string ReadServiceId()
         {
-            using (var activity = AndroidHelperFragment.GetActivity())
-            {
-                string packageName = activity.Call<string>("getPackageName");
-                using (var pm = activity.Call<AndroidJavaObject>("getPackageManager"))
-                using (var appInfo =
-                    pm.Call<AndroidJavaObject>("getApplicationInfo", packageName, ApplicationInfoFlags))
-                using (var bundle = appInfo.Get<AndroidJavaObject>("metaData"))
-                {
-                    string sysId = bundle.Call<string>("getString",
-                        "com.google.android.gms.nearby.connection.SERVICE_ID");
-                    OurUtils.Logger.d("SystemId from Manifest: " + sysId);
-                    return sysId;
-                }
-            }
+            var sysId = AndroidHelperFragment.CallPackageMetaData<string>(ApplicationInfoFlags,"getString","com.google.android.gms.nearby.connection.SERVICE_ID");
+            OurUtils.Logger.d("SystemId from Manifest: " + sysId);
+            return sysId;
         }
 
         private static Action<T> ToOnGameThread<T>(Action<T> toConvert)

@@ -17,14 +17,14 @@
 #if UNITY_ANDROID
 namespace GooglePlayGames.Android
 {
+    using System;
+
+    using UnityEngine;
+
     using GooglePlayGames.BasicApi;
     using GooglePlayGames.BasicApi.SavedGame;
-    using OurUtils;
-    using UnityEngine;
-    using System;
-    using System.Collections.Generic;
 
-    internal class AndroidHelperFragment
+    internal static class AndroidHelperFragment
     {
         private const string HelperFragmentClass = "com.google.games.bridge.HelperFragment";
 
@@ -34,6 +34,26 @@ namespace GooglePlayGames.Android
             {
                 return jc.GetStatic<AndroidJavaObject>("currentActivity");
             }
+        }
+
+        public static int PackageManagerFlag(string flagName)
+        {
+            using(var PackageManager = new AndroidJavaClass("android.content.pm.PackageManager"))
+                return PackageManager.GetStatic<int>(flagName);
+        }
+
+        public static T CallPackageMetaData<T>(string flagName,string methodName, params object[] args)
+        {
+            return CallPackageMetaData<T>(PackageManagerFlag(flagName),methodName,args);
+        }
+
+        public static T CallPackageMetaData<T>(int applicationInfoFlags,string methodName, params object[] args)
+        {
+            using (var activity = GetActivity())
+            using (var pm = activity.Call<AndroidJavaObject>("getPackageManager"))
+            using (var appInfo = pm.Call<AndroidJavaObject>("getApplicationInfo", activity.Call<string>("getPackageName"), applicationInfoFlags))
+            using (var bundle = appInfo.Get<AndroidJavaObject>("metaData"))
+                return bundle.Call<T>(methodName,args);
         }
 
         public static AndroidJavaObject GetDefaultPopupView()
@@ -190,32 +210,34 @@ namespace GooglePlayGames.Android
         {
             using (var helperFragment = new AndroidJavaClass(HelperFragmentClass))
             using (var task = helperFragment.CallStatic<AndroidJavaObject>("showSelectSnapshotUi",
-                AndroidHelperFragment.GetActivity(), uiTitle, showCreateSaveUI, showDeleteSaveUI,
-                maxDisplayedSavedGames))
+                                AndroidHelperFragment.GetActivity(), uiTitle,
+                                showCreateSaveUI, showDeleteSaveUI, maxDisplayedSavedGames))
             {
                 AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
                     task,
                     result =>
-                    {
-                        SelectUIStatus status = (SelectUIStatus) result.Get<int>("status");
-                        OurUtils.Logger.d("ShowSelectSnapshotUI result " + status);
+                {
+                    SelectUIStatus status = (SelectUIStatus) result.Get<int>("status");
+                    OurUtils.Logger.d("ShowSelectSnapshotUI result " + status);
 
-                        AndroidJavaObject javaMetadata = result.Get<AndroidJavaObject>("metadata");
-                        AndroidSnapshotMetadata metadata =
-                            javaMetadata == null
-                                ? null
-                                : new AndroidSnapshotMetadata(javaMetadata, /* contents= */null);
+                    AndroidJavaObject javaMetadata = result.Get<AndroidJavaObject>("metadata");
+                    AndroidSnapshotMetadata metadata =
+                        javaMetadata == null
+                            ? null
+                            : new AndroidSnapshotMetadata(javaMetadata, /* contents= */null);
 
-                        cb.Invoke(status, metadata);
-                    });
+                    cb.Invoke(status, metadata);
+                });
 
                 AndroidTaskUtils.AddOnFailureListener(
                     task,
                     exception =>
-                    {
-                        OurUtils.Logger.e("ShowSelectSnapshotUI failed with exception");
-                        cb.Invoke(SelectUIStatus.InternalError, null);
-                    });
+                {
+                    OurUtils.Logger.e(string.Format("ShowSelectSnapshotUI failed with {0}\n{1}"
+                                    ,exception != null ? exception : "null exception"
+                                    ,exception?.Call<string>("toString")));
+                    cb.Invoke(SelectUIStatus.InternalError, null);
+                });
             }
         }
     }
