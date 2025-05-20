@@ -59,7 +59,7 @@ android {
 // The jar resolver plugin handles the changing back from .srcaarto .aar
 task renameLibrary(type: Copy) {
     from "${buildDir}/outputs/aar/${baseName}-release.aar"
-    into "${buildDir}"
+    into "${buildDir}/srcaar_output"
     rename { String fn ->
         fn.replace("release.aar", "${version}.srcaar")
     }
@@ -78,7 +78,7 @@ publishing {
             artifactId = project.ext.baseName
             version = project.version
 
-            artifact("${buildDir}/${baseName}-${version}.srcaar" as File)
+            artifact("${buildDir}/srcaar_output/${baseName}-${version}.srcaar" as File)
 
             // Add the required dependencies to the generated `pom.xml` file.
             pom.withXml {
