@@ -61,6 +61,7 @@ namespace SmokeTest
         private FriendsGUI mFriendsGui;
         private RecallGUI mRecallGui;
         private EventsGUI mEventsGui;
+        private OAuthScopesGUI mOAuthScopesGui;
 
         // which UI are we showing?
         public enum Ui {
@@ -75,7 +76,8 @@ namespace SmokeTest
           Leaderboards,
           UserInfo,
           Friends,
-          Recall
+          Recall,
+          OAuthScopes
         }
 
         public void Start()
@@ -91,6 +93,7 @@ namespace SmokeTest
             this.mFriendsGui = new FriendsGUI(this);
             this.mRecallGui = new RecallGUI(this);
             this.mEventsGui = new EventsGUI(this);
+            this.mOAuthScopesGui = new OAuthScopesGUI(this);
         }
 
         public void SetUI(Ui page)
@@ -204,6 +207,10 @@ namespace SmokeTest
             else if (GUI.Button(this.CalcGrid(1, 4), "Recall"))
             {
                 SetUI(Ui.Recall);
+            }
+            else if (GUI.Button(this.CalcGrid(0, 5), "OAuth Scopes"))
+            {
+                SetUI(Ui.OAuthScopes);
             }
         }
 
@@ -576,6 +583,7 @@ namespace SmokeTest
             GUI.skin.label.fontSize = CalcFontSize();
             GUI.skin.button.fontSize = CalcFontSize();
             GUI.skin.textArea.fontSize = CalcFontSize();
+            GUI.skin.toggle.fontSize = CalcFontSize();
 
             if (mStandby)
             {
@@ -621,6 +629,9 @@ namespace SmokeTest
                         break;
                     case Ui.Recall:
                         mRecallGui.OnGUI();
+                        break;
+                    case Ui.OAuthScopes:
+                        mOAuthScopesGui.OnGUI();
                         break;
                     default:
                         // check for a status of interest, and if there
