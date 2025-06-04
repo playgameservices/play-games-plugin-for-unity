@@ -19,6 +19,7 @@
 namespace GooglePlayGames.BasicApi
 {
     using System;
+    using System.Collections.Generic;
     using GooglePlayGames.OurUtils;
     using UnityEngine.SocialPlatforms;
 
@@ -55,6 +56,15 @@ namespace GooglePlayGames.BasicApi
         }
 
         public void RequestServerSideAccess(bool forceRefreshToken, Action<string> callback)
+        {
+            LogUsage();
+            if (callback != null)
+            {
+                callback(null);
+            }
+        }
+
+        public void RequestServerSideAccess(bool forceRefreshToken, List<AuthScope> scopes, Action<AuthResponse> callback)
         {
             LogUsage();
             if (callback != null)

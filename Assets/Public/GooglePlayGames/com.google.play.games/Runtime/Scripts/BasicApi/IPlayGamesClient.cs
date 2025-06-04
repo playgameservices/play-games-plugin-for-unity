@@ -19,6 +19,7 @@
 namespace GooglePlayGames.BasicApi
 {
     using System;
+    using System.Collections.Generic;
     using UnityEngine.SocialPlatforms;
 
     /// <summary>
@@ -94,6 +95,43 @@ namespace GooglePlayGames.BasicApi
       /// refresh token will be included in addition to an access token.</param>
       /// <param name="callback"></param>
       void RequestServerSideAccess(bool forceRefreshToken, Action<string> callback);
+
+      /// <summary>
+      /// Requests server-side access to Play Games Services for the currently signed in player.
+      /// </summary>
+      /// An authorization code is returned when requested. Your server can then exchange this code
+      /// for an access token (and conditionally a refresh token when {@code forceRefreshToken} is {@code
+      /// true}). The access token allows your server to access the Play Games Services web APIs, which
+      /// is often used to complete sign-in by verifying the Play Games Services player ID.
+      ///
+      /// When {@code forceRefreshToken} is {@code true} during authorization code exchange, a refresh
+      /// token is provided along with the access token. This refresh token enables your server to obtain
+      /// new access tokens and continue accessing Play Games Services even when the user isn't actively
+      /// playing. Note that refresh tokens are only generated for players who have auto sign-in setting
+      /// enabled.
+      ///
+      /// Scopes represent the {@link AuthScope} values requested such as {@code AuthScope.EMAIL},
+      /// {@code AuthScope.PROFILE}, {@code AuthScope.OPEN_ID}. For new permissions, users will see a
+      /// consent screen upon the first request. Granting consent (or if permissions were already
+      /// granted) results in the {@link AuthResponse} listing the effectively granted {@link AuthScope}.
+      /// Declining permission results in an empty list of granted {@link AuthScope} in the {@link
+      /// AuthResponse} . Regardless of granted permissions, a successful request will always return the
+      /// authorization code.
+      /// <remarks>
+      ///
+      /// </remarks>
+      /// <param name="forceRefreshToken">If {@code true} when the returned authorization code is exchanged a
+      /// refresh token will be included in addition to an access token.</param>
+      ///<param name="scopes">A list of {@link AuthScope} values representing the OAuth 2.0 permissions being
+      ///requested, such as {@code AuthScope.EMAIL}, {@code AuthScope.PROFILE} and {@code
+      /// AuthScope.OPEN_ID}.</param>
+      /// <param name="callback"></param>
+      /// <return>A {@link Task} that completes with an {@link AuthResponse} containing the OAuth 2.0
+      /// authorization code as a string and a list of the {@link AuthScope}s that were effectively
+      /// granted by the user (see description for details on consent). This authorization code can
+      /// be exchanged by your server for an access token (and conditionally a refresh token) that
+      /// can be used to access the Play Games Services web APIs and other Google Identity APIs.</return>
+      void RequestServerSideAccess(bool forceRefreshToken, List<AuthScope> scopes, Action<AuthResponse> callback);
 
       /// <summary>
       /// Requests Recall Access to Player Games Services for the currently signed in account
