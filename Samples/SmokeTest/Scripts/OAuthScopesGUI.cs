@@ -34,6 +34,7 @@ namespace SmokeTest
 {
     using UnityEngine;
     using GooglePlayGames;
+    using GooglePlayGames.BasicApi;
     using System.Collections.Generic;
 
     public class OAuthScopesGUI : MonoBehaviour
@@ -47,7 +48,7 @@ namespace SmokeTest
         private bool emailChecked = false;
         private bool forceRefreshTokenChecked = false;
 
-        private List<string> selectedScopes = new List<string>();
+        private List<AuthScope> selectedScopes = new List<AuthScope>();
 
         internal OAuthScopesGUI(MainGui owner)
         {
@@ -115,34 +116,36 @@ namespace SmokeTest
         internal void GetRequestServerSideAccessWithScopes()
         {
             SetStandBy("Fetching server side access......");
-            EndStandBy();
+
 
             selectedScopes.Clear();
 
             if (openIdChecked)
             {
-                selectedScopes.Add("openid");
+                selectedScopes.Add(AuthScope.OPEN_ID);
             }
             if (profileChecked)
             {
-                selectedScopes.Add("profile");
+                selectedScopes.Add(AuthScope.PROFILE);
             }
             if (emailChecked)
             {
-                selectedScopes.Add("email");
+                selectedScopes.Add(AuthScope.EMAIL);
             }
 
             string selectedScopesText = selectedScopes.Count > 0 ? string.Join(", ", selectedScopes.ToArray()) : "None";
             string forceRefreshText = forceRefreshTokenChecked ? "Enabled" : "Disabled";
 
-
             mStatus = $"Selected scopes: {selectedScopes.Count} ({selectedScopesText})\nForce Refresh Token: {forceRefreshText}";
 
-            Debug.Log("OpenID Checked: " + openIdChecked);
-            Debug.Log("Profile Checked: " + profileChecked);
-            Debug.Log("Email Checked: " + emailChecked);
-            Debug.Log("Force Refresh Token Checked: " + forceRefreshTokenChecked);
-            return;
+            PlayGamesPlatform.Instance.RequestServerSideAccess(/* forceRefreshToken= */ forceRefreshTokenChecked, selectedScopes,
+                (AuthResponse authResponse) =>
+                {
+                    EndStandBy();
+                    Debug.Log("Auth code fetched successfully");
+                    mStatus = authResponse.ToString();
+                }
+            );
         }
     }
 }
