@@ -195,8 +195,15 @@ namespace GooglePlayGames.BasicApi
         NetworkError = -6,
     }
 
+    /// <summary>
+    /// Utility class for common types.
+    /// This class checks if a response status is a success or not.
+    /// </summary>
     public class CommonTypesUtil
     {
+        /// <summary>
+        /// Checks if a response status is a success or not.
+        /// </summary>
         public static bool StatusIsSuccess(ResponseStatus status)
         {
             return ((int) status) > 0;
