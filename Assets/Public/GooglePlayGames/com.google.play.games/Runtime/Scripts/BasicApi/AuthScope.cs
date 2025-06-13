@@ -42,8 +42,18 @@ namespace GooglePlayGames.BasicApi
         OPEN_ID
     }
 
+    /// <summary>
+    /// Extensions for the AuthScope enum.
+    /// <remarks>
+    /// These extensions are used to converting between the AuthScope enum and its string
+    /// representation.
+    /// </remarks>
+    /// </summary>
     public static class AuthScopeExtensions
     {
+        /// <summary>
+        /// A map of AuthScope string values to their enum representations.
+        /// </summary>
         private static readonly Dictionary<string, AuthScope> _stringToEnumMap =
             new Dictionary<string, AuthScope>
             {
@@ -52,6 +62,9 @@ namespace GooglePlayGames.BasicApi
                 { "OPEN_ID", AuthScope.OPEN_ID }
             };
 
+        /// <summary>
+        /// A map of AuthScope enum values to their string representations.
+        /// </summary>
         private static readonly Dictionary<AuthScope, string> _enumToStringMap =
            _stringToEnumMap.ToDictionary(pair => pair.Value, pair => pair.Key);
 
@@ -70,6 +83,12 @@ namespace GooglePlayGames.BasicApi
           return _enumToStringMap[authScope];
         }
 
+        /// <summary>
+        /// Returns the AuthScope enum value corresponding to the provided string.
+        /// </summary>
+        /// <param name="value">The string value used to represent the scope.</param>
+        /// <returns>The AuthScope enum value corresponding to the provided string.</returns>
+        /// <exception cref="ArgumentException">If the provided string is not a valid AuthScope.</exception>
         public static AuthScope FromValue(string value)
         {
             if (!_stringToEnumMap.ContainsKey(value))
