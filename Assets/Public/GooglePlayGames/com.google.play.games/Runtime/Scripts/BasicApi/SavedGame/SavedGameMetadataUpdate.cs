@@ -1,4 +1,4 @@
-﻿// <copyright file="SavedGameMetadataUpdate.cs" company="Google Inc.">
+// <copyright file="SavedGameMetadataUpdate.cs" company="Google Inc.">
 // Copyright (C) 2014 Google Inc.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,6 +33,10 @@ namespace GooglePlayGames.BasicApi.SavedGame
         private readonly byte[] mNewPngCoverImage;
         private readonly TimeSpan? mNewPlayedTime;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SavedGameMetadataUpdate"/> struct using the specified builder.
+        /// </summary>
+        /// <param name="builder">The builder used to initialize the saved game metadata update.</param>
         private SavedGameMetadataUpdate(Builder builder)
         {
             mDescriptionUpdated = builder.mDescriptionUpdated;
@@ -42,36 +46,57 @@ namespace GooglePlayGames.BasicApi.SavedGame
             mNewPlayedTime = builder.mNewPlayedTime;
         }
 
+        /// <summary>
+        /// Gets whether the description has been updated in the metadata.
+        /// </summary>
         public bool IsDescriptionUpdated
         {
             get { return mDescriptionUpdated; }
         }
 
+        /// <summary>
+        /// Gets the updated description for the saved game, if it has been changed.
+        /// </summary>
         public string UpdatedDescription
         {
             get { return mNewDescription; }
         }
 
+        /// <summary>
+        /// Gets whether the cover image has been updated in the metadata.
+        /// </summary>
         public bool IsCoverImageUpdated
         {
             get { return mCoverImageUpdated; }
         }
 
+        /// <summary>
+        /// Gets the updated PNG cover image, if it has been changed.
+        /// </summary>
         public byte[] UpdatedPngCoverImage
         {
             get { return mNewPngCoverImage; }
         }
 
+        /// <summary>
+        /// Gets whether the played time has been updated in the metadata.
+        /// </summary>
         public bool IsPlayedTimeUpdated
         {
             get { return mNewPlayedTime.HasValue; }
         }
 
+        /// <summary>
+        /// Gets the updated played time, if it has been changed.
+        /// </summary>
         public TimeSpan? UpdatedPlayedTime
         {
             get { return mNewPlayedTime; }
         }
 
+        /// <summary>
+        /// A builder for constructing instances of <see cref="SavedGameMetadataUpdate"/>.
+        /// </summary>
         public struct Builder
         {
             internal bool mDescriptionUpdated;
@@ -80,6 +105,11 @@ namespace GooglePlayGames.BasicApi.SavedGame
             internal byte[] mNewPngCoverImage;
             internal TimeSpan? mNewPlayedTime;
 
+            /// <summary>
+            /// Sets the description to be updated in the saved game metadata.
+            /// </summary>
+            /// <param name="description">The new description to set.</param>
+            /// <returns>The builder with the updated description.</returns>
             public Builder WithUpdatedDescription(string description)
             {
                 mNewDescription = Misc.CheckNotNull(description);
@@ -87,6 +117,11 @@ namespace GooglePlayGames.BasicApi.SavedGame
                 return this;
             }
 
+            /// <summary>
+            /// Sets the PNG cover image to be updated in the saved game metadata.
+            /// </summary>
+            /// <param name="newPngCoverImage">The new PNG image data for the cover image.</param>
+            /// <returns>The builder with the updated cover image.</returns>
             public Builder WithUpdatedPngCoverImage(byte[] newPngCoverImage)
             {
                 mCoverImageUpdated = true;
@@ -94,6 +129,12 @@ namespace GooglePlayGames.BasicApi.SavedGame
                 return this;
             }
 
+            /// <summary>
+            /// Sets the played time to be updated in the saved game metadata.
+            /// </summary>
+            /// <param name="newPlayedTime">The new played time to set.</param>
+            /// <returns>The builder with the updated played time.</returns>
+            /// <exception cref="InvalidOperationException">Thrown if the played time exceeds the maximum allowed value.</exception>
             public Builder WithUpdatedPlayedTime(TimeSpan newPlayedTime)
             {
                 if (newPlayedTime.TotalMilliseconds > ulong.MaxValue)
@@ -106,6 +147,10 @@ namespace GooglePlayGames.BasicApi.SavedGame
                 return this;
             }
 
+            /// <summary>
+            /// Builds a new <see cref="SavedGameMetadataUpdate"/> instance with the configured updates.
+            /// </summary>
+            /// <returns>A new instance of <see cref="SavedGameMetadataUpdate"/>.</returns>
             public SavedGameMetadataUpdate Build()
             {
                 return new SavedGameMetadataUpdate(this);
