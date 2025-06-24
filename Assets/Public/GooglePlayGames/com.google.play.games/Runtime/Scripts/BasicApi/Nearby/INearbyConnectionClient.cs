@@ -1,4 +1,4 @@
-﻿// <copyright file="INearbyConnectionClient.cs" company="Google Inc.">
+// <copyright file="INearbyConnectionClient.cs" company="Google Inc.">
 // Copyright (C) 2014 Google Inc.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +22,10 @@ namespace GooglePlayGames.BasicApi.Nearby
     // move this inside IMessageListener and IDiscoveryListener are always declared.
 #if UNITY_ANDROID
 
+    /// <summary>
+    /// Interface for managing nearby connections, including advertising, discovery,
+    /// and messaging between nearby devices using the Google Play Games API.
+    /// </summary>
     public interface INearbyConnectionClient
     {
         int MaxUnreliableMessagePayloadLength();
@@ -61,6 +65,10 @@ namespace GooglePlayGames.BasicApi.Nearby
     }
 #endif
 
+    /// <summary>
+    /// Interface for listening to messages and disconnection events
+    /// from remote endpoints during an active connection.
+    /// </summary>
     public interface IMessageListener
     {
         void OnMessageReceived(string remoteEndpointId, byte[] data,
@@ -69,6 +77,10 @@ namespace GooglePlayGames.BasicApi.Nearby
         void OnRemoteEndpointDisconnected(string remoteEndpointId);
     }
 
+    /// <summary>
+    /// Interface for handling events during discovery, such as finding
+    /// or losing nearby endpoints.
+    /// </summary>
     public interface IDiscoveryListener
     {
         void OnEndpointFound(EndpointDetails discoveredEndpoint);
