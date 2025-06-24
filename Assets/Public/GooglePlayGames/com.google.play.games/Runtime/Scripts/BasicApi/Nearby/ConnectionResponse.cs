@@ -18,17 +18,46 @@ namespace GooglePlayGames.BasicApi.Nearby
 {
     using GooglePlayGames.OurUtils;
 
+    /// <summary>
+    /// Represents a response to a connection request, including status, payload, and identifying information.
+    /// </summary>
     public struct ConnectionResponse
     {
         private static readonly byte[] EmptyPayload = new byte[0];
 
+        /// <summary>
+        /// Status codes representing the outcome of a connection request.
+        /// </summary>
         public enum Status
         {
+            /// <summary>
+            /// Indicates that the connection was accepted.
+            /// </summary>
             Accepted,
+
+            /// <summary>
+            /// Indicates that the connection was rejected.
+            /// </summary>
             Rejected,
+
+            /// <summary>
+            /// Indicates that an internal error occurred.
+            /// </summary>
             ErrorInternal,
+ 
+            /// <summary>
+            /// Indicates that the device is not connected to a network.
+            /// </summary>
             ErrorNetworkNotConnected,
+
+            /// <summary>
+            /// Indicates that the remote endpoint is not connected.
+            /// </summary>
             ErrorEndpointNotConnected,
+
+            /// <summary>
+            /// Indicates that the endpoints are already connected.
+            /// </summary>
             ErrorAlreadyConnected
         }
 
@@ -37,6 +66,13 @@ namespace GooglePlayGames.BasicApi.Nearby
         private readonly Status mResponseStatus;
         private readonly byte[] mPayload;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConnectionResponse"/> struct.
+        /// </summary>
+        /// <param name="localClientId">The ID of the local client.</param>
+        /// <param name="remoteEndpointId">The ID of the remote endpoint.</param>
+        /// <param name="code">The status of the connection response.</param>
+        /// <param name="payload">The payload data included with the response.</param>
         private ConnectionResponse(long localClientId, string remoteEndpointId, Status code,
             byte[] payload)
         {
@@ -46,50 +82,77 @@ namespace GooglePlayGames.BasicApi.Nearby
             this.mPayload = Misc.CheckNotNull(payload);
         }
 
+        /// <summary>
+        /// Gets the ID of the local client.
+        /// </summary>
         public long LocalClientId
         {
             get { return mLocalClientId; }
         }
 
+        /// <summary>
+        /// Gets the ID of the remote endpoint responding to the connection request.
+        /// </summary>
         public string RemoteEndpointId
         {
             get { return mRemoteEndpointId; }
         }
 
+        /// <summary>
+        /// Gets the status of the connection response.
+        /// </summary>
         public Status ResponseStatus
         {
             get { return mResponseStatus; }
         }
 
+        /// <summary>
+        /// Gets the payload sent with the connection response.
+        /// </summary>
         public byte[] Payload
         {
             get { return mPayload; }
         }
 
+        /// <summary>
+        /// Creates a response indicating the connection was rejected.
+        /// </summary>
         public static ConnectionResponse Rejected(long localClientId, string remoteEndpointId)
         {
             return new ConnectionResponse(localClientId, remoteEndpointId, Status.Rejected,
                 EmptyPayload);
         }
 
+        /// <summary>
+        /// Creates a response indicating the device is not connected to a network.
+        /// </summary>
         public static ConnectionResponse NetworkNotConnected(long localClientId, string remoteEndpointId)
         {
             return new ConnectionResponse(localClientId, remoteEndpointId, Status.ErrorNetworkNotConnected,
                 EmptyPayload);
         }
 
+        /// <summary>
+        /// Creates a response indicating an internal error occurred.
+        /// </summary>
         public static ConnectionResponse InternalError(long localClientId, string remoteEndpointId)
         {
             return new ConnectionResponse(localClientId, remoteEndpointId, Status.ErrorInternal,
                 EmptyPayload);
         }
 
+        /// <summary>
+        /// Creates a response indicating the remote endpoint is not connected.
+        /// </summary>
         public static ConnectionResponse EndpointNotConnected(long localClientId, string remoteEndpointId)
         {
             return new ConnectionResponse(localClientId, remoteEndpointId, Status.ErrorEndpointNotConnected,
                 EmptyPayload);
         }
 
+        /// <summary>
+        /// Creates a response indicating the connection was accepted with a payload.
+        /// </summary>
         public static ConnectionResponse Accepted(long localClientId, string remoteEndpointId,
             byte[] payload)
         {
@@ -97,6 +160,9 @@ namespace GooglePlayGames.BasicApi.Nearby
                 payload);
         }
 
+        /// <summary>
+        /// Creates a response indicating the endpoints are already connected.
+        /// </summary>
         public static ConnectionResponse AlreadyConnected(long localClientId,
             string remoteEndpointId)
         {
