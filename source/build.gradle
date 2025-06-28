@@ -233,6 +233,21 @@ sampleList.each { sampleName ->
     // This is a build task
     createTask.ext.remoteTaskPhase = 'build'
 
+    def copyManifestTask = tasks.create('CopyManifest' + sampleName, Copy) {
+        description = "Copies Packages/manifest.json for ${sampleName} if it exists"
+        dependsOn createTask // Run after the project directory is created
+        def sourceManifestDir = file("${samplesPath}/${sampleName}/Packages")
+        if (sourceManifestDir.exists()) {
+            from(sourceManifestDir) {
+                include 'manifest.json'
+            }
+            into(file("${project.ext.buildPath}/Samples/${sampleName}/Packages"))
+        } else {
+            println "No custom manifest dir at ${sourceManifestDir.absolutePath}, skipping manifest copy for ${sampleName}."
+        }
+    }
+    copyManifestTask.ext.remoteTaskPhase = 'build'
+
     /*
         Copy the source of the sample into build dir.
         This is done so it can be remoted and assembled as a part of a RemoteTask.
@@ -280,7 +295,7 @@ sampleList.each { sampleName ->
 
         packageTask.description = "Package ${sampleName} sample"
 
-        packageTask.dependsOn createTask, copySrcTask
+        packageTask.dependsOn createTask, copySrcTask, copyManifestTask
 
         packageTask.doLast {
             def logFilename = "${project.ext.buildPath}/ExportSample${sampleName}.log"
