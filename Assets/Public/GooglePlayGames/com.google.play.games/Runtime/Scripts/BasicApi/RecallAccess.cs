@@ -23,19 +23,29 @@ namespace GooglePlayGames.BasicApi
 
     /// <summary>
     /// Recall Access data. This is the callback data
-    /// when requesting Recall Access. 
+    /// when requesting Recall Access.
     /// </summary>
 
     public class RecallAccess
     {
 
+      ///<summary>
+      /// The session ID for the Recall Access.
+      /// </summary>
       private string mSessionId;
 
+      /// <summary>
+      /// Constructs a new RecallAccess object with the given session ID.
+      /// </summary>
+      /// <param name="sessionId">The session ID for the Recall Access.</param>
       internal RecallAccess(string sessionId)
       {
         mSessionId = sessionId;
       }
 
+      /// <summary>
+      /// The session ID for the Recall Access.
+      /// </summary>
       public string sessionId
       {
           get { return mSessionId; }
