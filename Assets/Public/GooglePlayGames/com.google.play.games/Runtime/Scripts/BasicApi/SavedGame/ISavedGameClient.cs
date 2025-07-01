@@ -1,4 +1,4 @@
-﻿// <copyright file="ISavedGameClient.cs" company="Google Inc.">
+// <copyright file="ISavedGameClient.cs" company="Google Inc.">
 // Copyright (C) 2014 Google Inc.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -72,6 +72,9 @@ namespace GooglePlayGames.BasicApi.SavedGame
         UseMostRecentlySaved
     }
 
+    /// <summary>
+    /// An enum for the different statuses that can be returned by the saved game client.
+    /// </summary>
     public enum SavedGameRequestStatus
     {
         Success = 1,
@@ -102,6 +105,9 @@ namespace GooglePlayGames.BasicApi.SavedGame
         BadInputError = -4
     }
 
+    /// <summary>
+    /// An enum for the different UI statuses that can be returned by the saved game client.
+    /// </summary>
     public enum SelectUIStatus
     {
         /// <summary>
@@ -128,14 +134,14 @@ namespace GooglePlayGames.BasicApi.SavedGame
         TimeoutError = -2,
 
         /// <summary>
-        /// A error related to authentication. This is probably due to the user being signed out
+        /// An error related to authentication. This error could be due to the user being signed out
         /// before the request could be issued.
         /// </summary>
         ///
         AuthenticationError = -3,
 
         /// <summary>
-        /// The request failed because it was given bad input (e.g. a filename with 200 characters).
+        /// The request failed due to invalid input. For example, the filename exceeded the 200 character limit..
         /// </summary>
         ///
         BadInputError = -4,
