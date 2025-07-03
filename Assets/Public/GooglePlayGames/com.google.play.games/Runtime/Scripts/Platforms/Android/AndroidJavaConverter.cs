@@ -85,6 +85,10 @@ namespace GooglePlayGames.Android
             string displayName = player.Call<String>("getDisplayName");
             string playerId = player.Call<String>("getPlayerId");
             string avatarUrl = player.Call<String>("getIconImageUrl");
+            if (string.IsNullOrEmpty(avatarUrl))
+            {
+                avatarUrl = player.Call<String>("getHiResImageUrl");
+            }
             return new Player(displayName, playerId, avatarUrl);
         }
 
@@ -96,6 +100,10 @@ namespace GooglePlayGames.Android
           string displayName = player.Call<String>("getDisplayName");
           string playerId = player.Call<String>("getPlayerId");
           string avatarUrl = player.Call<String>("getIconImageUrl");
+          if (string.IsNullOrEmpty(avatarUrl))
+          {
+              avatarUrl = player.Call<String>("getHiResImageUrl");
+          }
           bool isFriend =
               player.Call<AndroidJavaObject>("getRelationshipInfo").Call<int>("getFriendStatus") ==
               4 /* PlayerFriendStatus.Friend*/;
