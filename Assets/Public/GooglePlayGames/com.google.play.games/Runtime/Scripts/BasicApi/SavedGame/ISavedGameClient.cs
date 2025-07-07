@@ -362,7 +362,7 @@ namespace GooglePlayGames.BasicApi.SavedGame
         /// this instance will be kept as the cannonical value in the cloud.
         /// </summary>
         /// <param name="chosenMetadata">The chosen metadata. This metadata must be open. If it is not
-        /// open, the invokation of <see cref="NativeSavedGameClient.OpenWithManualConflictResolution"/> that produced this
+        /// open, the invocation of <see cref="NativeSavedGameClient.OpenWithManualConflictResolution"/> that produced this
         /// ConflictResolver will immediately fail with <see cref="SelectUIStatus.BadInputError"/>.</param>
         void ChooseMetadata(ISavedGameMetadata chosenMetadata);
 

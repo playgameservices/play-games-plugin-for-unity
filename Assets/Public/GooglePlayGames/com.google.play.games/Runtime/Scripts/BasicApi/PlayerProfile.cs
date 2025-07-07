@@ -16,17 +16,20 @@
 
 #if UNITY_ANDROID
 
-namespace GooglePlayGames.BasicApi
-{
+namespace GooglePlayGames.BasicApi {
+  /// <summary>
+  /// Represents a player, a real-world person (tied to a Games account).
+  /// </summary>
+  public class PlayerProfile : PlayGamesUserProfile {
     /// <summary>
-    /// Represents a player, a real-world person (tied to a Games account).
+    /// Constructor for PlayerProfile.
     /// </summary>
-    public class PlayerProfile : PlayGamesUserProfile
-    {
-        internal PlayerProfile(string displayName, string playerId, string avatarUrl, bool isFriend) : base(displayName,
-            playerId, avatarUrl, isFriend)
-        {
-        }
-    }
+    /// <param name="displayName">The display name of the player.</param>
+    /// <param name="playerId">The player ID of the player.</param>
+    /// <param name="avatarUrl">The URL of the player's avatar.</param>
+    /// <param name="isFriend">Whether the player is a friend of the current player.</param>
+    internal PlayerProfile(string displayName, string playerId, string avatarUrl, bool isFriend)
+        : base(displayName, playerId, avatarUrl, isFriend) {}
+  }
 }
 #endif

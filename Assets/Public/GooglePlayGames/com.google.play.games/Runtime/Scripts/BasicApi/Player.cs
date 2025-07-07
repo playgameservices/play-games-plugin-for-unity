@@ -24,6 +24,12 @@ namespace GooglePlayGames.BasicApi
     /// </summary>
     public class Player : PlayGamesUserProfile
     {
+        /// <summary>
+        /// Constructor for Player.
+        /// </summary>
+        /// <param name="displayName">The display name of the player.</param>
+        /// <param name="playerId">The player ID of the player.</param>
+        /// <param name="avatarUrl">The URL of the player's avatar.</param>
         internal Player(string displayName, string playerId, string avatarUrl)
             : base(displayName, playerId, avatarUrl)
         {

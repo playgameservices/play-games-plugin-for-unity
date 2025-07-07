@@ -1,5 +1,8 @@
 namespace GooglePlayGames.BasicApi
 {
+    /// <summary>
+    /// Enum to specify the interactivity of the sign in flow.
+    /// </summary>
     public enum SignInInteractivity
     {
         /// <summary>no UIs will be shown (if UIs are needed, it will fail rather than show them).</summary>
@@ -12,7 +15,7 @@ namespace GooglePlayGames.BasicApi
         /// </summary>
         CanPromptAlways,
 
-        /// <summary>When this is selected, PlayGamesPlatform.Authenticate does the followings in order:
+        /// <summary>When this is selected, PlayGamesPlatform.Authenticate does the following in order:
         /// 1. Attempt to silent sign in.
         /// 2. If silent sign in fails, check if user has previously declined to sign in and don’t prompt interactive
         /// sign in if they have.

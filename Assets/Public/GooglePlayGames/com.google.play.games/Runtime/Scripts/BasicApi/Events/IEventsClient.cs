@@ -1,4 +1,4 @@
-﻿// <copyright file="IEventsClient.cs" company="Google Inc.">
+// <copyright file="IEventsClient.cs" company="Google Inc.">
 // Copyright (C) 2014 Google Inc.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,7 +40,7 @@ namespace GooglePlayGames.BasicApi.Events
         void FetchAllEvents(DataSource source, Action<ResponseStatus, List<IEvent>> callback);
 
         /// <summary>
-        /// Fetchs the event with the specified ID.
+        /// Fetches the event with the specified ID.
         /// </summary>
         /// <param name="source">The source of the event (i.e. whether we can return stale cached
         /// values).</param>

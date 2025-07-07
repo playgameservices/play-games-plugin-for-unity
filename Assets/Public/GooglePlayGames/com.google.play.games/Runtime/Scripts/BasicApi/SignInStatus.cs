@@ -1,5 +1,8 @@
 namespace GooglePlayGames.BasicApi
 {
+    /// <summary>
+    /// Enum to specify the sign in status.
+    /// </summary>
     public enum SignInStatus
     {
         /// <summary>The operation was successful.</summary>

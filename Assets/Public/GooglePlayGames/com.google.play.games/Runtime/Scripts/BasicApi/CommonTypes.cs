@@ -136,6 +136,7 @@ namespace GooglePlayGames.BasicApi
         Social = 2,
     }
 
+    /// <summary>Values specifying the visibility status of the friends list.</summary>
     public enum FriendsListVisibilityStatus
     {
         ///< summary>
@@ -169,6 +170,7 @@ namespace GooglePlayGames.BasicApi
         NotAuthorized = -5,
     }
 
+    /// <summary>Values specifying the status of the friends list.</summary>
     public enum LoadFriendsStatus
     {
         /// <summary>An unknown value to return when loadFriends is not available.</summary>
