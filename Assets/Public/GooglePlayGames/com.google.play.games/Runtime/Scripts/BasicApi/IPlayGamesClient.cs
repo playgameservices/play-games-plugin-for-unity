@@ -84,13 +84,10 @@ namespace GooglePlayGames.BasicApi
       /// Services web APIs. This is commonly used to complete a sign-in flow by verifying the Play Games
       /// Services player id.
       ///
-      /// <p>If {@code forceRefreshToken} is true, when exchanging the authorization code a refresh token
+      /// If {@code forceRefreshToken} is true, when exchanging the authorization code a refresh token
       /// will be returned in addition to the access token. The refresh token allows the game-server to
       /// request additional access tokens, allowing your game-server to continue accesses Play Games
       /// Services while the user is not actively playing your app.
-      /// <remarks>
-      ///
-      /// </remarks>
       /// <param name="forceRefreshToken">If {@code true} when the returned authorization code is exchanged a
       /// refresh token will be included in addition to an access token.</param>
       /// <param name="callback"></param>
@@ -117,9 +114,6 @@ namespace GooglePlayGames.BasicApi
       /// Declining permission results in an empty list of granted {@link AuthScope} in the {@link
       /// AuthResponse} . Regardless of granted permissions, a successful request will always return the
       /// authorization code.
-      /// <remarks>
-      ///
-      /// </remarks>
       /// <param name="forceRefreshToken">If {@code true} when the returned authorization code is exchanged a
       /// refresh token will be included in addition to an access token.</param>
       ///<param name="scopes">A list of {@link AuthScope} values representing the OAuth 2.0 permissions being
@@ -150,7 +144,7 @@ namespace GooglePlayGames.BasicApi
       /// Returns the authenticated user's ID. Note that this value may change if a user signs
       /// out and signs in with a different account.
       /// </summary>
-      /// <returns>The user's ID, <code>null</code> if the user is not logged in.</returns>
+      /// <returns>The user's ID, null if the user is not logged in.</returns>
       string GetUserId();
 
       /// <summary>
@@ -163,14 +157,14 @@ namespace GooglePlayGames.BasicApi
       /// <summary>
       /// Returns a human readable name for the user, if they are logged in.
       /// </summary>
-      /// <returns>The user's human-readable name. <code>null</code> if they are not logged
+      /// <returns>The user's human-readable name. null if they are not logged
       /// in</returns>
       string GetUserDisplayName();
 
       /// <summary>
       /// Returns the user's avatar url, if they are logged in and have an avatar.
       /// </summary>
-      /// <returns>The URL to load the avatar image. <code>null</code> if they are not logged
+      /// <returns>The URL to load the avatar image. null if they are not logged
       /// in</returns>
       string GetUserImageUrl();
 
@@ -196,10 +190,10 @@ namespace GooglePlayGames.BasicApi
       /// Unlocks the achievement with the passed identifier.
       /// </summary>
       /// <remarks>If the operation succeeds, the callback
-      /// will be invoked on the game thread with <code>true</code>. If the operation fails, the
-      /// callback will be invoked with <code>false</code>. This operation will immediately fail if
+      /// will be invoked on the game thread with true. If the operation fails, the
+      /// callback will be invoked with false. This operation will immediately fail if
       /// the user is not authenticated (i.e. the callback will immediately be invoked with
-      /// <code>false</code>). If the achievement is already unlocked, this call will
+      /// false). If the achievement is already unlocked, this call will
       /// succeed immediately.
       /// </remarks>
       /// <param name="achievementId">The ID of the achievement to unlock.</param>
@@ -211,10 +205,10 @@ namespace GooglePlayGames.BasicApi
       /// Reveals the achievement with the passed identifier.
       /// </summary>
       /// <remarks>If the operation succeeds, the callback
-      /// will be invoked on the game thread with <code>true</code>. If the operation fails, the
-      /// callback will be invoked with <code>false</code>. This operation will immediately fail if
+      /// will be invoked on the game thread with true. If the operation fails, the
+      /// callback will be invoked with false. This operation will immediately fail if
       /// the user is not authenticated (i.e. the callback will immediately be invoked with
-      /// <code>false</code>). If the achievement is already in a revealed state, this call will
+      /// false). If the achievement is already in a revealed state, this call will
       /// succeed immediately.
       /// </remarks>
       /// <param name="achievementId">The ID of the achievement to reveal.</param>
@@ -226,10 +220,10 @@ namespace GooglePlayGames.BasicApi
       /// Increments the achievement with the passed identifier.
       /// </summary>
       /// <remarks>If the operation succeeds, the
-      /// callback will be invoked on the game thread with <code>true</code>. If the operation
-      /// fails, the  callback will be invoked with <code>false</code>. This operation will
+      /// callback will be invoked on the game thread with true. If the operation
+      /// fails, the  callback will be invoked with false. This operation will
       /// immediately fail if the user is not authenticated (i.e. the callback will immediately be
-      /// invoked with <code>false</code>).
+      /// invoked with false).
       /// </remarks>
       /// <param name="achievementId">The ID of the achievement to increment.</param>
       /// <param name="steps">The number of steps to increment by.</param>
@@ -325,9 +319,9 @@ namespace GooglePlayGames.BasicApi
       /// <summary>
       /// Shows the leaderboard UI for a specific leaderboard.
       /// </summary>
-      /// <remarks>If the passed ID is <code>null</code>, all leaderboards are displayed.
+      /// <remarks>If the passed ID is null, all leaderboards are displayed.
       /// </remarks>
-      /// <param name="leaderboardId">The leaderboard to display. <code>null</code> to display
+      /// <param name="leaderboardId">The leaderboard to display. null to display
       /// all.</param>
       /// <param name="span">Timespan to display for the leaderboard</param>
       /// <param name="callback">If non-null, the callback to invoke when the
@@ -377,7 +371,7 @@ namespace GooglePlayGames.BasicApi
       /// </summary>
       /// <remarks>This operation will immediately fail
       /// if the user is not authenticated (i.e. the callback will immediately be invoked with
-      /// <code>false</code>).
+      /// false).
       /// </remarks>
       /// <param name="leaderboardId">Leaderboard identifier.</param>
       /// <param name="score">Score.</param>

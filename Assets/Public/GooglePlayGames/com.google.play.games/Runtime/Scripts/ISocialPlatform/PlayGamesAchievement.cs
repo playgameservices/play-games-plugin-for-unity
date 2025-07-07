@@ -26,45 +26,128 @@ namespace GooglePlayGames
 #endif
     using UnityEngine.SocialPlatforms;
 
+    /// <summary>
+    /// Delegate for reporting achievement progress.
+    /// </summary>
+    /// <param name="id">The achievement ID.</param>
+    /// <param name="progress">The progress of the achievement (a value between 0.0 and 100.0).</param>
+    /// <param name="callback">A callback to be invoked with a boolean indicating success.</param>
     internal delegate void ReportProgress(string id, double progress, Action<bool> callback);
 
     /// <summary>
     /// Represents a Google Play Games achievement. It can be used to report an achievement
     /// to the API, offering identical functionality as <see cref="PlayGamesPlatform.ReportProgress" />.
+    /// Implements both the <see cref="IAchievement"/> and <see cref="IAchievementDescription"/> interfaces.
     /// </summary>
     internal class PlayGamesAchievement : IAchievement, IAchievementDescription
     {
+        /// <summary>
+        /// The callback for reporting progress.
+        /// </summary>
         private readonly ReportProgress mProgressCallback;
+
+        /// <summary>
+        /// The achievement's ID.
+        /// </summary>
         private string mId = string.Empty;
+
+        /// <summary>
+        /// A flag indicating if the achievement is incremental.
+        /// </summary>
         private bool mIsIncremental = false;
+
+        /// <summary>
+        /// The current steps completed for an incremental achievement.
+        /// </summary>
         private int mCurrentSteps = 0;
+
+        /// <summary>
+        /// The total steps required for an incremental achievement.
+        /// </summary>
         private int mTotalSteps = 0;
+
+        /// <summary>
+        /// The percentage of completion.
+        /// </summary>
         private double mPercentComplete = 0.0;
+
+        /// <summary>
+        /// A flag indicating if the achievement is completed (unlocked).
+        /// </summary>
         private bool mCompleted = false;
+
+        /// <summary>
+        /// A flag indicating if the achievement is hidden.
+        /// </summary>
         private bool mHidden = false;
+
+        /// <summary>
+        /// The last time the achievement was modified.
+        /// </summary>
         private DateTime mLastModifiedTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+
+        /// <summary>
+        /// The title of the achievement.
+        /// </summary>
         private string mTitle = string.Empty;
+
+        /// <summary>
+        /// The URL for the revealed (locked) achievement image.
+        /// </summary>
         private string mRevealedImageUrl = string.Empty;
+
+        /// <summary>
+        /// The URL for the unlocked achievement image.
+        /// </summary>
         private string mUnlockedImageUrl = string.Empty;
 #if UNITY_2017_1_OR_NEWER
+        /// <summary>
+        /// The web request used to fetch the achievement image.
+        /// </summary>
         private UnityWebRequest mImageFetcher = null;
 #else
+        /// <summary>
+        /// The web request used to fetch the achievement image.
+        /// </summary>
         private WWW mImageFetcher = null;
 #endif
+        /// <summary>
+        /// The downloaded achievement image as a Texture2D.
+        /// </summary>
         private Texture2D mImage = null;
+
+        /// <summary>
+        /// The description of the achievement.
+        /// </summary>
         private string mDescription = string.Empty;
+
+        /// <summary>
+        /// The points awarded for unlocking the achievement.
+        /// </summary>
         private ulong mPoints = 0;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PlayGamesAchievement"/> class.
+        /// Uses the default progress reporting mechanism from <see cref="PlayGamesPlatform"/>.
+        /// </summary>
         internal PlayGamesAchievement()
             : this(PlayGamesPlatform.Instance.ReportProgress)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PlayGamesAchievement"/> class with a custom progress callback.
+        /// </summary>
+        /// <param name="progressCallback">The callback to use for reporting progress.</param>
         internal PlayGamesAchievement(ReportProgress progressCallback)
         {
             mProgressCallback = progressCallback;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PlayGamesAchievement"/> class from a <see cref="BasicApi.Achievement"/> object.
+        /// </summary>
+        /// <param name="ach">The achievement data from the Basic API.</param>
         internal PlayGamesAchievement(Achievement ach) : this()
         {
             this.mId = ach.Id;
@@ -99,36 +182,33 @@ namespace GooglePlayGames
         }
 
         /// <summary>
-        /// Reveals, unlocks or increment achievement.
+        /// Reveals, unlocks or increments the achievement.
         /// </summary>
         /// <remarks>
-        /// Call after setting <see cref="id" />, <see cref="completed" />,
-        /// as well as <see cref="currentSteps" /> and <see cref="totalSteps" />
-        /// for incremental achievements. Equivalent to calling
-        /// <see cref="PlayGamesPlatform.ReportProgress" />.
+        /// This method is equivalent to calling <see cref="PlayGamesPlatform.ReportProgress" />.
+        /// The <see cref="id"/> and <see cref="percentCompleted"/> properties should be set before calling this method.
         /// </remarks>
+        /// <param name="callback">An action to be invoked with a value indicating whether the operation was successful.</param>
         public void ReportProgress(Action<bool> callback)
         {
             mProgressCallback.Invoke(mId, mPercentComplete, callback);
         }
 
         /// <summary>
-        /// Loads the local user's image from the url.  Loading urls
-        /// is asynchronous so the return from this call is fast,
-        /// the image is returned once it is loaded.  null is returned
-        /// up to that point.
+        /// Asynchronously loads the achievement's image from its URL.
         /// </summary>
+        /// <returns>The <see cref="Texture2D"/> image once loaded; otherwise, <c>null</c>.</returns>
         private Texture2D LoadImage()
         {
             if (hidden)
             {
-                // return null, we dont have images for hidden achievements.
+                // Return null, as hidden achievements do not have images.
                 return null;
             }
 
             string url = completed ? mUnlockedImageUrl : mRevealedImageUrl;
 
-            // the url can be null if the image is not configured.
+            // The URL can be null if no image is configured.
             if (!string.IsNullOrEmpty(url))
             {
                 if (mImageFetcher == null || mImageFetcher.url != url)
@@ -141,8 +221,7 @@ namespace GooglePlayGames
                     mImage = null;
                 }
 
-                // if we have the texture, just return, this avoids excessive
-                // memory usage calling www.texture repeatedly.
+                // If we already have the texture, return it to avoid repeated downloads.
                 if (mImage != null)
                 {
                     return mImage;
@@ -159,85 +238,66 @@ namespace GooglePlayGames
                 }
             }
 
-            // if there is no url, always return null.
+            // If there is no URL or the download is not complete, return null.
             return null;
         }
 
 
         /// <summary>
-        /// Gets or sets the id of this achievement.
+        /// Gets or sets the ID of this achievement.
         /// </summary>
-        /// <returns>
-        /// The identifier.
-        /// </returns>
+        /// <value>The achievement ID.</value>
         public string id
         {
             get { return mId; }
-
             set { mId = value; }
         }
 
         /// <summary>
         /// Gets a value indicating whether this achievement is incremental.
         /// </summary>
-        /// <remarks>
-        /// This value is only set by PlayGamesPlatform.LoadAchievements
-        /// </remarks>
-        /// <returns><c>true</c> if incremental; otherwise, <c>false</c>.</returns>
+        /// <remarks>This value is set by <see cref="PlayGamesPlatform.LoadAchievements"/>.</remarks>
+        /// <value><c>true</c> if incremental; otherwise, <c>false</c>.</value>
         public bool isIncremental
         {
             get { return mIsIncremental; }
         }
 
         /// <summary>
-        /// Gets the current steps completed of this achievement.
+        /// Gets the current number of steps completed for this achievement.
         /// </summary>
-        /// <remarks>
-        /// Undefined for standard (i.e. non-incremental) achievements.
-        /// This value is only set by PlayGamesPlatform.LoadAchievements, changing the
-        /// percentComplete will not affect this.
-        /// </remarks>
-        /// <returns>The current steps.</returns>
+        /// <remarks>This value is only defined for incremental achievements and is set by <see cref="PlayGamesPlatform.LoadAchievements"/>.</remarks>
+        /// <value>The current steps.</value>
         public int currentSteps
         {
             get { return mCurrentSteps; }
         }
 
         /// <summary>
-        /// Gets the total steps of this achievement.
+        /// Gets the total number of steps for this achievement.
         /// </summary>
-        /// <remarks>
-        /// Undefined for standard (i.e. non-incremental) achievements.
-        /// This value is only set by PlayGamesPlatform.LoadAchievements, changing the
-        /// percentComplete will not affect this.
-        /// </remarks>
-        /// <returns>The total steps.</returns>
+        /// <remarks>This value is only defined for incremental achievements and is set by <see cref="PlayGamesPlatform.LoadAchievements"/>.</remarks>
+        /// <value>The total steps.</value>
         public int totalSteps
         {
             get { return mTotalSteps; }
         }
 
         /// <summary>
-        /// Gets or sets the percent completed.
+        /// Gets or sets the completion percentage of this achievement.
         /// </summary>
-        /// <returns>
-        /// The percent completed.
-        /// </returns>
+        /// <value>The percent completed (from 0.0 to 100.0).</value>
         public double percentCompleted
         {
             get { return mPercentComplete; }
-
             set { mPercentComplete = value; }
         }
 
         /// <summary>
-        /// Gets a value indicating whether this achievement is completed.
+        /// Gets a value indicating whether this achievement is completed (unlocked).
         /// </summary>
-        /// <remarks>
-        /// This value is only set by PlayGamesPlatform.LoadAchievements, changing the
-        /// percentComplete will not affect this.
-        /// </remarks>
-        /// <returns><c>true</c> if completed; otherwise, <c>false</c>.</returns>
+        /// <remarks>This value is set by <see cref="PlayGamesPlatform.LoadAchievements"/>.</remarks>
+        /// <value><c>true</c> if completed; otherwise, <c>false</c>.</value>
         public bool completed
         {
             get { return this.mCompleted; }
@@ -246,37 +306,62 @@ namespace GooglePlayGames
         /// <summary>
         /// Gets a value indicating whether this achievement is hidden.
         /// </summary>
+        /// <remarks>This value is set by <see cref="PlayGamesPlatform.LoadAchievements"/>.</remarks>
         /// <value><c>true</c> if hidden; otherwise, <c>false</c>.</value>
         public bool hidden
         {
             get { return this.mHidden; }
         }
 
+        /// <summary>
+        /// Gets the date and time this achievement was last reported.
+        /// </summary>
+        /// <value>The last reported date.</value>
         public DateTime lastReportedDate
         {
             get { return mLastModifiedTime; }
         }
 
+        /// <summary>
+        /// Gets the title of the achievement.
+        /// </summary>
+        /// <value>The title.</value>
         public String title
         {
             get { return mTitle; }
         }
 
+        /// <summary>
+        /// Gets the image for the achievement, loading it asynchronously if necessary.
+        /// </summary>
+        /// <value>The achievement image as a <see cref="Texture2D"/>.</value>
         public Texture2D image
         {
             get { return LoadImage(); }
         }
 
+        /// <summary>
+        /// Gets the description for the achieved state.
+        /// </summary>
+        /// <value>The achieved description.</value>
         public string achievedDescription
         {
             get { return mDescription; }
         }
 
+        /// <summary>
+        /// Gets the description for the unachieved state.
+        /// </summary>
+        /// <value>The unachieved description.</value>
         public string unachievedDescription
         {
             get { return mDescription; }
         }
 
+        /// <summary>
+        /// Gets the point value of the achievement.
+        /// </summary>
+        /// <value>The points.</value>
         public int points
         {
             get { return (int) mPoints; }

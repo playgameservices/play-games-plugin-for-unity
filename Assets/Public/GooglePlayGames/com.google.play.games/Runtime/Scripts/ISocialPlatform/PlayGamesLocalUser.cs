@@ -23,14 +23,26 @@ namespace GooglePlayGames
     using UnityEngine.SocialPlatforms;
 
     /// <summary>
-    /// Represents the Google Play Games local user.
+    /// Represents the Google Play Games local user, providing access to
+    /// authentication and user-specific functionality. Implements the
+    /// <see cref="ILocalUser"/> interface.
     /// </summary>
     public class PlayGamesLocalUser : PlayGamesUserProfile, ILocalUser
     {
+        /// <summary>
+        /// A reference to the active Play Games platform instance.
+        /// </summary>
         internal PlayGamesPlatform mPlatform;
 
+        /// <summary>
+        /// Cached player stats.
+        /// </summary>
         private PlayerStats mStats;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PlayGamesLocalUser"/> class.
+        /// </summary>
+        /// <param name="plaf">The platform instance.</param>
         internal PlayGamesLocalUser(PlayGamesPlatform plaf)
             : base("localUser", string.Empty, string.Empty)
         {
@@ -39,64 +51,70 @@ namespace GooglePlayGames
         }
 
         /// <summary>
-        /// Authenticates the local user. Equivalent to calling
-        /// <see cref="PlayGamesPlatform.Authenticate" />.
+        /// Authenticates the local user. This is equivalent to calling
+        /// <see cref="PlayGamesPlatform.Authenticate(Action{SignInStatus})"/>.
         /// </summary>
+        /// <param name="callback">A callback to invoke with a boolean indicating success.</param>
         public void Authenticate(Action<bool> callback)
         {
             mPlatform.Authenticate(status => callback(status == SignInStatus.Success));
         }
 
         /// <summary>
-        /// Authenticates the local user. Equivalent to calling
-        /// <see cref="PlayGamesPlatform.Authenticate" />.
+        /// Authenticates the local user with an extended callback that includes the reason for failure.
+        /// This is equivalent to calling <see cref="PlayGamesPlatform.Authenticate(Action{SignInStatus})"/>.
         /// </summary>
+        /// <param name="callback">
+        /// A callback to invoke with a boolean indicating success and a string containing the status.
+        /// </param>
         public void Authenticate(Action<bool, string> callback)
         {
             mPlatform.Authenticate(status => callback(status == SignInStatus.Success, status.ToString()));
         }
 
         /// <summary>
-        /// Loads all friends of the authenticated user.
+        /// Loads the friends of the authenticated user.
         /// </summary>
+        /// <param name="callback">A callback to invoke with a boolean indicating success.</param>
         public void LoadFriends(Action<bool> callback)
         {
             mPlatform.LoadFriends(this, callback);
         }
 
         /// <summary>
-        /// Synchronous version of friends, returns null until loaded.
+        /// Gets the local user's friends. This will be null until <see cref="LoadFriends"/> completes.
         /// </summary>
+        /// <value>An array of the user's friends, or null if not yet loaded.</value>
         public IUserProfile[] friends
         {
             get { return mPlatform.GetFriends(); }
         }
 
         /// <summary>
-        /// Returns whether or not the local user is authenticated to Google Play Games.
+        /// Gets a value indicating whether the local user is authenticated to Google Play Games.
         /// </summary>
-        /// <returns>
-        /// <c>true</c> if authenticated; otherwise, <c>false</c>.
-        /// </returns>
+        /// <value><c>true</c> if authenticated; otherwise, <c>false</c>.</value>
         public bool authenticated
         {
             get { return mPlatform.IsAuthenticated(); }
         }
 
         /// <summary>
-        /// Not implemented. As safety placeholder, returns true.
+        /// Gets a value indicating whether the user is underage.
+        /// This is not implemented and returns <c>true</c> as a placeholder.
         /// </summary>
+        /// <value><c>true</c>.</value>
         public bool underage
         {
             get { return true; }
         }
 
+
+
         /// <summary>
-        /// Gets the display name of the user.
+        /// Gets the display name of the local user.
         /// </summary>
-        /// <returns>
-        /// The display name of the user.
-        /// </returns>
+        /// <value>The user's display name.</value>
         public new string userName
         {
             get
@@ -116,16 +134,13 @@ namespace GooglePlayGames
         }
 
         /// <summary>
-        /// Gets the user's Google id.
+        /// Gets the user's Google ID (Player ID).
         /// </summary>
-        /// <remarks> This id is persistent and uniquely identifies the user
-        ///     across all games that use Google Play Game Services.  It is
-        ///     the preferred method of uniquely identifying a player instead
-        ///     of email address.
+        /// <remarks>
+        /// This ID is persistent and uniquely identifies the user across all games.
+        /// It is the preferred way to identify a player.
         /// </remarks>
-        /// <returns>
-        /// The user's Google id.
-        /// </returns>
+        /// <value>The user's Google ID.</value>
         public new string id
         {
             get
@@ -146,23 +161,27 @@ namespace GooglePlayGames
 
 
         /// <summary>
-        /// Returns true (since this is the local user).
+        /// Gets a value indicating whether this user is a friend of the local user. Always returns <c>true</c>.
         /// </summary>
+        /// <value><c>true</c>.</value>
         public new bool isFriend
         {
             get { return true; }
         }
 
         /// <summary>
-        /// Gets the local user's state. This is always <c>UserState.Online</c> for
-        /// the local user.
+        /// Gets the user's state. For the local user, this is always <c>UserState.Online</c>.
         /// </summary>
+        /// <value><see cref="UserState.Online"/>.</value>
         public new UserState state
         {
             get { return UserState.Online; }
         }
 
-
+        /// <summary>
+        /// Gets the URL of the user's avatar image.
+        /// </summary>
+        /// <value>The avatar image URL.</value>
         public new string AvatarURL
         {
             get
@@ -183,9 +202,11 @@ namespace GooglePlayGames
         }
 
         /// <summary>
-        /// Gets the player's stats.
+        /// Gets the player's stats from the server.
         /// </summary>
-        /// <param name="callback">Callback when they are available.</param>
+        /// <param name="callback">A callback to be invoked with the status code and the player's stats.
+        /// The stats may be cached from a previous call.
+        /// </param>
         public void GetStats(Action<CommonStatusCodes, PlayerStats> callback)
         {
             if (mStats == null || !mStats.Valid)
@@ -198,7 +219,7 @@ namespace GooglePlayGames
             }
             else
             {
-                // 0 = success
+                // Return cached stats with a success code.
                 callback(CommonStatusCodes.Success, mStats);
             }
         }
