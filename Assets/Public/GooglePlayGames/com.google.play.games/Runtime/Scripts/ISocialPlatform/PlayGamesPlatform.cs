@@ -307,12 +307,12 @@ namespace GooglePlayGames
         /// Requests server-side access to Player Games Services for the currently signed in player.
         /// </summary>
         /// When requested an authorization code is returned that can be used by your game-server to
-        /// exchange for an access token and conditionally a refresh token (when {@code
-        /// forceRefreshToken} is true). The access token may then be used by your game-server to
+        /// exchange for an access token and conditionally a refresh token (when
+        /// <c>forceRefreshToken</c> is true). The access token may then be used by your game-server to
         /// access the Play Games Services web APIs. This is commonly used to complete a sign-in flow
         /// by verifying the Play Games Services player id.
         ///
-        /// <p>If {@code forceRefreshToken} is true, when exchanging the authorization code a refresh
+        /// <p>If <c>forceRefreshToken</c> is true, when exchanging the authorization code a refresh
         /// token will be returned in addition to the access token. The refresh token allows the
         /// game-server to request additional access tokens, allowing your game-server to continue
         /// accesses Play Games Services while the user is not actively playing your app. </p>
@@ -336,12 +336,12 @@ namespace GooglePlayGames
         /// Requests server-side access to Player Games Services for the currently signed in player.
         /// </summary>
         /// When requested an authorization code is returned that can be used by your game-server to
-        /// exchange for an access token and conditionally a refresh token (when {@code
-        /// forceRefreshToken} is true). The access token may then be used by your game-server to
+        /// exchange for an access token and conditionally a refresh token (when
+        /// <c>forceRefreshToken</c> is true). The access token may then be used by your game-server to
         /// access the Play Games Services web APIs. This is commonly used to complete a sign-in flow
         /// by verifying the Play Games Services player id.
         ///
-        /// <p>If {@code forceRefreshToken} is true, when exchanging the authorization code a refresh
+        /// <p>If <c>forceRefreshToken</c> is true, when exchanging the authorization code a refresh
         /// token will be returned in addition to the access token. The refresh token allows the
         /// game-server to request additional access tokens, allowing your game-server to continue
         /// accesses Play Games Services while the user is not actively playing your app. </p>
@@ -1208,8 +1208,8 @@ namespace GooglePlayGames
         /// Returns if the user has allowed permission for the game to access the friends list.
         /// </summary>
         /// <param name="forceReload">If true, this call will clear any locally cached data and
-        /// attempt to fetch the latest data from the server. Normally, this should be set to {@code
-        /// false} to gain advantages of data caching.</param>
+        /// attempt to fetch the latest data from the server. Normally, this should be set to
+        /// <c>false</c> to gain advantages of data caching.</param>
         /// <param name="callback">Callback invoked upon completion.</param>
         public void GetFriendsListVisibility(bool forceReload,
             Action<FriendsListVisibilityStatus> callback)
@@ -1271,7 +1271,7 @@ namespace GooglePlayGames
         /// <param name="forceReload">
         /// If true, this call will clear any locally cached data and attempt to
         /// fetch the latest data from the server. This would commonly be used for something like a
-        /// user-initiated refresh. Normally, this should be set to {@code false} to gain advantages of data caching.
+        /// user-initiated refresh. Normally, this should be set to <c>false</c> to gain advantages of data caching.
         /// </param>
         /// <param name="callback">Callback invoked upon completion with the status.</param>
         public void LoadFriends(int pageSize, bool forceReload,

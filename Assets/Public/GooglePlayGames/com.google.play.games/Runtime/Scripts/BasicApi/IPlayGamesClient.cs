@@ -79,16 +79,16 @@ namespace GooglePlayGames.BasicApi
       /// Requests server-side access to Player Games Services for the currently signed in player.
       /// </summary>
       /// When requested an authorization code is returned that can be used by your game-server to
-      /// exchange for an access token and conditionally a refresh token (when {@code forceRefreshToken}
+      /// exchange for an access token and conditionally a refresh token (when <c>forceRefreshToken</c>
       /// is true). The access token may then be used by your game-server to access the Play Games
       /// Services web APIs. This is commonly used to complete a sign-in flow by verifying the Play Games
       /// Services player id.
       ///
-      /// If {@code forceRefreshToken} is true, when exchanging the authorization code a refresh token
+      /// If <c>forceRefreshToken</c> is true, when exchanging the authorization code a refresh token
       /// will be returned in addition to the access token. The refresh token allows the game-server to
       /// request additional access tokens, allowing your game-server to continue accesses Play Games
       /// Services while the user is not actively playing your app.
-      /// <param name="forceRefreshToken">If {@code true} when the returned authorization code is exchanged a
+      /// <param name="forceRefreshToken">If <c>true</c> when the returned authorization code is exchanged a
       /// refresh token will be included in addition to an access token.</param>
       /// <param name="callback"></param>
       void RequestServerSideAccess(bool forceRefreshToken, Action<string> callback);
@@ -97,28 +97,28 @@ namespace GooglePlayGames.BasicApi
       /// Requests server-side access to Play Games Services for the currently signed in player.
       /// </summary>
       /// An authorization code is returned when requested. Your server can then exchange this code
-      /// for an access token (and conditionally a refresh token when {@code forceRefreshToken} is {@code
-      /// true}). The access token allows your server to access the Play Games Services web APIs, which
+      /// for an access token (and conditionally a refresh token when <c>forceRefreshToken</c> is
+      /// <c>true</c>). The access token allows your server to access the Play Games Services web APIs, which
       /// is often used to complete sign-in by verifying the Play Games Services player ID.
       ///
-      /// When {@code forceRefreshToken} is {@code true} during authorization code exchange, a refresh
+      /// When <c>forceRefreshToken</c> is <c>true</c> during authorization code exchange, a refresh
       /// token is provided along with the access token. This refresh token enables your server to obtain
       /// new access tokens and continue accessing Play Games Services even when the user isn't actively
       /// playing. Note that refresh tokens are only generated for players who have auto sign-in setting
       /// enabled.
       ///
-      /// Scopes represent the {@link AuthScope} values requested such as {@code AuthScope.EMAIL},
-      /// {@code AuthScope.PROFILE}, {@code AuthScope.OPEN_ID}. For new permissions, users will see a
+      /// Scopes represent the {@link AuthScope} values requested such as <c>AuthScope.EMAIL</c>,
+      /// <c>AuthScope.PROFILE</c>, <c>AuthScope.OPEN_ID</c>. For new permissions, users will see a
       /// consent screen upon the first request. Granting consent (or if permissions were already
       /// granted) results in the {@link AuthResponse} listing the effectively granted {@link AuthScope}.
       /// Declining permission results in an empty list of granted {@link AuthScope} in the {@link
       /// AuthResponse} . Regardless of granted permissions, a successful request will always return the
       /// authorization code.
-      /// <param name="forceRefreshToken">If {@code true} when the returned authorization code is exchanged a
+      /// <param name="forceRefreshToken">If <c>true</c> when the returned authorization code is exchanged a
       /// refresh token will be included in addition to an access token.</param>
       ///<param name="scopes">A list of {@link AuthScope} values representing the OAuth 2.0 permissions being
-      ///requested, such as {@code AuthScope.EMAIL}, {@code AuthScope.PROFILE} and {@code
-      /// AuthScope.OPEN_ID}.</param>
+      ///requested, such as <c>AuthScope.EMAIL</c>, <c>AuthScope.PROFILE</c> and
+      /// <c>AuthScope.OPEN_ID</c>.</param>
       /// <param name="callback"></param>
       /// <return>A {@link Task} that completes with an {@link AuthResponse} containing the OAuth 2.0
       /// authorization code as a string and a list of the {@link AuthScope}s that were effectively
@@ -284,8 +284,8 @@ namespace GooglePlayGames.BasicApi
       /// Returns if the user has allowed permission for the game to access the friends list.
       /// </summary>
       /// <param name="forceReload">If true, this call will clear any locally cached data and
-      /// attempt to fetch the latest data from the server. Normally, this should be set to {@code
-      /// false} to gain advantages of data caching.</param> <param name="callback">Callback
+      /// attempt to fetch the latest data from the server. Normally, this should be set to
+      /// <c>false</c> to gain advantages of data caching.</param> <param name="callback">Callback
       /// invoked upon completion.</param>
       void GetFriendsListVisibility(bool forceReload, Action<FriendsListVisibilityStatus> callback);
 
@@ -300,7 +300,7 @@ namespace GooglePlayGames.BasicApi
       /// <param name="forceReload">
       /// If true, this call will clear any locally cached data and attempt to
       /// fetch the latest data from the server. This would commonly be used for something like a
-      /// user-initiated refresh. Normally, this should be set to {@code false} to gain advantages
+      /// user-initiated refresh. Normally, this should be set to <c>false</c> to gain advantages
       /// of data caching.</param>
       /// <param name="callback">Callback invoked upon completion.</param>
       void LoadFriends(int pageSize, bool forceReload, Action<LoadFriendsStatus> callback);
