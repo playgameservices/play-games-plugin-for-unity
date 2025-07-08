@@ -22,8 +22,8 @@ namespace GooglePlayGames
     using UnityEngine.SocialPlatforms;
 
     /// <summary>
-    /// Represents a score on a Google Play Games leaderboard. Implements the
-    /// <see cref="IScore"/> interface.
+    /// Represents a score on a Google Play Games leaderboard. Implements the Unity
+    /// <c>IScore</c> interface.
     /// </summary>
     public class PlayGamesScore : IScore
     {
@@ -90,7 +90,6 @@ namespace GooglePlayGames
         /// <summary>
         /// Gets or sets the ID of the leaderboard this score is for.
         /// </summary>
-        /// <value>The leaderboard ID.</value>
         public string leaderboardID
         {
             get { return mLbId; }
@@ -100,7 +99,6 @@ namespace GooglePlayGames
         /// <summary>
         /// Gets or sets the score value.
         /// </summary>
-        /// <value>The score value.</value>
         public long value
         {
             get { return mValue; }
@@ -110,16 +108,14 @@ namespace GooglePlayGames
         /// <summary>
         /// Gets the date and time this score was achieved.
         /// </summary>
-        /// <value>The date of the score.</value>
         public DateTime date
         {
             get { return mDate; }
         }
 
         /// <summary>
-        /// Gets the score value as an unformatted string.
+        /// Gets the score value as a formatted string.
         /// </summary>
-        /// <value>The formatted score value string.</value>
         public string formattedValue
         {
             get { return mValue.ToString(); }
@@ -128,18 +124,14 @@ namespace GooglePlayGames
         /// <summary>
         /// Gets the ID of the user who achieved this score.
         /// </summary>
-        /// <value>The user's ID.</value>
         public string userID
         {
             get { return mPlayerId; }
         }
 
-
-
         /// <summary>
         /// Gets the rank of this score in the leaderboard.
         /// </summary>
-        /// <value>The rank.</value>
         public int rank
         {
             get { return (int) mRank; }
@@ -148,7 +140,6 @@ namespace GooglePlayGames
         /// <summary>
         /// Gets the metadata associated with this score (also known as a score tag).
         /// </summary>
-        /// <value>The metadata.</value>
         public string metaData
         {
             get { return mMetadata; }

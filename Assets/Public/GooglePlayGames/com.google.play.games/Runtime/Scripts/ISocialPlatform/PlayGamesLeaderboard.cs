@@ -24,9 +24,9 @@ namespace GooglePlayGames
     using UnityEngine.SocialPlatforms;
 
     /// <summary>
-    /// Represents a Google Play Games leaderboard. This class implements the
-    /// <see cref="ILeaderboard"/> interface, providing a standard way to interact
-    /// with leaderboard data.
+    /// epresents a Google Play Games leaderboard, which is a concrete implementation of Unity's
+    /// generic <c>ILeaderboard</c> interface, specifically for the Google Play Games service on
+    /// Android. The class provides a way to configure and store data for a specific leaderboard.
     /// </summary>
     public class PlayGamesLeaderboard : ILeaderboard
     {
@@ -36,17 +36,18 @@ namespace GooglePlayGames
         private string mId;
 
         /// <summary>
-        /// The user scope for the leaderboard scores (e.g., Global, Friends).
+        /// The user scope for the leaderboard scores. For example, determines if scores are fetched
+        /// from all players (Global) or just the user's friends (FriendsOnly).
         /// </summary>
         private UserScope mUserScope;
 
         /// <summary>
-        /// The range of ranks to be loaded.
+        /// Specifies the start rank and the number of scores to retrieve.
         /// </summary>
         private Range mRange;
 
         /// <summary>
-        /// The time scope for the leaderboard scores (e.g., AllTime, Weekly, Daily).
+        /// Filters scores by time period. For example, AllTime, Weekly, Daily.
         /// </summary>
         private TimeScope mTimeScope;
 
@@ -56,7 +57,7 @@ namespace GooglePlayGames
         private string[] mFilteredUserIds;
 
         /// <summary>
-        /// A flag indicating if the scores are currently being loaded.
+        /// A boolean flag that is <c>true</c> while the scores are being loaded; otherwise, <c>false</c>.
         /// </summary>
         private bool mLoading;
 

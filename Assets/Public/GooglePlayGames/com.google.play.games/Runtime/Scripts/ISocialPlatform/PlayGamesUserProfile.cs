@@ -28,7 +28,7 @@ namespace GooglePlayGames
     using UnityEngine.SocialPlatforms;
 
     /// <summary>
-    /// Represents a Google Play Games user profile. Implements the <see cref="IUserProfile"/>
+    /// Represents a Google Play Games user profile. Implements the Unity's <c>IUserProfile</c>
     /// interface and is used as a base class for <see cref="PlayGamesLocalUser" />.
     /// </summary>
     public class PlayGamesUserProfile : IUserProfile
@@ -141,7 +141,6 @@ namespace GooglePlayGames
         /// <summary>
         /// Gets the user's game-specific identifier. In this implementation, it is the same as the player ID.
         /// </summary>
-        /// <value>The game ID.</value>
         public string gameId
         {
             get { return mPlayerId; }
@@ -159,7 +158,6 @@ namespace GooglePlayGames
         /// <summary>
         /// Gets the user's current state. In this implementation, it always returns 'Online'.
         /// </summary>
-        /// <value>The user's state.</value>
         public UserState state
         {
             get { return UserState.Online; }
@@ -190,7 +188,6 @@ namespace GooglePlayGames
         /// <summary>
         /// Gets the URL of the user's avatar.
         /// </summary>
-        /// <value>The avatar URL.</value>
         public string AvatarURL
         {
             get { return mAvatarUrl; }

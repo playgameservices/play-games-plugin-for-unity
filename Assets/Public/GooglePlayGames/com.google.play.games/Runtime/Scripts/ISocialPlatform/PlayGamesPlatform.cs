@@ -227,10 +227,10 @@ namespace GooglePlayGames
         /// <remarks> After a mapping is
         /// registered, you can use <c>fromId</c> instead of <c>toId</c> when making a call.
         /// For example, the following two snippets are equivalent:
-        /// ReportProgress("Cfiwjew894_AQ", 100.0, callback);
-        /// ...is equivalent to:
-        /// AddIdMapping("super-combo", "Cfiwjew894_AQ");
-        /// ReportProgress("super-combo", 100.0, callback);
+        /// <c>ReportProgress("Cfiwjew894_AQ", 100.0, callback);</c>
+        /// is equivalent to:
+        /// <c>AddIdMapping("super-combo", "Cfiwjew894_AQ");</c>
+        /// <c>ReportProgress("super-combo", 100.0, callback);</c>
         /// </remarks>
         /// <param name='fromId'>
         /// The identifier to map.
@@ -434,7 +434,7 @@ namespace GooglePlayGames
         /// Returns the user's display name.
         /// </summary>
         /// <returns>
-        /// The user display name (e.g. "Bruno Oliveira")
+        /// The user display name. For example, "Bruno Oliveira"
         /// </returns>
         public string GetUserDisplayName()
         {
@@ -469,11 +469,11 @@ namespace GooglePlayGames
 
         /// <summary>
         /// Reports the progress of an achievement (reveal, unlock or increment). This method attempts
-        /// to implement the expected behavior of ISocialPlatform.ReportProgress as closely as possible,
+        /// to implement the expected behavior of <c>ISocialPlatform.ReportProgress</c> as closely as possible,
         /// as described below. Although this method works with incremental achievements for compatibility
         /// purposes, calling this method for incremental achievements is not recommended,
         /// since the Play Games API exposes incremental achievements in a very different way
-        /// than the interface presented by ISocialPlatform.ReportProgress. The implementation of this
+        /// than the interface presented by <c>ISocialPlatform.ReportProgress</c>. The implementation of this
         /// method for incremental achievements attempts to produce the correct result, but may be
         /// imprecise. If possible, call <see cref="IncrementAchievement" /> instead.
         /// </summary>
@@ -588,9 +588,9 @@ namespace GooglePlayGames
         /// Reveals the achievement with the passed identifier. This is a Play Games extension of the ISocialPlatform API.
         /// </summary>
         /// <remarks>If the operation succeeds, the callback
-        /// will be invoked on the game thread with true. If the operation fails, the
-        /// callback will be invoked with false. This operation will immediately fail if
-        /// the user is not authenticated (i.e. the callback will immediately be invoked with
+        /// will be invoked on the game thread with <c>true</c>. If the operation fails, the
+        /// callback will be invoked with <c>false</c>. This operation will immediately fail if
+        /// the user is not authenticated (the callback will immediately be invoked with
         /// false). If the achievement is already in a revealed state, this call will
         /// succeed immediately.
         /// </remarks>
@@ -628,10 +628,10 @@ namespace GooglePlayGames
         /// Unlocks the achievement with the passed identifier. This is a Play Games extension of the ISocialPlatform API.
         /// </summary>
         /// <remarks>If the operation succeeds, the callback
-        /// will be invoked on the game thread with true. If the operation fails, the
+        /// will be invoked on the game thread with <c>true</c>. If the operation fails, the
         /// callback will be invoked with false. This operation will immediately fail if
-        /// the user is not authenticated (i.e. the callback will immediately be invoked with
-        /// false). If the achievement is already unlocked, this call will
+        /// the user is not authenticated (the callback will immediately be invoked with
+        /// <c>false</c>). If the achievement is already unlocked, this call will
         /// succeed immediately.
         /// </remarks>
         /// <param name='achievementID'>
@@ -1207,7 +1207,7 @@ namespace GooglePlayGames
         /// <summary>
         /// Returns if the user has allowed permission for the game to access the friends list.
         /// </summary>
-        /// <param name="forceReload">If true, this call will clear any locally cached data and
+        /// <param name="forceReload">If <c>true</c>, this call will clear any locally cached data and
         /// attempt to fetch the latest data from the server. Normally, this should be set to
         /// <c>false</c> to gain advantages of data caching.</param>
         /// <param name="callback">Callback invoked upon completion.</param>

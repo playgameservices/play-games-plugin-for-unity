@@ -24,8 +24,8 @@ namespace GooglePlayGames
 
     /// <summary>
     /// Represents the Google Play Games local user, providing access to
-    /// authentication and user-specific functionality. Implements the
-    /// <see cref="ILocalUser"/> interface.
+    /// authentication and user-specific functionality. Implements Unity's
+    /// <c>ILocalUser</c> interface.
     /// </summary>
     public class PlayGamesLocalUser : PlayGamesUserProfile, ILocalUser
     {
@@ -101,9 +101,8 @@ namespace GooglePlayGames
 
         /// <summary>
         /// Gets a value indicating whether the user is underage.
-        /// This is not implemented and returns <c>true</c> as a placeholder.
         /// </summary>
-        /// <value><c>true</c>.</value>
+        /// <value>This is not implemented and returns <c>true</c> as a placeholder.</value>
         public bool underage
         {
             get { return true; }
@@ -161,18 +160,18 @@ namespace GooglePlayGames
 
 
         /// <summary>
-        /// Gets a value indicating whether this user is a friend of the local user. Always returns <c>true</c>.
+        /// Gets a value indicating whether this user is a friend of the local user.
         /// </summary>
-        /// <value><c>true</c>.</value>
+        /// <value>Always returns <c>true</c>.</value>
         public new bool isFriend
         {
             get { return true; }
         }
 
         /// <summary>
-        /// Gets the user's state. For the local user, this is always <c>UserState.Online</c>.
+        /// Gets the user's state.
         /// </summary>
-        /// <value><see cref="UserState.Online"/>.</value>
+        /// <value>For the local user, this is always <c>UserState.Online</c>.</value>
         public new UserState state
         {
             get { return UserState.Online; }
