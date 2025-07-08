@@ -2,7 +2,7 @@
     "name": "com.google.play.games",
     "displayName": "Google Play Games",
     "description": "The Google Play Games plugin for Unity allows you to access the Google Play Games API through Unity's social interface.",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "unity": "2018.4",
     "author": {
         "name": "Google LLC"

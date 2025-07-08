@@ -1,14 +1,11 @@
 NOTES ON UPGRADING
 
-Note for 2.0.0
+Note for 2.1.0
 
-The new SDK contains six changes which you should be aware of:
-1. Recall feature implementation. See [Recall for unity](https://developer.android.com/games/pgs/recall)
-2. Smoketest app is updated. 
-3. Update Android Gradle Plugin and Gradle to 7.5.1.
-4. Upgraded maven to maven-publish
-5. Pin unity-jar-resolver version to 1.2.182.
-6. Removal of PGA dependency
+The new SDK contains three changes which you should be aware of:
+1. Added support for additional auth scopes using [requestServerSideAccess](https://developer.android.com/games/pgs/unity/unity-start#retrieve-auth-codes).
+2. Removed the deprecated [Google Sign-In](https://developer.android.com/identity/legacy/gsi) dependency.
+3. Removed the deprecated [Google Drive](https://developers.google.com/android/reference/com/google/android/gms/drive/Drive) dependency.
 
 There are no major changes related to sign-in flow.
 
