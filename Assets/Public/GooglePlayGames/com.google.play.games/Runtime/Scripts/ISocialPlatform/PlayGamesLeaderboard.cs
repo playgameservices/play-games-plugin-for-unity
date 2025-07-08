@@ -24,9 +24,9 @@ namespace GooglePlayGames
     using UnityEngine.SocialPlatforms;
 
     /// <summary>
-    /// epresents a Google Play Games leaderboard, which is a concrete implementation of Unity's
-    /// generic <c>ILeaderboard</c> interface, specifically for the Google Play Games service on
-    /// Android. The class provides a way to configure and store data for a specific leaderboard.
+    /// Represents a Google Play Games leaderboard. The class provides a way to configure and store
+    /// data for a specific leaderboard.
+    /// Implements Unity's generic <c>ILeaderboard</c> interface.
     /// </summary>
     public class PlayGamesLeaderboard : ILeaderboard
     {
