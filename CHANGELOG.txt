@@ -1,6 +1,6 @@
 Version 2.1.0
     New Features:
-    * Added support for additional auth scopes using [requestServerSideAccess](https://developer.google.com/games/pgs/unity/unity-start#retrieve-auth-codes).
+    * Added support for additional auth scopes using [requestServerSideAccess](https://developer.android.com/games/pgs/unity/unity-start#retrieve-auth-codes).
 
     Deprecated Features:
     * Removed the deprecated [Google Sign-In](https://developer.android.com/identity/legacy/gsi) dependency.
