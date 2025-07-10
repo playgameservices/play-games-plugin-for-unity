@@ -38,22 +38,13 @@ namespace GooglePlayGames.Editor
             Debug.Log("GPGSUpgrader start");
 
             GPGSProjectSettings.Instance.Set(GPGSUtil.LASTUPGRADEKEY, PluginVersion.VersionKey);
-            GPGSProjectSettings.Instance.Set(GPGSUtil.PLUGINVERSIONKEY,
-                PluginVersion.VersionString);
+            GPGSProjectSettings.Instance.Set(GPGSUtil.PLUGINVERSIONKEY, PluginVersion.VersionString);
             GPGSProjectSettings.Instance.Save();
 
-            bool isChanged = false;
-            // Check that there is a AndroidManifest.xml file
-            if (!GPGSUtil.AndroidManifestExists())
-            {
-                isChanged = true;
-                GPGSUtil.GenerateAndroidManifest();
-            }
+            GPGSUtil.UpdateGameInfo();
 
-            if (isChanged)
-            {
-                AssetDatabase.Refresh();
-            }
+            AssetDatabase.Refresh();
+
             Debug.Log("GPGSUpgrader done");
         }
     }
