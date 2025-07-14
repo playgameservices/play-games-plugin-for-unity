@@ -1,4 +1,4 @@
-﻿// <copyright file="VideoCaptureState.cs" company="Google Inc.">
+// <copyright file="VideoCaptureState.cs" company="Google Inc.">
 // Copyright (C) 2016 Google Inc.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +23,9 @@ namespace GooglePlayGames.BasicApi.Video
     /// <summary>
     /// Represents the video recording capabilities.
     /// </summary>
+    /// <remarks>
+    /// @deprecated This class will be removed in the future in favor of Unity Games V2 Plugin.
+    /// </remarks>
     public class VideoCaptureState
     {
         private bool mIsCapturing;
@@ -42,18 +45,27 @@ namespace GooglePlayGames.BasicApi.Video
         }
 
         /// <summary>Returns whether the service is currently capturing or not.</summary>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public bool IsCapturing
         {
             get { return mIsCapturing; }
         }
 
         /// <summary>Returns the capture mode of the current capture.</summary>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public VideoCaptureMode CaptureMode
         {
             get { return mCaptureMode; }
         }
 
         /// <summary>Returns the quality level of the current capture.</summary>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public VideoQualityLevel QualityLevel
         {
             get { return mQualityLevel; }
@@ -63,6 +75,7 @@ namespace GooglePlayGames.BasicApi.Video
         /// Returns whether the capture overlay is currently visible or not.
         /// </summary>
         /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
         /// This also indicates the capture overlay is being used by the user and background capture will fail.
         /// </remarks>
         public bool IsOverlayVisible
@@ -74,6 +87,7 @@ namespace GooglePlayGames.BasicApi.Video
         /// Returns whether the capture is currently paused or not.
         /// </summary>
         /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
         /// Will always be <code>false</code> if <code>IsCapturing</code> if <code>false</code>.
         /// </remarks>
         public bool IsPaused
@@ -81,6 +95,12 @@ namespace GooglePlayGames.BasicApi.Video
             get { return mIsPaused; }
         }
 
+        /// <summary>
+        /// Returns a string representation of the video capture state.
+        /// </summary>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public override string ToString()
         {
             return string.Format("[VideoCaptureState: mIsCapturing={0}, mCaptureMode={1}, mQualityLevel={2}, " +

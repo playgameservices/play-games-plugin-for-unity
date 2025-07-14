@@ -1,4 +1,4 @@
-﻿// <copyright file="VideoCapabilities.cs" company="Google Inc.">
+// <copyright file="VideoCapabilities.cs" company="Google Inc.">
 // Copyright (C) 2016 Google Inc.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +23,9 @@ namespace GooglePlayGames.BasicApi.Video
     /// <summary>
     /// Represents the video recording capabilities.
     /// </summary>
+    /// <remarks>
+    /// @deprecated This class will be removed in the future in favor of Unity Games V2 Plugin.
+    /// </remarks>
     public class VideoCapabilities
     {
         private bool mIsCameraSupported;
@@ -42,24 +45,36 @@ namespace GooglePlayGames.BasicApi.Video
         }
 
         /// <summary>Returns whether the device has a front-facing camera and we can use it.</summary>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public bool IsCameraSupported
         {
             get { return mIsCameraSupported; }
         }
 
         /// <summary>Returns whether the device has a microphone and we can use it.</summary>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public bool IsMicSupported
         {
             get { return mIsMicSupported; }
         }
 
         /// <summary>Returns whether the device has an external storage device and we can use it.</summary>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public bool IsWriteStorageSupported
         {
             get { return mIsWriteStorageSupported; }
         }
 
         /// <summary>Returns whether the device supports the given capture mode.</summary>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public bool SupportsCaptureMode(VideoCaptureMode captureMode)
         {
             if (captureMode != VideoCaptureMode.Unknown)
@@ -74,6 +89,9 @@ namespace GooglePlayGames.BasicApi.Video
         }
 
         /// <summary>Returns whether the device supports the given quality level.</summary>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public bool SupportsQualityLevel(VideoQualityLevel qualityLevel)
         {
             if (qualityLevel != VideoQualityLevel.Unknown)
@@ -87,6 +105,12 @@ namespace GooglePlayGames.BasicApi.Video
             }
         }
 
+        /// <summary>
+        /// Returns a string representation of the video capabilities.
+        /// </summary>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public override string ToString()
         {
             return string.Format(

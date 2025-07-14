@@ -1,4 +1,4 @@
-﻿// <copyright file="IVideoClient.cs" company="Google Inc.">
+// <copyright file="IVideoClient.cs" company="Google Inc.">
 // Copyright (C) 2016 Google Inc.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,6 +24,7 @@ namespace GooglePlayGames.BasicApi.Video
     /// </summary>
     /// <remarks>
     /// All callbacks in this interface must be invoked on the game thread.
+    /// @deprecated This interface will be removed in the future in favor of Unity Games V2 Plugin.
     /// </remarks>
     public interface IVideoClient
     {
@@ -33,6 +34,7 @@ namespace GooglePlayGames.BasicApi.Video
         /// <remarks>Includes whether the mic or front-facing camera are supported,
         /// if the service can write to external storage, and what capture modes
         /// and quality levels are available.
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
         /// </remarks>
         /// <param name="callback">The callback for the results. The passed capabilities will be non-null if
         /// and only if the request succeeded. This callback will be invoked on the game thread.</param>
@@ -41,6 +43,9 @@ namespace GooglePlayGames.BasicApi.Video
         /// <summary>
         /// Launches the video capture overlay.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         void ShowCaptureOverlay();
 
         /// <summary>
@@ -50,6 +55,7 @@ namespace GooglePlayGames.BasicApi.Video
         /// This will inform about whether the capture overlay is visible,
         /// if the overlay is actively being used to capture, and much more.
         /// See <see cref="VideoCaptureState"/> for more details.
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
         /// </remarks>
         /// <param name="callback">The callback for the results. The passed capture state will be non-null if
         /// and only if the request succeeded. This callback will be invoked on the game thread.</param>
@@ -59,6 +65,7 @@ namespace GooglePlayGames.BasicApi.Video
         /// Fetches if the capture service is already in use or not.
         /// </summary>
         /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
         /// Use this call to check if a start capture api call will return ErrorVideoAlreadyCapturing.
         /// If this returns true, then its safe to start capturing.
         ///
@@ -74,12 +81,16 @@ namespace GooglePlayGames.BasicApi.Video
         /// Synchronous simple check to determine if the device supports capture.
         /// </summary>
         /// <returns>If video capture is supported on this device.</returns>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         bool IsCaptureSupported();
 
         /// <summary>
         /// Register a listener to listen for changes to the video capture overlay state.
         /// </summary>
         /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
         /// Note that only one overlay state listener may be active at a time.
         /// Calling this method while another overlay state listener was previously
         /// registered will replace the original listener with the new one.
@@ -90,6 +101,9 @@ namespace GooglePlayGames.BasicApi.Video
         /// <summary>
         /// Unregisters this client's overlay state update listener, if any.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         void UnregisterCaptureOverlayStateChangedListener();
     }
 }

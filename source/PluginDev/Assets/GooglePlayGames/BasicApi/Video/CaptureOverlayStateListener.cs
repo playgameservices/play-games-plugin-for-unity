@@ -1,4 +1,4 @@
-﻿// <copyright file="CaptureOverlayStateListener.cs" company="Google Inc.">
+// <copyright file="CaptureOverlayStateListener.cs" company="Google Inc.">
 // Copyright (C) 2016 Google Inc. All rights reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,12 +20,18 @@ namespace GooglePlayGames.BasicApi.Video
     /// Capture overlay state listener, will be called to notify you of changes
     /// to the state of the capture overlay.
     /// </summary>
+    /// <remarks>
+    /// @deprecated This interface will be removed in the future in favor of Unity Games V2 Plugin.
+    /// </remarks>
     public interface CaptureOverlayStateListener
     {
         /// <summary>
         /// Called when the state of the capture overlay changes.
         /// </summary>
         /// <param name="overlayState">The current capture overlay state.</param>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         void OnCaptureOverlayStateChanged(VideoCaptureOverlayState overlayState);
     }
 }
