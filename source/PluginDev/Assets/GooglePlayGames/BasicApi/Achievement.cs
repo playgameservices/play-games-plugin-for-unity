@@ -34,6 +34,7 @@ namespace GooglePlayGames.BasicApi
     /// Achievements has two types, standard which is unlocked in one step,
     /// and incremental, which require multiple steps to unlock.
     /// </para>
+    /// @deprecated This class will be removed in the future in favor of Unity Games V2 Plugin.
     /// </remarks>
     public class Achievement
     {
@@ -57,6 +58,9 @@ namespace GooglePlayGames.BasicApi
         /// Returns a <see cref="System.String"/> that represents the current <see cref="GooglePlayGames.BasicApi.Achievement"/>.
         /// </summary>
         /// <returns>A <see cref="System.String"/> that represents the current <see cref="GooglePlayGames.BasicApi.Achievement"/>.</returns>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public override string ToString()
         {
             return string.Format(
@@ -65,6 +69,12 @@ namespace GooglePlayGames.BasicApi
                 mIsRevealed, mIsUnlocked, mCurrentSteps, mTotalSteps);
         }
 
+        /// <summary>
+        /// Constructs a new <see cref="GooglePlayGames.BasicApi.Achievement"/>.
+        /// </summary>
+        /// <remarks>
+        /// @deprecated This constructor will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public Achievement()
         {
         }
@@ -72,6 +82,9 @@ namespace GooglePlayGames.BasicApi
         /// <summary>
         /// Indicates whether this achievement is incremental.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public bool IsIncremental
         {
             get { return mIsIncremental; }
@@ -82,6 +95,9 @@ namespace GooglePlayGames.BasicApi
         /// <summary>
         /// The number of steps the user has gone towards unlocking this achievement.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public int CurrentSteps
         {
             get { return mCurrentSteps; }
@@ -92,6 +108,9 @@ namespace GooglePlayGames.BasicApi
         /// <summary>
         /// The total number of steps needed to unlock this achievement.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public int TotalSteps
         {
             get { return mTotalSteps; }
@@ -102,6 +121,9 @@ namespace GooglePlayGames.BasicApi
         /// <summary>
         /// Indicates whether the achievement is unlocked or not.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public bool IsUnlocked
         {
             get { return mIsUnlocked; }
@@ -112,6 +134,9 @@ namespace GooglePlayGames.BasicApi
         /// <summary>
         /// Indicates whether the achievement is revealed or not (hidden).
         /// </summary>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public bool IsRevealed
         {
             get { return mIsRevealed; }
@@ -122,6 +147,9 @@ namespace GooglePlayGames.BasicApi
         /// <summary>
         /// The ID string of this achievement.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public string Id
         {
             get { return mId; }
@@ -132,6 +160,9 @@ namespace GooglePlayGames.BasicApi
         /// <summary>
         /// The description of this achievement.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public string Description
         {
             get { return this.mDescription; }
@@ -142,6 +173,9 @@ namespace GooglePlayGames.BasicApi
         /// <summary>
         /// The name of this achievement.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public string Name
         {
             get { return this.mName; }
@@ -153,6 +187,7 @@ namespace GooglePlayGames.BasicApi
         /// The date and time the state of the achievement was modified.
         /// </summary>
         /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
         /// The value is invalid (-1 long) if the achievement state has
         /// never been updated.
         /// </remarks>
@@ -170,6 +205,9 @@ namespace GooglePlayGames.BasicApi
         /// <summary>
         /// The number of experience points earned for unlocking this Achievement.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public ulong Points
         {
             get { return mPoints; }
@@ -180,6 +218,9 @@ namespace GooglePlayGames.BasicApi
         /// <summary>
         /// The URL to the image to display when the achievement is revealed.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public string RevealedImageUrl
         {
             get { return mRevealedImageUrl; }
@@ -190,6 +231,9 @@ namespace GooglePlayGames.BasicApi
         /// <summary>
         /// The URL to the image to display when the achievement is unlocked.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public string UnlockedImageUrl
         {
             get { return mUnlockedImageUrl; }
