@@ -1,4 +1,4 @@
-﻿// <copyright file="ISavedGameMetadata.cs" company="Google Inc.">
+// <copyright file="ISavedGameMetadata.cs" company="Google Inc.">
 // Copyright (C) 2014 Google Inc.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +22,9 @@ namespace GooglePlayGames.BasicApi.SavedGame
     /// Interface representing the metadata for a saved game. These instances are also used as handles
     /// for reading and writing the content of the underlying file.
     /// </summary>
+    /// <remarks>
+    /// @deprecated This interface will be removed in the future in favor of Unity Games V2 Plugin.
+    /// </remarks>
     public interface ISavedGameMetadata
     {
         /// <summary>
@@ -32,6 +35,9 @@ namespace GooglePlayGames.BasicApi.SavedGame
         ///
         /// </summary>
         /// <value><c>true</c> if this instance is open; otherwise, <c>false</c>.</value>
+        /// <remarks>
+        /// @deprecated This property will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         bool IsOpen { get; }
 
         /// <summary>
@@ -40,12 +46,18 @@ namespace GooglePlayGames.BasicApi.SavedGame
         /// and will between 1 and 100 characters in length (inclusive).
         /// </summary>
         /// <value>The filename.</value>
+        /// <remarks>
+        /// @deprecated This property will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         string Filename { get; }
 
         /// <summary>
         /// Returns a human-readable description of what the saved game contains. This may be null.
         /// </summary>
         /// <value>The description.</value>
+        /// <remarks>
+        /// @deprecated This property will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         string Description { get; }
 
         /// <summary>
@@ -53,6 +65,9 @@ namespace GooglePlayGames.BasicApi.SavedGame
         /// the saved game does not have a cover image.
         /// </summary>
         /// <value>The cover image URL.</value>
+        /// <remarks>
+        /// @deprecated This property will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         string CoverImageURL { get; }
 
         /// <summary>
@@ -63,6 +78,9 @@ namespace GooglePlayGames.BasicApi.SavedGame
         /// <code>TimeSpan.FromMilliseconds(0)</code>
         /// </summary>
         /// <value>The total time played.</value>
+        /// <remarks>
+        /// @deprecated This property will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         TimeSpan TotalTimePlayed { get; }
 
         /// <summary>
@@ -72,6 +90,9 @@ namespace GooglePlayGames.BasicApi.SavedGame
         /// CommitUpdate or Resolve methods).
         /// </summary>
         /// <value>The last modified timestamp.</value>
+        /// <remarks>
+        /// @deprecated This property will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         DateTime LastModifiedTimestamp { get; }
     }
 }

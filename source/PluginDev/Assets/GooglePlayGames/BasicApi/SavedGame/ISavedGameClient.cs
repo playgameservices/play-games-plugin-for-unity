@@ -1,4 +1,4 @@
-﻿// <copyright file="ISavedGameClient.cs" company="Google Inc.">
+// <copyright file="ISavedGameClient.cs" company="Google Inc.">
 // Copyright (C) 2014 Google Inc.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +23,9 @@ namespace GooglePlayGames.BasicApi.SavedGame
     /// An enum for the different strategies that can be used to resolve saved game conflicts (i.e.
     /// conflicts produced by two or more separate writes to the same saved game at once).
     /// </summary>
+    /// <remarks>
+    /// @deprecated This enum will be removed in the future in favor of Unity Games V2 Plugin.
+    /// </remarks>
     public enum ConflictResolutionStrategy
     {
         /// <summary>
@@ -32,6 +35,9 @@ namespace GooglePlayGames.BasicApi.SavedGame
         /// developer, or in the case of two saved games with equal play times,
         /// <see cref="UseOriginal"/> will be used instead.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This enum will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         UseLongestPlaytime,
 
         /// <summary>
@@ -48,27 +54,41 @@ namespace GooglePlayGames.BasicApi.SavedGame
         /// or by overwriting it with conflicting value, Z (i.e. choose "unmerged" aka
         /// <see cref="UseUnmerged"/>).
         /// </summary>
-        ///
+        /// <remarks>
+        /// @deprecated This enum will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         UseOriginal,
 
         /// <summary>
         /// See the documentation for <see cref="UseOriginal"/>
         /// </summary>
+        /// <remarks>
+        /// @deprecated This enum will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         UseUnmerged,
 
         /// <summary>
         /// Manual resolution, no automatic resolution is attempted.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This enum will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         UseManual,
 
         /// <summary>
         /// The use last known good snapshot to resolve conflicts automatically.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This enum will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         UseLastKnownGood,
 
         /// <summary>
         /// The use most recently saved snapshot to resolve conflicts automatically.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This enum will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         UseMostRecentlySaved
     }
 
@@ -79,26 +99,34 @@ namespace GooglePlayGames.BasicApi.SavedGame
         /// <summary>
         /// The request failed due to a timeout.
         /// </summary>
-        ///
+        /// <remarks>
+        /// @deprecated This enum will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         TimeoutError = -1,
 
         /// <summary>
         /// An unexpected internal error. Check the log for error messages.
         /// </summary>
-        ///
+        /// <remarks>
+        /// @deprecated This enum will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         InternalError = -2,
 
         /// <summary>
         /// A error related to authentication. This is probably due to the user being signed out
         /// before the request could be issued.
         /// </summary>
-        ///
+        /// <remarks>
+        /// @deprecated This enum will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         AuthenticationError = -3,
 
         /// <summary>
         /// The request failed because it was given bad input (e.g. a filename with 200 characters).
         /// </summary>
-        ///
+        /// <remarks>
+        /// @deprecated This enum will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         BadInputError = -4
     }
 
@@ -107,37 +135,50 @@ namespace GooglePlayGames.BasicApi.SavedGame
         /// <summary>
         /// The user selected a saved game.
         /// </summary>
+        /// <remarks>
+        /// @deprecated This enum will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         SavedGameSelected = 1,
 
         /// <summary>
         /// The user closed the UI without selecting a saved game.
         /// </summary>
-        ///
+        /// <remarks>
+        /// @deprecated This enum will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         UserClosedUI = 2,
 
         /// <summary>
         /// An unexpected internal error. Check the log for error messages.
         /// </summary>
-        ///
+        /// <remarks>
+        /// @deprecated This enum will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         InternalError = -1,
 
         /// <summary>
         /// There was a timeout while displaying the UI.
         /// </summary>
-        ///
+        /// <remarks>
+        /// @deprecated This enum will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         TimeoutError = -2,
 
         /// <summary>
         /// A error related to authentication. This is probably due to the user being signed out
         /// before the request could be issued.
         /// </summary>
-        ///
+        /// <remarks>
+        /// @deprecated This enum will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         AuthenticationError = -3,
 
         /// <summary>
         /// The request failed because it was given bad input (e.g. a filename with 200 characters).
         /// </summary>
-        ///
+        /// <remarks>
+        /// @deprecated This enum will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         BadInputError = -4,
 
         UiBusy = -5
@@ -158,6 +199,9 @@ namespace GooglePlayGames.BasicApi.SavedGame
     /// present if conflict resolution occurs on a different device. In addition, since a given saved
     /// game may have multiple conflicts, this callback must be designed to handle multiple invocations.
     /// </summary>
+    /// <remarks>
+    /// @deprecated This delegate will be removed in the future in favor of Unity Games V2 Plugin.
+    /// </remarks>
     public delegate void ConflictCallback(IConflictResolver resolver, ISavedGameMetadata original,
         byte[] originalData, ISavedGameMetadata unmerged, byte[] unmergedData);
 
@@ -203,6 +247,9 @@ namespace GooglePlayGames.BasicApi.SavedGame
     /// <para>See online <a href="https://developers.google.com/games/services/common/concepts/savedgames">
     /// documentation for Saved Games</a> for more information.</para>
     /// </summary>
+    /// <remarks>
+    /// @deprecated This interface will be removed in the future in favor of Unity Games V2 Plugin.
+    /// </remarks>
     public interface ISavedGameClient
     {
         /// <summary>
@@ -222,6 +269,9 @@ namespace GooglePlayGames.BasicApi.SavedGame
         /// <param name="callback">The callback that is invoked when this operation finishes. The
         /// returned metadata will only be non-null if the open succeeded. This callback will always
         /// execute on the game thread and the returned metadata (if any) will be "Open".</param>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         void OpenWithAutomaticConflictResolution(string filename, DataSource source,
             ConflictResolutionStrategy resolutionStrategy,
             Action<SavedGameRequestStatus, ISavedGameMetadata> callback);
@@ -252,6 +302,9 @@ namespace GooglePlayGames.BasicApi.SavedGame
         /// encountered during conflict resolution, that error will be reflected here. This callback
         /// will always execute on the game thread and the returned metadata (if any) will be "Open".
         /// </param>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         void OpenWithManualConflictResolution(string filename, DataSource source,
             bool prefetchDataOnConflict, ConflictCallback conflictCallback,
             Action<SavedGameRequestStatus, ISavedGameMetadata> completedCallback);
@@ -269,6 +322,9 @@ namespace GooglePlayGames.BasicApi.SavedGame
         /// read completed without error, the passed status will be <see cref="SavedGameRequestStatus.Success"/> and the passed
         /// bytes will correspond to the binary data for the file. In the case of
         /// </param>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         void ReadBinaryData(ISavedGameMetadata metadata,
             Action<SavedGameRequestStatus, byte[]> completedCallback);
 
@@ -293,6 +349,9 @@ namespace GooglePlayGames.BasicApi.SavedGame
         /// read. If the user backs out of the UI without selecting a saved game, this callback will
         /// receive <see cref="UserClosedUI"/> and a null saved game. This callback will always execute
         /// on the game thread.</param>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         void ShowSelectSavedGameUI(string uiTitle, uint maxDisplayedSavedGames, bool showCreateSaveUI,
             bool showDeleteSaveUI, Action<SelectUIStatus, ISavedGameMetadata> callback);
 
@@ -317,6 +376,9 @@ namespace GooglePlayGames.BasicApi.SavedGame
         /// encountered during conflict resolution, that error will be reflected here. This callback
         /// will always execute on the game thread and the returned metadata (if any) will NOT be
         /// "Open" (i.e. commiting an update closes the metadata).</param>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         void CommitUpdate(ISavedGameMetadata metadata, SavedGameMetadataUpdate updateForMetadata,
             byte[] updatedBinaryData, Action<SavedGameRequestStatus, ISavedGameMetadata> callback);
 
@@ -332,6 +394,9 @@ namespace GooglePlayGames.BasicApi.SavedGame
         /// encountered during the fetch, that error will be reflected here. This callback
         /// will always execute on the game thread and the returned metadata (if any) will NOT be
         /// "Open".</param>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         void FetchAllSavedGames(DataSource source,
             Action<SavedGameRequestStatus, List<ISavedGameMetadata>> callback);
 
@@ -341,6 +406,9 @@ namespace GooglePlayGames.BasicApi.SavedGame
         /// </summary>
         /// <param name="metadata">the saved game metadata identifying the data to
         /// delete.</param>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         void Delete(ISavedGameMetadata metadata);
     }
 
@@ -348,6 +416,9 @@ namespace GooglePlayGames.BasicApi.SavedGame
     /// An interface that allows developers to resolve metadata conflicts that may be encountered while
     /// opening saved games.
     /// </summary>
+    /// <remarks>
+    /// @deprecated This interface will be removed in the future in favor of Unity Games V2 Plugin.
+    /// </remarks>
     public interface IConflictResolver
     {
         /// <summary>
@@ -358,6 +429,9 @@ namespace GooglePlayGames.BasicApi.SavedGame
         /// <param name="chosenMetadata">The chosen metadata. This metadata must be open. If it is not
         /// open, the invokation of <see cref="NativeSavedGameClient.OpenWithManualConflictResolution"/> that produced this
         /// ConflictResolver will immediately fail with <see cref="SelectUIStatus.BadInputError"/>.</param>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         void ChooseMetadata(ISavedGameMetadata chosenMetadata);
 
         /// <summary>
@@ -367,6 +441,9 @@ namespace GooglePlayGames.BasicApi.SavedGame
         /// original or unmerged metadata provided when the callback is invoked.</param>
         /// <param name="metadataUpdate">Metadata update, same as when committing changes.</param>
         /// <param name="updatedData">Updated data to use when resolving the conflict.</param>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         void ResolveConflict(ISavedGameMetadata chosenMetadata, SavedGameMetadataUpdate metadataUpdate,
             byte[] updatedData);
     }
