@@ -1,4 +1,4 @@
-﻿// <copyright file="IEventsClient.cs" company="Google Inc.">
+// <copyright file="IEventsClient.cs" company="Google Inc.">
 // Copyright (C) 2014 Google Inc.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,6 +29,9 @@ namespace GooglePlayGames.BasicApi.Events
     ///
     /// All callbacks in this interface must be invoked on the game thread.
     /// </summary>
+    /// <remarks>
+    /// @deprecated This interface will be removed in the future in favor of Unity Games V2 Plugin.
+    /// </remarks>
     public interface IEventsClient
     {
         /// <summary>
@@ -39,6 +42,9 @@ namespace GooglePlayGames.BasicApi.Events
         /// <param name="callback">A callback for the results of the request. The passed list will only
         /// be non-empty if the request succeeded. This callback will be invoked on the game thread.
         /// </param>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         void FetchAllEvents(DataSource source, Action<ResponseStatus, List<IEvent>> callback);
 
         /// <summary>
@@ -49,6 +55,9 @@ namespace GooglePlayGames.BasicApi.Events
         /// <param name="eventId">The ID of the event.</param>
         /// <param name="callback">A callback for the result of the event. If the request failed, the
         /// passed event will be null. This callback will be invoked on the game thread.</param>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         void FetchEvent(DataSource source, string eventId, Action<ResponseStatus, IEvent> callback);
 
         /// <summary>
@@ -56,6 +65,9 @@ namespace GooglePlayGames.BasicApi.Events
         /// </summary>
         /// <param name="eventId">The ID of the event to increment.</param>
         /// <param name="stepsToIncrement">The number of steps to increment by.</param>
+        /// <remarks>
+        /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         void IncrementEvent(string eventId, uint stepsToIncrement);
     }
 }
