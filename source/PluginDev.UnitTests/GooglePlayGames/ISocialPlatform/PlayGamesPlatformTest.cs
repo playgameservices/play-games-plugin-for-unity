@@ -18,6 +18,7 @@ using NUnit.Framework;
 using GooglePlayGames.BasicApi;
 using GooglePlayGames.OurUtils;
 
+#pragma warning disable CS0618
 namespace GooglePlayGames.UnitTests {
     [TestFixture]
     public class PlayGamesPlatformTest {

@@ -38,6 +38,7 @@ namespace GooglePlayGames
     /// implementation of the ISocialPlatform interface. Methods lacking an implementation
     /// or whose behavior is at variance with the standard are noted as such.
     /// </summary>
+    [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
     public class PlayGamesPlatform : ISocialPlatform
     {
         /// <summary>Singleton instance</summary>
@@ -94,6 +95,7 @@ namespace GooglePlayGames
         /// <returns>
         /// <c>true</c> if debug log enabled; otherwise, <c>false</c>.
         /// </returns>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public static bool DebugLogEnabled
         {
             get { return GooglePlayGames.OurUtils.Logger.DebugLogEnabled; }
@@ -107,6 +109,7 @@ namespace GooglePlayGames
         /// <returns>
         /// The instance.
         /// </returns>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public static PlayGamesPlatform Instance
         {
             get
@@ -128,6 +131,7 @@ namespace GooglePlayGames
         /// is complete.
         /// </summary>
         /// <value>The nearby.</value>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public static INearbyConnectionClient Nearby
         {
             get
@@ -144,6 +148,7 @@ namespace GooglePlayGames
 
         /// <summary>Gets the saved game client object.</summary>
         /// <value>The saved game client.</value>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public ISavedGameClient SavedGame
         {
             get { return mClient.GetSavedGameClient(); }
@@ -151,6 +156,7 @@ namespace GooglePlayGames
 
         /// <summary>Gets the events client object.</summary>
         /// <value>The events client.</value>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public IEventsClient Events
         {
             get { return mClient.GetEventsClient(); }
@@ -158,6 +164,7 @@ namespace GooglePlayGames
 
         /// <summary>Gets the video client object.</summary>
         /// <value>The video client.</value>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public IVideoClient Video
         {
             get { return mClient.GetVideoClient(); }
@@ -169,6 +176,7 @@ namespace GooglePlayGames
         /// <returns>
         /// The local user.
         /// </returns>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public ILocalUser localUser
         {
             get { return mLocalUser; }
@@ -181,6 +189,7 @@ namespace GooglePlayGames
         /// Multiple calls to this method are ignored.
         /// </remarks>
         /// <param name="configuration">Configuration to use when initializing.</param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public static void InitializeInstance(PlayGamesClientConfiguration configuration)
         {
             if (sInstance == null || sInstance.mConfiguration != configuration)
@@ -201,6 +210,7 @@ namespace GooglePlayGames
         /// calls to this method are ignored.
         /// </remarks>
         /// <param name="callback">Callback invoked when  complete.</param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public static void InitializeNearby(Action<INearbyConnectionClient> callback)
         {
             Debug.Log("Calling InitializeNearby!");
@@ -243,6 +253,7 @@ namespace GooglePlayGames
         /// example, <c>Social.Active.Authenticate()</c>.
         /// </summary>
         /// <returns>The singleton <see cref="PlayGamesPlatform" /> instance.</returns>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public static PlayGamesPlatform Activate()
         {
             GooglePlayGames.OurUtils.Logger.d("Activating PlayGamesPlatform.");
@@ -258,6 +269,7 @@ namespace GooglePlayGames
         /// <remarks>This can only be called after authentication.  It affects
         /// popups for achievements and other game services elements.</remarks>
         /// <param name="gravity">Gravity for the popup.</param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void SetGravityForPopups(Gravity gravity)
         {
             mClient.SetGravityForPopups(gravity);
@@ -285,6 +297,7 @@ namespace GooglePlayGames
         /// <param name='toId'>
         /// The identifier that <c>fromId</c> will be mapped to.
         /// </param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void AddIdMapping(string fromId, string toId)
         {
             mIdMap[fromId] = toId;
@@ -298,6 +311,7 @@ namespace GooglePlayGames
         /// with <c>true</c> if authentication was successful, <c>false</c>
         /// otherwise.
         /// </param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void Authenticate(Action<bool> callback)
         {
             Authenticate(callback, false);
@@ -311,6 +325,7 @@ namespace GooglePlayGames
         /// with <c>true</c> if authentication was successful, <c>false</c>
         /// otherwise.
         /// </param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void Authenticate(Action<bool, string> callback)
         {
             Authenticate(callback, false);
@@ -333,6 +348,7 @@ namespace GooglePlayGames
         /// and, if that fails, present the user with a "Sign in" button that then
         /// triggers normal (not silent) authentication.
         /// </param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void Authenticate(Action<bool> callback, bool silent)
         {
             Authenticate((bool success, string msg) => callback(success), silent);
@@ -355,6 +371,7 @@ namespace GooglePlayGames
         /// and, if that fails, present the user with a "Sign in" button that then
         /// triggers normal (not silent) authentication.
         /// </param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void Authenticate(Action<bool, string> callback, bool silent)
         {
             Authenticate(silent ? SignInInteractivity.NoPrompt : SignInInteractivity.CanPromptAlways, status =>
@@ -386,6 +403,7 @@ namespace GooglePlayGames
         /// </summary>
         /// <param name="callback">The callback to call when authentication finishes.</param>
         /// <param name="signInInteractivity"><see cref="SignInInteractivity"/></param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void Authenticate(SignInInteractivity signInInteractivity, Action<SignInStatus> callback)
         {
             // make a platform-specific Play Games client
@@ -492,6 +510,7 @@ namespace GooglePlayGames
         /// <seealso cref="Authenticate(Action&lt;bool&gt;,bool)"/>
         /// <param name="unused">Unused parameter for this implementation.</param>
         /// <param name="callback">Callback invoked when complete.</param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void Authenticate(ILocalUser unused, Action<bool> callback)
         {
             Authenticate(callback, false);
@@ -503,6 +522,7 @@ namespace GooglePlayGames
         /// <seealso cref="Authenticate(Action&lt;bool&gt;,bool)"/>
         /// <param name="unused">Unused parameter for this implementation.</param>
         /// <param name="callback">Callback invoked when complete.</param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void Authenticate(ILocalUser unused, Action<bool, string> callback)
         {
             Authenticate(callback, false);
@@ -514,6 +534,7 @@ namespace GooglePlayGames
         /// <returns>
         /// <c>true</c> if the user is authenticated; otherwise, <c>false</c>.
         /// </returns>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public bool IsAuthenticated()
         {
             return mClient != null && mClient.IsAuthenticated();
@@ -522,6 +543,7 @@ namespace GooglePlayGames
         /// <summary>Sign out. After signing out,
         /// Authenticate must be called again to sign back in.
         /// </summary>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void SignOut()
         {
             if (mClient != null)
@@ -537,6 +559,7 @@ namespace GooglePlayGames
         /// </summary>
         /// <param name="userIds">User identifiers.</param>
         /// <param name="callback">Callback invoked when complete.</param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void LoadUsers(string[] userIds, Action<IUserProfile[]> callback)
         {
             if (!IsAuthenticated())
@@ -558,6 +581,7 @@ namespace GooglePlayGames
         /// The user's Google ID. No guarantees are made as to the meaning or format of
         /// this identifier except that it is unique to the user who is signed in.
         /// </returns>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public string GetUserId()
         {
             if (!IsAuthenticated())
@@ -573,6 +597,7 @@ namespace GooglePlayGames
         /// <summary>
         /// Get an id token for the user.
         /// </summary>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public string GetIdToken()
         {
             if (mClient != null)
@@ -593,6 +618,7 @@ namespace GooglePlayGames
         /// To get another server auth code after the initial one returned, call
         /// GetAnotherServerAuthCode().
         /// </remarks>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public string GetServerAuthCode()
         {
             if (mClient != null && mClient.IsAuthenticated())
@@ -615,6 +641,7 @@ namespace GooglePlayGames
         /// retrieving another auth code. </param>
         /// <param name="callback">Callback returning the auth code or null
         /// if there was an error.  NOTE: This callback can return immediately.</param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void GetAnotherServerAuthCode(bool reAuthenticateIfNeeded,
             Action<string> callback)
         {
@@ -647,6 +674,7 @@ namespace GooglePlayGames
         /// <summary>
         /// Gets the user's email.
         /// </summary>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public string GetUserEmail()
         {
             return mClient.GetUserEmail();
@@ -656,6 +684,7 @@ namespace GooglePlayGames
         /// Gets the player stats.
         /// </summary>
         /// <param name="callback">Callback invoked when completed.</param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void GetPlayerStats(Action<CommonStatusCodes, PlayerStats> callback)
         {
             if (mClient != null && mClient.IsAuthenticated())
@@ -677,6 +706,7 @@ namespace GooglePlayGames
         /// <returns>
         /// The user display name (e.g. "Bruno Oliveira")
         /// </returns>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public string GetUserDisplayName()
         {
             if (!IsAuthenticated())
@@ -696,6 +726,7 @@ namespace GooglePlayGames
         /// The URL, or <code>null</code> if the user is not authenticated or does not have
         /// an avatar.
         /// </returns>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public string GetUserImageUrl()
         {
             if (!IsAuthenticated())
@@ -736,6 +767,7 @@ namespace GooglePlayGames
         /// Callback that will be called to report the result of the operation: <c>true</c> on
         /// success, <c>false</c> otherwise.
         /// </param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void ReportProgress(string achievementID, double progress, Action<bool> callback)
         {
             callback = ToOnGameThread(callback);
@@ -831,6 +863,7 @@ namespace GooglePlayGames
         /// The callback to call to report the success or failure of the operation. The callback
         /// will be called with <c>true</c> to indicate success or <c>false</c> for failure.
         /// </param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void RevealAchievement(string achievementID, Action<bool> callback = null)
         {
             if (!IsAuthenticated())
@@ -871,6 +904,7 @@ namespace GooglePlayGames
         /// The callback to call to report the success or failure of the operation. The callback
         /// will be called with <c>true</c> to indicate success or <c>false</c> for failure.
         /// </param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void UnlockAchievement(string achievementID, Action<bool> callback = null)
         {
             if (!IsAuthenticated())
@@ -907,6 +941,7 @@ namespace GooglePlayGames
         /// The callback to call to report the success or failure of the operation. The callback
         /// will be called with <c>true</c> to indicate success or <c>false</c> for failure.
         /// </param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void IncrementAchievement(string achievementID, int steps, Action<bool> callback)
         {
             if (!IsAuthenticated())
@@ -947,6 +982,7 @@ namespace GooglePlayGames
         /// The callback to call to report the success or failure of the operation. The callback
         /// will be called with <c>true</c> to indicate success or <c>false</c> for failure.
         /// </param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void SetStepsAtLeast(string achievementID, int steps, Action<bool> callback)
         {
             if (!IsAuthenticated())
@@ -972,6 +1008,7 @@ namespace GooglePlayGames
         /// Loads the Achievement descriptions.
         /// </summary>
         /// <param name="callback">The callback to receive the descriptions</param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void LoadAchievementDescriptions(Action<IAchievementDescription[]> callback)
         {
             if (!IsAuthenticated())
@@ -1002,6 +1039,7 @@ namespace GooglePlayGames
         /// Loads the achievement state for the current user.
         /// </summary>
         /// <param name="callback">The callback to receive the achievements</param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void LoadAchievements(Action<IAchievement[]> callback)
         {
             if (!IsAuthenticated())
@@ -1031,6 +1069,7 @@ namespace GooglePlayGames
         /// <returns>
         /// The achievement object.
         /// </returns>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public IAchievement CreateAchievement()
         {
             return new PlayGamesAchievement();
@@ -1051,6 +1090,7 @@ namespace GooglePlayGames
         /// The callback to call to report the success or failure of the operation. The callback
         /// will be called with <c>true</c> to indicate success or <c>false</c> for failure.
         /// </param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void ReportScore(long score, string board, Action<bool> callback)
         {
             if (!IsAuthenticated())
@@ -1078,6 +1118,7 @@ namespace GooglePlayGames
         /// <param name="board">leaderboard id.</param>
         /// <param name="metadata">metadata about the score.</param>
         /// <param name="callback">Callback invoked upon completion.</param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void ReportScore(long score, string board, string metadata, Action<bool> callback)
         {
             if (!IsAuthenticated())
@@ -1109,6 +1150,7 @@ namespace GooglePlayGames
         /// </remarks>
         /// <param name="leaderboardId">Leaderboard Id</param>
         /// <param name="callback">Callback to invoke when completed.</param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void LoadScores(string leaderboardId, Action<IScore[]> callback)
         {
             LoadScores(
@@ -1131,6 +1173,7 @@ namespace GooglePlayGames
         /// <param name="collection">Collection. social or public</param>
         /// <param name="timeSpan">Time span. daily, weekly, all-time</param>
         /// <param name="callback">Callback to invoke when completed.</param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void LoadScores(
             string leaderboardId,
             LeaderboardStart start,
@@ -1166,6 +1209,7 @@ namespace GooglePlayGames
         /// <param name="token">Token used to recording the loading.</param>
         /// <param name="rowCount">Row count.</param>
         /// <param name="callback">Callback invoked when complete.</param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void LoadMoreScores(
             ScorePageToken token,
             int rowCount,
@@ -1189,6 +1233,7 @@ namespace GooglePlayGames
         /// load scores.
         /// </summary>
         /// <returns>The leaderboard object.</returns>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public ILeaderboard CreateLeaderboard()
         {
             return new PlayGamesLeaderboard(mDefaultLbUi);
@@ -1198,6 +1243,7 @@ namespace GooglePlayGames
         /// Shows the standard Google Play Games achievements user interface,
         /// which allows the player to browse their achievements.
         /// </summary>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void ShowAchievementsUI()
         {
             ShowAchievementsUI(null);
@@ -1209,6 +1255,7 @@ namespace GooglePlayGames
         /// </summary>
         /// <param name="callback">If non-null, the callback is invoked when
         /// the achievement UI is dismissed</param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void ShowAchievementsUI(Action<UIStatus> callback)
         {
             if (!IsAuthenticated())
@@ -1229,6 +1276,7 @@ namespace GooglePlayGames
         /// specific leaderboard only. Otherwise, a list of all the leaderboards
         /// will be shown.
         /// </summary>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void ShowLeaderboardUI()
         {
             GooglePlayGames.OurUtils.Logger.d("ShowLeaderboardUI with default ID");
@@ -1244,6 +1292,7 @@ namespace GooglePlayGames
         /// Google Play Games leaderboard ID or an alias configured through a call to
         /// <see cref="AddIdMapping" />.
         /// </param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void ShowLeaderboardUI(string leaderboardId)
         {
             if (leaderboardId != null)
@@ -1260,6 +1309,7 @@ namespace GooglePlayGames
         /// </summary>
         /// <param name="leaderboardId">leaderboard ID, can be null meaning all leaderboards.</param>
         /// <param name="callback">Callback to call.  If null, nothing is called.</param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void ShowLeaderboardUI(string leaderboardId, Action<UIStatus> callback)
         {
             ShowLeaderboardUI(leaderboardId, LeaderboardTimeSpan.AllTime, callback);
@@ -1272,6 +1322,7 @@ namespace GooglePlayGames
         /// <param name="leaderboardId">leaderboard ID, can be null meaning all leaderboards.</param>
         /// <param name="span">Timespan to display scores in the leaderboard.</param>
         /// <param name="callback">Callback to call.  If null, nothing is called.</param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void ShowLeaderboardUI(
             string leaderboardId,
             LeaderboardTimeSpan span,
@@ -1303,6 +1354,7 @@ namespace GooglePlayGames
         /// Google Play Games leaderboard ID or an alias configured through a call to
         /// <see cref="AddIdMapping" />.
         /// </param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void SetDefaultLeaderboardForUI(string lbid)
         {
             GooglePlayGames.OurUtils.Logger.d("SetDefaultLeaderboardForUI: " + lbid);
@@ -1323,6 +1375,7 @@ namespace GooglePlayGames
         /// </remarks>
         /// <param name="user">The current local user</param>
         /// <param name="callback">Callback invoked when complete.</param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void LoadFriends(ILocalUser user, Action<bool> callback)
         {
             if (!IsAuthenticated())
@@ -1347,6 +1400,7 @@ namespace GooglePlayGames
         /// <param name="board">The leaderboard object.  This is created by
         /// calling CreateLeaderboard(), and then initialized appropriately.</param>
         /// <param name="callback">Callback invoked when complete.</param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void LoadScores(ILeaderboard board, Action<bool> callback)
         {
             if (!IsAuthenticated())
@@ -1393,6 +1447,7 @@ namespace GooglePlayGames
         /// <summary>Asks user to give permissions for the given scopes.</summary>
         /// <param name="scopes">Scope to ask permission for</param>
         /// <param name="callback">Callback used to indicate the outcome of the operation.</param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void RequestPermission(string scope, Action<SignInStatus> callback)
         {
             RequestPermissions(new string[] {scope}, callback);
@@ -1401,6 +1456,7 @@ namespace GooglePlayGames
         /// <summary>Asks user to give permissions for the given scopes.</summary>
         /// <param name="scopes">List of scopes to ask permission for</param>
         /// <param name="callback">Callback used to indicate the outcome of the operation.</param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void RequestPermissions(string[] scopes, Action<SignInStatus> callback)
         {
             if (!IsAuthenticated())
@@ -1417,6 +1473,7 @@ namespace GooglePlayGames
         /// <summary>Returns whether or not user has given permissions for given scopes.</summary>
         /// <param name="scope">scope</param>
         /// <returns><c>true</c>, if given, <c>false</c> otherwise.</returns>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public bool HasPermission(string scope)
         {
             return HasPermissions(new string[] {scope});
@@ -1425,6 +1482,7 @@ namespace GooglePlayGames
         /// <summary>Returns whether or not user has given permissions for given scopes.</summary>
         /// <param name="scopes">array of scopes</param>
         /// <returns><c>true</c>, if given, <c>false</c> otherwise.</returns>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public bool HasPermissions(string[] scopes)
         {
             if (!IsAuthenticated())
@@ -1442,6 +1500,7 @@ namespace GooglePlayGames
         /// </summary>
         /// <returns><c>true</c>, if loading was gotten, <c>false</c> otherwise.</returns>
         /// <param name="board">The leaderboard to check for loading in progress</param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public bool GetLoading(ILeaderboard board)
         {
             return board != null && board.loading;
@@ -1458,6 +1517,7 @@ namespace GooglePlayGames
         /// The game's own display name of the current player.
         /// </param>
         /// <param name="callback">Callback invoked upon completion.</param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void ShowCompareProfileWithAlternativeNameHintsUI(string userId,
             string otherPlayerInGameName,
             string currentPlayerInGameName,
@@ -1486,6 +1546,7 @@ namespace GooglePlayGames
         /// attempt to fetch the latest data from the server. Normally, this should be set to {@code
         /// false} to gain advantages of data caching.</param>
         /// <param name="callback">Callback invoked upon completion.</param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void GetFriendsListVisibility(bool forceReload,
             Action<FriendsListVisibilityStatus> callback)
         {
@@ -1506,6 +1567,7 @@ namespace GooglePlayGames
         /// <param name="callback">The callback to invoke when complete. If null,
         /// no callback is called. </param>
         /// </summary>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void AskForLoadFriendsResolution(Action<UIStatus> callback)
         {
             if (!IsAuthenticated())
@@ -1523,6 +1585,7 @@ namespace GooglePlayGames
         /// <summary>
         /// Gets status of the last call to load friends.
         /// </summary>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public LoadFriendsStatus GetLastLoadFriendsStatus()
         {
             if (!IsAuthenticated())
@@ -1549,6 +1612,7 @@ namespace GooglePlayGames
         /// user-initiated refresh. Normally, this should be set to {@code false} to gain advantages
         /// of data caching.</param> <param name="callback">Callback invoked upon
         /// completion.</param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void LoadFriends(int pageSize, bool forceReload,
             Action<LoadFriendsStatus> callback)
         {
@@ -1572,6 +1636,7 @@ namespace GooglePlayGames
         /// guaranteed to contain at least this many if the collection contains enough records.
         /// </param>
         /// <param name="callback"></param>
+        [Obsolete("This method will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).")]
         public void LoadMoreFriends(int pageSize, Action<LoadFriendsStatus> callback)
         {
             if (!IsAuthenticated())

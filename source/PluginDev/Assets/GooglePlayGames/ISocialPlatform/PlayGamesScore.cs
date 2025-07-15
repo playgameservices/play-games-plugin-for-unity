@@ -16,6 +16,7 @@
 
 #if UNITY_ANDROID
 
+#pragma warning disable CS0618
 namespace GooglePlayGames
 {
     using System;

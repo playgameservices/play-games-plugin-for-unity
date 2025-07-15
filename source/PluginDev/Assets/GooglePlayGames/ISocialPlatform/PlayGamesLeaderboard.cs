@@ -1,4 +1,4 @@
-﻿// <copyright file="PlayGamesLeaderboard.cs" company="Google Inc.">
+// <copyright file="PlayGamesLeaderboard.cs" company="Google Inc.">
 // Copyright (C) 2015 Google Inc. All Rights Reserved.
 //
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +16,7 @@
 
 #if UNITY_ANDROID
 
+#pragma warning disable CS0618
 namespace GooglePlayGames
 {
     using System.Collections.Generic;
