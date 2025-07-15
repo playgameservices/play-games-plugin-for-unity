@@ -20,27 +20,62 @@ namespace GooglePlayGames.BasicApi.Nearby
     using System.Collections.Generic;
     using GooglePlayGames.OurUtils;
 
+    /// <summary>
+    /// Represents the result of an advertising operation in the Nearby API.
+    /// </summary>
+    /// <remarks>
+    /// @deprecated This struct will be removed in the future in favor of Unity Games V2 Plugin.
+    /// </remarks>
     public struct AdvertisingResult
     {
         private readonly ResponseStatus mStatus;
         private readonly string mLocalEndpointName;
 
+        /// <summary>
+        /// Initializes a new instance of the AdvertisingResult struct.
+        /// </summary>
+        /// <param name="status">The response status of the advertising operation.</param>
+        /// <param name="localEndpointName">The local endpoint name.</param>
+        /// <remarks>
+        /// @deprecated This constructor will be removed in the future. We recommend that you migrate to the Play Games Services Unity Plugin (v2).
+        /// </remarks>
         public AdvertisingResult(ResponseStatus status, string localEndpointName)
         {
             this.mStatus = status;
             this.mLocalEndpointName = Misc.CheckNotNull(localEndpointName);
         }
 
+        /// <summary>
+        /// @deprecated This property will be removed in the future in favor of Unity Games V2 Plugin.
+        /// Gets a value indicating whether the advertising operation succeeded.
+        /// </summary>
+        /// <remarks>
+        /// @deprecated This property will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public bool Succeeded
         {
             get { return mStatus == ResponseStatus.Success; }
         }
 
+        /// <summary>
+        /// @deprecated This property will be removed in the future in favor of Unity Games V2 Plugin.
+        /// Gets the status of the advertising operation.
+        /// </summary>
+        /// <remarks>
+        /// @deprecated This property will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public ResponseStatus Status
         {
             get { return mStatus; }
         }
 
+        /// <summary>
+        /// @deprecated This property will be removed in the future in favor of Unity Games V2 Plugin.
+        /// Gets the local endpoint name of the advertising operation.
+        /// </summary>
+        /// <remarks>
+        /// @deprecated This property will be removed in the future in favor of Unity Games V2 Plugin.
+        /// </remarks>
         public string LocalEndpointName
         {
             get { return mLocalEndpointName; }
