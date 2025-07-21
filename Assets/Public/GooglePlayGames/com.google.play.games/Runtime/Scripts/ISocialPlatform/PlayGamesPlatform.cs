@@ -903,13 +903,17 @@ namespace GooglePlayGames
         /// <param name="collection">Collection. social or public</param>
         /// <param name="timeSpan">Time span. daily, weekly, all-time</param>
         /// <param name="callback">Callback to invoke when completed.</param>
+        /// <param name="forceReload">If true, this call will clear any locally cached data and
+        /// attempt to fetch the latest data from the server. Normally, this should be set to {@code
+        /// false} to gain advantages of data caching.</param>
         public void LoadScores(
             string leaderboardId,
             LeaderboardStart start,
             int rowCount,
             LeaderboardCollection collection,
             LeaderboardTimeSpan timeSpan,
-            Action<LeaderboardScoreData> callback)
+            Action<LeaderboardScoreData> callback,
+            bool forceReload = false)
         {
             if (!IsAuthenticated())
             {
@@ -926,7 +930,8 @@ namespace GooglePlayGames
                 rowCount,
                 collection,
                 timeSpan,
-                callback);
+                callback,
+                forceReload);
         }
 
         /// <summary>
