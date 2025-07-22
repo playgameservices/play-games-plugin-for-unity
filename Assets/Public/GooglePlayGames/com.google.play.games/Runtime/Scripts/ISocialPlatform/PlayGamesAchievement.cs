@@ -172,7 +172,7 @@ namespace GooglePlayGames
             }
 
             this.mCompleted = ach.IsUnlocked;
-            this.mHidden = !ach.IsRevealed;
+            this.mHidden = !ach.IsRevealed && !ach.IsUnlocked;
             this.mLastModifiedTime = ach.LastModifiedTime;
             this.mTitle = ach.Name;
             this.mDescription = ach.Description;
@@ -215,8 +215,10 @@ namespace GooglePlayGames
                 {
 #if UNITY_2017_1_OR_NEWER
                     mImageFetcher = UnityWebRequestTexture.GetTexture(url);
+                    mImageFetcher.SendWebRequest();
 #else
                     mImageFetcher = new WWW(url);
+                    mImageFetcher.Send();
 #endif
                     mImage = null;
                 }
