@@ -176,8 +176,7 @@ namespace GooglePlayGames.Android
             }
 
             using (var client = getGamesSignInClient())
-            using (var task = client.Call<AndroidJavaObject>("requestServerSideAccess",
-                GameInfo.WebClientId, forceRefreshToken))
+            using (var task = client.Call<AndroidJavaObject>("requestServerSideAccess", GameInfo.WebClientId, forceRefreshToken))
             {
                 AndroidTaskUtils.AddOnSuccessListener<string>(
                     task,
@@ -213,7 +212,7 @@ namespace GooglePlayGames.Android
             }
 
             using (var client = getGamesSignInClient())
-            using (var task = client.Call<AndroidJavaObject>("requestServerSideAccess", WebClientId, forceRefreshToken))
+            using (var task = client.Call<AndroidJavaObject>("requestServerSideAccess", WebClientId, forceRefreshToken, javaScopesList))
             {
                 task.AddOnSuccessListener<AndroidJavaObject>(authCode => callback(ToAuthResponse(authCode))).AddOnFailureListener((exception) => {
                     OurUtils.Logger.e("Requesting server side access task failed - " + exception.Call<string>("toString"));
