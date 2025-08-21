@@ -17,13 +17,13 @@
 #if UNITY_ANDROID
 namespace GooglePlayGames.Editor
 {
-    using System.Collections.Generic;
-    using System.IO;
-    using UnityEditor.Callbacks;
-    using UnityEditor;
-    using UnityEngine;
+    using System.Linq;
 
-    public static class GPGSPostBuild
+    using UnityEditor;
+    using UnityEditor.Callbacks;
+
+
+    public class GPGSPostBuild : AssetPostprocessor
     {
         [PostProcessBuild(99999)]
         public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
@@ -36,6 +36,12 @@ namespace GooglePlayGames.Editor
             }
 
             return;
+        }
+
+        static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths, bool didDomainReload)
+        {
+            if(didDomainReload || importedAssets.Concat(deletedAssets).Concat(movedAssets).Any((path) => path.EndsWith("AndroidManifest.xml")))
+                GPGSUtil.PatchAndroidManifest();
         }
     }
 }
