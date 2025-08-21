@@ -23,10 +23,10 @@ namespace GooglePlayGames.Android
     using GooglePlayGames.BasicApi.Events;
     using GooglePlayGames.BasicApi.SavedGame;
     using GooglePlayGames.OurUtils;
+
     using System;
-    using System.Linq;
-    using System.Collections.Generic;
-    using UnityEngine;
+	using System.Collections.Generic;
+	using UnityEngine;
     using UnityEngine.SocialPlatforms;
 
     public class AndroidClient : IPlayGamesClient
@@ -169,24 +169,14 @@ namespace GooglePlayGames.Android
         {
             callback = AsOnGameThreadCallback(callback);
 
-            if (!GameInfo.WebClientIdInitialized())
-            {
-                throw new InvalidOperationException("Requesting server side access requires web " +
-                                                    "client id to be configured.");
-            }
+            if (string.IsNullOrEmpty(WebClientId) || !WebClientId.StartsWith(AppId) || !WebClientId.EndsWith(".googleusercontent.com"))
+                throw new InvalidOperationException("Requesting server side access requires web client id to be configured.");
 
             using (var client = getGamesSignInClient())
-            using (var task = client.Call<AndroidJavaObject>("requestServerSideAccess", GameInfo.WebClientId, forceRefreshToken))
+            using (var task = client.Call<AndroidJavaObject>("requestServerSideAccess", WebClientId, forceRefreshToken))
             {
-                AndroidTaskUtils.AddOnSuccessListener<string>(
-                    task,
-                    authCode => callback(authCode)
-                );
-
-                AndroidTaskUtils.AddOnFailureListener(task, exception =>
-                {
-                    OurUtils.Logger.e("Requesting server side access task failed - " +
-                                      exception.Call<string>("toString"));
+                task.AddOnSuccessListener<string>(authCode => callback(authCode)).AddOnFailureListener((exception) => {
+                    OurUtils.Logger.e("Requesting server side access task failed - " + exception.Call<string>("toString"));
                     callback(null);
                 });
             }
