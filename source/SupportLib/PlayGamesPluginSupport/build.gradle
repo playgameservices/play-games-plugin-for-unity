@@ -99,7 +99,7 @@ uploadArchives {
 }
 
 dependencies {
-    implementation 'com.google.android.gms:play-services-games:23.1.0'
+    implementation 'com.google.android.gms:play-services-games:24.0.0'
     implementation 'com.google.android.gms:play-services-auth:20.5.0'
     implementation 'com.google.android.gms:play-services-nearby:18.5.0'
 }

@@ -70,7 +70,7 @@ project.ext {
         git_exe = 'git'
     }
 
-    pluginVersion = "0.10.14"
+    pluginVersion = "0.10.15"
 
     // String for specifying the build mode.
     // If 'eap', will include all files from the 'Protected' folder.
