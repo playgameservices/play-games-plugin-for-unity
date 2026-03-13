@@ -22,6 +22,7 @@ namespace GooglePlayGames.Editor
     using System.Collections.Generic;
     using System.IO;
     using System.Xml;
+    using System.Linq;
     using UnityEditor;
     using UnityEngine;
 
@@ -108,7 +109,7 @@ namespace GooglePlayGames.Editor
         /// <remarks>The Games SDK requires additional metadata in the AndroidManifest.xml
         ///     file. </remarks>
         private const string ManifestRelativePath =
-            "../../Plugins/Android/GooglePlayGamesManifest.androidlib/AndroidManifest.xml";
+            "Plugins/Android/GooglePlayGamesManifest.androidlib/AndroidManifest.xml";
 
         private const string RootFolderName = "com.google.play.games";
 
@@ -187,7 +188,17 @@ namespace GooglePlayGames.Editor
         ///     file. </remarks>
         private static string ManifestPath
         {
-            get { return SlashesToPlatformSeparator(Path.Combine(RootPath, ManifestRelativePath)); }
+            get
+            {
+                bool isInAssetsDir = RootPath.Split(Path.DirectorySeparatorChar)
+                    .Contains("Assets");
+
+                string manifestPath = isInAssetsDir
+                    ? Path.Combine(RootPath, "../../", ManifestRelativePath)
+                    : Path.Combine(Application.dataPath, ManifestRelativePath);
+
+                return SlashesToPlatformSeparator(manifestPath);
+            }
         }
 
         /// <summary>
