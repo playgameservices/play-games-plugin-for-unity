@@ -7,5 +7,12 @@
     "author": {
         "name": "Google LLC"
     },
-    "dependencies": {}
+    "dependencies": {},
+    "samples": [
+        {
+            "displayName": "SmokeTest",
+            "description": "Google Play Games Service Samples",
+            "path": "Samples~/SmokeTest"
+        }
+    ]
 }

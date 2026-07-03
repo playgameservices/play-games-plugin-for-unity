@@ -75,7 +75,7 @@ namespace GooglePlayGames.Android
             }
         }
 
-        internal static Player ToPlayer(AndroidJavaObject player)
+        internal static PlayGamesUserProfile ToPlayer(AndroidJavaObject player)
         {
             if (player == null)
             {
@@ -84,8 +84,8 @@ namespace GooglePlayGames.Android
 
             string displayName = player.Call<String>("getDisplayName");
             string playerId = player.Call<String>("getPlayerId");
-            string avatarUrl = player.Call<String>("getIconImageUrl");
-            return new Player(displayName, playerId, avatarUrl);
+            string avatarUrl = player.Call<AndroidJavaObject>("getIconImageUri").Call<string>("toString");
+            return new PlayGamesUserProfile(displayName, playerId, avatarUrl);
         }
 
         internal static PlayerProfile ToPlayerProfile(AndroidJavaObject player) {
@@ -93,12 +93,10 @@ namespace GooglePlayGames.Android
             return null;
           }
 
-          string displayName = player.Call<String>("getDisplayName");
-          string playerId = player.Call<String>("getPlayerId");
-          string avatarUrl = player.Call<String>("getIconImageUrl");
-          bool isFriend =
-              player.Call<AndroidJavaObject>("getRelationshipInfo").Call<int>("getFriendStatus") ==
-              4 /* PlayerFriendStatus.Friend*/;
+          string displayName = player.Call<string>("getDisplayName");
+          string playerId = player.Call<string>("getPlayerId");
+          string avatarUrl = player.Call<AndroidJavaObject>("getIconImageUri").Call<string>("toString");
+          bool isFriend = player.Call<AndroidJavaObject>("getRelationshipInfo").Call<int>("getFriendStatus") == 4 /* PlayerFriendStatus.Friend*/;
           return new PlayerProfile(displayName, playerId, avatarUrl, isFriend);
         }
 

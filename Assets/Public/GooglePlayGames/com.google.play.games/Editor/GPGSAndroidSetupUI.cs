@@ -24,6 +24,10 @@ namespace GooglePlayGames.Editor
     using UnityEditor;
     using UnityEngine;
 
+#if UNITY_2021_2_OR_NEWER
+    using UnityEditor.Build;
+#endif
+
     /// <summary>
     /// Google Play Game Services Setup dialog for Android.
     /// </summary>
@@ -57,15 +61,14 @@ namespace GooglePlayGames.Editor
         /// <summary>
         /// Menus the item for GPGS android setup.
         /// </summary>
-        [MenuItem("Window/Google Play Games/Setup/Android setup...", false, 1)]
+        [MenuItem("Google/Play Games/Setup/Android setup...", false, 1)]
         public static void MenuItemFileGPGSAndroidSetup()
         {
-            EditorWindow window = EditorWindow.GetWindow(
-                typeof(GPGSAndroidSetupUI), true, GPGSStrings.AndroidSetup.Title);
+            var window = EditorWindow.GetWindow<GPGSAndroidSetupUI>(true, GPGSStrings.AndroidSetup.Title);
             window.minSize = new Vector2(500, 400);
         }
 
-        [MenuItem("Window/Google Play Games/Setup/Android setup...", true)]
+        [MenuItem("Google/Play Games/Setup/Android setup...", true)]
         public static bool EnableAndroidMenuItem()
         {
 #if UNITY_ANDROID
@@ -111,8 +114,6 @@ namespace GooglePlayGames.Editor
                 // check the bundle id and set it if needed.
                 CheckBundleId();
 
-                GPGSUtil.CheckAndFixDependencies();
-                GPGSUtil.CheckAndFixVersionedAssestsPaths();
                 AssetDatabase.Refresh();
 
                 Google.VersionHandler.VerboseLoggingEnabled = true;
@@ -162,26 +163,26 @@ namespace GooglePlayGames.Editor
                 }
             }
 
-            // check for valid app id
-            if (!GPGSUtil.LooksLikeValidAppId(appId) && string.IsNullOrEmpty(nearbySvcId))
+            if(string.IsNullOrEmpty(nearbySvcId))
             {
-                GPGSUtil.Alert(GPGSStrings.Setup.AppIdError);
-                return false;
-            }
-
-            if (nearbySvcId != null)
-            {
-#if UNITY_ANDROID
-                if (!NearbyConnectionUI.PerformSetup(nearbySvcId, true))
+                // check for valid app id
+                if (!GPGSUtil.LooksLikeValidAppId(appId))
                 {
+                    GPGSUtil.Alert(GPGSStrings.Setup.AppIdError);
                     return false;
                 }
-#endif
             }
+#if UNITY_ANDROID
+            else if (!NearbyConnectionUI.PerformSetup(nearbySvcId, true))
+            {
+                return false;
+            }
+#endif
 
             GPGSProjectSettings.Instance.Set(GPGSUtil.APPIDKEY, appId);
             GPGSProjectSettings.Instance.Set(GPGSUtil.WEBCLIENTIDKEY, webClientId);
             GPGSProjectSettings.Instance.Save();
+            GPGSUtil.PatchAndroidManifest();
             GPGSUtil.UpdateGameInfo();
 
             // check that Android SDK is there
@@ -196,7 +197,7 @@ namespace GooglePlayGames.Editor
             }
 
             // Generate AndroidManifest.xml
-            GPGSUtil.GenerateAndroidManifest();
+            GPGSUtil.UpdateGameInfo();
 
             // refresh assets, and we're done
             AssetDatabase.Refresh();
@@ -298,9 +299,8 @@ namespace GooglePlayGames.Editor
                 }
                 catch (Exception e)
                 {
-                    GPGSUtil.Alert(
-                        GPGSStrings.Error,
-                        "Invalid classname: " + e.Message);
+                    GPGSUtil.Alert(GPGSStrings.Error,"Invalid classname: " + e.Message);
+                    Debug.LogException(e);
                 }
             }
 
@@ -355,47 +355,44 @@ namespace GooglePlayGames.Editor
             string packageName = GPGSProjectSettings.Instance.Get(
                 GPGSUtil.ANDROIDBUNDLEIDKEY, string.Empty);
             string currentId;
-#if UNITY_5_6_OR_NEWER
-            currentId = PlayerSettings.GetApplicationIdentifier(
-                BuildTargetGroup.Android);
+#if UNITY_2021_2_OR_NEWER
+            currentId = PlayerSettings.GetApplicationIdentifier(NamedBuildTarget.Android);
+#elif UNITY_5_6_OR_NEWER
+            currentId = PlayerSettings.GetApplicationIdentifier(BuildTargetGroup.Android);
 #else
             currentId = PlayerSettings.bundleIdentifier;
 #endif
-            if (!string.IsNullOrEmpty(packageName))
+            if (string.IsNullOrEmpty(packageName))
             {
-                if (string.IsNullOrEmpty(currentId) ||
-                    currentId == "com.Company.ProductName")
+                Debug.Log("NULL package!!");
+            }
+            else if (string.IsNullOrEmpty(currentId) || currentId == "com.Company.ProductName")
+            {
+#if UNITY_2021_2_OR_NEWER
+                PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android, packageName);
+#elif UNITY_5_6_OR_NEWER
+                PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Android, packageName);
+#else
+                PlayerSettings.bundleIdentifier = packageName;
+#endif
+            }
+            else if (currentId != packageName)
+            {
+                if (EditorUtility.DisplayDialog(
+                    "Set Bundle Identifier?",
+                    "The server configuration is using " + packageName +
+                    ", but the player settings is set to " + currentId +
+                    ".\nSet the Bundle Identifier to " + packageName + "?",
+                    "OK", "Cancel"))
                 {
-#if UNITY_5_6_OR_NEWER
-                    PlayerSettings.SetApplicationIdentifier(
-                        BuildTargetGroup.Android, packageName);
+#if UNITY_2021_2_OR_NEWER
+                    PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android, packageName);
+#elif UNITY_5_6_OR_NEWER
+                    PlayerSettings.SetApplicationIdentifier(BuildTargetGroup.Android, packageName);
 #else
                     PlayerSettings.bundleIdentifier = packageName;
 #endif
                 }
-                else if (currentId != packageName)
-                {
-                    if (EditorUtility.DisplayDialog(
-                        "Set Bundle Identifier?",
-                        "The server configuration is using " +
-                        packageName + ", but the player settings is set to " +
-                        currentId + ".\nSet the Bundle Identifier to " +
-                        packageName + "?",
-                        "OK",
-                        "Cancel"))
-                    {
-#if UNITY_5_6_OR_NEWER
-                        PlayerSettings.SetApplicationIdentifier(
-                            BuildTargetGroup.Android, packageName);
-#else
-                        PlayerSettings.bundleIdentifier = packageName;
-#endif
-                    }
-                }
-            }
-            else
-            {
-                Debug.Log("NULL package!!");
             }
         }
 
