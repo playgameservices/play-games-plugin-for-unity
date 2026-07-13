@@ -499,17 +499,22 @@ task generate_manifest(dependsOn: [ 'inject_versionIntoMetaFiles']) {
 }
 
 
-task copy_manifestMetadata(dependsOn: generate_manifest, type: Copy) {
-  def manifestBasename = versionedAssetName(currentPluginBasename + '.txt',
-        null) + '.meta'
-  description 'Copy .meta file for the plugin manifest.'
-  from file("${pluginProj}/${editorDir}/" + manifestBasename)
-  into file("${pluginProj}/${editorDir}/")
-  rename {
-    String fn ->
-      return fn.replace(manifestBasename,
-          versionedAssetName(currentPluginBasename + '.txt',
-          "${currentPluginVersion}") + '.meta')
+task generate_manifestMetadata(dependsOn: generate_manifest) {
+  description 'Generate .meta file for the plugin manifest.'
+  doLast {
+    def manifestMetaName = versionedAssetName(currentPluginBasename + '.txt', "${currentPluginVersion}") + '.meta'
+    def metaFile = file("${pluginProj}/${editorDir}/" + manifestMetaName)
+    metaFile.write("""fileFormatVersion: 2
+guid: 693a823b8f0ad41fe8231a1b1c8a50da
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+labels:
+- gvh
+- gvh_manifest
+""")
   }
 }
 task export_legacy_package () {
@@ -543,7 +548,7 @@ task export_legacy_package () {
         runUnity(argv, logFilename)
     }
 }
-export_legacy_package.dependsOn generate_manifest, import_jarresolver, copy_manifestMetadata
+export_legacy_package.dependsOn generate_manifest, import_jarresolver, generate_manifestMetadata
 export_legacy_package.dependsOn copy_pluginProjSrc
 export_legacy_package.ext.remoteTaskPhase = 'build'
 
@@ -566,7 +571,7 @@ task export_plugin_tgz_setup() {
                     from file("${pluginProj}/Assets/GooglePlayGames/${packageName}")
                 }
             }
-            task.dependsOn generate_manifest, import_jarresolver, copy_manifestMetadata
+            task.dependsOn generate_manifest, import_jarresolver, generate_manifestMetadata
             task.dependsOn copy_pluginProjSrc
     }
 }
