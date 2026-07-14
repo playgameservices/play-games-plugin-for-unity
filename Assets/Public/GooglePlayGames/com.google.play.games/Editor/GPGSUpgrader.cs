@@ -28,6 +28,8 @@ namespace GooglePlayGames.Editor
     [InitializeOnLoad]
     public class GPGSUpgrader
     {
+        static bool sMigrated = false;
+
         /// <summary>
         /// Initializes static members of the <see cref="GooglePlayGames.GPGSUpgrader"/> class.
         /// </summary>
@@ -35,14 +37,56 @@ namespace GooglePlayGames.Editor
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode)
                 return;
+
+            // Normal interactive path: wait until AssetDatabase is fully idle
+            // (no import worker, no compile) before touching it.
+            EditorApplication.delayCall += RunMigration;
+        }
+
+        static void RunMigration()
+        {
+            if (EditorApplication.isCompiling || EditorApplication.isUpdating)
+            {
+                EditorApplication.delayCall += RunMigration; // retry next tick
+                return;
+            }
+
+            DoMigrate();
+        }
+
+        // Call this directly from any build/CI entry point
+        // Safe to call multiple times — idempotent.
+        public static void EnsureMigrated()
+        {
+            DoMigrate();
+        }
+
+        static void DoMigrate()
+        {
+            if (sMigrated) return;
+
             Debug.Log("GPGSUpgrader start");
+            bool isChanged = false;
+
+            // Migrate settings to ScriptableObject on upgrade/first-run if asset is missing
+            string resDir = "Assets/GooglePlayGames/Resources";
+            string assetPath = resDir + "/PlayGamesSettings.asset";
+            if (!File.Exists(assetPath))
+            {
+                string appId = GPGSProjectSettings.Instance.Get(GPGSUtil.APPIDKEY);
+                if (!string.IsNullOrEmpty(appId))
+                {
+                    Debug.Log("GPGSUpgrader: Migrating settings to PlayGamesSettings.asset");
+                    GPGSUtil.UpdateGameInfo();
+                    isChanged = true;
+                }
+            }
 
             GPGSProjectSettings.Instance.Set(GPGSUtil.LASTUPGRADEKEY, PluginVersion.VersionKey);
             GPGSProjectSettings.Instance.Set(GPGSUtil.PLUGINVERSIONKEY,
                 PluginVersion.VersionString);
             GPGSProjectSettings.Instance.Save();
-
-            bool isChanged = false;
+            
             // Check that there is a AndroidManifest.xml file
             if (!GPGSUtil.AndroidManifestExists())
             {
@@ -55,6 +99,8 @@ namespace GooglePlayGames.Editor
                 AssetDatabase.Refresh();
             }
             Debug.Log("GPGSUpgrader done");
+            
+            sMigrated = true;
         }
     }
 }

@@ -179,7 +179,10 @@ namespace GooglePlayGames.Editor
             }
 
             GPGSProjectSettings.Instance.Set(GPGSUtil.APPIDKEY, appId);
-            GPGSProjectSettings.Instance.Set(GPGSUtil.WEBCLIENTIDKEY, webClientId);
+            if (webClientId != null)
+            {
+                GPGSProjectSettings.Instance.Set(GPGSUtil.WEBCLIENTIDKEY, webClientId);
+            }
             GPGSProjectSettings.Instance.Save();
             GPGSUtil.UpdateGameInfo();
 

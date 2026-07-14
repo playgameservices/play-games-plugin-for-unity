@@ -49,7 +49,7 @@ namespace GooglePlayGames.Android
         private IUserProfile[] mFriends = new IUserProfile[0];
         private LoadFriendsStatus mLastLoadFriendsStatus = LoadFriendsStatus.Unknown;
 
-        AndroidJavaClass mGamesClass = new AndroidJavaClass("com.google.android.gms.games.PlayGames");
+        AndroidJavaClass mGamesClass;
         private static string TasksClassName = "com.google.android.gms.tasks.Tasks";
 
         private AndroidJavaObject mFriendsResolutionException = null;
@@ -60,6 +60,7 @@ namespace GooglePlayGames.Android
 
         internal AndroidClient()
         {
+            mGamesClass = new AndroidJavaClass("com.google.android.gms.games.PlayGames");
             PlayGamesHelperObject.CreateObject();
             InitializeSdk();
         }
@@ -185,7 +186,8 @@ namespace GooglePlayGames.Android
         {
             callback = AsOnGameThreadCallback(callback);
 
-            if (!GameInfo.WebClientIdInitialized())
+            var settings = PlayGamesSettings.LoadInstance();
+            if (settings == null || string.IsNullOrEmpty(settings.WebClientId))
             {
                 throw new InvalidOperationException("Requesting server side access requires web " +
                                                     "client id to be configured.");
@@ -193,7 +195,7 @@ namespace GooglePlayGames.Android
 
             using (var client = getGamesSignInClient())
             using (var task = client.Call<AndroidJavaObject>("requestServerSideAccess",
-                GameInfo.WebClientId, forceRefreshToken))
+                settings.WebClientId, forceRefreshToken))
             {
                 AndroidTaskUtils.AddOnSuccessListener<string>(
                     task,
@@ -213,7 +215,8 @@ namespace GooglePlayGames.Android
         {
             callback = AsOnGameThreadCallback(callback);
 
-            if (!GameInfo.WebClientIdInitialized())
+            var settings = PlayGamesSettings.LoadInstance();
+            if (settings == null || string.IsNullOrEmpty(settings.WebClientId))
             {
                 throw new InvalidOperationException("Requesting server-side access requires a web client ID to be configured.");
             }
@@ -233,7 +236,7 @@ namespace GooglePlayGames.Android
             using (var client = getGamesSignInClient())
             using (var task = client.Call<AndroidJavaObject>(
                 "requestServerSideAccess",
-                GameInfo.WebClientId,
+                settings.WebClientId,
                 forceRefreshToken,
                 javaScopesList))
             {
