@@ -21,7 +21,7 @@ allprojects {
 }
 
 /*
-    Project level variables
+    Project level variables.
 */
 project.ext {
     os_name = System.getProperty("os.name").toLowerCase();
@@ -423,32 +423,9 @@ copy_pluginProjSrc.ext.remoteTaskPhase = 'build'
 
 
 
-task generate_dependency_xml() {
-  description "Generate the JarResolver dependency file for the support library"
-  dependsOn copy_pluginProjSrc
-  doFirst {
-    def xmlFile = file("${pluginProj}/${editorDir}/${currentPluginBasename}Dependencies.xml")
-    xmlFile << '<?xml version="1.0" encoding="UTF-8" ?>\n'
-    xmlFile << '<dependencies>\n'
-    xmlFile << '<!-- Internal library dependency generated at build time. \n'
-    xmlFile << '    It also defines the transitive dependencies on play-services\n'
-    xmlFile << '-->\n'
-    xmlFile << '  <androidPackages>\n'
-    xmlFile << '    <androidPackage spec="com.google.games:gpgs-plugin-support:'
-    xmlFile << "${currentPluginVersion}\">\n"
-    xmlFile << '      <repositories>\n'
-    xmlFile << '        <repository>Assets/GooglePlayGames/com.google.play.games/Editor/m2repository</repository>\n'
-    xmlFile << '      </repositories>\n'
-    xmlFile << '    </androidPackage>\n'
-    xmlFile << '  </androidPackages>\n'
-    xmlFile << '</dependencies>\n'
-  }
-}
-
-
 task inject_versionIntoMetaFiles() {
   description 'Inject the version number into the plugin\'s meta files.'
-  dependsOn copy_pluginProjSrc, generate_dependency_xml, import_jarresolver
+  dependsOn copy_pluginProjSrc, import_jarresolver
   doLast {
     def currentManifestFile = versionedAssetName("${currentPluginBasename}.txt", "${currentPluginVersion}")
     for (fileobj in fileTree("${pluginProj}")) {
@@ -705,10 +682,36 @@ task build_java_support_lib(type: GradleBuild) {
     startParameter.projectProperties.put('projVersion',currentPluginVersion)
     startParameter.projectProperties.put('uploadDir', "${project.ext.buildPath}/m2repository")
 
-    tasks = ['build', 'publish']
+    tasks = ['build']
 }
 
 build_java_support_lib.ext.remoteTaskPhase = 'prebuild'
+
+task copy_aar_to_source(type: Copy) {
+    description "Copies compiled Android bridge AAR directly into the source and sandbox directories"
+    dependsOn build_java_support_lib
+    from "${supportLibProj}/PlayGamesPluginSupport/build/outputs/aar"
+    include "gpgs-plugin-support-release.aar"
+    
+    // Target 1: Repository source directory (for version control tracking)
+    into "Assets/Public/GooglePlayGames/com.google.play.games/Runtime/Plugins/Android"
+    rename { String filename ->
+        return "gpgs-plugin-support.aar"
+    }
+
+    // Target 2: Sandbox build directory (so it gets packaged immediately in the current run)
+    doLast {
+        copy {
+            from "${supportLibProj}/PlayGamesPluginSupport/build/outputs/aar"
+            include "gpgs-plugin-support-release.aar"
+            into "${pluginProj}/Assets/GooglePlayGames/com.google.play.games/Runtime/Plugins/Android"
+            rename { String filename ->
+                return "gpgs-plugin-support.aar"
+            }
+        }
+    }
+}
+copy_aar_to_source.ext.remoteTaskPhase = 'prebuild'
 
 task clean_support_lib(type: GradleBuild) {
     description = "cleans the client libraries for Android"

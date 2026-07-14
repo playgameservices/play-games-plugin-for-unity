@@ -113,7 +113,7 @@ namespace GooglePlayGames.Editor
         private const string RootFolderName = "com.google.play.games";
 
         /// <summary>
-        /// The root path of the Google Play Games plugin
+        /// The root path of the Google Play Games plugin.
         /// </summary>
         public static string RootPath
         {
@@ -655,36 +655,14 @@ namespace GooglePlayGames.Editor
         }
 
         /// <summary>
-        /// Checks the dependencies file and fixes repository paths
-        /// if they are incorrect (for example if the user moved plugin
-        /// into some subdirectory). This is a generated file containing
-        /// the list of dependencies that are needed for the plugin to work.
+        /// Stub to satisfy legacy script compilation.
+        /// This method previously contained logic to rewrite paths in the dependencies XML 
+        /// when resolving the local Maven repository for EDM4U. Because the plugin now includes 
+        /// the native bridge AAR directly and EDM4U fetches remote Android dependencies natively,
+        /// this manual intervention is obsolete and left empty to avoid breaking legacy integrations.
         /// </summary>
         public static void CheckAndFixDependencies()
         {
-            string depPath =
-                SlashesToPlatformSeparator(Path.Combine(GPGSUtil.RootPath,
-                    "Editor/GooglePlayGamesPluginDependencies.xml"));
-
-            XmlDocument doc = new XmlDocument();
-            doc.Load(depPath);
-
-            XmlNodeList repos = doc.SelectNodes("//androidPackage[contains(@spec,'com.google.games')]//repository");
-            foreach (XmlNode repo in repos)
-            {
-                if (!Directory.Exists(repo.InnerText))
-                {
-                    int pos = repo.InnerText.IndexOf(RootFolderName);
-                    if (pos != -1)
-                    {
-                        repo.InnerText =
-                            Path.Combine(RootPath, repo.InnerText.Substring(pos + RootFolderName.Length + 1))
-                                .Replace("\\", "/");
-                    }
-                }
-            }
-
-            doc.Save(depPath);
         }
 
         /// <summary>

@@ -111,7 +111,6 @@ namespace GooglePlayGames.Editor
                 // check the bundle id and set it if needed.
                 CheckBundleId();
 
-                GPGSUtil.CheckAndFixDependencies();
                 GPGSUtil.CheckAndFixVersionedAssestsPaths();
                 AssetDatabase.Refresh();
 

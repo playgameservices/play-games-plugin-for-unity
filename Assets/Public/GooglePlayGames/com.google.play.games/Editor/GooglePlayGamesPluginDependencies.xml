@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<dependencies><!--  Remote Android Play Services dependencies resolved online  -->
+
+  <androidPackages>
+    <androidPackage spec='com.google.android.gms:play-services-games-v2:21.0.0'>
+      <repositories>
+        <repository>https://maven.google.com/</repository>
+      </repositories>
+    </androidPackage>
+    <androidPackage spec='com.google.android.gms:play-services-nearby:18.5.0'>
+      <repositories>
+        <repository>https://maven.google.com/</repository>
+      </repositories>
+    </androidPackage>
+  </androidPackages>
+</dependencies>
