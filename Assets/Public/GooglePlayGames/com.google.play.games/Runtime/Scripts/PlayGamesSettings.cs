@@ -18,6 +18,13 @@ namespace GooglePlayGames
 {
     using UnityEngine;
 
+    /// <summary>
+    /// ScriptableObject containing configuration settings for the Google Play Games plugin.
+    /// 
+    /// Note: Do not move this file from its original location (Runtime/Scripts). The 
+    /// Editor utility GPGSUtil.RootPath relies on the physical location of this asset 
+    /// to dynamically resolve the plugin's root directory.
+    /// </summary>
     public class PlayGamesSettings : ScriptableObject
     {
         private const string SettingsFile = "PlayGamesSettings";

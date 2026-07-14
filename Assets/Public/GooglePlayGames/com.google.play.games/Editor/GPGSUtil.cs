@@ -107,8 +107,6 @@ namespace GooglePlayGames.Editor
         /// </summary>
         /// <remarks>The Games SDK requires additional metadata in the AndroidManifest.xml
         ///     file. </remarks>
-        private const string ManifestRelativePath =
-            "../../Plugins/Android/GooglePlayGamesManifest.androidlib/AndroidManifest.xml";
 
         private const string RootFolderName = "com.google.play.games";
 
@@ -121,49 +119,21 @@ namespace GooglePlayGames.Editor
             {
                 if (string.IsNullOrEmpty(mRootPath))
                 {
-#if UNITY_2018_4_OR_NEWER
-                    // Search for root path in plugin locations for both Asset packages and UPM packages
-                    string[] dirs = Directory.GetDirectories("Packages", RootFolderName, SearchOption.AllDirectories);
-                    string[] dir1 = Directory.GetDirectories("Assets", RootFolderName, SearchOption.AllDirectories);
-                    int dirsLength = dirs.Length;
-                    Array.Resize<string>(ref dirs, dirsLength + dir1.Length);
-                    Array.Copy(dir1, 0, dirs, dirsLength, dir1.Length);
-#else
-                    string[] dirs = Directory.GetDirectories("Assets", RootFolderName, SearchOption.AllDirectories);
-#endif
-                    switch (dirs.Length)
+                    var settingsHelper = ScriptableObject.CreateInstance<PlayGamesSettings>();
+                    string path = AssetDatabase.GetAssetPath(MonoScript.FromScriptableObject(settingsHelper));
+                    if (string.IsNullOrEmpty(path))
                     {
-                        case 0:
-                            Alert("Plugin error: com.google.play.games folder was renamed");
-                            throw new Exception("com.google.play.games folder was renamed");
-
-                        case 1:
-                            mRootPath = SlashesToPlatformSeparator(dirs[0]);
-                            break;
-
-                        default:
-                            for (int i = 0; i < dirs.Length; i++)
-                            {
-                                if (File.Exists(SlashesToPlatformSeparator(Path.Combine(dirs[i], GameInfoRelativePath)))
-                                )
-                                {
-                                    mRootPath = SlashesToPlatformSeparator(dirs[i]);
-                                    break;
-                                }
-                            }
-
-                            if (string.IsNullOrEmpty(mRootPath))
-                            {
-                                Alert("Plugin error: com.google.play.games folder was renamed");
-                                throw new Exception("com.google.play.games folder was renamed");
-                            }
-
-                            break;
+                        Alert("Plugin error: GPGSUtil could not resolve PlayGamesSettings path.");
+                        throw new Exception("GPGSUtil could not resolve PlayGamesSettings path.");
                     }
+                    string dir = Path.GetDirectoryName(path);
+                    if (dir.EndsWith("Scripts"))
+                    {
+                        dir = Path.GetDirectoryName(Path.GetDirectoryName(dir));
+                    }
+                    mRootPath = SlashesToPlatformSeparator(dir);
+                    ScriptableObject.DestroyImmediate(settingsHelper);
                 }
-                // UPM package root path is 'Library/PackageCache/com.google.play.games@.*/
-                // where the suffix can be a version number if installed with URS
-                // or a hash if from disk or tarball
                 if (mRootPath.Contains(RootFolderName + '@'))
                 {
                     mRootPath = mRootPath.Replace("Packages", "Library/PackageCache");
@@ -187,7 +157,7 @@ namespace GooglePlayGames.Editor
         ///     file. </remarks>
         private static string ManifestPath
         {
-            get { return SlashesToPlatformSeparator(Path.Combine(RootPath, ManifestRelativePath)); }
+            get { return SlashesToPlatformSeparator("Assets/Plugins/Android/GooglePlayGamesManifest.androidlib/AndroidManifest.xml"); }
         }
 
         /// <summary>
