@@ -285,7 +285,7 @@ namespace GooglePlayGames.Editor
         /// <param name="s">the string to test.</param>
         public static bool LooksLikeValidClientId(string s)
         {
-            return s.EndsWith(".googleusercontent.com");
+            return new System.Text.RegularExpressions.Regex(@"^[a-zA-Z0-9\-\.]+\.googleusercontent\.com$").IsMatch(s);
         }
 
         /// <summary>
@@ -525,6 +525,11 @@ namespace GooglePlayGames.Editor
         /// <param name="resourceKeys">Resource keys.</param>
         public static void WriteResourceIds(string classDirectory, string className, Hashtable resourceKeys)
         {
+            // Play Console resource IDs are short Base64URL-ish tokens. Anything else
+            // is either corrupt or hostile - refuse to emit it into compiled source.
+            System.Text.RegularExpressions.Regex safeResourceValue =
+                new System.Text.RegularExpressions.Regex(@"\A[A-Za-z0-9_\-]{1,64}\z");
+
             string constantsValues = string.Empty;
             string[] parts = className.Split('.');
             string dirName = classDirectory;
@@ -549,8 +554,15 @@ namespace GooglePlayGames.Editor
             foreach (DictionaryEntry ent in resourceKeys)
             {
                 string key = MakeIdentifier((string) ent.Key);
+                string val = (string) ent.Value;
+                if (!safeResourceValue.IsMatch(val))
+                {
+                    Alert("Resource value for '" + key + "' contains unexpected characters "
+                        + "and was skipped. Please copy the resources directly from Play Console.");
+                    continue;
+                }
                 constantsValues += "        public const string " +
-                                   key + " = \"" + ent.Value + "\"; // <GPGSID>\n";
+                                   key + " = \"" + val + "\"; // <GPGSID>\n";
             }
 
             string fileBody = GPGSUtil.ReadEditorTemplate("template-Constants");
