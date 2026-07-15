@@ -409,7 +409,12 @@ namespace GooglePlayGames.Editor
         /// <param name="res">Res. the data to parse.</param>
         private static bool ParseResources(string classDirectory, string className, string res)
         {
+            // The pasted blob is untrusted. Disable DTD/external-entity processing
+            // so a hostile <!DOCTYPE ... SYSTEM "http://..."> cannot beacon out or
+            // read local files during parse (XXE).
             XmlTextReader reader = new XmlTextReader(new StringReader(res));
+            reader.DtdProcessing = DtdProcessing.Prohibit;
+            reader.XmlResolver = null;
             bool inResource = false;
             string lastProp = null;
             Hashtable resourceKeys = new Hashtable();
@@ -432,7 +437,14 @@ namespace GooglePlayGames.Editor
                         if (lastProp == "app_id")
                         {
                             appId = reader.Value;
-                            GPGSProjectSettings.Instance.Set(GPGSUtil.APPIDKEY, appId);
+                            // Do not persist until validated: a hostile app_id would
+                            // otherwise sit in the in-memory settings and reach
+                            // GenerateAndroidManifest() unvalidated if Nearby setup is
+                            // run in the same Editor session (manifest XML injection).
+                            if (GPGSUtil.LooksLikeValidAppId(appId))
+                            {
+                                GPGSProjectSettings.Instance.Set(GPGSUtil.APPIDKEY, appId);
+                            }
                         }
                         else if (lastProp == "package_name")
                         {
