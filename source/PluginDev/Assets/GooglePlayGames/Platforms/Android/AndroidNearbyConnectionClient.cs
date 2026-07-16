@@ -169,6 +169,7 @@ namespace GooglePlayGames.Android
             Action<ConnectionResponse> responseCallback, IMessageListener listener)
         {
             Misc.CheckNotNull(listener, "listener");
+            responseCallback = ToOnGameThread(responseCallback);
             var listenerOnGameThread = new OnGameThreadMessageListener(listener);
             DiscoveringConnectionLifecycleCallback cb =
                 new DiscoveringConnectionLifecycleCallback(responseCallback, listenerOnGameThread, mClient);
@@ -185,7 +186,7 @@ namespace GooglePlayGames.Android
             mAdvertisingMessageListener = new OnGameThreadMessageListener(listener);
 
             using (var payloadCallback = new AndroidJavaObject("com.google.games.bridge.PayloadCallbackProxy",
-                new PayloadCallback(listener)))
+                new PayloadCallback(mAdvertisingMessageListener)))
             using (mClient.Call<AndroidJavaObject>("acceptConnection", remoteEndpointId, payloadCallback))
                 ;
         }
@@ -202,12 +203,15 @@ namespace GooglePlayGames.Android
 
             public void onPayloadReceived(String endpointId, AndroidJavaObject payload)
             {
-                if (payload.Call<int>("getType") != 1) // 1 for BYTES
+                using (payload)
                 {
-                    return;
-                }
+                    if (payload.Call<int>("getType") != 1) // 1 for BYTES
+                    {
+                        return;
+                    }
 
-                mListener.OnMessageReceived(endpointId, payload.Call<byte[]>("asBytes"), /* isReliableMessage */ true);
+                    mListener.OnMessageReceived(endpointId, payload.Call<byte[]>("asBytes"), /* isReliableMessage */ true);
+                }
             }
         }
 
