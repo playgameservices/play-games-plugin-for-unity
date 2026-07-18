@@ -1,5 +1,5 @@
 # Google Play Games plugin for Unity
-_Copyright (c) 2014 Google Inc. All rights reserved._
+_Copyright (c) 2021 Google Inc. All rights reserved._
 
 The Google Play Games plugin for Unity&reg; is an open-source project whose goal
 is to provide a plugin that allows game developers to integrate with
