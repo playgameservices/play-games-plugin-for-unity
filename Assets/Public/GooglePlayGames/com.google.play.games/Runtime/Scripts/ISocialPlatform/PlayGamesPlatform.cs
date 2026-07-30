@@ -150,6 +150,53 @@ namespace GooglePlayGames
         }
 
         /// <summary>
+        /// Records a single player game event.
+        /// </summary>
+        /// <param name="playerGameEvent">The event to record.</param>
+        public void RecordEvent(PlayerGameEvent playerGameEvent)
+        {
+            if (IsAuthenticated())
+            {
+                mClient.RecordEvent(playerGameEvent);
+            }
+            else
+            {
+                OurUtils.Logger.e("RecordEvent can only be called after authentication.");
+            }
+        }
+
+        /// <summary>
+        /// Records a list of player game events.
+        /// </summary>
+        /// <param name="events">The list of events to record.</param>
+        public void RecordEvents(List<PlayerGameEvent> events)
+        {
+            if (IsAuthenticated())
+            {
+                mClient.RecordEvents(events);
+            }
+            else
+            {
+                OurUtils.Logger.e("RecordEvents can only be called after authentication.");
+            }
+        }
+
+        /// <summary>
+        /// Requests an immediate upload of any pending player game events.
+        /// </summary>
+        public void RequestEventsUpload()
+        {
+            if (IsAuthenticated())
+            {
+                mClient.RequestEventsUpload();
+            }
+            else
+            {
+                OurUtils.Logger.e("RequestEventsUpload can only be called after authentication.");
+            }
+        }
+
+        /// <summary>
         /// Gets the local user.
         /// </summary>
         /// <returns>

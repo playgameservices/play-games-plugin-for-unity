@@ -401,6 +401,23 @@ namespace GooglePlayGames.BasicApi
       /// <returns>The events client.</returns>
       Events.IEventsClient GetEventsClient();
 
+      /// <summary>
+      /// Records a single player game event.
+      /// </summary>
+      /// <param name="playerGameEvent">The event to record.</param>
+      void RecordEvent(PlayerGameEvent playerGameEvent);
+
+      /// <summary>
+      /// Records a list of player game events.
+      /// </summary>
+      /// <param name="events">The list of events to record.</param>
+      void RecordEvents(List<PlayerGameEvent> events);
+
+      /// <summary>
+      /// Requests an immediate upload of any pending player game events.
+      /// </summary>
+      void RequestEventsUpload();
+
       IUserProfile[] GetFriends();
     }
 }
