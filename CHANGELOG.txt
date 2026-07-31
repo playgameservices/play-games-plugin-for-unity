@@ -1,3 +1,8 @@
+Version 2.2.0
+    New Features:
+    * Added support for Game Stats API (RecordEvent, RecordEvents, and RequestEventsUpload).
+    * Increased minimum supported Android API level (minSdkVersion) to 24 (Android 7.0 Nougat).
+
 Version 2.1.0
     New Features:
     * Added support for additional auth scopes using [requestServerSideAccess](https://developer.android.com/games/pgs/unity/unity-start#retrieve-auth-codes).

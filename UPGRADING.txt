@@ -1,5 +1,11 @@
 NOTES ON UPGRADING
 
+Note for 2.2.0
+
+1. Added support for Game Stats API (RecordEvent, RecordEvents, and RequestEventsUpload).
+2. Upgraded play-services-games-v2 dependency to 22.0.0.
+3. Increased minimum supported Android API level (minSdkVersion) to 24 (Android 7.0 Nougat).
+
 Note for 2.1.0
 
 The new SDK contains three changes which you should be aware of:

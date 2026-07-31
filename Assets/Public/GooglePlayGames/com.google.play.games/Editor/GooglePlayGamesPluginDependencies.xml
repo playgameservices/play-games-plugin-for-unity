@@ -2,7 +2,7 @@
 <dependencies><!--  Remote Android Play Services dependencies resolved online  -->
 
   <androidPackages>
-    <androidPackage spec='com.google.android.gms:play-services-games-v2:21.0.0'>
+    <androidPackage spec='com.google.android.gms:play-services-games-v2:22.0.0'>
       <repositories>
         <repository>https://maven.google.com/</repository>
       </repositories>
