@@ -885,7 +885,8 @@ namespace GooglePlayGames.Android
         public void LoadScores(string leaderboardId, LeaderboardStart start,
             int rowCount, LeaderboardCollection collection,
             LeaderboardTimeSpan timeSpan,
-            Action<LeaderboardScoreData> callback)
+            Action<LeaderboardScoreData> callback,
+            bool forceReload = false)
         {
             using (var client = getLeaderboardsClient())
             {
@@ -896,7 +897,8 @@ namespace GooglePlayGames.Android
                     leaderboardId,
                     AndroidJavaConverter.ToLeaderboardVariantTimeSpan(timeSpan),
                     AndroidJavaConverter.ToLeaderboardVariantCollection(collection),
-                    rowCount))
+                    rowCount,
+                    forceReload))
                 {
                     AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
                         task,
