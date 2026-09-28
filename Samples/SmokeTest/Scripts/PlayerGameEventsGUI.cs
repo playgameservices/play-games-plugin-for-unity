@@ -52,6 +52,10 @@ namespace SmokeTest
             {
                 RecordMultipleEvents();
             }
+            if (GUILayout.Button("Record Multiple (Imm)", GUILayout.Height(height), GUILayout.ExpandWidth(true)))
+            {
+                RecordMultipleEventsImmediate();
+            }
             if (GUILayout.Button("Request Events Upload", GUILayout.Height(height), GUILayout.ExpandWidth(true)))
             {
                 RequestEventsUpload();
@@ -119,6 +123,22 @@ namespace SmokeTest
                 .Build());
             PlayGamesPlatform.Instance.RecordEvents(events);
             mStatus = "Called RecordEvents";
+        }
+
+        internal void RecordMultipleEventsImmediate()
+        {
+            SetStandBy("Recording multiple events immediately...");
+            List<PlayerGameEvent> events = new List<PlayerGameEvent>();
+            events.Add(new PlayerGameEvent.Builder("test_event_multiple_imm_1")
+                .AddProperty("prop_str", "value1")
+                .Build());
+            events.Add(new PlayerGameEvent.Builder("test_event_multiple_imm_2")
+                .AddProperty("prop_bool", true)
+                .Build());
+            PlayGamesPlatform.Instance.RecordEventsImmediate(events, success =>
+            {
+                mStatus = "Called RecordEventsImmediate, result: " + success;
+            });
         }
 
         internal void RequestEventsUpload()
