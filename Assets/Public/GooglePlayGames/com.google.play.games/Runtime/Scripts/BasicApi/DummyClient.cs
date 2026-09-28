@@ -490,6 +490,17 @@ namespace GooglePlayGames.BasicApi
         {
             LogUsage();
         }
+
+        /// <summary>
+        /// Records a single player game event immediately.
+        /// </summary>
+        /// <param name="playerGameEvent">The event to record.</param>
+        /// <param name="callback">Callback used to indicate whether the operation succeeded.</param>
+        public void RecordEventImmediate(PlayerGameEvent playerGameEvent, Action<bool> callback)
+        {
+            LogUsage();
+            callback?.Invoke(false);
+        }
         
         /// <summary>
         /// Records a list of player game events.

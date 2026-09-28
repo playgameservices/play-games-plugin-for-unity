@@ -1225,6 +1225,50 @@ namespace GooglePlayGames.Android
             }
         }
 
+        public void RecordEventImmediate(PlayerGameEvent playerGameEvent, Action<bool> callback)
+        {
+            callback = AsOnGameThreadCallback(callback);
+            if (!IsAuthenticated())
+            {
+                OurUtils.Logger.w("Not authenticated, skipping RecordEventImmediate");
+                callback?.Invoke(false);
+                return;
+            }
+
+            if (playerGameEvent == null)
+            {
+                OurUtils.Logger.w("playerGameEvent is null, skipping RecordEventImmediate");
+                callback?.Invoke(false);
+                return;
+            }
+
+            using (var client = getGameStatsClient())
+            using (var javaEvent = ToJavaPlayerGameEvent(playerGameEvent))
+            {
+                if (javaEvent == null)
+                {
+                    OurUtils.Logger.w("Failed to convert PlayerGameEvent to Java object");
+                    callback?.Invoke(false);
+                    return;
+                }
+
+                using (var task = client.Call<AndroidJavaObject>("recordEventImmediate", javaEvent))
+                {
+                    AndroidTaskUtils.AddOnSuccessListener<AndroidJavaObject>(
+                        task,
+                        _ => callback?.Invoke(true));
+                    AndroidTaskUtils.AddOnFailureListener(
+                        task,
+                        exception =>
+                        {
+                            OurUtils.Logger.e("recordEventImmediate failed: " +
+                                (exception != null ? exception.Call<string>("toString") : "unknown error"));
+                            callback?.Invoke(false);
+                        });
+                }
+            }
+        }
+
         public void RecordEvents(List<PlayerGameEvent> events)
         {
             if (!IsAuthenticated())

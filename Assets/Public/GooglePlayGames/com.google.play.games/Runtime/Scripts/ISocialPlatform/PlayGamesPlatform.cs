@@ -166,6 +166,24 @@ namespace GooglePlayGames
         }
 
         /// <summary>
+        /// Records a single player game event immediately.
+        /// </summary>
+        /// <param name="playerGameEvent">The event to record.</param>
+        /// <param name="callback">Callback used to indicate whether the operation succeeded or failed.</param>
+        public void RecordEventImmediate(PlayerGameEvent playerGameEvent, Action<bool> callback)
+        {
+            if (IsAuthenticated())
+            {
+                mClient.RecordEventImmediate(playerGameEvent, callback);
+            }
+            else
+            {
+                OurUtils.Logger.e("RecordEventImmediate can only be called after authentication.");
+                callback?.Invoke(false);
+            }
+        }
+
+        /// <summary>
         /// Records a list of player game events.
         /// </summary>
         /// <param name="events">The list of events to record.</param>

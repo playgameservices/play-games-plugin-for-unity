@@ -44,6 +44,10 @@ namespace SmokeTest
             {
                 RecordSingleEvent();
             }
+            if (GUILayout.Button("Record Single (Imm)", GUILayout.Height(height), GUILayout.ExpandWidth(true)))
+            {
+                RecordSingleEventImmediate();
+            }
             if (GUILayout.Button("Record Multiple Events", GUILayout.Height(height), GUILayout.ExpandWidth(true)))
             {
                 RecordMultipleEvents();
@@ -88,6 +92,19 @@ namespace SmokeTest
                 .Build();
             PlayGamesPlatform.Instance.RecordEvent(playerGameEvent);
             mStatus = "Called RecordEvent";
+        }
+
+        internal void RecordSingleEventImmediate()
+        {
+            SetStandBy("Recording single event immediately...");
+            PlayerGameEvent playerGameEvent = new PlayerGameEvent.Builder("test_event_immediate")
+                .AddProperty("prop1", 123L)
+                .AddProperty("prop_duration", TimeSpan.FromMinutes(5))
+                .Build();
+            PlayGamesPlatform.Instance.RecordEventImmediate(playerGameEvent, success =>
+            {
+                mStatus = "Called RecordEventImmediate, result: " + success;
+            });
         }
 
         internal void RecordMultipleEvents()
