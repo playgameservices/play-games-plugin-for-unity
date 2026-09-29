@@ -1,5 +1,11 @@
 NOTES ON UPGRADING
 
+Note for 2.3.0
+
+1. Added support for immediate Game Stats APIs (RecordEventImmediate and RecordEventsImmediate).
+2. Added support for Duration (TimeSpan) property in PlayerGameEvent.
+3. Upgraded play-services-games-v2 dependency to 22.1.0.
+
 Note for 2.2.1
 
 1. Resolved build errors in Unity 2021 and 2022 caused by Java version requirements.
