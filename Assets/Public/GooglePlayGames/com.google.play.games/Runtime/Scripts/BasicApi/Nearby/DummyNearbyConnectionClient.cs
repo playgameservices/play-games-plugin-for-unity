@@ -93,6 +93,21 @@ namespace GooglePlayGames.BasicApi.Nearby
         }
 
         /// <summary>
+        /// Sends a connection request to the specified endpoint (auth-digit-aware overload).
+        /// </summary>
+        public void SendConnectionRequest(string name, string remoteEndpointId, byte[] payload,
+            System.Action<ConnectionRequest> initiatedCallback,
+            System.Action<ConnectionResponse> responseCallback, IMessageListener listener)
+        {
+            OurUtils.Logger.d("SendConnectionRequest called from dummy implementation");
+            if (responseCallback != null)
+            {
+                ConnectionResponse obj = ConnectionResponse.Rejected(0, string.Empty);
+                responseCallback.Invoke(obj);
+            }
+        }
+
+        /// <summary>
         /// Logs the message about accepts a connection request from the specified endpoint.
         /// </summary>
         public void AcceptConnectionRequest(string remoteEndpointId, byte[] payload, IMessageListener listener)

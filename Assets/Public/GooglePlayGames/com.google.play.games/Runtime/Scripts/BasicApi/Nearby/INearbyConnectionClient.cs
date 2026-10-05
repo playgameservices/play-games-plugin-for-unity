@@ -78,7 +78,17 @@ namespace GooglePlayGames.BasicApi.Nearby
         /// <param name="payload">The connection request payload.</param>
         /// <param name="responseCallback">Callback for the connection response.</param>
         /// <param name="listener">Listener for message events.</param>
+        [Obsolete("Auto-accepts without surfacing authentication digits; use the overload with initiatedCallback.")]
         void SendConnectionRequest(string name, string remoteEndpointId, byte[] payload,
+            Action<ConnectionResponse> responseCallback, IMessageListener listener);
+
+        /// <summary>
+        /// Sends a connection request to a remote endpoint and surfaces the
+        /// resulting <see cref="ConnectionRequest"/> (including authentication
+        /// digits) so the caller can decide whether to accept.
+        /// </summary>
+        void SendConnectionRequest(string name, string remoteEndpointId, byte[] payload,
+            Action<ConnectionRequest> initiatedCallback,
             Action<ConnectionResponse> responseCallback, IMessageListener listener);
 
         /// <summary>
