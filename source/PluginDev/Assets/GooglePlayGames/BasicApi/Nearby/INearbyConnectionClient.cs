@@ -100,7 +100,17 @@ namespace GooglePlayGames.BasicApi.Nearby
         /// <remarks>
         /// @deprecated This method will be removed in the future in favor of Unity Games V2 Plugin.
         /// </remarks>
+        [Obsolete("Auto-accepts without surfacing authentication digits; use the overload with initiatedCallback.")]
         void SendConnectionRequest(string name, string remoteEndpointId, byte[] payload,
+            Action<ConnectionResponse> responseCallback, IMessageListener listener);
+
+        /// <summary>
+        /// Sends a connection request to a remote endpoint and surfaces the
+        /// resulting <see cref="ConnectionRequest"/> (including authentication
+        /// digits) so the caller can decide whether to accept.
+        /// </summary>
+        void SendConnectionRequest(string name, string remoteEndpointId, byte[] payload,
+            Action<ConnectionRequest> initiatedCallback,
             Action<ConnectionResponse> responseCallback, IMessageListener listener);
 
         /// <summary>

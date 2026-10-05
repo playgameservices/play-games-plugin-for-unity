@@ -123,8 +123,9 @@ namespace GooglePlayGames.Android
             public void onConnectionInitiated(string endpointId, AndroidJavaObject connectionInfo)
             {
                 mLocalEndpointName = connectionInfo.Call<string>("getEndpointName");
-                mConnectionRequestCallback(new ConnectionRequest(endpointId, mLocalEndpointName, mClient.GetServiceId(),
-                    new byte[0]));
+                string authDigits = connectionInfo.Call<string>("getAuthenticationDigits");
+                mConnectionRequestCallback(new ConnectionRequest(endpointId, mLocalEndpointName,
+                    mClient.GetServiceId(), new byte[0], authDigits));
             }
 
             public void onConnectionResult(string endpointId, AndroidJavaObject connectionResolution)
@@ -165,14 +166,32 @@ namespace GooglePlayGames.Android
             mAdvertisingMessageListener = null;
         }
 
+        [Obsolete("Auto-accepts the connection without surfacing the Nearby " +
+                  "authentication digits, which makes MITM detection impossible. " +
+                  "Use the overload that takes Action<ConnectionRequest> initiatedCallback.")]
         public void SendConnectionRequest(string name, string remoteEndpointId, byte[] payload,
             Action<ConnectionResponse> responseCallback, IMessageListener listener)
         {
+            SendConnectionRequest(name, remoteEndpointId, payload,
+                req => AcceptConnectionRequest(req.RemoteEndpoint.EndpointId, new byte[0], listener),
+                responseCallback, listener);
+        }
+
+        public void SendConnectionRequest(string name, string remoteEndpointId, byte[] payload,
+            Action<ConnectionRequest> initiatedCallback,
+            Action<ConnectionResponse> responseCallback, IMessageListener listener)
+        {
             Misc.CheckNotNull(listener, "listener");
-            responseCallback = ToOnGameThread(responseCallback);
+            Misc.CheckNotNull(initiatedCallback, "initiatedCallback");
+            initiatedCallback = ToOnGameThread(initiatedCallback);
+            if (responseCallback != null)
+            {
+                responseCallback = ToOnGameThread(responseCallback);
+            }
             var listenerOnGameThread = new OnGameThreadMessageListener(listener);
             DiscoveringConnectionLifecycleCallback cb =
-                new DiscoveringConnectionLifecycleCallback(responseCallback, listenerOnGameThread, mClient);
+                new DiscoveringConnectionLifecycleCallback(initiatedCallback, responseCallback,
+                    listenerOnGameThread, this);
             using (var connectionLifecycleCallback =
                 new AndroidJavaObject("com.google.games.bridge.ConnectionLifecycleCallbackProxy", cb))
             using (mClient.Call<AndroidJavaObject>("requestConnection", name, remoteEndpointId,
@@ -244,25 +263,30 @@ namespace GooglePlayGames.Android
 
         private class DiscoveringConnectionLifecycleCallback : AndroidJavaProxy
         {
+            private Action<ConnectionRequest> mInitiatedCallback;
             private Action<ConnectionResponse> mResponseCallback;
             private IMessageListener mListener;
-            private AndroidJavaObject mClient;
+            private AndroidNearbyConnectionClient mOuter;
 
-            public DiscoveringConnectionLifecycleCallback(Action<ConnectionResponse> responseCallback,
-                IMessageListener listener, AndroidJavaObject client) : base(
+            public DiscoveringConnectionLifecycleCallback(Action<ConnectionRequest> initiatedCallback,
+                Action<ConnectionResponse> responseCallback, IMessageListener listener,
+                AndroidNearbyConnectionClient outer) : base(
                 "com/google/games/bridge/ConnectionLifecycleCallbackProxy$Callback")
             {
+                mInitiatedCallback = initiatedCallback;
                 mResponseCallback = responseCallback;
                 mListener = listener;
-                mClient = client;
+                mOuter = outer;
             }
 
             public void onConnectionInitiated(string endpointId, AndroidJavaObject connectionInfo)
             {
-                using (var payloadCallback = new AndroidJavaObject("com.google.games.bridge.PayloadCallbackProxy",
-                    new PayloadCallback(mListener)))
-                using (mClient.Call<AndroidJavaObject>("acceptConnection", endpointId, payloadCallback))
-                    ;
+                // Do NOT auto-accept. Surface the request (incl. auth digits) to
+                // the game; it must call AcceptConnectionRequest / RejectConnectionRequest.
+                string remoteName = connectionInfo.Call<string>("getEndpointName");
+                string authDigits = connectionInfo.Call<string>("getAuthenticationDigits");
+                mInitiatedCallback(new ConnectionRequest(endpointId, remoteName,
+                    mOuter.GetServiceId(), new byte[0], authDigits));
             }
 
             public void onConnectionResult(string endpointId, AndroidJavaObject connectionResolution)

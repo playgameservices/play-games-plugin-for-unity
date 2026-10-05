@@ -28,6 +28,7 @@ namespace GooglePlayGames.BasicApi.Nearby
     {
         private readonly EndpointDetails mRemoteEndpoint;
         private readonly byte[] mPayload;
+        private readonly string mAuthenticationDigits;
 
         /// <summary>
         /// Initializes a new instance of the ConnectionRequest struct.
@@ -41,10 +42,22 @@ namespace GooglePlayGames.BasicApi.Nearby
         /// </remarks>
         public ConnectionRequest(string remoteEndpointId,
             string remoteEndpointName, string serviceId, byte[] payload)
+            : this(remoteEndpointId, remoteEndpointName, serviceId, payload, null)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConnectionRequest"/> struct,
+        /// including the Nearby Connections v2 authentication digits.
+        /// </summary>
+        public ConnectionRequest(string remoteEndpointId,
+            string remoteEndpointName, string serviceId, byte[] payload,
+            string authenticationDigits)
         {
             Logger.d("Constructing ConnectionRequest");
             mRemoteEndpoint = new EndpointDetails(remoteEndpointId, remoteEndpointName, serviceId);
             this.mPayload = Misc.CheckNotNull(payload);
+            this.mAuthenticationDigits = authenticationDigits;
         }
 
         /// <summary>
@@ -67,6 +80,17 @@ namespace GooglePlayGames.BasicApi.Nearby
         public byte[] Payload
         {
             get { return mPayload; }
+        }
+
+        /// <summary>
+        /// Gets the 4-digit authentication token from GMS Nearby Connections.
+        /// Display this on both peers and have users compare out-of-band before
+        /// calling <see cref="INearbyConnectionClient.AcceptConnectionRequest"/>.
+        /// May be null on legacy code paths.
+        /// </summary>
+        public string AuthenticationDigits
+        {
+            get { return mAuthenticationDigits; }
         }
     }
 }
